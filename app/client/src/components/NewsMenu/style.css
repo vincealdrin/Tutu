@@ -1,0 +1,12 @@
+.NewsMenu {
+	position: absolute;
+	right: -1500px;
+}
+
+.Bleed {
+	display: flex;
+	height: 100px;
+	padding: 1rem;
+	background: #ea5f48;
+	align-items: center;
+}

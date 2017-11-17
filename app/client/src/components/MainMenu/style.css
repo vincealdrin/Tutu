@@ -1,0 +1,9 @@
+.InFront {
+	height: 100vh;
+	background: #fff !important;
+	position: fixed;
+	box-shadow: 0px 0px 12px #343841 !important;
+	border-right: 1px solid #aaa !important;
+	border-radius: 0 !important;
+	z-index: 10;
+}

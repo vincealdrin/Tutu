@@ -1,0 +1,15 @@
+.GridLayoutView {
+	width: 100vw;
+	min-height: 100vh;
+}
+
+.BleedColor {
+	display: flex;
+	height: 240px;
+	background: #3c4b68;
+	align-items: center;
+}
+
+.SearchBar {
+	margin-left: 120px;
+}

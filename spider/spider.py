@@ -11,16 +11,15 @@ import sys
 from random import randrange
 from fake_useragent import UserAgent
 import rethinkdb as r
+import datetime
+from urllib.parse import urldefrag
+from sumy.parsers.plaintext import PlaintextParser #We're choosing a plaintext parser here, other parsers available for HTML etc.
+from sumy.nlp.tokenizers import Tokenizer
+from sumy.summarizers.lsa import LsaSummarizer as Summarizer
+from sumy.nlp.stemmers import Stemmer
+from sumy.utils import get_stop_words
 
 load_dotenv(find_dotenv(), override=True)
-
-AMAZON_ACCESS_KEY = os.environ.get('AMAZON_ACCESS_KEY')
-AMAZON_SECRET_KEY = os.environ.get('AMAZON_SECRET_KEY')
-DB_NAME = os.environ.get('DB_NAME')
-DB_HOST = os.environ.get('DB_HOST')
-DB_PORT = os.environ.get('DB_PORT')
-
-r.connect(DB_HOST, DB_PORT)
 
 # get free proxies from us-proxy.org
 def get_proxies():
@@ -49,11 +48,26 @@ def sleep():
 
     time.sleep(slp_time)
 
-news_sources = r.table('sources').run()
+AMAZON_ACCESS_KEY = os.environ.get('AMAZON_ACCESS_KEY')
+AMAZON_SECRET_KEY = os.environ.get('AMAZON_SECRET_KEY')
+DB_NAME = os.environ.get('DB_NAME')
+DB_HOST = os.environ.get('DB_HOST')
+DB_PORT = os.environ.get('DB_PORT')
+LANGUAGE = 'english'
+SENTENCES_COUNT = 5
 
-'''
-for news_source in news_sources:
-    for url in news_source['urls']:
+stemmer = Stemmer(LANGUAGE)
+summarizer = Summarizer(stemmer)
+summarizer.stop_words = get_stop_words(LANGUAGE)
+conn = r.connect(DB_HOST, DB_PORT, db=DB_NAME)
+news_sources = r.table('sources').run(conn)
+count = 0
+
+with open('./locations-ph.json') as locations_data:
+    locations = json.load(locations_data)
+
+    for news_source in news_sources:
+        url = news_source['contentData']['dataUrl']
         config = newspaper.Config()
         config.browser_user_agent = UserAgent().random
         config.follow_meta_refresh = True
@@ -76,8 +90,13 @@ for news_source in news_sources:
             start_time = time.clock()
             sleep()
 
-            if any(na['url'] == urldefrag(article.url).url or na['url'] == urldefrag(article.url).url[:urldefrag(article.url).url.find('?')] for na in news_articles):
+            defragged_url = urldefrag(article.url).url
+            clean_url = defragged_url[:defragged_url.find('?')]
+            found_articles = r.table('articles').get_all(clean_url, index='url').run(conn)
+            print(found_articles)
+            if len(found_articles):
                 print('\n(EXISTING URL) Skipped: ' + str(article.url) + '\n')
+                # print('-- id: ': found_articles)
                 continue
 
             try:
@@ -107,16 +126,24 @@ for news_source in news_sources:
                     continue
 
                 new_article = {
+                    'source_id': news_source['id'],
                     'url': urldefrag(article.url).url,
                     'title': article.title.encode('ascii', 'ignore').decode('utf-8'),
                     'authors': article.authors,
                     'text': article.text.encode('ascii', 'ignore').decode('utf-8').replace('\n', ''),
                     'publish_date': article.publish_date.strftime('%m/%d/%Y') if article.publish_date else '',
                     'top_image': article.top_image,
-                    'source': source_info
+                    'timestamp': datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
+                    'summary': summarizer(PlaintextParser.from_string(article.text), SENTENCES_COUNT),
+                    'lan': ,
+                    'lon': ,
+                    'category': '',
+                    'sentiment': ''
                     # 'images': article.images,
                     # 'movies': article.movies
                 }
+
+                r.table('articles').insert(new_article).run(conn)
 
                 count += 1
 
@@ -128,4 +155,4 @@ for news_source in news_sources:
                 print(e)
                 continue
 
-    print('\n' + source.domain + ' done!')
+        print('\n' + source.domain + ' done!')

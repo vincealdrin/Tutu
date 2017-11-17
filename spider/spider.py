@@ -4,20 +4,23 @@ import time
 from requests import get
 from bs4 import BeautifulSoup
 import re
-from myawis.myawis import CallAwis, URLINFO_RESPONSE_GROUPS
 from dotenv import load_dotenv, find_dotenv
 import os
-from urllib.parse import urlparse, urldefrag
 import langdetect
 import sys
 from random import randrange
 from fake_useragent import UserAgent
-from uuid import uuid4
+import rethinkdb as r
 
 load_dotenv(find_dotenv(), override=True)
 
 AMAZON_ACCESS_KEY = os.environ.get('AMAZON_ACCESS_KEY')
 AMAZON_SECRET_KEY = os.environ.get('AMAZON_SECRET_KEY')
+DB_NAME = os.environ.get('DB_NAME')
+DB_HOST = os.environ.get('DB_HOST')
+DB_PORT = os.environ.get('DB_PORT')
+
+r.connect(DB_HOST, DB_PORT)
 
 # get free proxies from us-proxy.org
 def get_proxies():
@@ -46,104 +49,83 @@ def sleep():
 
     time.sleep(slp_time)
 
-def scrape(sources_json_path):
-    awis_count = 0
-    count = 0
-    folder_path = './articles-' + str(uuid4())
+news_sources = r.table('sources').run()
 
-    os.makedirs(folder_path)
-    print(folder_path + ' folder created!')
+'''
+for news_source in news_sources:
+    for url in news_source['urls']:
+        config = newspaper.Config()
+        config.browser_user_agent = UserAgent().random
+        config.follow_meta_refresh = True
+        # config.proxies = get_proxies()
 
-    with open(sources_json_path) as json_data:
-        news_sources = json.load(json_data)
-        news_articles = []
-        no_text_articles = []
-        error_sources = []
-        zero_articles_sources = []
+        try:
+            source = newspaper.build('http://'+url, config=config, memoize_articles=False)
+        except Exception as e:
+            print('(SOURCE ERROR) Source Skipped\n')
+            print(e)
+            continue
 
-        for news_source in news_sources:
-            for url in news_source['urls']:
-                config = newspaper.Config()
-                config.browser_user_agent = UserAgent().random
-                config.follow_meta_refresh = True
-                # config.proxies = get_proxies()
+        print('\n' + source.domain + ' has ' + str(len(source.articles)) + ' articles\n')
+
+        if (len(source.articles) == 0):
+            print('(ZERO ARTICLES) Source Skipped\n')
+            continue
+
+        for article in source.articles:
+            start_time = time.clock()
+            sleep()
+
+            if any(na['url'] == urldefrag(article.url).url or na['url'] == urldefrag(article.url).url[:urldefrag(article.url).url.find('?')] for na in news_articles):
+                print('\n(EXISTING URL) Skipped: ' + str(article.url) + '\n')
+                continue
+
+            try:
+                article.download()
+                article.parse()
 
                 try:
-                    source = newspaper.build('http://'+url, config=config, memoize_articles=False)
-                except Exception as e:
-                    print('(SOURCE ERROR) Source Skipped\n')
-                    print(e)
+                    if langdetect.detect(article.text) != 'en':
+                        print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
+                        continue
+                except:
+                    print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
                     continue
 
-                print('\n' + source.domain + ' has ' + str(len(source.articles)) + ' articles\n')
-
-                if (len(source.articles) == 0):
-                    print('(ZERO ARTICLES) Source Skipped\n')
-                    zero_articles_sources.append(source.url)
-                    with open(folder_path + '/zero-articles-sources.json', 'w+') as no_text_json_file:
-                        json.dump(zero_articles_sources, no_text_json_file, indent=2, default=str)
+                if  len(article.title.split()) < 5 and len(article.text.split()) < 100:
+                    print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
                     continue
 
-                for article in source.articles:
-                    start_time = time.clock()
-                    sleep()
+                if not article.text:
+                    print('\n(NO TEXT) Skipped: ' + str(article.url) + '\n')
 
-                    if any(na['url'] == urldefrag(article.url).url or na['url'] == urldefrag(article.url).url[:urldefrag(article.url).url.find('?')] for na in news_articles):
-                        print('\n(EXISTING URL) Skipped: ' + str(article.url) + '\n')
-                        continue
+                    no_text_articles.append(article.url)
 
-                    try:
-                        article.download()
-                        article.parse()
+                    with open(folder_path + '/no-text-articles.json', 'w+') as no_text_json_file:
+                        json.dump(no_text_articles, no_text_json_file, indent=2, default=str)
 
-                        try:
-                            if langdetect.detect(article.text) != 'en':
-                                print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
-                                continue
-                        except:
-                            print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
-                            continue
+                    continue
 
-                        if  len(article.title.split()) < 5 and len(article.text.split()) < 100:
-                            print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
-                            continue
+                new_article = {
+                    'url': urldefrag(article.url).url,
+                    'title': article.title.encode('ascii', 'ignore').decode('utf-8'),
+                    'authors': article.authors,
+                    'text': article.text.encode('ascii', 'ignore').decode('utf-8').replace('\n', ''),
+                    'publish_date': article.publish_date.strftime('%m/%d/%Y') if article.publish_date else '',
+                    'top_image': article.top_image,
+                    'source': source_info
+                    # 'images': article.images,
+                    # 'movies': article.movies
+                }
 
-                        if not article.text:
-                            print('\n(NO TEXT) Skipped: ' + str(article.url) + '\n')
+                count += 1
 
-                            no_text_articles.append(article.url)
+                print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
+                print('-- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
 
-                            with open(folder_path + '/no-text-articles.json', 'w+') as no_text_json_file:
-                                json.dump(no_text_articles, no_text_json_file, indent=2, default=str)
+            except newspaper.ArticleException as e:
+                print('\n(ARTICLE ERROR) Article Skipped\n')
+                print(e)
+                continue
 
-                            continue
-
-                        new_article = {
-                            'url': urldefrag(article.url).url,
-                            'title': article.title.encode('ascii', 'ignore').decode('utf-8'),
-                            'authors': article.authors,
-                            'text': article.text.encode('ascii', 'ignore').decode('utf-8').replace('\n', ''),
-                            'publish_date': article.publish_date.strftime('%m/%d/%Y') if article.publish_date else '',
-                            'top_image': article.top_image,
-                            'source': source_info
-                            # 'images': article.images,
-                            # 'movies': article.movies
-                        }
-
-                        news_articles.append(new_article)
-                        count += 1
-
-                        print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
-                        print('-- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
-
-                        with open(folder_path + '/articles.json', 'w+') as json_file:
-                            json.dump(news_articles, json_file, indent=2, sort_keys=True, default=str)
-
-                    except newspaper.ArticleException as e:
-                        print('\n(ARTICLE ERROR) Article Skipped\n')
-                        print(e)
-                        continue
-
-            print('\n' + source.domain + ' done!')
-
-scrape(sys.argv[1])
+    print('\n' + source.domain + ' done!')

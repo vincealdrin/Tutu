@@ -19,7 +19,6 @@ const getSourceInfo = (url) => new Promise((resolve, reject) => {
     ResponseGroup: responseGroups.join(),
   }, (err, info) => {
     if (err) reject(err);
-
     resolve(info);
   });
 });
@@ -43,7 +42,7 @@ const getAboutContactUrl = async (url) => {
       aboutUsUrl = `http:${aboutUsUrl}`;
     }
 
-    if (!/^https?:\/\//.test(aboutUsUrl)) {
+    if (aboutUsUrl && !/^https?:\/\//.test(aboutUsUrl)) {
       aboutUsUrl = `http://${aboutUsUrl}`;
     }
 
@@ -53,17 +52,34 @@ const getAboutContactUrl = async (url) => {
       })
       .attr('href') || '';
 
-
     if (contactUsUrl[0] === '/') {
       contactUsUrl = url + contactUsUrl;
     }
 
     if (contactUsUrl.substring(0, 2) === '//') {
-      contactUsUrl = `http:${aboutUsUrl}`;
+      contactUsUrl = `http:${contactUsUrl}`;
     }
 
-    if (!/^https?:\/\//.test(contactUsUrl)) {
+    if (contactUsUrl && !/^https?:\/\//.test(contactUsUrl)) {
       contactUsUrl = `http://${contactUsUrl}`;
+    }
+
+    if (!aboutUsUrl) {
+      $('a').each(function() {
+        if ((/about-? ?us?/i).test($(this).attr('href'))) {
+          aboutUsUrl = $(this).attr('href');
+          return false;
+        }
+      });
+    }
+
+    if (!contactUsUrl) {
+      $('a').each(function() {
+        if ((/about-? ?us?/i).test($(this).attr('href'))) {
+          aboutUsUrl = $(this).attr('href');
+          return false;
+        }
+      });
     }
 
     return { aboutUsUrl, contactUsUrl };
@@ -106,17 +122,19 @@ module.exports = (conn, socket) => {
 
   router.post('/', async (req, res, next) => {
     const sources = req.body;
-    const sourcesInfo = sources.map(async ({ source }) => {
-      const { aboutUsUrl, contactUsUrl } = await getAboutContactUrl(source);
-      const info = await getSourceInfo(source);
+    const sourcesInfo = await Promise.all(sources.map(async (source) => {
+      const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
+
+      const { aboutUsUrl, contactUsUrl } = await getAboutContactUrl(url);
+      const infoPromise = await getSourceInfo(source);
+      const info = await infoPromise;
       delete info.contactInfo;
 
       return { ...info, aboutUsUrl, contactUsUrl };
-    });
+    }));
 
     try {
       const { generated_keys } = await r.table(tbl).insert(sourcesInfo).run(conn);
-
       return res.json(sourcesInfo.map((info, i) => ({
         ...info,
         id: generated_keys[i],

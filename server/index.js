@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const socketIo = require('socket.io');
 const morgan = require('morgan');
@@ -9,8 +11,6 @@ const errorhandler = require('errorhandler');
 const initDb = require('./db');
 const routes = require('./routes');
 const r = require('rethinkdb');
-
-require('dotenv').config();
 
 const app = express();
 const server = http.Server(app);

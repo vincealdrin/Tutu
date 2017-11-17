@@ -1,0 +1,40 @@
+{
+  "extends": "airbnb-base",
+  "plugins": [
+    "import"
+  ],
+  "rules": {
+    "indent": [
+      "error",
+      2
+    ],
+    "comma-dangle": [
+      "warn",
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "ignore"
+      }
+    ],
+    "new-cap": "off",
+    "no-underscore-dangle": "off",
+    "arrow-parens": [
+      "warn",
+      "always"
+    ],
+    "one-var": "off",
+    "no-tabs": "off",
+    "semi": "error",
+    "consistent-return": "off",
+    "no-param-reassign": "warn",
+    "linebreak-style": "off",
+    "space-before-function-paren": "off",
+    "func-names": "off",
+    "radix": "off",
+    "prefer-arrow-callback": "warn",
+    "sort-imports": "error",
+    "camelcase": "warn"
+  }
+}

@@ -32,20 +32,37 @@ if (isProduction) {
 
 initDb((conn) => {
   io.sockets.on('connection', (socket) => {
-    r.table('articles').changes().run(conn, (err, cursor) => {
-      if (err) throw err;
-
-      socket.emit('new_articles', cursor.toArray());
-    });
-
-    r.table('sources').changes().run(conn, (err, cursor) => {
-      if (err) throw err;
-
-      socket.emit('new_sources', cursor.toArray());
-    });
-
-    app.use(routes(conn, socket));
+    console.log(`${socket.id}has connected`);
   });
+
+  r.table('articles').changes().run(conn, (err, cursor) => {
+    if (err) throw err;
+
+    cursor.each((e, article) => {
+      if (e) throw e;
+      io.emit('new_articles', article);
+    });
+  });
+
+  r.table('sources').changes().run(conn, (err, cursor) => {
+    if (err) throw err;
+
+    cursor.each((e, source) => {
+      if (e) throw e;
+      io.emit('new_sources', source);
+    });
+  });
+
+  r.table('users').changes().run(conn, (err, cursor) => {
+    if (err) throw err;
+
+    cursor.each((e, user) => {
+      if (e) throw e;
+      io.emit('new_users', user);
+    });
+  });
+
+  app.use(routes(conn, io));
 
   // / catch 404 and forward to error handler
   app.use((req, res, next) => {

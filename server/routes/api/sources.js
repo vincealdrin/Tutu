@@ -1,8 +1,77 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const awis = require('awis');
-const request = require('request');
+const rp = require('request-promise');
 const cheerio = require('cheerio');
+
+const awisClient = awis({
+  key: process.env.AMAZON_ACCESS_KEY,
+  secret: process.env.AMAZON_SECRET_KEY,
+});
+
+const responseGroups = ['RelatedLinks', 'Categories', 'Rank', 'ContactInfo', 'RankByCountry',
+  'UsageStats', 'Speed', 'Language', 'OwnedDomains', 'LinksInCount',
+  'SiteData', 'AdultContent'];
+const getSourceInfo = (url) => new Promise((resolve, reject) => {
+  awisClient({
+    Action: 'UrlInfo',
+    Url: url,
+    ResponseGroup: responseGroups.join(),
+  }, (err, info) => {
+    if (err) reject(err);
+
+    resolve(info);
+  });
+});
+
+const getAboutContactUrl = async (url) => {
+  try {
+    const htmlDoc = await rp(url);
+    const $ = cheerio.load(htmlDoc);
+
+    let aboutUsUrl = $('a:contains("About")')
+      .filter(function() {
+        return (/about ?(us)?/i).test($(this).text());
+      })
+      .attr('href') || '';
+
+    if (aboutUsUrl[0] === '/') {
+      aboutUsUrl = url + aboutUsUrl;
+    }
+
+    if (aboutUsUrl.substring(0, 2) === '//') {
+      aboutUsUrl = `http:${aboutUsUrl}`;
+    }
+
+    if (!/^https?:\/\//.test(aboutUsUrl)) {
+      aboutUsUrl = `http://${aboutUsUrl}`;
+    }
+
+    let contactUsUrl = $('a:contains("Contact")')
+      .filter(function() {
+        return (/contact ?(us)?/i).test($(this).text());
+      })
+      .attr('href') || '';
+
+
+    if (contactUsUrl[0] === '/') {
+      contactUsUrl = url + contactUsUrl;
+    }
+
+    if (contactUsUrl.substring(0, 2) === '//') {
+      contactUsUrl = `http:${aboutUsUrl}`;
+    }
+
+    if (!/^https?:\/\//.test(contactUsUrl)) {
+      contactUsUrl = `http://${contactUsUrl}`;
+    }
+
+    return { aboutUsUrl, contactUsUrl };
+  } catch (e) {
+    console.error(e);
+    return { error: 'Source Error' };
+  }
+};
 
 module.exports = (conn, socket) => {
   const tbl = 'sources';
@@ -23,7 +92,7 @@ module.exports = (conn, socket) => {
     }
   });
 
-  router.get('/:sourceId', async (req, res) => {
+  router.get('/:sourceId', async (req, res, next) => {
     const { sourceId } = req.params;
 
     try {
@@ -35,20 +104,29 @@ module.exports = (conn, socket) => {
     }
   });
 
-  router.post('/', async (req, res) => {
+  router.post('/', async (req, res, next) => {
     const sources = req.body;
+    const sourcesInfo = sources.map(async ({ source }) => {
+      const { aboutUsUrl, contactUsUrl } = await getAboutContactUrl(source);
+      const info = await getSourceInfo(source);
+      delete info.contactInfo;
+
+      return { ...info, aboutUsUrl, contactUsUrl };
+    });
 
     try {
-      const { generated_keys } = await r.table(tbl).insert(sources).run(conn);
+      const { generated_keys } = await r.table(tbl).insert(sourcesInfo).run(conn);
 
-
-      return res.json(generated_keys);
+      return res.json(sourcesInfo.map((info, i) => ({
+        ...info,
+        id: generated_keys[i],
+      })));
     } catch (e) {
       next(e);
     }
   });
 
-  router.put('/:sourceId', async (req, res) => {
+  router.put('/:sourceId', async (req, res, next) => {
     const { sourceId } = req.params;
     const source = req.body;
 
@@ -61,7 +139,7 @@ module.exports = (conn, socket) => {
     }
   });
 
-  router.delete('/', async (req, res) => {
+  router.delete('/', async (req, res, next) => {
     const { ids = [] } = req.body;
 
     try {
@@ -73,7 +151,7 @@ module.exports = (conn, socket) => {
     }
   });
 
-  router.delete('/:sourceId', async (req, res) => {
+  router.delete('/:sourceId', async (req, res, next) => {
     const { sourceId = '' } = req.params;
 
     try {

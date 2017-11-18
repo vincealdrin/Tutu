@@ -52,10 +52,36 @@ def sleep(should_slp):
 
         time.sleep(slp_time)
 
-def clean_body(text):
-    clean_text = text.encode('ascii', 'ignore').decode('utf-8').replace('\n', '')
-    clean_text = clean_text.replace('ADVERTISEMENT', '')
-    return clean_text
+
+def get_author(html_doc):
+    soup = BeautifulSoup(html_doc, 'html.parser')
+    anchors = soup.find_all('a', href=True)
+    author = ''
+
+    for anchor in anchors:
+        if 'author' in anchor['href'] and anchor:
+            author = anchor.extract().get_text()
+
+    if not author:
+        byline_tags = soup.select('[class*=byline]')
+        for byline_tag in byline_tags:
+            author = byline_tag.extract().get_text()
+            if author:
+                break
+
+    if not author:
+        byline_tags = soup.select('[id*=byline]')
+        for byline_tag in byline_tags:
+            author = byline_tag.extract().get_text()
+            if author:
+                break
+
+    author = re.sub('(?i)By ?', '', author)
+
+    if len(author) > 50:
+        author = ''
+
+    return author.strip()
 
 AMAZON_ACCESS_KEY = os.environ.get('AMAZON_ACCESS_KEY')
 AMAZON_SECRET_KEY = os.environ.get('AMAZON_SECRET_KEY')
@@ -128,7 +154,12 @@ for news_source in news_sources:
             article.parse()
             article.nlp()
 
-            body = clean_body(article.text)
+            categories = []
+            category1 = text_client.UnsupervisedClassify({ 'url': article.url, 'class': classes[:5] })
+            category2 = text_client.UnsupervisedClassify({ 'url': article.url, 'class': classes[5:] })
+            categories = category1['classes'] + category2['classes']
+
+            body = category1['text']
 
             try:
                 if langdetect.detect(body) != 'en':
@@ -176,12 +207,6 @@ for news_source in news_sources:
                     print('\n(NOT PH RELATED) Skipped: ' + str(article.url) + '\n')
                     continue
 
-            categories = []
-            category1 = text_client.UnsupervisedClassify({ 'url': article.url, 'class': classes[:5] })
-            category2 = text_client.UnsupervisedClassify({ 'url': article.url, 'class': classes[5:] })
-            categories.append(category1)
-            categories.append(category2)
-
             summary_sentences = []
             for summary in summarizer(PlaintextParser.from_string(body, Tokenizer(LANGUAGE)).document, SENTENCES_COUNT):
                 summary_sentences.append(str(summary))
@@ -191,6 +216,11 @@ for news_source in news_sources:
                 'polarity': blob.polarity,
                 'subjectivity': blob.subjectivity
             }
+
+            if not article.authors:
+                author = get_author(article.html)
+                if author:
+                    article.authors.append(author)
 
             new_article = {
                 'id': url_uuid,
@@ -218,7 +248,7 @@ for news_source in news_sources:
 
             aylien_status = text_client.RateLimits()
             print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
-            print('AYLIEN REMAINING CALL: '+aylien_status['remaining'] + ' -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
+            print('AYLIEN REMAINING CALL: '+str(aylien_status['remaining'])+' -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
             should_slp = True
 
         except newspaper.ArticleException as e:

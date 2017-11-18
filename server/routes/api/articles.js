@@ -47,7 +47,10 @@ module.exports = (conn, socket) => {
   });
 
   router.post('/', async (req, res) => {
-    const articles = req.body;
+    const articles = req.body.map((article) => ({
+      ...articles,
+      id: r.uuid(article.url),
+    }));
 
     try {
       const { generated_keys } = await r.table(tbl).insert(articles).run(conn);

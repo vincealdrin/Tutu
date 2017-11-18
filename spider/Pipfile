@@ -25,6 +25,8 @@ scipy = "*"
 socketio-client = "*"
 rethinkdb = "*"
 sumy = "*"
+matplotlib = "*"
+aylien-apiclient = "*"
 
 
 [dev-packages]

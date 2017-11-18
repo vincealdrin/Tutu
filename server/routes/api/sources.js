@@ -130,15 +130,17 @@ module.exports = (conn, socket) => {
       const info = await infoPromise;
       delete info.contactInfo;
 
-      return { ...info, aboutUsUrl, contactUsUrl };
+      return {
+        ...info,
+        aboutUsUrl,
+        contactUsUrl,
+        id: r.uuid(url),
+      };
     }));
 
     try {
-      const { generated_keys } = await r.table(tbl).insert(sourcesInfo).run(conn);
-      return res.json(sourcesInfo.map((info, i) => ({
-        ...info,
-        id: generated_keys[i],
-      })));
+      await r.table(tbl).insert(sourcesInfo).run(conn);
+      return res.json(sourcesInfo);
     } catch (e) {
       next(e);
     }

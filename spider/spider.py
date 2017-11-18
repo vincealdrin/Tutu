@@ -45,14 +45,17 @@ def get_proxies():
 
     return proxies
 
-def sleep():
-    slp_time = randrange(2, 6)
-    print('\n> ' + str(slp_time) + 's sleep...\n')
+def sleep(should_slp):
+    if should_slp:
+        slp_time = randrange(2, 6)
+        print('\n> ' + str(slp_time) + 's sleep...\n')
 
-    time.sleep(slp_time)
+        time.sleep(slp_time)
 
 def clean_body(text):
-    return text.encode('ascii', 'ignore').decode('utf-8').replace('\n', '').replace('ADVERTISEMENT', '')
+    clean_text = text.encode('ascii', 'ignore').decode('utf-8').replace('\n', '')
+    clean_text = clean_text.replace('ADVERTISEMENT', '')
+    return clean_text
 
 AMAZON_ACCESS_KEY = os.environ.get('AMAZON_ACCESS_KEY')
 AMAZON_SECRET_KEY = os.environ.get('AMAZON_SECRET_KEY')
@@ -75,17 +78,16 @@ news_sources = list(r.table('sources').run(conn))
 
 text_client = textapi.Client("c5db8a0f", "59ec79539dafd44df50d93cd19b2f947")
 classes = [
-    'Business', 'Economy', 'Finance',
-    'Industries', 'Lifestyle','Entertainment',
-    'Sports', 'Government', 'Politics', 'Law',
-    'Health', 'Technology', 'Crime', 'Weather',
-    'Transportation', 'Nation', 'Regional'
+    'Business', 'Economy', 'Lifestyle',
+    'Entertainment', 'Sports', 'Government & Politics',
+    'Health', 'Science & Technology', 'Crime', 'Weather'
 ]
 count = 0
 
-if not len(news_sources):
+if not news_sources:
     print('EMPTY NEWS SOURCES')
 
+should_slp = False
 for news_source in news_sources:
     url = news_source['contentData']['dataUrl']
     config = newspaper.Config()
@@ -102,13 +104,13 @@ for news_source in news_sources:
 
     print('\n' + source.domain + ' has ' + str(len(source.articles)) + ' articles\n')
 
-    if (len(source.articles) == 0):
+    if (not source.articles):
         print('(ZERO ARTICLES) Source Skipped\n')
         continue
 
     for article in source.articles:
         start_time = time.clock()
-        sleep()
+        sleep(should_slp)
 
         defragged_url = urldefrag(article.url).url
         clean_url = defragged_url[:defragged_url.find('?')]
@@ -116,8 +118,9 @@ for news_source in news_sources:
         found_article = r.table('articles').get(url_uuid).run(conn)
 
         if found_article:
-            print('\n(EXISTING URL) Skipped: ' + str(article.url) + '\n')
-            print(' --' + found_article['url'])
+            print('\n(EXISTING URL) Skipped: ' + str(article.url))
+            print(' -- ' + found_article['id'] + '\n')
+            should_slp = False
             continue
 
         try:
@@ -156,20 +159,38 @@ for news_source in news_sources:
             for location in locations:
                 location_pattern = re.compile('(?i)(City of '+location['location']+'|'+location['location']+' City|'+location['location']+' Municipality|'+location['location']+')+?,? ?('+location['province']+' Province|'+location['province']+'|Metro '+location['province']+')+?,? ?(Philippines|PH)?')
 
-                if location_pattern.match(body) or location_pattern.match(article.title):
+                if location_pattern.search(body) or location_pattern.search(article.title):
                     matched_locations.append(location['id'])
+                    break
 
-            if not len(matched_locations):
+            if not matched_locations:
                 for province in provinces:
                     province_pattern = re.compile('(?i)('+province['province']+' Province|'+province['province']+'|Metro '+province['province']+'|'+province['province']+')+?,? ?(Philippines|PH)?')
-                    print(province_pattern)
-                    if province_pattern.match(body) or province_pattern.match(article.title):
+                    if province_pattern.search(body) or province_pattern.search(article.title):
                         matched_locations.append(province['id'])
+                        break
 
-            if not len(matched_locations):
-                if not nation_pattern.match(body) and not nation_pattern.match(article.title):
+
+            if not matched_locations:
+                if not nation_pattern.search(body) and not nation_pattern.search(article.title):
                     print('\n(NOT PH RELATED) Skipped: ' + str(article.url) + '\n')
                     continue
+
+            categories = []
+            category1 = text_client.UnsupervisedClassify({ 'url': article.url, 'class': classes[:5] })
+            category2 = text_client.UnsupervisedClassify({ 'url': article.url, 'class': classes[5:] })
+            categories.append(category1)
+            categories.append(category2)
+
+            summary_sentences = []
+            for summary in summarizer(PlaintextParser.from_string(body, Tokenizer(LANGUAGE)).document, SENTENCES_COUNT):
+                summary_sentences.append(str(summary))
+
+            blob = TextBlob(body)
+            sentiment = {
+                'polarity': blob.polarity,
+                'subjectivity': blob.subjectivity
+            }
 
             new_article = {
                 'id': url_uuid,
@@ -181,12 +202,12 @@ for news_source in news_sources:
                 'publishDate': article.publish_date.strftime('%m/%d/%Y') if article.publish_date else '',
                 'top_image': article.top_image,
                 'timestamp': datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
-                'summary': summarizer(PlaintextParser.from_string(body), SENTENCES_COUNT),
-                'summary2': aritcle.summary,
+                'summary': summary_sentences,
+                'summary2': article.summary,
                 'keywords': article.keywords,
                 'locations': matched_locations,
-                'category': text_client.UnsupervisedClassify({ "url": article.url, "classes": classes }),
-                'sentiment': TextBlob(body).sentiment
+                'categories': categories,
+                'sentiment': sentiment
                 # 'images': article.images,
                 # 'movies': article.movies
             }
@@ -195,9 +216,10 @@ for news_source in news_sources:
 
             count += 1
 
+            aylien_status = text_client.RateLimits()
             print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
-
-            print('AYLIEN API LIMIT: '+json.dumps(text_client.RateLimits())+' -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
+            print('AYLIEN REMAINING CALL: '+aylien_status['remaining'] + ' -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
+            should_slp = True
 
         except newspaper.ArticleException as e:
             print('\n(ARTICLE ERROR) Article Skipped\n')

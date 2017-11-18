@@ -51,6 +51,9 @@ def sleep():
 
     time.sleep(slp_time)
 
+def clean_body(text):
+    return text.encode('ascii', 'ignore').decode('utf-8').replace('\n', '').replace('ADVERTISEMENT', '')
+
 AMAZON_ACCESS_KEY = os.environ.get('AMAZON_ACCESS_KEY')
 AMAZON_SECRET_KEY = os.environ.get('AMAZON_SECRET_KEY')
 DB_NAME = os.environ.get('DB_NAME')
@@ -120,21 +123,23 @@ for news_source in news_sources:
         try:
             article.download()
             article.parse()
-            artile.nlp()
+            article.nlp()
+
+            body = clean_body(article.text)
 
             try:
-                if langdetect.detect(article.text) != 'en':
+                if langdetect.detect(body) != 'en':
                     print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
                     continue
             except:
                 print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
                 continue
 
-            if  len(article.title.split()) < 5 and len(article.text.split()) < 100:
+            if  len(article.title.split()) < 5 and len(body.split()) < 100:
                 print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
                 continue
 
-            if not article.text:
+            if not body:
                 print('\n(NO TEXT) Skipped: ' + str(article.url) + '\n')
 
                 no_text_articles.append(article.url)
@@ -144,25 +149,26 @@ for news_source in news_sources:
 
                 continue
 
-            nation_pattern = re.compile('(?i)^(-+)?(PH|Philippines|Pilipinas|Filipino|Pilipino|Pinoy)(-*)?$')
+            nation_terms = 'PH|Philippines|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos'
+            nation_pattern = re.compile('(\W('+nation_terms+')$|^('+nation_terms+')\W|\W('+nation_terms+')\W)')
 
             matched_locations = []
             for location in locations:
-                location_pattern = re.compile('(?i)(City of '+location['location']+'|'+location['location']+' City|'+location['location']+' Municipality)+?,? ?('+location['province']+' Province|'+location['province']+'|Metro '+location['province']+')+?,? ?(Philippines|PH)?')
+                location_pattern = re.compile('(?i)(City of '+location['location']+'|'+location['location']+' City|'+location['location']+' Municipality|'+location['location']+')+?,? ?('+location['province']+' Province|'+location['province']+'|Metro '+location['province']+')+?,? ?(Philippines|PH)?')
 
-                if (location_pattern.match(article.text)):
+                if location_pattern.match(body) or location_pattern.match(article.title):
                     matched_locations.append(location['id'])
 
             if not len(matched_locations):
                 for province in provinces:
-                    province_pattern = re.compile('(?i)('+province['province']+' Province|'+province['province']+'|Metro '+province['province']+')+?,? ?(Philippines|PH)?')
-
-                    if (province_pattern.match(article.text)):
+                    province_pattern = re.compile('(?i)('+province['province']+' Province|'+province['province']+'|Metro '+province['province']+'|'+province['province']+')+?,? ?(Philippines|PH)?')
+                    print(province_pattern)
+                    if province_pattern.match(body) or province_pattern.match(article.title):
                         matched_locations.append(province['id'])
 
             if not len(matched_locations):
-                if not nation_pattern.match(article.text):
-                    print('\n(NOT PH RELATED) Article Skipped\n')
+                if not nation_pattern.match(body) and not nation_pattern.match(article.title):
+                    print('\n(NOT PH RELATED) Skipped: ' + str(article.url) + '\n')
                     continue
 
             new_article = {
@@ -171,16 +177,16 @@ for news_source in news_sources:
                 'sourceId': news_source['id'],
                 'title': article.title.encode('ascii', 'ignore').decode('utf-8'),
                 'authors': article.authors,
-                'text': article.text.encode('ascii', 'ignore').decode('utf-8').replace('\n', ''),
+                'body': body,
                 'publishDate': article.publish_date.strftime('%m/%d/%Y') if article.publish_date else '',
                 'top_image': article.top_image,
                 'timestamp': datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
-                'summary': summarizer(PlaintextParser.from_string(article.text), SENTENCES_COUNT),
+                'summary': summarizer(PlaintextParser.from_string(body), SENTENCES_COUNT),
                 'summary2': aritcle.summary,
                 'keywords': article.keywords,
                 'locations': matched_locations,
                 'category': text_client.UnsupervisedClassify({ "url": article.url, "classes": classes }),
-                'sentiment': TextBlob(article.text).sentiment
+                'sentiment': TextBlob(body).sentiment
                 # 'images': article.images,
                 # 'movies': article.movies
             }
@@ -190,7 +196,8 @@ for news_source in news_sources:
             count += 1
 
             print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
-            print('-- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
+
+            print('AYLIEN API LIMIT: '+json.dumps(text_client.RateLimits())+' -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
 
         except newspaper.ArticleException as e:
             print('\n(ARTICLE ERROR) Article Skipped\n')

@@ -1,15 +1,22 @@
-.GridLayoutView {
-	width: 100vw;
-	min-height: 100vh;
-}
-
-.BleedColor {
+.UpperBleed {
 	display: flex;
+	width: 100vw;
 	height: 240px;
-	background: #3c4b68;
+	margin-bottom: 2rem;
+	background-color: #343841;
 	align-items: center;
 }
 
 .SearchBar {
+	width: 500px !important;
+	padding-right: 9rem !important;
 	margin-left: 120px;
+}
+
+.MarginLeft {
+	margin-left: 120px;
+}
+
+.MarginBottom {
+	margin-bottom: 2rem !important;
 }

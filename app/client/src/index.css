@@ -1,5 +1,7 @@
 body {
   margin: 0 !important;
   padding: 0 !important;
-  font-family: sans-serif;
+	font-family: sans-serif;
+	background: #f4f4f4;
+	cursor: default;
 }

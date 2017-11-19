@@ -1,4 +1,4 @@
-.NewsMenu {
+.news-menu {
 	width: 400px;
 	position: fixed;
 	top: 9%;
@@ -7,14 +7,31 @@
 	box-shadow: 0px 0px 12px #343841 !important;
 }
 
-.NewsMenuItems:hover {
+.news-menu-items:hover {
 	background: #e7e7e7 !important;
 }
 
-.Bleed {
+.bleed {
 	display: flex;
 	height: 100px;
 	padding: 1rem;
 	background: #464c58;
 	align-items: center;
+}
+
+.bottom-bleed {
+	height: 150px;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: center;
+}
+
+.datepicker-button {
+	color: #fff !important;
+	background: #f25100 !important;
+	border-radius: 100px !important;
+}
+
+.react-datepicker {
+	display: flex !important;
 }

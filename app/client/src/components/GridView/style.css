@@ -1,4 +1,4 @@
-.UpperBleed {
+.upper-bleed {
 	display: flex;
 	width: 100vw;
 	height: 240px;
@@ -7,16 +7,20 @@
 	align-items: center;
 }
 
-.SearchBar {
-	width: 500px !important;
-	padding-right: 9rem !important;
-	margin-left: 120px;
+.prompt, 
+.results {
+	width: 300px !important;
+	margin-left: 120px !important;
 }
 
-.MarginLeft {
-	margin-left: 120px;
+.margin-left {
+	margin-left: 120px !important;
 }
 
-.MarginBottom {
+.card-margin-left {
+	margin: 1rem !important;
+}
+
+.margin-bottom {
 	margin-bottom: 2rem !important;
 }

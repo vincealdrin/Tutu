@@ -1,28 +1,22 @@
 import React, { Component } from 'react';
-import { Grid } from 'semantic-ui-react';
 import NewsItem from './NewsItem';
+import MasonryLayout from 'react-masonry-component';
 
 class News extends Component {
 	
+	static defaultProps = { maxCount: 4 }
 	renderNewsItem = (newsArticle) => <NewsItem key={newsArticle.newsImage} newsArticle={newsArticle} />
 	
 	render() {
-		const {
-			newsFirst = [],
-			newsSecond = [],
-		} = this.props;
+		const { news = [] } = this.props;
 
 		return (
-			<Grid style={{ width: 1380 }}>
-				<Grid.Row className='MarginLeft' columns={4}>
-					<Grid.Column>
-						{newsFirst.map(renderNewsItem)}
-					</Grid.Column>
-					<Grid.Column>
-						{newsSecond.map(renderNewsItem)}
-					</Grid.Column>
-				</Grid.Row>
-			</Grid>
+			<div style={{ width: 1380 }}>
+				<MasonryLayout className="margin-left">
+					{news.map(this.renderNewsItem)}
+				</MasonryLayout>
+
+			</div>
 		)
 	}
 }

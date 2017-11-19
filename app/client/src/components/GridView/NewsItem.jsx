@@ -6,13 +6,13 @@ class NewsItems extends Component {
 		const extra = (
 			<div>
 				<a>
-					<Icon name='thumbs up' />
+					<Icon name="thumbs up" />
 					2.4k Likes
 				</a>
 				&nbsp;
 				&nbsp;
 				<a>
-					<Icon name='share alternate' />
+					<Icon name="share alternate" />
 					5k Shares
 				</a>
 			</div>
@@ -20,12 +20,13 @@ class NewsItems extends Component {
 
 		return (
 			<Card 
+				link
 				image={this.props.newsArticle.newsImage}
 				header={this.props.newsArticle.newsHeader}
 				meta={this.props.newsArticle.newsMeta}
 				description={this.props.newsArticle.newsDescription}
 				extra={extra}
-				className='MarginBottom'
+				className="card-margin-left"
 			/>
 		)
 	}

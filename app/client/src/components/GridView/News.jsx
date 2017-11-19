@@ -3,51 +3,23 @@ import { Grid } from 'semantic-ui-react';
 import NewsItem from './NewsItem';
 
 class News extends Component {
+	
+	renderNewsItem = (newsArticle) => <NewsItem key={newsArticle.newsImage} newsArticle={newsArticle} />
+	
 	render() {
-		let newsItems1st, newsItems2nd, newsItems3rd, newsItems4th;
-		if(this.props.newsFirst) {
-			newsItems1st = this.props.newsFirst.map(newsArticle => {
-				return (
-					<NewsItem key={newsArticle.newsImage} newsArticle={newsArticle} />
-				)
-			});
-		}
-		if(this.props.newsSecond) {
-			newsItems2nd = this.props.newsSecond.map(newsArticle => {
-				return (
-					<NewsItem key={newsArticle.newsImage} newsArticle={newsArticle} />
-				)
-			});
-		}
-		if(this.props.newsFourth) {
-			newsItems4th = this.props.newsFourth.map(newsArticle => {
-				return (
-					<NewsItem key={newsArticle.newsImage} newsArticle={newsArticle} />
-				)
-			});
-		}
-		if(this.props.newsThird) {
-			newsItems3rd = this.props.newsThird.map(newsArticle => {
-				return (
-					<NewsItem key={newsArticle.newsImage} newsArticle={newsArticle} />
-				)
-			});
-		}
+		const {
+			newsFirst = [],
+			newsSecond = [],
+		} = this.props;
 
 		return (
 			<Grid style={{ width: 1380 }}>
 				<Grid.Row className='MarginLeft' columns={4}>
 					<Grid.Column>
-						{newsItems1st}
+						{newsFirst.map(renderNewsItem)}
 					</Grid.Column>
 					<Grid.Column>
-						{newsItems2nd}
-					</Grid.Column>
-					<Grid.Column>
-						{newsItems3rd}
-					</Grid.Column>
-					<Grid.Column>
-						{newsItems4th}
+						{newsSecond.map(renderNewsItem)}
 					</Grid.Column>
 				</Grid.Row>
 			</Grid>

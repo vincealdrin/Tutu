@@ -89,7 +89,7 @@ const getAboutContactUrl = async (url) => {
   }
 };
 
-module.exports = (conn, socket) => {
+module.exports = (conn, io) => {
   const tbl = 'sources';
 
   router.get('/', async (req, res, next) => {

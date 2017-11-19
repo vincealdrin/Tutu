@@ -90,6 +90,8 @@ DB_HOST = os.environ.get('DB_HOST')
 DB_PORT = os.environ.get('DB_PORT')
 AYLIEN_APP_ID = os.environ.get('AYLIEN_APP_ID')
 AYLIEN_APP_KEY = os.environ.get('AYLIEN_APP_KEY')
+AYLIEN_APP_ID2 = os.environ.get('AYLIEN_APP_ID2')
+AYLIEN_APP_KEY2 = os.environ.get('AYLIEN_APP_KEY2')
 LANGUAGE = 'english'
 SENTENCES_COUNT = 5
 
@@ -102,7 +104,8 @@ locations = r.table('locations').eq_join('province_id', r.table('provinces')).zi
 provinces = r.table('provinces').run(conn)
 news_sources = list(r.table('sources').run(conn))
 
-text_client = textapi.Client("c5db8a0f", "59ec79539dafd44df50d93cd19b2f947")
+text_client = textapi.Client(AYLIEN_APP_ID, AYLIEN_APP_KEY)
+text_client2 = textapi.Client(AYLIEN_APP_ID2, AYLIEN_APP_KEY2)
 classes = [
     'Business', 'Economy', 'Lifestyle',
     'Entertainment', 'Sports', 'Government & Politics',
@@ -156,7 +159,7 @@ for news_source in news_sources:
 
             categories = []
             category1 = text_client.UnsupervisedClassify({ 'url': article.url, 'class': classes[:5] })
-            category2 = text_client.UnsupervisedClassify({ 'url': article.url, 'class': classes[5:] })
+            category2 = text_client2.UnsupervisedClassify({ 'url': article.url, 'class': classes[5:] })
             categories = category1['classes'] + category2['classes']
 
             body = category1['text']
@@ -247,8 +250,10 @@ for news_source in news_sources:
             count += 1
 
             aylien_status = text_client.RateLimits()
+            aylien_status2 = text_client2.RateLimits()
+            remaining = aylien_status['remaining'] + aylien_status2['remaining']
             print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
-            print('AYLIEN REMAINING CALL: '+str(aylien_status['remaining'])+' -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
+            print('AYLIEN REMAINING CALL: ['+str(aylien_status['remaining'])+', '+str(aylien_status2['remaining'])+'] -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
             should_slp = True
 
         except newspaper.ArticleException as e:

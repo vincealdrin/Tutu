@@ -22,6 +22,10 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "eslint-config-airbnb": "^16.1.0"
+    "eslint-config-airbnb": "^16.1.0",
+    "stylefmt": "^6.0.0",
+    "stylelint": "^8.2.0",
+    "stylelint-declaration-block-no-ignored-properties": "^1.0.1",
+    "stylelint-order": "^0.7.0"
   }
 }

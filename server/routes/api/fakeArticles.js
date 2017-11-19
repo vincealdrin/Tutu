@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 
-module.exports = (conn, socket) => {
+module.exports = (conn, io) => {
   const tbl = 'fakeArticles';
 
   router.get('/', async (req, res, next) => {

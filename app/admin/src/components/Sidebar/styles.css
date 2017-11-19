@@ -1,0 +1,10 @@
+.sidebar-container {
+  height: 100vh;
+}
+
+.ui.sidebar.visible ~ .pusher {
+  width: calc(100% - 150px);
+}
+
+.sidebar-children {
+}

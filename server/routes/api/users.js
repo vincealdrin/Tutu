@@ -20,7 +20,7 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.get('/:userId', async (req, res) => {
+  router.get('/:userId', async (req, res, next) => {
     const { userId } = req.params;
 
     try {
@@ -32,32 +32,39 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.post('/', async (req, res) => {
-    const users = req.body;
+  router.post('/', async (req, res, next) => {
+    const user = req.body;
+    const id = r.uuid(user.username);
+    const newUser = { ...user, id };
 
     try {
-      const { generated_keys } = await r.table(tbl).insert(users).run(conn);
+      await r.table(tbl).insert(newUser).run(conn);
 
-      return res.json(generated_keys);
+      return res.json(id);
     } catch (e) {
       next(e);
     }
   });
 
-  router.put('/:userId', async (req, res) => {
+  router.put('/:userId', async (req, res, next) => {
     const { userId } = req.params;
+    const { isIdChanged } = req.query;
     const user = req.body;
+
+    if (isIdChanged) {
+      user.id = r.uuid(user.username);
+    }
 
     try {
       await r.table(tbl).get(userId).update(user).run(conn);
 
-      res.status(204).end();
+      res.json(user);
     } catch (e) {
       next(e);
     }
   });
 
-  router.delete('/', async (req, res) => {
+  router.delete('/', async (req, res, next) => {
     const { ids = [] } = req.body;
 
     try {
@@ -69,7 +76,7 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.delete('/:userId', async (req, res) => {
+  router.delete('/:userId', async (req, res, next) => {
     const { userId = '' } = req.params;
 
     try {

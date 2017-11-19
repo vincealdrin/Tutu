@@ -148,12 +148,17 @@ module.exports = (conn, io) => {
 
   router.put('/:sourceId', async (req, res, next) => {
     const { sourceId } = req.params;
+    const { isIdChanged } = req.query;
     const source = req.body;
+
+    if (isIdChanged) {
+      source.id = r.uuid(source.url);
+    }
 
     try {
       await r.table(tbl).get(sourceId).update(source).run(conn);
 
-      res.status(204).end();
+      res.json(source);
     } catch (e) {
       next(e);
     }

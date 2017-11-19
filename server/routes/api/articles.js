@@ -34,7 +34,7 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.get('/:articleId', async (req, res) => {
+  router.get('/:articleId', async (req, res, next) => {
     const { articleId } = req.params;
 
     try {
@@ -46,7 +46,7 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.post('/', async (req, res) => {
+  router.post('/', async (req, res, next) => {
     const articles = req.body.map((article) => ({
       ...articles,
       id: r.uuid(article.url),
@@ -61,20 +61,25 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.put('/:articleId', async (req, res) => {
+  router.put('/:articleId', async (req, res, next) => {
     const { articleId } = req.params;
+    const { isIdChanged } = req.query;
     const article = req.body;
+
+    if (isIdChanged) {
+      article.id = r.uuid(article.url);
+    }
 
     try {
       await r.table(tbl).get(articleId).update(article).run(conn);
 
-      res.status(204).end();
+      res.json(article);
     } catch (e) {
       next(e);
     }
   });
 
-  router.delete('/', async (req, res) => {
+  router.delete('/', async (req, res, next) => {
     const { ids = [] } = req.body;
 
     try {
@@ -86,7 +91,7 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.delete('/:articleId', async (req, res) => {
+  router.delete('/:articleId', async (req, res, next) => {
     const { articleId = '' } = req.params;
 
     try {

@@ -23,6 +23,8 @@ spider/*.json
 spider/*.csv
 spider/*.xml
 spider/articles-*/
+!spider/provinces-capital-ph.json
+!spider/locations-ph.json
 
 npm-debug.log*
 yarn-debug.log*

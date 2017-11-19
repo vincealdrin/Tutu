@@ -3,5 +3,37 @@
     "${env.SPARK_HOME}\\python",
     "${env.SPARK_HOME}\\python\\pyspark"
   ],
-  "python.pythonPath": "C:\\Users\\vncea\\.virtualenvs\\spider-EyAUVvSq"
+  // change this depending on ur venv path
+  "python.pythonPath":
+  "C:\\Users\\vncea\\.virtualenvs\\spider-EyAUVvSq",
+  "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/.DS_Store": true,
+      "**/node_modules": true
+  },
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": false,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
+  "eslint.autoFixOnSave": true,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": false,
+  "editor.formatOnSave": false,
+  "editor.formatOnPaste": false,
+  "editor.formatOnType": false,
+  // Python specific
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.formatting.provider": "yapf",
+  "python.unitTest.unittestEnabled": false,
+  "python.unitTest.pyTestEnabled": false,
+  "python.unitTest.nosetestsEnabled": false,
+  "emmet.showExpandedAbbreviation": "inMarkupAndStylesheetFilesOnly",
+  "emmet.showAbbreviationSuggestions": true,
+  "git.enableSmartCommit": true,
+  "git.autofetch": false,
+  "files.eol": "\n",
+  "emmet.triggerExpansionOnTab": true,
+  "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+  "stylelint.enable": true,
+  "files.insertFinalNewline": true
 }

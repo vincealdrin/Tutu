@@ -22,9 +22,11 @@ fake-useragent = "*"
 scikit-learn = "*"
 numpy = "*"
 scipy = "*"
-socketio-client = "*"
+socketIO-client = "*"
 rethinkdb = "*"
 sumy = "*"
+matplotlib = "*"
+aylien-apiclient = "*"
 
 
 [dev-packages]

@@ -2,7 +2,7 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 
 module.exports = (conn, io) => {
-  const tbl = 'users';
+  const tbl = 'fakeArticles';
 
   router.get('/', async (req, res, next) => {
     const { page = 0, limit = 15 } = req.query;
@@ -12,31 +12,31 @@ module.exports = (conn, io) => {
         .skip(page * limit)
         .limit(limit)
         .run(conn);
-      const users = await cursor.toArray();
+      const fakeArticles = await cursor.toArray();
 
-      return res.json(users);
+      return res.json(fakeArticles);
     } catch (e) {
       next(e);
     }
   });
 
-  router.get('/:userId', async (req, res) => {
-    const { userId } = req.params;
+  router.get('/:fakeArticleId', async (req, res) => {
+    const { fakeArticleId } = req.params;
 
     try {
-      const user = await r.table(tbl).get(userId).run(conn);
+      const fakeArticle = await r.table(tbl).get(fakeArticleId).run(conn);
 
-      return res.json(user);
+      return res.json(fakeArticle);
     } catch (e) {
       next(e);
     }
   });
 
   router.post('/', async (req, res) => {
-    const users = req.body;
+    const fakeArticles = req.body;
 
     try {
-      const { generated_keys } = await r.table(tbl).insert(users).run(conn);
+      const { generated_keys } = await r.table(tbl).insert(fakeArticles).run(conn);
 
       return res.json(generated_keys);
     } catch (e) {
@@ -44,12 +44,12 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.put('/:userId', async (req, res) => {
-    const { userId } = req.params;
-    const user = req.body;
+  router.put('/:fakeArticleId', async (req, res) => {
+    const { fakeArticleId } = req.params;
+    const fakeArticle = req.body;
 
     try {
-      await r.table(tbl).get(userId).update(user).run(conn);
+      await r.table(tbl).get(fakeArticleId).update(fakeArticle).run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -69,11 +69,11 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.delete('/:userId', async (req, res) => {
-    const { userId = '' } = req.params;
+  router.delete('/:fakeArticleId', async (req, res) => {
+    const { fakeArticleId = '' } = req.params;
 
     try {
-      await r.table(tbl).getAll(userId).delete().run(conn);
+      await r.table(tbl).getAll(fakeArticleId).delete().run(conn);
 
       res.status(204).end();
     } catch (e) {

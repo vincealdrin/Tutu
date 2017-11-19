@@ -1,6 +1,8 @@
+require('dotenv').config();
+
 const r = require('rethinkdb');
 
-module.exports = async (cb) => {
+(async () => {
   const db = process.env.DB_NAME;
   const conn = await r.connect({
     db,
@@ -37,21 +39,12 @@ module.exports = async (cb) => {
 
   try {
     await r.table('articles').indexCreate(
-      'positions',
-      r.row('locations')('position'),
+      'locations',
+      r.row('locations')('coordinates'),
       { geo: true, multi: true }
     ).run(conn);
-    console.log('positions index created on articles table');
+    console.log('locations index created on articles table');
   } catch (e) {
-    console.log('positions index already exists on articles table');
+    console.log('locations index already exists on articles table');
   }
-
-  // try {
-  //   await r.table('sources').indexCreate('url').run(conn);
-  //   console.log('url index created on sources table');
-  // } catch (e) {
-  //   console.log('url index already exists on sources table');
-  // }
-
-  cb(conn);
-};
+})();

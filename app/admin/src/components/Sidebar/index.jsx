@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
-import { Sidebar, Segment, Menu, Icon } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Sidebar, Segment, Menu } from 'semantic-ui-react';
+import MenuItems from './MenuItems';
+import TopMenu from '../TopMenu';
 import './styles.css';
 
 class AppSidebar extends Component {
-  render() {
-    const {
-      isExpanded,
-    } = this.props;
+  state = {
+    isExpanded: true,
+  }
 
+  toggleExpand = () => this.setState({ isExpanded: !this.state.isExpanded })
+
+  render() {
     return (
       <div className="sidebar-container">
         <Sidebar.Pushable as={Segment}>
@@ -17,28 +20,14 @@ class AppSidebar extends Component {
             animation="slide out"
             width="thin"
             as={Menu}
-            visible={isExpanded}
+            visible={this.state.isExpanded}
             vertical
             inverted
           >
-            <Menu.Item to="/" as={Link}>
-              <Icon name="dashboard" />
-              Dashboard
-            </Menu.Item>
-            <Menu.Item to="/sources" as={Link}>
-              <Icon name="world" />
-              Sources
-            </Menu.Item>
-            <Menu.Item to="/articles" as={Link}>
-              <Icon name="newspaper" />
-              Articles
-            </Menu.Item>
-            <Menu.Item to="/users" as={Link}>
-              <Icon name="users" />
-              Users
-            </Menu.Item>
+            <MenuItems />
           </Sidebar>
           <Sidebar.Pusher>
+            <TopMenu toggleSidebarExpand={this.toggleExpand} />
             <div className="sidebar-children">
               {this.props.children}
             </div>

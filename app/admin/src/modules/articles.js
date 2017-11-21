@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { updateCrudStatus, crudStatus } from '../../utils';
+import { updateCrudStatus, crudStatus } from '../utils';
 
 export const FETCH_ARTICLES = 'articles/FETCH_ARTICLES';
 export const CREATE_ARTICLE = 'articles/CREATE_ARTICLE';
@@ -55,47 +55,47 @@ export default (state = initialState, action) => {
 };
 
 export const fetchArticles = () => async (dispatch) => {
-  dispatch({ type: FETCH_ARTICLES, status: 'pending' });
+  dispatch({ type: FETCH_ARTICLES, statusText: 'pending' });
 
   try {
     const articles = await axios.get('a');
 
     dispatch({
       type: FETCH_ARTICLES,
-      status: 'success',
+      statusText: 'success',
       articles,
     });
   } catch (e) {
     dispatch({
       type: FETCH_ARTICLES,
-      status: 'error',
-      errorMsg: e.message,
+      statusText: 'error',
+      status: e.response.status,
     });
   }
 };
 
 export const createArticle = (article) => async (dispatch) => {
-  dispatch({ type: CREATE_ARTICLE, status: 'pending' });
+  dispatch({ type: CREATE_ARTICLE, statusText: 'pending' });
 
   try {
     const id = await axios.post('a', article);
 
     dispatch({
       type: CREATE_ARTICLE,
-      status: 'success',
+      statusText: 'success',
       newArticle: { ...article, id },
     });
   } catch (e) {
     dispatch({
       type: CREATE_ARTICLE,
-      status: 'error',
-      errorMsg: e.message,
+      statusText: 'error',
+      status: e.response.status,
     });
   }
 };
 
 export const updateArticle = (articleId, article, isIdChanged = false) => async (dispatch) => {
-  dispatch({ type: UPDATE_ARTICLE, status: 'pending' });
+  dispatch({ type: UPDATE_ARTICLE, statusText: 'pending' });
 
   try {
     const endpoint = `/articles/${articleId}`;
@@ -104,34 +104,34 @@ export const updateArticle = (articleId, article, isIdChanged = false) => async 
 
     dispatch({
       type: UPDATE_ARTICLE,
-      status: 'success',
+      statusText: 'success',
       updatedArticle,
     });
   } catch (e) {
     dispatch({
       type: UPDATE_ARTICLE,
-      status: 'error',
-      errorMsg: e.message,
+      statusText: 'error',
+      status: e.response.status,
     });
   }
 };
 
 export const deleteArticles = (ids) => async (dispatch) => {
-  dispatch({ type: DELETE_ARTICLES, status: 'pending' });
+  dispatch({ type: DELETE_ARTICLES, statusText: 'pending' });
 
   try {
     await axios.put('/articles/', ids);
 
     dispatch({
       type: DELETE_ARTICLES,
-      status: 'success',
+      statusText: 'success',
       deletedIds: ids,
     });
   } catch (e) {
     dispatch({
       type: DELETE_ARTICLES,
-      status: 'error',
-      errorMsg: e.message,
+      statusText: 'error',
+      status: e.response.status,
     });
   }
 };

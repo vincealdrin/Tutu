@@ -134,7 +134,7 @@ module.exports = (conn, io) => {
         ...info,
         aboutUsUrl,
         contactUsUrl,
-        id: r.uuid(url),
+        id: r.uuid(url).run(conn),
       };
     }));
 
@@ -152,7 +152,7 @@ module.exports = (conn, io) => {
     const source = req.body;
 
     if (isIdChanged) {
-      source.id = r.uuid(source.url);
+      source.id = r.uuid(source.url).run(conn);
     }
 
     try {

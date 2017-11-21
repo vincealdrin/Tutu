@@ -143,7 +143,7 @@ for news_source in news_sources:
 
         defragged_url = urldefrag(article.url).url
         clean_url = defragged_url[:defragged_url.find('?')]
-        url_uuid = r.uuid(clean_url).run(conn)
+        url_uuid = r.uuid(clean_url).run(conn).run(conn)
         found_article = r.table('articles').get(url_uuid).run(conn)
 
         if found_article:

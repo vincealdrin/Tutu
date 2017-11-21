@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { updateCrudStatus, crudStatus } from '../../utils';
+import { updateCrudStatus, crudStatus } from '../utils';
 
 export const FETCH_USERS = 'users/FETCH_USERS';
 export const CREATE_USER = 'users/CREATE_USER';
@@ -9,6 +9,7 @@ export const DECREMENT = 'users/DECREMENT';
 
 const initialState = {
   users: [],
+  totalCount: 0,
   fetchStatus: crudStatus,
   createStatus: crudStatus,
   updateStatus: crudStatus,
@@ -21,6 +22,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         users: action.users || state.users,
+        totalCount: action.totalCount,
         fetchStatus: updateCrudStatus(action),
       };
     case CREATE_USER:
@@ -54,48 +56,57 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchUsers = () => async (dispatch) => {
-  dispatch({ type: FETCH_USERS, status: 'pending' });
+export const fetchUsers = (page, limit, filter, search) => async (dispatch) => {
+  dispatch({ type: FETCH_USERS, statusText: 'pending' });
 
   try {
-    const users = await axios.get('a');
+    const { data: users, status, headers } = await axios.get('/users', {
+      params: {
+        page,
+        limit,
+        filter,
+        search,
+      },
+    });
 
     dispatch({
       type: FETCH_USERS,
-      status: 'success',
+      usersTotalCount: parseInt(headers['x-total-count'], 10),
+      statusText: 'success',
+      status,
       users,
     });
   } catch (e) {
     dispatch({
       type: FETCH_USERS,
-      status: 'error',
-      errorMsg: e.message,
+      statusText: 'error',
+      status: e.response.status,
     });
   }
 };
 
 export const createUser = (user) => async (dispatch) => {
-  dispatch({ type: CREATE_USER, status: 'pending' });
+  dispatch({ type: CREATE_USER, statusText: 'pending' });
 
   try {
-    const id = await axios.post('a', user);
+    const id = await axios.post('/users', user);
 
     dispatch({
       type: CREATE_USER,
-      status: 'success',
+      statusText: 'success',
       newUser: { ...user, id },
     });
   } catch (e) {
     dispatch({
       type: CREATE_USER,
-      status: 'error',
-      errorMsg: e.message,
+      statusText: 'error',
+      status: e.response.status,
     });
   }
 };
 
 export const updateUser = (userId, user, isIdChanged = false) => async (dispatch) => {
-  dispatch({ type: UPDATE_USER, status: 'pending' });
+  dispatch({ type: UPDATE_USER, statusText: 'pending' });
 
   try {
     const endpoint = `/users/${userId}`;
@@ -104,34 +115,34 @@ export const updateUser = (userId, user, isIdChanged = false) => async (dispatch
 
     dispatch({
       type: UPDATE_USER,
-      status: 'success',
+      statusText: 'success',
       updatedUser,
     });
   } catch (e) {
     dispatch({
       type: UPDATE_USER,
-      status: 'error',
-      errorMsg: e.message,
+      statusText: 'error',
+      status: e.response.status,
     });
   }
 };
 
 export const deleteUsers = (ids) => async (dispatch) => {
-  dispatch({ type: DELETE_USERS, status: 'pending' });
+  dispatch({ type: DELETE_USERS, statusText: 'pending' });
 
   try {
     await axios.put('/users/', ids);
 
     dispatch({
       type: DELETE_USERS,
-      status: 'success',
+      statusText: 'success',
       deletedIds: ids,
     });
   } catch (e) {
     dispatch({
       type: DELETE_USERS,
-      status: 'error',
-      errorMsg: e.message,
+      statusText: 'error',
+      status: e.response.status,
     });
   }
 };

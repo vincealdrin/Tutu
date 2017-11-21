@@ -8,13 +8,15 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 const http = require('http');
 const errorhandler = require('errorhandler');
+const r = require('rethinkdb');
+const cors = require('cors');
 const initDb = require('./db');
 const routes = require('./routes');
-const r = require('rethinkdb');
 
 const app = express();
 const server = http.Server(app);
 const io = socketIo(server);
+
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -23,6 +25,7 @@ app.use(compression({
   memLevel: 9,
 }));
 
+app.use(cors({ exposedHeaders: 'X-Total-Count' }));
 
 const isProduction = process.env.NODE_ENV === 'production';
 

@@ -20,7 +20,7 @@ with open('./provinces-capital-ph.json') as provinces_data:
 for location in locations:
   prov = location['province']
   del location['province']
-  loc_id = r.uuid(location['formattedAddress'])
+  loc_id = r.uuid(location['formattedAddress']).run(conn)
 
   a = r.table('locations').insert({
     "location": location['location'],
@@ -36,7 +36,7 @@ for location in locations:
 
   for province in provinces:
     if (prov == province['province'] and location['location'] == province['capital']):
-      p_id = r.uuid(province['ISO'])
+      p_id = r.uuid(province['ISO']).run(conn)
       b = r.table('provinces').insert({
         "ISO": province['ISO'],
         "province": province['province'],

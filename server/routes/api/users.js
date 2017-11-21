@@ -1,20 +1,34 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
+const bcrypt = require('bcrypt-nodejs');
 
 module.exports = (conn, io) => {
-  const tbl = 'users';
+  const tblName = 'users';
 
   router.get('/', async (req, res, next) => {
-    const { page = 0, limit = 15 } = req.query;
+    const {
+      page = 0,
+      limit = 15,
+      filter,
+      search,
+    } = req.query;
 
     try {
-      const cursor = await r.table(tbl)
+      const table = r.table(tblName);
+      const totalCount = await table.count().run(conn);
+
+      if (filter && search) {
+        table.filter({ [filter]: search });
+      }
+
+      const cursor = await table
         .skip(page * limit)
         .limit(limit)
         .run(conn);
       const users = await cursor.toArray();
 
-      return res.json(users);
+      res.setHeader('X-Total-Count', totalCount);
+      res.json(users);
     } catch (e) {
       next(e);
     }
@@ -24,9 +38,9 @@ module.exports = (conn, io) => {
     const { userId } = req.params;
 
     try {
-      const user = await r.table(tbl).get(userId).run(conn);
+      const user = await r.table(tblName).get(userId).run(conn);
 
-      return res.json(user);
+      res.json(user);
     } catch (e) {
       next(e);
     }
@@ -34,16 +48,22 @@ module.exports = (conn, io) => {
 
   router.post('/', async (req, res, next) => {
     const user = req.body;
-    const id = r.uuid(user.username);
-    const newUser = { ...user, id };
+    const id = await r.uuid(user.username).run(conn);
 
-    try {
-      await r.table(tbl).insert(newUser).run(conn);
+    bcrypt.hash(user.password, null, null, async (err, hash) => {
+      if (err) throw err;
 
-      return res.json(id);
-    } catch (e) {
-      next(e);
-    }
+      user.id = id;
+      user.password = hash;
+
+      try {
+        await r.table(tblName).insert(user).run(conn);
+
+        res.json(user);
+      } catch (e) {
+        next(e);
+      }
+    });
   });
 
   router.put('/:userId', async (req, res, next) => {
@@ -52,11 +72,11 @@ module.exports = (conn, io) => {
     const user = req.body;
 
     if (isIdChanged) {
-      user.id = r.uuid(user.username);
+      user.id = r.uuid(user.username).run(conn);
     }
 
     try {
-      await r.table(tbl).get(userId).update(user).run(conn);
+      await r.table(tblName).get(userId).update(user).run(conn);
 
       res.json(user);
     } catch (e) {
@@ -68,7 +88,7 @@ module.exports = (conn, io) => {
     const { ids = [] } = req.body;
 
     try {
-      await r.table(tbl).getAll(r.args(ids)).delete().run(conn);
+      await r.table(tblName).getAll(r.args(ids)).delete().run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -80,7 +100,7 @@ module.exports = (conn, io) => {
     const { userId = '' } = req.params;
 
     try {
-      await r.table(tbl).getAll(userId).delete().run(conn);
+      await r.table(tblName).getAll(userId).delete().run(conn);
 
       res.status(204).end();
     } catch (e) {

@@ -27,33 +27,31 @@ const data = {
 class Home extends Component {
   render() {
     return (
-      <div className="home-container">
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width={7}>
-              <Segment>
+      <Grid>
+        <Grid.Row>
+          <Grid.Column width={7}>
+            <Segment>
                 Country
-              </Segment>
-              <Segment>
-                <HorizontalBar
-                  data={data}
-                />
-              </Segment>
-            </Grid.Column>
+            </Segment>
+            <Segment>
+              <HorizontalBar
+                data={data}
+              />
+            </Segment>
+          </Grid.Column>
 
-            <Grid.Column width={9}>
-              <Statistics />
-              <Segment>
-                <Bar
-                  data={data}
-                />
-              </Segment>
-            </Grid.Column>
-          </Grid.Row>
+          <Grid.Column width={9}>
+            <Statistics />
+            <Segment>
+              <Bar
+                data={data}
+              />
+            </Segment>
+          </Grid.Column>
+        </Grid.Row>
 
-          <SpiderSection />
-        </Grid>
-      </div>
+        <SpiderSection />
+      </Grid>
     );
   }
 }

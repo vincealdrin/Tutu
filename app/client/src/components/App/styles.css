@@ -1,0 +1,14 @@
+.in-front {
+  position: fixed;
+  z-index: 10;
+  height: 100vh;
+  background: #fff !important;
+  border-right: 1px solid #aaa !important;
+  border-radius: 0 !important;
+  box-shadow: 0 0 12px #343841 !important;
+}
+
+.container {
+  width: 100vw;
+  height: 100vh;
+}

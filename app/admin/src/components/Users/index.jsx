@@ -4,6 +4,11 @@ import { connect } from 'react-redux';
 import { fetchUsers } from '../../modules/users';
 import DataTable from '../Common/DataTable';
 
+const columns = [
+  { key: 'username', text: 'Username' },
+  { key: 'name', text: 'Name' },
+];
+
 const mapStateToProps = ({
   users: {
     users,
@@ -21,12 +26,6 @@ const mapStateToProps = ({
   deleteStatus,
   totalCount,
 });
-
-const columns = [
-  { key: 'username', text: 'Username' },
-  { key: 'name', text: 'Name' },
-];
-
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchUsers,

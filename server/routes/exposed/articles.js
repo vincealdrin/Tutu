@@ -16,14 +16,19 @@ module.exports = (conn, io) => {
       index: 'positions',
       maxDist: parseFloat(maxDist),
       unit: 'km',
+      maxResults: parseInt(limit),
     };
 
     try {
       const cursor = await r.table(tbl)
         .getNearest(point, articlesArea)
-        .eqJoin(r.row('source_id'), r.table('sources'))
-        .limit(limit)
+        .eqJoin(r.row('doc')('sourceId'), r.table('sources'))
         .zip()
+        // .merge((article) => ({
+        //   locations: r.table('locations')
+        //     .getAll(r.args(article('locations')))
+        //     .coerceTo('array'),
+        // }))
         .run(conn);
       const articles = await cursor.toArray();
 

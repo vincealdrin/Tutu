@@ -29,7 +29,7 @@ for location in locations:
     "area": location['area'],
     "psgc": location['psgc'],
     "formattedAddress": location['formattedAddress'],
-    "coordinates": r.point(location['coordinates']['longitude'], location['coordinates']['latitude']),
+    "position": r.point(location['coordinates']['longitude'], location['coordinates']['latitude']),
     "region": location['region'],
     'id': loc_id
   }).run(conn)

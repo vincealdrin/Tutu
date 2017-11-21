@@ -9,14 +9,14 @@ module.exports = (conn, io) => {
 
     try {
       const table = r.table(tblName);
-      const totalArticlesCount = await table.count().run(conn);
+      const totalCount = await table.count().run(conn);
       const cursor = await table
         .skip(page * limit)
         .limit(limit)
         .run(conn);
       const articles = await cursor.toArray();
 
-      res.setHeader('X-Total-Articles-Count', totalArticlesCount);
+      res.setHeader('X-Total-Count', totalCount);
       return res.json(articles);
     } catch (e) {
       next(e);

@@ -100,7 +100,7 @@ summarizer = Summarizer(stemmer)
 summarizer.stop_words = get_stop_words(LANGUAGE)
 
 conn = r.connect(DB_HOST, DB_PORT, db=DB_NAME)
-locations = list(r.table('locations').eq_join('provinceId', r.table('provinces')).zip().run(conn))
+locations = list( r.table('locations').eq_join('provinceId', r.table('provinces')).without({ 'right': {'id': True} }).zip().run(conn))
 provinces = list(r.table('provinces').eq_join('capitalId', r.table('locations')).zip().run(conn))
 news_sources = list(r.table('sources').order_by('dateAdded').run(conn))
 
@@ -248,7 +248,7 @@ for news_source in news_sources:
                 'summary': summary_sentences,
                 'summary2': article.summary,
                 'keywords': article.keywords,
-                'locations': set([ml['id'] for ml in matched_locations]),
+                'locations': matched_locations,
                 'categories': categories,
                 'sentiment': sentiment
                 # 'images': article.images,

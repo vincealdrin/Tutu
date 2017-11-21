@@ -74,7 +74,7 @@ export const fetchUsers = (page, limit, filter, search) => async (dispatch) => {
 
     dispatch({
       type: FETCH_USERS,
-      usersTotalCount: parseInt(headers['x-total-count'], 10),
+      totalCount: parseInt(headers['x-total-count'], 10),
       statusText: 'success',
       status,
       users,

@@ -5,7 +5,11 @@
   "dependencies": {
     "history": "^4.7.2",
     "react": "^16.1.0",
+    "react-datepicker": "^0.61.0",
     "react-dom": "^16.1.0",
+    "react-input-range": "^1.2.1",
+    "react-masonry-component": "^6.0.1",
+    "react-masonry-layout": "^0.2.3",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.8",

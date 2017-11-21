@@ -196,7 +196,6 @@ for news_source in news_sources:
 
             nation_terms = 'PH|Philippines|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos'
             nation_pattern = re.compile('(\W('+nation_terms+')$|^('+nation_terms+')\W|\W('+nation_terms+')\W)', re.IGNORECASE)
-            print(urlparse(article.url).path)
             combined_body = body + ' ' + article.text + ' ' + article.title + ' ' + urlparse(article.url).path
 
             matched_locations = []
@@ -205,9 +204,7 @@ for news_source in news_sources:
 
                 matched = location_pattern.search(combined_body)
                 if matched:
-                    print(matched.group(1))
                     matched_locations.append(location)
-                    break
 
             if not matched_locations:
                 for province in provinces:
@@ -215,9 +212,7 @@ for news_source in news_sources:
                     matched = province_pattern.search(combined_body)
 
                     if matched:
-                        print(matched.group(1))
                         matched_locations.append(province)
-                        break
 
             if not matched_locations:
                 if not nation_pattern.search(combined_body):
@@ -253,7 +248,7 @@ for news_source in news_sources:
                 'summary': summary_sentences,
                 'summary2': article.summary,
                 'keywords': article.keywords,
-                'locations': [ml['id'] for ml in matched_locations],
+                'locations': set([ml['id'] for ml in matched_locations]),
                 'categories': categories,
                 'sentiment': sentiment
                 # 'images': article.images,
@@ -268,7 +263,7 @@ for news_source in news_sources:
             aylien_status2 = text_client2.RateLimits()
             remaining = aylien_status['remaining'] + aylien_status2['remaining']
             print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
-            print('Locations: ' + ', '.join([ml['formattedAddress'] for ml in matched_locations]))
+            print('Locations: ' + ' | '.join([ml['formattedAddress'] for ml in matched_locations]))
             print('AYLIEN REMAINING CALL: ['+str(aylien_status['remaining'])+', '+str(aylien_status2['remaining'])+'] -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
             should_slp = True
 

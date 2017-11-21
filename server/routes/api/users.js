@@ -72,7 +72,7 @@ module.exports = (conn, io) => {
     const user = req.body;
 
     if (isIdChanged) {
-      user.id = r.uuid(user.username).run(conn);
+      user.id = await r.uuid(user.username).run(conn);
     }
 
     try {

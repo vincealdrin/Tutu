@@ -2250,7 +2250,7 @@
         "googlePlaceId": "ChIJezANze39TzIRBOXPCY8bCWM"
     },
     {
-        "location": "Isabela City",
+        "location": "Isabela",
         "province": "Basilan",
         "type": "City",
         "brgyCount": "45",
@@ -2808,7 +2808,7 @@
         "googlePlaceId": "ChIJ3w9mhNBtvTMRe_eSKDUTt1k"
     },
     {
-        "location": "Batangas City",
+        "location": "Batangas",
         "province": "Batangas",
         "type": "City",
         "brgyCount": "105",
@@ -7506,7 +7506,7 @@
         "googlePlaceId": "ChIJR08VQy3WlzMRhFa1m3bF7pk"
     },
     {
-        "location": "Cavite City",
+        "location": "Cavite",
         "province": "Cavite",
         "type": "City",
         "brgyCount": "84",
@@ -8136,7 +8136,7 @@
         "googlePlaceId": "ChIJE5zVD7FNqDMRw92JE2G0enY"
     },
     {
-        "location": "Cebu City",
+        "location": "Cebu",
         "province": "Cebu",
         "type": "City",
         "brgyCount": "80",
@@ -9540,7 +9540,7 @@
         "googlePlaceId": "ChIJ2yH2dUpN-DIRV9L9sxLZ7Tw"
     },
     {
-        "location": "Davao City",
+        "location": "Davao",
         "province": "Davao del Sur",
         "type": "City",
         "brgyCount": "182",
@@ -12222,7 +12222,7 @@
         "googlePlaceId": "ChIJ3ZyRp3VarjMRPDcdh982wY0"
     },
     {
-        "location": "Iloilo City",
+        "location": "Iloilo",
         "province": "Iloilo",
         "type": "City",
         "brgyCount": "180",
@@ -16344,7 +16344,7 @@
         "googlePlaceId": "ChIJ4bL3RaFr-DIR_8h3bwjPVUQ"
     },
     {
-        "location": "Cotabato City",
+        "location": "Cotabato",
         "province": "Maguindanao",
         "type": "City",
         "brgyCount": "37",
@@ -17190,7 +17190,7 @@
         "googlePlaceId": "ChIJ9UEUvB2RpjMRB2EusiuaUpw"
     },
     {
-        "location": "Masbate City",
+        "location": "Masbate",
         "province": "Masbate",
         "type": "City",
         "brgyCount": "30",
@@ -18576,7 +18576,7 @@
         "googlePlaceId": "ChIJB9wnuJrIlzMR0SeifBqaYMw"
     },
     {
-        "location": "Quezon City",
+        "location": "Quezon",
         "province": "Manila",
         "type": "City",
         "brgyCount": "142",
@@ -25470,7 +25470,7 @@
         "googlePlaceId": "ChIJxU5seRvJoDMRorDZRsMZqI4"
     },
     {
-        "location": "Sorsogon City",
+        "location": "Sorsogon",
         "province": "Sorsogon",
         "type": "City",
         "brgyCount": "64",
@@ -26928,7 +26928,7 @@
         "googlePlaceId": "ChIJVT4aQbHjAzMR3VBOT7KJ5z4"
     },
     {
-        "location": "Surigao City",
+        "location": "Surigao",
         "province": "Surigao del Norte",
         "type": "City",
         "brgyCount": "54",
@@ -27612,7 +27612,7 @@
         "googlePlaceId": "ChIJ0WrTUfizljMRqrzIrwc2iow"
     },
     {
-        "location": "Tarlac City",
+        "location": "Tarlac",
         "province": "Tarlac",
         "type": "City",
         "brgyCount": "76",
@@ -29070,7 +29070,7 @@
         "googlePlaceId": "ChIJ2a1yR6k-VDIRI_bKLppW4kE"
     },
     {
-        "location": "Zamboanga City",
+        "location": "Zamboanga",
         "province": "Zamboanga del Sur",
         "type": "City",
         "brgyCount": "98",

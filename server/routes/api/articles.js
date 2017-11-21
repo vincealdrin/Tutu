@@ -36,9 +36,9 @@ module.exports = (conn, io) => {
   });
 
   router.post('/', async (req, res, next) => {
-    const articles = req.body.map((article) => ({
+    const articles = req.body.map(async (article) => ({
       ...articles,
-      id: r.uuid(article.url).run(conn),
+      id: await r.uuid(article.url).run(conn),
     }));
 
     try {
@@ -56,7 +56,7 @@ module.exports = (conn, io) => {
     const article = req.body;
 
     if (isIdChanged) {
-      article.id = r.uuid(article.url).run(conn);
+      article.id = await r.uuid(article.url).run(conn);
     }
 
     try {

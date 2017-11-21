@@ -12,7 +12,7 @@ from random import randrange
 from fake_useragent import UserAgent
 import rethinkdb as r
 import datetime
-from urllib.parse import urldefrag
+from urllib.parse import urldefrag, urlparse
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.summarizers.lsa import LsaSummarizer as Summarizer
@@ -100,9 +100,9 @@ summarizer = Summarizer(stemmer)
 summarizer.stop_words = get_stop_words(LANGUAGE)
 
 conn = r.connect(DB_HOST, DB_PORT, db=DB_NAME)
-locations = r.table('locations').eq_join('province_id', r.table('provinces')).zip().run(conn)
-provinces = r.table('provinces').run(conn)
-news_sources = list(r.table('sources').run(conn))
+locations = list(r.table('locations').eq_join('provinceId', r.table('provinces')).zip().run(conn))
+provinces = list(r.table('provinces').eq_join('capitalId', r.table('locations')).zip().run(conn))
+news_sources = list(r.table('sources').order_by('dateAdded').run(conn))
 
 text_client = textapi.Client(AYLIEN_APP_ID, AYLIEN_APP_KEY)
 text_client2 = textapi.Client(AYLIEN_APP_ID2, AYLIEN_APP_KEY2)
@@ -143,7 +143,7 @@ for news_source in news_sources:
 
         defragged_url = urldefrag(article.url).url
         clean_url = defragged_url[:defragged_url.find('?')]
-        url_uuid = r.uuid(clean_url).run(conn).run(conn)
+        url_uuid = r.uuid(clean_url).run(conn)
         found_article = r.table('articles').get(url_uuid).run(conn)
 
         if found_article:
@@ -167,13 +167,21 @@ for news_source in news_sources:
             try:
                 if langdetect.detect(body) != 'en':
                     print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
+                    should_slp = True
                     continue
             except:
                 print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
+                should_slp = True
                 continue
 
             if  len(article.title.split()) < 5 and len(body.split()) < 100:
                 print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
+                should_slp = True
+                continue
+
+            if source.brand in body:
+                print('\n(SOURCE IS IN BODY) Skipped: ' + str(article.url) + '\n')
+                should_slp = True
                 continue
 
             if not body:
@@ -183,31 +191,38 @@ for news_source in news_sources:
 
                 with open(folder_path + '/no-text-articles.json', 'w+') as no_text_json_file:
                     json.dump(no_text_articles, no_text_json_file, indent=2, default=str)
-
+                should_slp = True
                 continue
 
             nation_terms = 'PH|Philippines|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos'
-            nation_pattern = re.compile('(\W('+nation_terms+')$|^('+nation_terms+')\W|\W('+nation_terms+')\W)')
+            nation_pattern = re.compile('(\W('+nation_terms+')$|^('+nation_terms+')\W|\W('+nation_terms+')\W)', re.IGNORECASE)
+            print(urlparse(article.url).path)
+            combined_body = body + ' ' + article.text + ' ' + article.title + ' ' + urlparse(article.url).path
 
             matched_locations = []
             for location in locations:
-                location_pattern = re.compile('(?i)(City of '+location['location']+'|'+location['location']+' City|'+location['location']+' Municipality|'+location['location']+')+?,? ?('+location['province']+' Province|'+location['province']+'|Metro '+location['province']+')+?,? ?(Philippines|PH)?')
+                location_pattern = re.compile('\W(City of '+location['location']+'|'+location['location']+' City|'+location['location']+' Municipality|'+location['location']+')+,? ?('+location['province']+' Province|'+location['province']+'|Metro '+location['province']+')?,? ?(Philippines|PH)?\W', re.IGNORECASE)
 
-                if location_pattern.search(body) or location_pattern.search(article.title):
-                    matched_locations.append(location['id'])
+                matched = location_pattern.search(combined_body)
+                if matched:
+                    print(matched.group(1))
+                    matched_locations.append(location)
                     break
 
             if not matched_locations:
                 for province in provinces:
-                    province_pattern = re.compile('(?i)('+province['province']+' Province|'+province['province']+'|Metro '+province['province']+'|'+province['province']+')+?,? ?(Philippines|PH)?')
-                    if province_pattern.search(body) or province_pattern.search(article.title):
-                        matched_locations.append(province['id'])
+                    province_pattern = re.compile('\W('+province['province']+' Province|'+province['province']+'|Metro '+province['province']+'|'+province['province']+')+,? ?(Philippines|PH)?\W', re.IGNORECASE)
+                    matched = province_pattern.search(combined_body)
+
+                    if matched:
+                        print(matched.group(1))
+                        matched_locations.append(province)
                         break
 
-
             if not matched_locations:
-                if not nation_pattern.search(body) and not nation_pattern.search(article.title):
-                    print('\n(NOT PH RELATED) Skipped: ' + str(article.url) + '\n')
+                if not nation_pattern.search(combined_body):
+                    print('\n(NO PH LOCATIONS) Skipped: ' + str(article.url) + '\n')
+                    should_slp = True
                     continue
 
             summary_sentences = []
@@ -238,7 +253,7 @@ for news_source in news_sources:
                 'summary': summary_sentences,
                 'summary2': article.summary,
                 'keywords': article.keywords,
-                'locations': matched_locations,
+                'locations': [ml['id'] for ml in matched_locations],
                 'categories': categories,
                 'sentiment': sentiment
                 # 'images': article.images,
@@ -253,6 +268,7 @@ for news_source in news_sources:
             aylien_status2 = text_client2.RateLimits()
             remaining = aylien_status['remaining'] + aylien_status2['remaining']
             print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
+            print('Locations: ' + ', '.join([ml['formattedAddress'] for ml in matched_locations]))
             print('AYLIEN REMAINING CALL: ['+str(aylien_status['remaining'])+', '+str(aylien_status2['remaining'])+'] -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
             should_slp = True
 

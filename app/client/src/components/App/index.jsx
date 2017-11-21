@@ -2,7 +2,7 @@ import React from 'react';
 import MainMenu from '../MainMenu';
 
 const App = () => (
-    <MainMenu />
+  <MainMenu />
 );
 
 export default App;

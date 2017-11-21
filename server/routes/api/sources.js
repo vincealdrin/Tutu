@@ -122,6 +122,7 @@ module.exports = (conn, io) => {
 
   router.post('/', async (req, res, next) => {
     const sources = req.body;
+    const dateAdded = new Date();
     const sourcesInfo = await Promise.all(sources.map(async (source) => {
       const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
 
@@ -134,7 +135,8 @@ module.exports = (conn, io) => {
         ...info,
         aboutUsUrl,
         contactUsUrl,
-        id: r.uuid(url).run(conn),
+        dateAdded,
+        id: await r.uuid(url).run(conn),
       };
     }));
 
@@ -152,7 +154,7 @@ module.exports = (conn, io) => {
     const source = req.body;
 
     if (isIdChanged) {
-      source.id = r.uuid(source.url).run(conn);
+      source.id = await r.uuid(source.url).run(conn);
     }
 
     try {

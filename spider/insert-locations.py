@@ -47,7 +47,7 @@ for location in locations:
         "townCount": province['townCount'],
         "brgyCount": int(province['brgyCount']),
         "cityCount": province['cityCount'],
-        "capital_id": loc_id,
+        "capitalId": loc_id,
         'id': p_id
       }).run(conn)
 

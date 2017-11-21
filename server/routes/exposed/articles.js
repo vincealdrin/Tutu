@@ -6,7 +6,6 @@ module.exports = (conn, io) => {
 
   router.get('/', async (req, res, next) => {
     const {
-      page = 0,
       limit = 15,
       lng = 0,
       lat = 0,
@@ -20,13 +19,13 @@ module.exports = (conn, io) => {
     };
 
     try {
-      const articles = await r.table(tbl)
+      const cursor = await r.table(tbl)
         .getNearest(point, articlesArea)
         .eqJoin(r.row('source_id'), r.table('sources'))
-        .skip(page * limit)
         .limit(limit)
         .zip()
         .run(conn);
+      const articles = await cursor.toArray();
 
       return res.json(articles);
     } catch (e) {

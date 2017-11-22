@@ -23,9 +23,9 @@ for location in locations:
   loc_id = r.uuid(location['formattedAddress']).run(conn)
 
   a = r.table('locations').insert({
-    "location": location['location'],
+    "name": location['name'],
     "type": location['type'],
-    "brgyCount": location['brgyCount'],
+    "brgyCount": int(location['brgyCount']),
     "area": location['area'],
     "psgc": location['psgc'],
     "formattedAddress": location['formattedAddress'],
@@ -35,11 +35,11 @@ for location in locations:
   }).run(conn)
 
   for province in provinces:
-    if (prov == province['province'] and location['location'] == province['capital']):
+    if (prov == province['name'] and location['name'] == province['capital']):
       p_id = r.uuid(province['ISO']).run(conn)
       b = r.table('provinces').insert({
         "ISO": province['ISO'],
-        "province": province['province'],
+        "name": province['name'],
         "capital": province['capital'],
         "area": province['area'],
         "division": province['division'],

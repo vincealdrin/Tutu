@@ -92,6 +92,8 @@ AYLIEN_APP_ID = os.environ.get('AYLIEN_APP_ID')
 AYLIEN_APP_KEY = os.environ.get('AYLIEN_APP_KEY')
 AYLIEN_APP_ID2 = os.environ.get('AYLIEN_APP_ID2')
 AYLIEN_APP_KEY2 = os.environ.get('AYLIEN_APP_KEY2')
+AYLIEN_APP_ID3 = os.environ.get('AYLIEN_APP_ID3')
+AYLIEN_APP_KEY3= os.environ.get('AYLIEN_APP_KEY3')
 LANGUAGE = 'english'
 SENTENCES_COUNT = 5
 
@@ -100,16 +102,28 @@ summarizer = Summarizer(stemmer)
 summarizer.stop_words = get_stop_words(LANGUAGE)
 
 conn = r.connect(DB_HOST, DB_PORT, db=DB_NAME)
-locations = list( r.table('locations').eq_join('provinceId', r.table('provinces')).without({ 'right': {'id': True} }).zip().run(conn))
-provinces = list(r.table('provinces').eq_join('capitalId', r.table('locations')).zip().run(conn))
+locations = list(
+    r.table('locations').eq_join('provinceId', r.table('provinces')).merge(lambda doc:
+        {
+            'location': doc['left'].without({ 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True}),
+            'province': doc['right'].without({ 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True })
+        }).without({ 'right': True, 'left': True }).run(conn))
+provinces = list(
+    r.table('provinces').eq_join('capitalId', r.table('locations')).merge(lambda doc:
+        {
+            'location': doc['left'].without({ 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True}),
+            'province': doc['right'].without({ 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True })
+        }).without({ 'right': True, 'left': True }).run(conn))
 news_sources = list(r.table('sources').order_by('dateAdded').run(conn))
 
 text_client = textapi.Client(AYLIEN_APP_ID, AYLIEN_APP_KEY)
 text_client2 = textapi.Client(AYLIEN_APP_ID2, AYLIEN_APP_KEY2)
+text_client3 = textapi.Client(AYLIEN_APP_ID3, AYLIEN_APP_KEY3)
 classes = [
-    'Business', 'Economy', 'Lifestyle',
+    'Business', 'Economy & Finance', 'Lifestyle', 'Accident',
     'Entertainment', 'Sports', 'Government & Politics',
-    'Health', 'Science & Technology', 'Crime', 'Weather'
+    'Health', 'Science & Technology', 'Crime', 'Weather',
+    'Calamity', 'Nation', 'Education', 'Food'
 ]
 count = 0
 
@@ -159,8 +173,9 @@ for news_source in news_sources:
 
             categories = []
             category1 = text_client.UnsupervisedClassify({ 'url': article.url, 'class': classes[:5] })
-            category2 = text_client2.UnsupervisedClassify({ 'url': article.url, 'class': classes[5:] })
-            categories = category1['classes'] + category2['classes']
+            category2 = text_client2.UnsupervisedClassify({ 'url': article.url, 'class': classes[5:10] })
+            category3 = text_client3.UnsupervisedClassify({ 'url': article.url, 'class': classes[10:] })
+            categories = category1['classes'] + category2['classes'] + category3['classes']
 
             body = category1['text']
 
@@ -194,13 +209,16 @@ for news_source in news_sources:
                 should_slp = True
                 continue
 
+            with open('./world-countries.json') as countries_file:
+                countries = json.load(countries_file)
+
             nation_terms = 'PH|Philippines|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos'
             nation_pattern = re.compile('(\W('+nation_terms+')$|^('+nation_terms+')\W|\W('+nation_terms+')\W)', re.IGNORECASE)
             combined_body = body + ' ' + article.text + ' ' + article.title + ' ' + urlparse(article.url).path
 
             matched_locations = []
             for location in locations:
-                location_pattern = re.compile('\W(City of '+location['location']+'|'+location['location']+' City|'+location['location']+' Municipality|'+location['location']+')+,? ?('+location['province']+' Province|'+location['province']+'|Metro '+location['province']+')?,? ?(Philippines|PH)?\W', re.IGNORECASE)
+                location_pattern = re.compile('\W(City of '+location['location']['name']+'|'+location['location']['name']+' City|'+location['location']['name']+' Municipality|'+location['location']['name']+')+,? ?('+location['province']['name']+' Province|'+location['province']['name']+'|Metro '+location['province']['name']+')?,? ?(Philippines|PH)?\W', re.IGNORECASE)
 
                 matched = location_pattern.search(combined_body)
                 if matched:
@@ -208,11 +226,17 @@ for news_source in news_sources:
 
             if not matched_locations:
                 for province in provinces:
-                    province_pattern = re.compile('\W('+province['province']+' Province|'+province['province']+'|Metro '+province['province']+'|'+province['province']+')+,? ?(Philippines|PH)?\W', re.IGNORECASE)
+                    province_pattern = re.compile('\W('+province['province']['name']+' Province|'+province['province']['name']+'|Metro '+province['province']['name']+'|'+province['province']['name']+')+,? ?(Philippines|PH)?\W', re.IGNORECASE)
                     matched = province_pattern.search(combined_body)
 
                     if matched:
                         matched_locations.append(province)
+
+            for country in countries:
+                if country in combined_body and not nation_pattern.search(combined_body):
+                    print('\n(OTHER COUNTRY BUT NO PH) Skipped: ' + str(article.url) + '\n')
+                    should_slp = True
+                    continue
 
             if not matched_locations:
                 if not nation_pattern.search(combined_body):
@@ -261,9 +285,10 @@ for news_source in news_sources:
 
             aylien_status = text_client.RateLimits()
             aylien_status2 = text_client2.RateLimits()
-            remaining = aylien_status['remaining'] + aylien_status2['remaining']
+            aylien_status3 = text_client3.RateLimits()
+            remaining = aylien_status['remaining'] + aylien_status2['remaining'] + aylien_status3['remaining']
             print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
-            print('Locations: ' + ' | '.join([ml['formattedAddress'] for ml in matched_locations]))
+            print('Locations: ' + ' | '.join([ml['location']['formattedAddress'] for ml in matched_locations]))
             print('AYLIEN REMAINING CALL: ['+str(aylien_status['remaining'])+', '+str(aylien_status2['remaining'])+'] -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
             should_slp = True
 

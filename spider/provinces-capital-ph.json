@@ -1,6 +1,6 @@
 [{
     "ISO": "PH-ABR",
-    "province": "Abra",
+    "name": "Abra",
     "capital": "Bangued",
     "area": "7009416525000000000 km^2",
     "division": "Luzon",
@@ -14,7 +14,7 @@
     }
 }, {
     "ISO": "PH-AGN",
-    "province": "Agusan del Norte",
+    "name": "Agusan del Norte",
     "capital": "Cabadbaran",
     "area": "7009354686000000000 km^2",
     "division": "Mindanao",
@@ -28,7 +28,7 @@
     }
 }, {
     "ISO": "PH-AGS",
-    "province": "Agusan del Sur",
+    "name": "Agusan del Sur",
     "capital": "Prosperidad",
     "area": "7009998952000000000 km^2",
     "division": "Mindanao",
@@ -42,7 +42,7 @@
     }
 }, {
     "ISO": "PH-AKL",
-    "province": "Aklan",
+    "name": "Aklan",
     "capital": "Kalibo",
     "area": "7009182142000000000 km^2",
     "division": "Visayas",
@@ -56,7 +56,7 @@
     }
 }, {
     "ISO": "PH-ALB",
-    "province": "Albay",
+    "name": "Albay",
     "capital": "Legazpi",
     "area": "7009257577000000000 km^2",
     "division": "Luzon",
@@ -70,7 +70,7 @@
     }
 }, {
     "ISO": "PH-ANT",
-    "province": "Antique",
+    "name": "Antique",
     "capital": "San Jose de Buenavista",
     "area": "7009272917000000000 km^2",
     "division": "Visayas",
@@ -84,7 +84,7 @@
     }
 }, {
     "ISO": "PH-APA",
-    "province": "Apayao",
+    "name": "Apayao",
     "capital": "Kabugao",
     "area": "7009441335000000000 km^2",
     "division": "Luzon",
@@ -98,7 +98,7 @@
     }
 }, {
     "ISO": "PH-AUR",
-    "province": "Aurora",
+    "name": "Aurora",
     "capital": "Baler",
     "area": "7009314732000000000 km^2",
     "division": "Luzon",
@@ -112,7 +112,7 @@
     }
 }, {
     "ISO": "PH-BAS",
-    "province": "Basilan",
+    "name": "Basilan",
     "capital": "Lamitan",
     "area": "7009132723000000000 km^2",
     "division": "Mindanao",
@@ -126,7 +126,7 @@
     }
 }, {
     "ISO": "PH-BAN",
-    "province": "Bataan",
+    "name": "Bataan",
     "capital": "Balanga",
     "area": "7009137298000000000 km^2",
     "division": "Luzon",
@@ -140,7 +140,7 @@
     }
 }, {
     "ISO": "PH-BTN",
-    "province": "Batanes",
+    "name": "Batanes",
     "capital": "Basco",
     "area": "7008219010000000000 km^2",
     "division": "Luzon",
@@ -154,7 +154,7 @@
     }
 }, {
     "ISO": "PH-BTG",
-    "province": "Batangas",
+    "name": "Batangas",
     "capital": "Batangas City",
     "area": "7009311972000000000 km^2",
     "division": "Luzon",
@@ -168,7 +168,7 @@
     }
 }, {
     "ISO": "PH-BEN",
-    "province": "Benguet",
+    "name": "Benguet",
     "capital": "La Trinidad",
     "area": "7009282659000000000 km^2",
     "division": "Luzon",
@@ -182,7 +182,7 @@
     }
 }, {
     "ISO": "PH-BIL",
-    "province": "Biliran",
+    "name": "Biliran",
     "capital": "Naval",
     "area": "7008536010000000000 km^2",
     "division": "Visayas",
@@ -196,7 +196,7 @@
     }
 }, {
     "ISO": "PH-BOH",
-    "province": "Bohol",
+    "name": "Bohol",
     "capital": "Tagbilaran",
     "area": "7009482095000000000 km^2",
     "division": "Visayas",
@@ -210,7 +210,7 @@
     }
 }, {
     "ISO": "PH-BUK",
-    "province": "Bukidnon",
+    "name": "Bukidnon",
     "capital": "Malaybalay",
     "area": "7010104985900000000 km^2",
     "division": "Mindanao",
@@ -224,7 +224,7 @@
     }
 }, {
     "ISO": "PH-BUL",
-    "province": "Bulacan",
+    "name": "Bulacan",
     "capital": "Malolos",
     "area": "7009279610000000000 km^2",
     "division": "Luzon",
@@ -238,7 +238,7 @@
     }
 }, {
     "ISO": "PH-CAG",
-    "province": "Cagayan",
+    "name": "Cagayan",
     "capital": "Tuguegarao",
     "area": "7009929575000000000 km^2",
     "division": "Luzon",
@@ -252,7 +252,7 @@
     }
 }, {
     "ISO": "PH-CAN",
-    "province": "Camarines Norte",
+    "name": "Camarines Norte",
     "capital": "Daet",
     "area": "7009232007000000000 km^2",
     "division": "Luzon",
@@ -266,7 +266,7 @@
     }
 }, {
     "ISO": "PH-CAS",
-    "province": "Camarines Sur",
+    "name": "Camarines Sur",
     "capital": "Pili",
     "area": "7009549703000000000 km^2",
     "division": "Luzon",
@@ -280,7 +280,7 @@
     }
 }, {
     "ISO": "PH-CAM",
-    "province": "Camiguin",
+    "name": "Camiguin",
     "capital": "Mambajao",
     "area": "7008237950000000000 km^2",
     "division": "Mindanao",
@@ -294,7 +294,7 @@
     }
 }, {
     "ISO": "PH-CAP",
-    "province": "Capiz",
+    "name": "Capiz",
     "capital": "Roxas",
     "area": "7009259464000000000 km^2",
     "division": "Visayas",
@@ -308,7 +308,7 @@
     }
 }, {
     "ISO": "PH-CAT",
-    "province": "Catanduanes",
+    "name": "Catanduanes",
     "capital": "Virac",
     "area": "7009149216000000000 km^2",
     "division": "Luzon",
@@ -322,7 +322,7 @@
     }
 }, {
     "ISO": "PH-CAV",
-    "province": "Cavite",
+    "name": "Cavite",
     "capital": "Imus",
     "area": "7009157417000000000 km^2",
     "division": "Luzon",
@@ -336,7 +336,7 @@
     }
 }, {
     "ISO": "PH-CEB",
-    "province": "Cebu",
+    "name": "Cebu",
     "capital": "Cebu City",
     "area": "7009534200000000000 km^2",
     "division": "Visayas",
@@ -350,7 +350,7 @@
     }
 }, {
     "ISO": "PH-COM",
-    "province": "Compostela Valley",
+    "name": "Compostela Valley",
     "capital": "Nabunturan",
     "area": "7009447977000000000 km^2",
     "division": "Mindanao",
@@ -364,7 +364,7 @@
     }
 }, {
     "ISO": "PH-NCO",
-    "province": "Cotabato",
+    "name": "Cotabato",
     "capital": "Kidapawan",
     "area": "7009900890000000000 km^2",
     "division": "Mindanao",
@@ -378,7 +378,7 @@
     }
 }, {
     "ISO": "PH-DAV",
-    "province": "Davao del Norte",
+    "name": "Davao del Norte",
     "capital": "Tagum",
     "area": "7009342697000000000 km^2",
     "division": "Mindanao",
@@ -392,7 +392,7 @@
     }
 }, {
     "ISO": "PH-DAS",
-    "province": "Davao del Sur",
+    "name": "Davao del Sur",
     "capital": "Digos",
     "area": "7009460759000000000 km^2",
     "division": "Mindanao",
@@ -406,7 +406,7 @@
     }
 }, {
     "ISO": "PH-DVO",
-    "province": "Davao Occidental",
+    "name": "Davao Occidental",
     "capital": "Malita",
     "area": "7009216345000000000 km^2",
     "division": "Mindanao",
@@ -420,7 +420,7 @@
     }
 }, {
     "ISO": "PH-DAO",
-    "province": "Davao Oriental",
+    "name": "Davao Oriental",
     "capital": "Mati",
     "area": "7009567964000000000 km^2",
     "division": "Mindanao",
@@ -434,7 +434,7 @@
     }
 }, {
     "ISO": "PH-DIN",
-    "province": "Dinagat Islands",
+    "name": "Dinagat Islands",
     "capital": "San Jose",
     "area": "7009103633999999999 km^2",
     "division": "Mindanao",
@@ -448,7 +448,7 @@
     }
 }, {
     "ISO": "PH-EAS",
-    "province": "Eastern Samar",
+    "name": "Eastern Samar",
     "capital": "Borongan",
     "area": "7009466047000000000 km^2",
     "division": "Visayas",
@@ -462,7 +462,7 @@
     }
 }, {
     "ISO": "PH-GUI",
-    "province": "Guimaras",
+    "name": "Guimaras",
     "capital": "Jordan",
     "area": "7008604570000000000 km^2",
     "division": "Visayas",
@@ -476,7 +476,7 @@
     }
 }, {
     "ISO": "PH-IFU",
-    "province": "Ifugao",
+    "name": "Ifugao",
     "capital": "Lagawe",
     "area": "7009262821000000000 km^2",
     "division": "Luzon",
@@ -490,7 +490,7 @@
     }
 }, {
     "ISO": "PH-ILN",
-    "province": "Ilocos Norte",
+    "name": "Ilocos Norte",
     "capital": "Laoag",
     "area": "7009346789000000000 km^2",
     "division": "Luzon",
@@ -504,7 +504,7 @@
     }
 }, {
     "ISO": "PH-ILS",
-    "province": "Ilocos Sur",
+    "name": "Ilocos Sur",
     "capital": "Vigan",
     "area": "7009259600000000000 km^2",
     "division": "Luzon",
@@ -518,7 +518,7 @@
     }
 }, {
     "ISO": "PH-ILI",
-    "province": "Iloilo",
+    "name": "Iloilo",
     "capital": "Iloilo City",
     "area": "7009507917000000000 km^2",
     "division": "Visayas",
@@ -532,7 +532,7 @@
     }
 }, {
     "ISO": "PH-ISA",
-    "province": "Isabela",
+    "name": "Isabela",
     "capital": "Ilagan",
     "area": "7010124149300000000 km^2",
     "division": "Luzon",
@@ -546,7 +546,7 @@
     }
 }, {
     "ISO": "PH-KAL",
-    "province": "Kalinga",
+    "name": "Kalinga",
     "capital": "Tabuk",
     "area": "7009323125000000000 km^2",
     "division": "Luzon",
@@ -560,7 +560,7 @@
     }
 }, {
     "ISO": "PH-LUN",
-    "province": "La Union",
+    "name": "La Union",
     "capital": "San Fernando",
     "area": "7009149770000000000 km^2",
     "division": "Luzon",
@@ -574,7 +574,7 @@
     }
 }, {
     "ISO": "PH-LAG",
-    "province": "Laguna",
+    "name": "Laguna",
     "capital": "Santa Cruz",
     "area": "7009191785000000000 km^2",
     "division": "Luzon",
@@ -588,7 +588,7 @@
     }
 }, {
     "ISO": "PH-LAN",
-    "province": "Lanao del Norte",
+    "name": "Lanao del Norte",
     "capital": "Tubod",
     "area": "7009415993999999999 km^2",
     "division": "Mindanao",
@@ -602,7 +602,7 @@
     }
 }, {
     "ISO": "PH-LAS",
-    "province": "Lanao del Sur",
+    "name": "Lanao del Sur",
     "capital": "Marawi",
     "area": "7009387289000000000 km^2",
     "division": "Mindanao",
@@ -616,7 +616,7 @@
     }
 }, {
     "ISO": "PH-LEY",
-    "province": "Leyte",
+    "name": "Leyte",
     "capital": "Tacloban",
     "area": "7009651505000000000 km^2",
     "division": "Visayas",
@@ -630,7 +630,7 @@
     }
 }, {
     "ISO": "PH-MAG",
-    "province": "Maguindanao",
+    "name": "Maguindanao",
     "capital": "Shariff Aguak",
     "area": "7009614653000000000 km^2",
     "division": "Mindanao",
@@ -644,7 +644,7 @@
     }
 }, {
     "ISO": "PH-MAD",
-    "province": "Marinduque",
+    "name": "Marinduque",
     "capital": "Boac",
     "area": "7008952580000000000 km^2",
     "division": "Luzon",
@@ -658,7 +658,7 @@
     }
 }, {
     "ISO": "PH-MAS",
-    "province": "Masbate",
+    "name": "Masbate",
     "capital": "Masbate City",
     "area": "7009415177999999999 km^2",
     "division": "Luzon",
@@ -672,7 +672,7 @@
     }
 }, {
     "ISO": "PH-MSC",
-    "province": "Misamis Occidental",
+    "name": "Misamis Occidental",
     "capital": "Oroquieta",
     "area": "7009205521999999999 km^2",
     "division": "Mindanao",
@@ -686,7 +686,7 @@
     }
 }, {
     "ISO": "PH-MSR",
-    "province": "Misamis Oriental",
+    "name": "Misamis Oriental",
     "capital": "Cagayan de Oro",
     "area": "7009354432000000000 km^2",
     "division": "Mindanao",
@@ -700,7 +700,7 @@
     }
 }, {
     "ISO": "PH-MOU",
-    "province": "Mountain Province",
+    "name": "Mountain name",
     "capital": "Bontoc",
     "area": "7009215738000000000 km^2",
     "division": "Luzon",
@@ -714,7 +714,7 @@
     }
 }, {
     "ISO": "PH-NEC",
-    "province": "Negros Occidental",
+    "name": "Negros Occidental",
     "capital": "Bacolod",
     "area": "7009796521000000000 km^2",
     "division": "Visayas",
@@ -728,7 +728,7 @@
     }
 }, {
     "ISO": "PH-NER",
-    "province": "Negros Oriental",
+    "name": "Negros Oriental",
     "capital": "Dumaguete",
     "area": "7009538553000000000 km^2",
     "division": "Visayas",
@@ -742,7 +742,7 @@
     }
 }, {
     "ISO": "PH-NSA",
-    "province": "Northern Samar",
+    "name": "Northern Samar",
     "capital": "Catarman",
     "area": "7009369293000000000 km^2",
     "division": "Visayas",
@@ -756,7 +756,7 @@
     }
 }, {
     "ISO": "PH-NUE",
-    "province": "Nueva Ecija",
+    "name": "Nueva Ecija",
     "capital": "Palayan",
     "area": "7009575133000000000 km^2",
     "division": "Luzon",
@@ -770,7 +770,7 @@
     }
 }, {
     "ISO": "PH-NUV",
-    "province": "Nueva Vizcaya",
+    "name": "Nueva Vizcaya",
     "capital": "Bayombong",
     "area": "7009397567000000000 km^2",
     "division": "Luzon",
@@ -784,7 +784,7 @@
     }
 }, {
     "ISO": "PH-MDC",
-    "province": "Occidental Mindoro",
+    "name": "Occidental Mindoro",
     "capital": "Mamburao",
     "area": "7009586571000000000 km^2",
     "division": "Luzon",
@@ -798,7 +798,7 @@
     }
 }, {
     "ISO": "PH-MDR",
-    "province": "Oriental Mindoro",
+    "name": "Oriental Mindoro",
     "capital": "Calapan",
     "area": "7009423838000000000 km^2",
     "division": "Luzon",
@@ -812,7 +812,7 @@
     }
 }, {
     "ISO": "PH-PLW",
-    "province": "Palawan",
+    "name": "Palawan",
     "capital": "Puerto Princesa",
     "area": "7010170307500000000 km^2",
     "division": "Luzon",
@@ -826,7 +826,7 @@
     }
 }, {
     "ISO": "PH-PAM",
-    "province": "Pampanga",
+    "name": "Pampanga",
     "capital": "San Fernando",
     "area": "7009206246999999999 km^2",
     "division": "Luzon",
@@ -840,7 +840,7 @@
     }
 }, {
     "ISO": "PH-PAN",
-    "province": "Pangasinan",
+    "name": "Pangasinan",
     "capital": "Lingayen",
     "area": "7009545101000000000 km^2",
     "division": "Luzon",
@@ -854,7 +854,7 @@
     }
 }, {
     "ISO": "PH-QUE",
-    "province": "Quezon",
+    "name": "Quezon",
     "capital": "Lucena",
     "area": "7009906960000000000 km^2",
     "division": "Luzon",
@@ -868,7 +868,7 @@
     }
 }, {
     "ISO": "PH-QUI",
-    "province": "Quirino",
+    "name": "Quirino",
     "capital": "Cabarroguis",
     "area": "7009232347000000000 km^2",
     "division": "Luzon",
@@ -882,7 +882,7 @@
     }
 }, {
     "ISO": "PH-RIZ",
-    "province": "Rizal",
+    "name": "Rizal",
     "capital": "Antipolo",
     "area": "7009119194000000000 km^2",
     "division": "Luzon",
@@ -896,7 +896,7 @@
     }
 }, {
     "ISO": "PH-ROM",
-    "province": "Romblon",
+    "name": "Romblon",
     "capital": "Romblon",
     "area": "7009153345000000000 km^2",
     "division": "Luzon",
@@ -910,7 +910,7 @@
     }
 }, {
     "ISO": "PH-WSA",
-    "province": "Samar",
+    "name": "Samar",
     "capital": "Catbalogan",
     "area": "7009604803000000000 km^2",
     "division": "Visayas",
@@ -924,7 +924,7 @@
     }
 }, {
     "ISO": "PH-SAR",
-    "province": "Sarangani",
+    "name": "Sarangani",
     "capital": "Alabel",
     "area": "7009360125000000000 km^2",
     "division": "Mindanao",
@@ -938,7 +938,7 @@
     }
 }, {
     "ISO": "PH-SIG",
-    "province": "Siquijor",
+    "name": "Siquijor",
     "capital": "Siquijor",
     "area": "7008337490000000000 km^2",
     "division": "Visayas",
@@ -952,7 +952,7 @@
     }
 }, {
     "ISO": "PH-SOR",
-    "province": "Sorsogon",
+    "name": "Sorsogon",
     "capital": "Sorsogon City",
     "area": "7009211901000000000 km^2",
     "division": "Luzon",
@@ -966,7 +966,7 @@
     }
 }, {
     "ISO": "PH-SCO",
-    "province": "South Cotabato",
+    "name": "South Cotabato",
     "capital": "Koronadal",
     "area": "7009442881000000000 km^2",
     "division": "Mindanao",
@@ -980,7 +980,7 @@
     }
 }, {
     "ISO": "PH-SLE",
-    "province": "Southern Leyte",
+    "name": "Southern Leyte",
     "capital": "Maasin",
     "area": "7009179861000000000 km^2",
     "division": "Visayas",
@@ -994,7 +994,7 @@
     }
 }, {
     "ISO": "PH-SUK",
-    "province": "Sultan Kudarat",
+    "name": "Sultan Kudarat",
     "capital": "Isulan",
     "area": "7009529834000000000 km^2",
     "division": "Mindanao",
@@ -1008,7 +1008,7 @@
     }
 }, {
     "ISO": "PH-SLU",
-    "province": "Sulu",
+    "name": "Sulu",
     "capital": "Jolo",
     "area": "7009160040000000000 km^2",
     "division": "Mindanao",
@@ -1022,7 +1022,7 @@
     }
 }, {
     "ISO": "PH-SUN",
-    "province": "Surigao del Norte",
+    "name": "Surigao del Norte",
     "capital": "Surigao City",
     "area": "7009197293000000000 km^2",
     "division": "Mindanao",
@@ -1036,7 +1036,7 @@
     }
 }, {
     "ISO": "PH-SUR",
-    "province": "Surigao del Sur",
+    "name": "Surigao del Sur",
     "capital": "Tandag",
     "area": "7009493270000000000 km^2",
     "division": "Mindanao",
@@ -1050,7 +1050,7 @@
     }
 }, {
     "ISO": "PH-TAR",
-    "province": "Tarlac",
+    "name": "Tarlac",
     "capital": "Tarlac City",
     "area": "7009305360000000000 km^2",
     "division": "Luzon",
@@ -1064,7 +1064,7 @@
     }
 }, {
     "ISO": "PH-TAW",
-    "province": "Tawi-Tawi",
+    "name": "Tawi-Tawi",
     "capital": "Bongao",
     "area": "7009108740000000000 km^2",
     "division": "Mindanao",
@@ -1078,7 +1078,7 @@
     }
 }, {
     "ISO": "PH-ZMB",
-    "province": "Zambales",
+    "name": "Zambales",
     "capital": "Iba",
     "area": "7009383083000000000 km^2",
     "division": "Luzon",
@@ -1092,7 +1092,7 @@
     }
 }, {
     "ISO": "PH-ZAN",
-    "province": "Zamboanga del Norte",
+    "name": "Zamboanga del Norte",
     "capital": "Dipolog",
     "area": "7009730100000000000 km^2",
     "division": "Mindanao",
@@ -1106,7 +1106,7 @@
     }
 }, {
     "ISO": "PH-ZAS",
-    "province": "Zamboanga del Sur",
+    "name": "Zamboanga del Sur",
     "capital": "Pagadian",
     "area": "7009591416000000000 km^2",
     "division": "Mindanao",
@@ -1120,7 +1120,7 @@
     }
 }, {
     "ISO": "PH-ZSI",
-    "province": "Zamboanga Sibugay",
+    "name": "Zamboanga Sibugay",
     "capital": "Ipil",
     "area": "7009360775000000000 km^2",
     "division": "Mindanao",
@@ -1134,7 +1134,7 @@
     }
 }, {
     "ISO": "PH-00",
-    "province": "Manila",
+    "name": "Manila",
     "capital": "Manila",
     "area": "7008638550000000000 km^2",
     "division": "Luzon",

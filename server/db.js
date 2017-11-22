@@ -38,7 +38,7 @@ module.exports = async (cb) => {
   try {
     await r.table('articles').indexCreate(
       'positions',
-      r.row('locations')('position'),
+      r.row('locations')('location')('position'),
       { geo: true, multi: true }
     ).run(conn);
     console.log('positions index created on articles table');

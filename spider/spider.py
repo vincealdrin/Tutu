@@ -113,7 +113,7 @@ locations = list(
 provinces = list(
     r.table('provinces').eq_join('capitalId', r.table('locations')).merge(lambda doc:
         {
-            'province': doc['left'].without({ 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True })
+            'province': doc['left'].without({ 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True }),
             'location': doc['right'].without({ 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True}),
         }).without({ 'right': True, 'left': True }).run(conn))
 news_sources = list(r.table('sources').order_by('dateAdded').run(conn))

@@ -9,6 +9,8 @@ An Interactive Map of Credible News Outlets in the Philippines
   * [yarn](https://www.npmjs.com/package/yarn)
   * [create-react-app](https://www.npmjs.com/package/create-react-app)
 
+
+
 ## User Client Installation
 
 ```sh

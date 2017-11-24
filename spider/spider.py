@@ -269,7 +269,7 @@ for news_source in news_sources:
                 'title': article.title.encode('ascii', 'ignore').decode('utf-8'),
                 'authors': article.authors,
                 'body': body,
-                'publishDate': article.publish_date if article.publish_date else datetime.strptime(htmldate.find_date(article.html), '%Y-%m-%d').astimezone(r.make_timezone('+08:00')),
+                'publishDate': datetime.strptime(htmldate.find_date(article.publish_date), '%Y-%m-%d').astimezone(r.make_timezone('+08:00') if article.publish_date else datetime.strptime(htmldate.find_date(article.html), '%Y-%m-%d').astimezone(r.make_timezone('+08:00')),
                 'topImage': article.top_image,
                 'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
                 'summary': summary_sentences,

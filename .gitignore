@@ -25,6 +25,7 @@ spider/*.xml
 spider/articles-*/
 !spider/provinces-capital-ph.json
 !spider/locations-ph.json
+!spider/world-countries.json
 
 npm-debug.log*
 yarn-debug.log*

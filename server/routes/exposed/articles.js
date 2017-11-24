@@ -24,7 +24,32 @@ module.exports = (conn, io) => {
       const cursor = await r.table(tbl)
         .getNearest(point, articlesArea)
         .eqJoin(r.row('doc')('sourceId'), r.table('sources'))
-        .zip()
+        .merge((doc) => ({
+          article: doc('left')('doc')
+            .merge((article) => ({
+              categories: article('categories').filter((category) => category('score').gt(0)),
+            }))
+            .without({
+              body: true,
+              locations: true,
+            }),
+          source: {
+            info: doc('right').without({
+              id: true,
+              trafficData: true,
+              siteData: { onlineSince: true },
+              contentData: {
+                ownedDomains: true,
+                speed: true,
+                language: true,
+                adultContent: true,
+              },
+              related: true,
+            }),
+            relatedLinks: doc('right')('related')('relatedLinks'),
+          },
+        }))
+        .without({ left: true, right: true })
         .run(conn);
       const articles = await cursor.toArray();
 

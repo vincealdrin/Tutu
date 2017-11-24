@@ -113,8 +113,8 @@ locations = list(
 provinces = list(
     r.table('provinces').eq_join('capitalId', r.table('locations')).merge(lambda doc:
         {
-            'location': doc['left'].without({ 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True}),
-            'province': doc['right'].without({ 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True })
+            'province': doc['left'].without({ 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True })
+            'location': doc['right'].without({ 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True}),
         }).without({ 'right': True, 'left': True }).run(conn))
 news_sources = list(r.table('sources').order_by('dateAdded').run(conn))
 
@@ -221,7 +221,7 @@ for news_source in news_sources:
 
             matched_locations = []
             for location in locations:
-                location_pattern = re.compile('\W(City of '+location['location']['name']+'|'+location['location']['name']+' City|'+location['location']['name']+' Municipality|'+location['location']['name']+')+,? ?('+location['province']['name']+' Province|'+location['province']['name']+'|Metro '+location['province']['name']+')?,? ?(Philippines|PH)?\W', re.IGNORECASE)
+                location_pattern = re.compile('\W(City of '+location['location']['name']+'|'+location['location']['name']+' City|'+location['location']['name']+' Municipality|'+location['location']['name']+')+,? ?('+location['province']['name']+' Province|'+location['province']['name']+'|Metro '+location['province']['name']+')+,? ?(Philippines|PH)?\W', re.IGNORECASE)
 
                 matched = location_pattern.search(combined_body)
                 if matched:

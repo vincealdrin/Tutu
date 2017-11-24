@@ -20,18 +20,15 @@ module.exports = (conn, io) => {
     };
 
     try {
+      const totalCount = await r.table(tbl).count().run(conn);
       const cursor = await r.table(tbl)
         .getNearest(point, articlesArea)
         .eqJoin(r.row('doc')('sourceId'), r.table('sources'))
         .zip()
-        // .merge((article) => ({
-        //   locations: r.table('locations')
-        //     .getAll(r.args(article('locations')))
-        //     .coerceTo('array'),
-        // }))
         .run(conn);
       const articles = await cursor.toArray();
 
+      res.setHeader('X-Total-Count', totalCount);
       return res.json(articles);
     } catch (e) {
       next(e);

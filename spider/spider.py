@@ -11,7 +11,7 @@ import sys
 from random import randrange
 from fake_useragent import UserAgent
 import rethinkdb as r
-import datetime
+from datetime import datetime
 from urllib.parse import urldefrag, urlparse
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
@@ -21,9 +21,10 @@ from sumy.utils import get_stop_words
 from aylienapiclient import textapi
 from textblob import TextBlob
 import hashlib
+import htmldate
+import pytz
 
 load_dotenv(find_dotenv(), override=True)
-
 # get free proxies from us-proxy.org
 def get_proxies():
     html_doc = get('https://www.us-proxy.org/').text
@@ -83,6 +84,7 @@ def get_author(html_doc):
 
     return author.strip()
 
+
 AMAZON_ACCESS_KEY = os.environ.get('AMAZON_ACCESS_KEY')
 AMAZON_SECRET_KEY = os.environ.get('AMAZON_SECRET_KEY')
 DB_NAME = os.environ.get('DB_NAME')
@@ -119,6 +121,7 @@ news_sources = list(r.table('sources').order_by('dateAdded').run(conn))
 text_client = textapi.Client(AYLIEN_APP_ID, AYLIEN_APP_KEY)
 text_client2 = textapi.Client(AYLIEN_APP_ID2, AYLIEN_APP_KEY2)
 text_client3 = textapi.Client(AYLIEN_APP_ID3, AYLIEN_APP_KEY3)
+
 classes = [
     'Business', 'Economy & Finance', 'Lifestyle', 'Accident',
     'Entertainment', 'Sports', 'Government & Politics',
@@ -212,7 +215,7 @@ for news_source in news_sources:
             with open('./world-countries.json') as countries_file:
                 countries = json.load(countries_file)
 
-            nation_terms = 'PH|Philippines|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos'
+            nation_terms = 'PH|Philippines?|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos'
             nation_pattern = re.compile('(\W('+nation_terms+')$|^('+nation_terms+')\W|\W('+nation_terms+')\W)', re.IGNORECASE)
             combined_body = body + ' ' + article.text + ' ' + article.title + ' ' + urlparse(article.url).path
 
@@ -266,9 +269,9 @@ for news_source in news_sources:
                 'title': article.title.encode('ascii', 'ignore').decode('utf-8'),
                 'authors': article.authors,
                 'body': body,
-                'publishDate': article.publish_date.strftime('%m/%d/%Y') if article.publish_date else '',
-                'top_image': article.top_image,
-                'timestamp': datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
+                'publishDate': article.publish_date if article.publish_date else datetime.strptime(htmldate.find_date(article.html), '%Y-%m-%d').astimezone(r.make_timezone('+08:00')),
+                'topImage': article.top_image,
+                'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
                 'summary': summary_sentences,
                 'summary2': article.summary,
                 'keywords': article.keywords,
@@ -280,16 +283,14 @@ for news_source in news_sources:
             }
 
             r.table('articles').insert(new_article).run(conn)
-
             count += 1
 
             aylien_status = text_client.RateLimits()
             aylien_status2 = text_client2.RateLimits()
             aylien_status3 = text_client3.RateLimits()
-            remaining = aylien_status['remaining'] + aylien_status2['remaining'] + aylien_status3['remaining']
             print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
             print('Locations: ' + ' | '.join([ml['location']['formattedAddress'] for ml in matched_locations]))
-            print('AYLIEN REMAINING CALL: ['+str(aylien_status['remaining'])+', '+str(aylien_status2['remaining'])+'] -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
+            print('AYLIEN REMAINING CALL: ['+str(aylien_status['remaining'])+', '+str(aylien_status2['remaining'])+', '+str(aylien_status3['remaining'])+'] -- ' + str('%.2f' % float(time.clock() - start_time)) + 's scraping runtime')
             should_slp = True
 
         except newspaper.ArticleException as e:

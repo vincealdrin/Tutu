@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { crudStatus, updateCrudStatus } from '../util';
 
-export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
+export const FETCH_RECENT_ARTICLES = 'recentArticles/FETCH_RECENT_ARTICLES';
 
 const initialState = {
   articles: [],
@@ -12,7 +12,7 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_ARTICLES:
+    case FETCH_RECENT_ARTICLES:
       return {
         ...state,
         articles: action.articles || state.articles,
@@ -24,7 +24,7 @@ export default (state = initialState, action) => {
 };
 
 export const fetchArticles = (lng, lat, maxDist, limit) => async (dispatch) => {
-  dispatch({ type: FETCH_ARTICLES, statusText: 'pending' });
+  dispatch({ type: FETCH_RECENT_ARTICLES, statusText: 'pending' });
 
   try {
     const { data: articles, headers, status } = await axios.get('/articles', {
@@ -35,9 +35,9 @@ export const fetchArticles = (lng, lat, maxDist, limit) => async (dispatch) => {
         limit,
       },
     });
-    console.log(articles);
+
     dispatch({
-      type: FETCH_ARTICLES,
+      type: FETCH_RECENT_ARTICLES,
       totalCount: parseInt(headers['x-total-count'], 10),
       statusText: 'success',
       articles,
@@ -45,7 +45,7 @@ export const fetchArticles = (lng, lat, maxDist, limit) => async (dispatch) => {
     });
   } catch (e) {
     dispatch({
-      type: FETCH_ARTICLES,
+      type: FETCH_RECENT_ARTICLES,
       statusText: 'error',
       status: e.response.status,
     });

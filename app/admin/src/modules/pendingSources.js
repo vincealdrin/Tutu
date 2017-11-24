@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { updateCrudStatus, crudStatus } from '../utils';
 
-export const FETCH_SOURCES = 'sources/FETCH_SOURCES';
-export const CREATE_SOURCE = 'sources/CREATE_SOURCE';
-export const UPDATE_SOURCE = 'sources/UPDATE_SOURCE';
-export const DELETE_SOURCES = 'sources/DELETE_SOURCE';
+export const FETCH_PENDING_SOURCES = 'pendingSources/FETCH_PENDING_SOURCES';
+export const CREATE_PENDING_SOURCE = 'pendingSources/CREATE_PENDING_SOURCE';
+export const UPDATE_PENDING_SOURCE = 'pendingSources/UPDATE_PENDING_SOURCE';
+export const DELETE_PENDING_SOURCES = 'pendingSources/DELETE_PENDING_SOURCE';
 
 const initialState = {
   sources: [],
@@ -16,13 +16,13 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_SOURCES:
+    case FETCH_PENDING_SOURCES:
       return {
         ...state,
         sources: action.sources || state.sources,
         fetchStatus: updateCrudStatus(action),
       };
-    case CREATE_SOURCE:
+    case CREATE_PENDING_SOURCE:
       return {
         ...state,
         sources: [
@@ -31,7 +31,7 @@ export default (state = initialState, action) => {
         ],
         createStatus: updateCrudStatus(action),
       };
-    case UPDATE_SOURCE:
+    case UPDATE_PENDING_SOURCE:
       return {
         ...state,
         sources: state.sources.map((source) => {
@@ -42,7 +42,7 @@ export default (state = initialState, action) => {
         }),
         updateStatus: updateCrudStatus(action),
       };
-    case DELETE_SOURCES:
+    case DELETE_PENDING_SOURCES:
       return {
         ...state,
         sources: state.sources.filter((source) => action.deletedIds.includes(source.id)),
@@ -54,19 +54,19 @@ export default (state = initialState, action) => {
 };
 
 export const fetchSources = () => async (dispatch) => {
-  dispatch({ type: FETCH_SOURCES, statusText: 'pending' });
+  dispatch({ type: FETCH_PENDING_SOURCES, statusText: 'pending' });
 
   try {
     const sources = await axios.get('a');
 
     dispatch({
-      type: FETCH_SOURCES,
+      type: FETCH_PENDING_SOURCES,
       statusText: 'success',
       sources,
     });
   } catch (e) {
     dispatch({
-      type: FETCH_SOURCES,
+      type: FETCH_PENDING_SOURCES,
       statusText: 'error',
       status: e.response.status,
     });
@@ -74,19 +74,19 @@ export const fetchSources = () => async (dispatch) => {
 };
 
 export const createSource = (source) => async (dispatch) => {
-  dispatch({ type: CREATE_SOURCE, statusText: 'pending' });
+  dispatch({ type: CREATE_PENDING_SOURCE, statusText: 'pending' });
 
   try {
     const id = await axios.post('a', source);
 
     dispatch({
-      type: CREATE_SOURCE,
+      type: CREATE_PENDING_SOURCE,
       statusText: 'success',
       newSource: { ...source, id },
     });
   } catch (e) {
     dispatch({
-      type: CREATE_SOURCE,
+      type: CREATE_PENDING_SOURCE,
       statusText: 'error',
       status: e.response.status,
     });
@@ -94,7 +94,7 @@ export const createSource = (source) => async (dispatch) => {
 };
 
 export const updateSource = (sourceId, source, isIdChanged = false) => async (dispatch) => {
-  dispatch({ type: UPDATE_SOURCE, statusText: 'pending' });
+  dispatch({ type: UPDATE_PENDING_SOURCE, statusText: 'pending' });
 
   try {
     const endpoint = `/sources/${sourceId}`;
@@ -102,13 +102,13 @@ export const updateSource = (sourceId, source, isIdChanged = false) => async (di
     const updatedSource = await axios.put(path, source);
 
     dispatch({
-      type: UPDATE_SOURCE,
+      type: UPDATE_PENDING_SOURCE,
       statusText: 'success',
       updatedSource,
     });
   } catch (e) {
     dispatch({
-      type: UPDATE_SOURCE,
+      type: UPDATE_PENDING_SOURCE,
       statusText: 'error',
       status: e.response.status,
     });
@@ -116,19 +116,19 @@ export const updateSource = (sourceId, source, isIdChanged = false) => async (di
 };
 
 export const deleteSources = (ids) => async (dispatch) => {
-  dispatch({ type: DELETE_SOURCES, statusText: 'pending' });
+  dispatch({ type: DELETE_PENDING_SOURCES, statusText: 'pending' });
 
   try {
     await axios.put('/sources/', ids);
 
     dispatch({
-      type: DELETE_SOURCES,
+      type: DELETE_PENDING_SOURCES,
       statusText: 'success',
       deletedIds: ids,
     });
   } catch (e) {
     dispatch({
-      type: DELETE_SOURCES,
+      type: DELETE_PENDING_SOURCES,
       statusText: 'error',
       status: e.response.status,
     });

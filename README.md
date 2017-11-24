@@ -12,7 +12,7 @@ An Interactive Map of Credible News Outlets in the Philippines
 ## User Client Installation
 
 ```sh
-cd app/client
+cd app/client/
 
 yarn install
 yarn start
@@ -22,7 +22,7 @@ The default port is 3000
 ## Admin Client Installation
 
 ```sh
-cd app/admin
+cd app/admin/
 
 yarn install
 yarn start
@@ -32,7 +32,7 @@ The default port is 3001
 ## Server Installation
 
 ```sh
-cd server
+cd server/
 
 yarn install
 yarn start
@@ -42,7 +42,7 @@ The default port is 5000
 ## Spider Installation
 
 ```sh
-cd spider
+cd spider/
 
 pip install pipenv
 pipenv install

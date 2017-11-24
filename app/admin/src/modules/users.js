@@ -21,10 +21,10 @@ export default (state = initialState, action) => {
     case FETCH_USERS:
       return {
         ...state,
-        users: [
+        users: action.users ? [
           ...state.users,
           ...action.users,
-        ],
+        ] : state.users,
         totalCount: action.totalCount,
         fetchStatus: updateCrudStatus(action),
       };

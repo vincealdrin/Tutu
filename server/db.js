@@ -13,7 +13,6 @@ module.exports = async (cb) => {
     'users',
     'siteStats',
     'fakeSources',
-    'fakeArticles',
     'pendingSources',
     'locations',
     'provinces',

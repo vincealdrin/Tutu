@@ -109,7 +109,6 @@ class MapView extends Component {
 
   render() {
     const { articles } = this.props;
-    console.log(this.props);
     return (
       <div className="mapview-container">
         <GoogleMapReact

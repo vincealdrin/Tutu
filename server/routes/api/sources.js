@@ -40,9 +40,7 @@ const getAboutContactUrl = async (url) => {
 
     if (aboutUsUrl.substring(0, 2) === '//') {
       aboutUsUrl = `http:${aboutUsUrl}`;
-    }
-
-    if (aboutUsUrl && !/^https?:\/\//.test(aboutUsUrl)) {
+    } else if (aboutUsUrl && !/^https?:\/\//.test(aboutUsUrl)) {
       aboutUsUrl = `http://${aboutUsUrl}`;
     }
 
@@ -54,9 +52,7 @@ const getAboutContactUrl = async (url) => {
 
     if (contactUsUrl[0] === '/') {
       contactUsUrl = url + contactUsUrl;
-    }
-
-    if (contactUsUrl.substring(0, 2) === '//') {
+    } else if (contactUsUrl.substring(0, 2) === '//') {
       contactUsUrl = `http:${contactUsUrl}`;
     }
 
@@ -96,12 +92,14 @@ module.exports = (conn, io) => {
     const { page = 0, limit = 15 } = req.query;
 
     try {
+      const totalCount = await r.table(tbl).count().run(conn);
       const cursor = await r.table(tbl)
         .skip(page * limit)
         .limit(limit)
         .run(conn);
       const sources = await cursor.toArray();
 
+      res.setHeader('X-Total-Count', totalCount);
       return res.json(sources);
     } catch (e) {
       next(e);

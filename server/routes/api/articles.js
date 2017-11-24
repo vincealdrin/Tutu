@@ -2,15 +2,14 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 
 module.exports = (conn, io) => {
-  const tblName = 'articles';
+  const tbl = 'articles';
 
   router.get('/', async (req, res, next) => {
     const { page = 0, limit = 20 } = req.query;
 
     try {
-      const table = r.table(tblName);
-      const totalCount = await table.count().run(conn);
-      const cursor = await table
+      const totalCount = await r.table(tbl).count().run(conn);
+      const cursor = await r.table(tbl)
         .skip(page * limit)
         .limit(limit)
         .run(conn);
@@ -27,7 +26,7 @@ module.exports = (conn, io) => {
     const { articleId } = req.params;
 
     try {
-      const article = await r.table(tblName).get(articleId).run(conn);
+      const article = await r.table(tbl).get(articleId).run(conn);
 
       return res.json(article);
     } catch (e) {
@@ -42,7 +41,7 @@ module.exports = (conn, io) => {
     }));
 
     try {
-      const { generated_keys } = await r.table(tblName).insert(articles).run(conn);
+      const { generated_keys } = await r.table(tbl).insert(articles).run(conn);
 
       return res.json(generated_keys);
     } catch (e) {
@@ -60,7 +59,7 @@ module.exports = (conn, io) => {
     }
 
     try {
-      await r.table(tblName).get(articleId).update(article).run(conn);
+      await r.table(tbl).get(articleId).update(article).run(conn);
 
       res.json(article);
     } catch (e) {
@@ -72,7 +71,7 @@ module.exports = (conn, io) => {
     const { ids = [] } = req.body;
 
     try {
-      await r.table(tblName).getAll(r.args(ids)).delete().run(conn);
+      await r.table(tbl).getAll(r.args(ids)).delete().run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -84,7 +83,7 @@ module.exports = (conn, io) => {
     const { articleId = '' } = req.params;
 
     try {
-      await r.table(tblName).getAll(articleId).delete().run(conn);
+      await r.table(tbl).getAll(articleId).delete().run(conn);
 
       res.status(204).end();
     } catch (e) {

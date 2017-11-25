@@ -1,40 +1,71 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Icon, Popup } from 'semantic-ui-react';
+import { Menu, Icon, Label, Image, Grid, Header } from 'semantic-ui-react';
+import MenuItems from './MenuItems';
 import './style.css';
 
 class MainMenu extends Component {
-  state = { activeItem: 'map' }
-  handleMenuClick = (e, { name }) => this.setState({ activeItem: name })
 
   render() {
-    const { activeItem } = this.state;
+
+		const articles = [
+			{
+				source: 'http://www.sunstar.com.ph/sites/default/files/styles/large/public/field/image/article/rappler_1.jpg?itok=6_Elgc2Z',
+				description: 'This is a long statement meant to be a description for the image of the article to the left.'
+			},
+			{
+				source: 'http://www.sunstar.com.ph/sites/default/files/styles/large/public/field/image/article/rappler_1.jpg?itok=6_Elgc2Z',
+				description: 'This is a long statement meant to be a description for the image of the article to the left.'
+			},
+			{
+				source: 'http://www.sunstar.com.ph/sites/default/files/styles/large/public/field/image/article/rappler_1.jpg?itok=6_Elgc2Z',
+				description: 'This is a long statement meant to be a description for the image of the article to the left.'
+			},
+			{
+				source: 'http://www.sunstar.com.ph/sites/default/files/styles/large/public/field/image/article/rappler_1.jpg?itok=6_Elgc2Z',
+				description: 'This is a long statement meant to be a description for the image of the article to the left.'
+			},
+			{
+				source: 'http://www.sunstar.com.ph/sites/default/files/styles/large/public/field/image/article/rappler_1.jpg?itok=6_Elgc2Z',
+				description: 'This is a long statement meant to be a description for the image of the article to the left.'
+			},
+			{
+				source: 'http://www.sunstar.com.ph/sites/default/files/styles/large/public/field/image/article/rappler_1.jpg?itok=6_Elgc2Z',
+				description: 'This is a long statement meant to be a description for the image of the article to the left.'
+			}
+		]
 
     return (
-      <Menu icon="labeled" className="in-front" vertical>
-        <Menu.Item name="home" to="/" as={Link} active={activeItem === 'map'} onClick={this.handleMenuClick}>
-          <Icon name="legal" color="olive" />
-        </Menu.Item>
+			<div className="menu-container in-front">
+				<div className="left-col">
+				<Label as="a" color="red" className="margin-top" ribbon>Top News</Label>
+				<div className="news-section">
+					<div>
+						<Grid>
+							{articles.map(article => {
+								return (
+									<Grid.Row className="articles">
+										<Grid.Column width={7}>
+											<Image src={article.source} fluid rounded href={article.source} target="_blank" />
+										</Grid.Column>
+										<Grid.Column width={9}>
+											<Header as="h3">Article Name</Header>
+											<p>
+												{article.description}
+											</p>
+										</Grid.Column>
+									</Grid.Row>
+								)
+							})}
+						</Grid>
+					</div>
+				</div>
+				</div>
 
-        <Popup
-          trigger={<Menu.Item name="map" to="/" as={Link} active={activeItem === 'map'} onClick={this.handleMenuClick}><Icon name="map" /></Menu.Item>}
-          content="Map View"
-          position="right center"
-          inverted
-        />
-        <Popup
-          trigger={<Menu.Item name="grid" to="/grid" as={Link} active={activeItem === 'grid'} onClick={this.handleMenuClick}><Icon name="grid layout" /></Menu.Item>}
-          content="Grid View"
-          position="right center"
-          inverted
-        />
-        <Popup
-          trigger={<Menu.Item name="list" to="/list" as={Link} active={activeItem === 'list'} onClick={this.handleMenuClick}><Icon name="list layout" /></Menu.Item>}
-          content="List View"
-          position="right center"
-          inverted
-        />
-      </Menu>
+				<div className="right-col">
+					<MenuItems />
+				</div>
+			</div>
     );
   }
 }

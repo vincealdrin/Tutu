@@ -1,9 +1,20 @@
-.in-front {
+.tutu-logo { margin-bottom: 8rem !important; }
+.in-front { z-index: 10; background: #fff; }
+.news-section { padding: 1.7rem; }
+/* .left-col { overflow: auto; } */
+.margin-top { margin-top: 2rem !important; }
+.icon::before { font-size: 1.5rem; }
+.map::before { font-size: 2rem; }
+
+.menu-container {
 	position: fixed;
-	height: 100vh;
-	background: #fff !important;
-	box-shadow: 0px 0px 12px #343841 !important;
-	border-right: 1px solid #aaa !important;
-	border-radius: 0 !important;
-	z-index: 10;
+	top: 0;
+	right: 0;
+	display: flex;
+	width: 30%;
+}
+
+.articles {
+	display: flex;
+	align-items: center !important;
 }

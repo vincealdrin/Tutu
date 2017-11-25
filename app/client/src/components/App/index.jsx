@@ -28,7 +28,7 @@ const App = () => (
         <Route exact path="/" component={RecentArticles} />
       </AppSidebar>
     </Grid.Column>
-  </Grid>
+  </Grid> 
 );
 
 export default App;

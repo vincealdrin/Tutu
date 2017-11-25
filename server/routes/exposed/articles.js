@@ -15,9 +15,7 @@ module.exports = (conn, io) => {
       swLng,
       swLat,
       limit = 15,
-      maxDist = 100,
     } = req.query;
-    const parsedMaxDist = parseFloat(maxDist);
     const bounds = r.polygon(
       [parseFloat(swLng), parseFloat(swLat)],
       [parseFloat(seLng), parseFloat(seLat)],
@@ -57,36 +55,23 @@ module.exports = (conn, io) => {
             relatedLinks: doc('right')('related')('relatedLinks')('relatedLink'),
           },
         }))
-        // .merge((doc) => ({
-        //   info: doc('left').merge((article) => ({
-        //     categories: article('categories').filter((category) => category('score').gt(0)),
-        //     // locations: article('locations').filter((location) =>
-        //     // r.distance(location('location')('position'), point, { unit: 'km' }).le(parsedMaxDist)),
-        //   }))
-        //     .without({
-        //       body: true,
-        //     }),
-        //   source: {
-        //     source: doc('right').without({
-        //       id: true,
-        //       trafficData: true,
-        //       siteData: { onlineSince: true },
-        //       contentData: {
-        //         ownedDomains: true,
-        //         speed: true,
-        //         language: true,
-        //         adultContent: true,
-        //       },
-        //       related: true,
-        //     }),
-        //     relatedLinks: doc('right')('related')('relatedLinks')('relatedLink'),
-        //   },
-        // }))
-        // .without({ left: true, right: true })
         .run(conn);
       const articles = await cursor.toArray();
 
       res.setHeader('X-Total-Count', totalCount);
+      return res.json(articles);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/recent', async (req, res, next) => {
+    try {
+      // const totalCount = await r.table(tbl).count().run(conn);
+      const cursor = await r.table(tbl).getAll(r.now()).run(conn);
+      const articles = await cursor.toArray();
+
+      // res.setHeader('X-Total-Count', totalCount);
       return res.json(articles);
     } catch (e) {
       next(e);

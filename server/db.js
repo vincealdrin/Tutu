@@ -45,6 +45,13 @@ module.exports = async (cb) => {
     console.log('positions index already exists on articles table');
   }
 
+  try {
+    await r.table('articles').indexCreate('publishDate').run(conn);
+    console.log('publishDate index created on articles table');
+  } catch (e) {
+    console.log('publishDate index already exists on articles table');
+  }
+
   // try {
   //   await r.table('sources').indexCreate('url').run(conn);
   //   console.log('url index created on sources table');

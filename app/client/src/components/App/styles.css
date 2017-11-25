@@ -8,7 +8,12 @@
   box-shadow: 0 0 12px #343841 !important;
 }
 
-.container {
-  width: 100vw;
+#root div.app-container-column {
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.app-container {
+  width: 100%;
   height: 100vh;
 }

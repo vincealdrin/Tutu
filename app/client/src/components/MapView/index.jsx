@@ -34,22 +34,22 @@ class MapView extends Component {
   render() {
     const { articles, clusters } = this.props;
     return (
-      <div className="mapview-container">
-        <GoogleMapReact
-          defaultZoom={9}
-          defaultCenter={this.defaultCenter}
-          bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
-          options={{
-            minZoom: 8,
-            maxZoom: 21,
+      <GoogleMapReact
+        defaultZoom={9}
+        defaultCenter={this.defaultCenter}
+        bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
+        options={{
+            minZoom: 7,
+            maxZoom: 16,
             styles: mapStyle,
             gestureHandling: 'greedy',
           }}
-          onChange={({ center, zoom, bounds }) => {
+        onChange={({ center, zoom, bounds }) => {
+            console.log(zoom);
             this.props.fetchArticles(center, zoom, bounds, 15);
           }}
-        >
-          {clusters.map(({
+      >
+        {clusters.map(({
               wx, wy, numPoints, points,
             }) => {
             if (numPoints === 1) {
@@ -74,8 +74,7 @@ class MapView extends Component {
               />
             );
           })}
-        </GoogleMapReact>
-      </div>
+      </GoogleMapReact>
     );
   }
 }

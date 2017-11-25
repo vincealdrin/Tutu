@@ -42,6 +42,7 @@ module.exports = (conn, io) => {
           sentiment: doc('left')('sentiment'),
           summary: doc('left')('summary'),
           summary2: doc('left')('summary2'),
+          topImage: doc('left')('topImage'),
           categories: doc('left')('categories').filter((category) => category('score').gt(0)),
           locations: doc('left')('locations')
             .filter((loc) => bounds.intersects(loc('location')('position')))

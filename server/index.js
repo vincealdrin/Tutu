@@ -46,29 +46,8 @@ initDb((conn) => {
   r.table('articles')
     .changes()
     .eqJoin(r.row('sourceId'), r.table('sources'))
-    .map((doc) => ({
-      url: doc('new_val')('left')('url'),
-      title: doc('new_val')('left')('title'),
-      authors: doc('new_val')('left')('authors'),
-      keywords: doc('new_val')('left')('keywords'),
-      publishDate: doc('new_val')('left')('publishDate'),
-      sentiment: doc('new_val')('left')('sentiment'),
-      summary: doc('new_val')('left')('summary'),
-      summary2: doc('new_val')('left')('summary2'),
-      categories: doc('new_val')('left')('categories').filter((category) => category('score').gt(0)),
-      locations: doc('new_val')('left')('locations').map((loc) => loc('location')('position').toGeojson()('coordinates')),
-      source: {
-        url: doc('new_val')('right')('contentData')('dataUrl'),
-        title: doc('new_val')('right')('contentData')('siteData')('title'),
-        description: doc('new_val')('right')('contentData')('siteData')('description'),
-        aboutUsUrl: doc('new_val')('right')('aboutUsUrl'),
-        contactUsUrl: doc('new_val')('right')('contactUsUrl'),
-        relatedLinks: doc('new_val')('right')('related')('relatedLinks')('relatedLink'),
-      },
-    }))
     .run(conn, (err, cursor) => {
       if (err) throw err;
-      console.log(cursor);
       cursor.each((e, article) => {
         if (e) throw e;
 

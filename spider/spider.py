@@ -116,7 +116,7 @@ provinces = list(
             'province': doc['left'].without({ 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True }),
             'location': doc['right'].without({ 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True})
         }).without({ 'right': True, 'left': True }).run(conn))
-news_sources = list(r.table('sources').order_by('dateAdded').run(conn))
+news_sources = list(r.table('sources').order_by(r.desc('dateAdded')).run(conn))
 
 text_client = textapi.Client(AYLIEN_APP_ID, AYLIEN_APP_KEY)
 text_client2 = textapi.Client(AYLIEN_APP_ID2, AYLIEN_APP_KEY2)
@@ -215,7 +215,7 @@ for news_source in news_sources:
             with open('./world-countries.json') as countries_file:
                 countries = json.load(countries_file)
 
-            nation_terms = 'PH|Philippines?|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos'
+            nation_terms = '\WPH|Philippines?|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos\W'
             nation_pattern = re.compile('(\W('+nation_terms+')$|^('+nation_terms+')\W|\W('+nation_terms+')\W)', re.IGNORECASE)
             combined_body = body + ' ' + article.text + ' ' + article.title + ' ' + urlparse(article.url).path
 
@@ -246,6 +246,8 @@ for news_source in news_sources:
                     print('\n(NO PH LOCATIONS) Skipped: ' + str(article.url) + '\n')
                     should_slp = True
                     continue
+                else:
+                    print(nation_pattern.search(combined_body))
 
             summary_sentences = []
             for summary in summarizer(PlaintextParser.from_string(body, Tokenizer(LANGUAGE)).document, SENTENCES_COUNT):

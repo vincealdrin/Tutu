@@ -46,10 +46,10 @@ module.exports = async (cb) => {
   }
 
   try {
-    await r.table('articles').indexCreate('publishDate').run(conn);
-    console.log('publishDate index created on articles table');
+    await r.table('articles').indexCreate('timestamp').run(conn);
+    console.log('timestamp index created on articles table');
   } catch (e) {
-    console.log('publishDate index already exists on articles table');
+    console.log('timestamp index already exists on articles table');
   }
 
   // try {

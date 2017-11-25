@@ -44,15 +44,45 @@ initDb((conn) => {
   });
 
   r.table('articles')
-    .changes()
-    .eqJoin(r.row('sourceId'), r.table('sources'))
+    .changes({ includeTypes: true })
+    .eqJoin(r.row('new_val')('sourceId'), r.table('sources'))
+    .map((join) => ({
+      type: join('left')('type'),
+      article: {
+        url: join('left')('new_val')('url'),
+        title: join('left')('new_val')('title'),
+        authors: join('left')('new_val')('authors'),
+        keywords: join('left')('new_val')('keywords'),
+        publishDate: join('left')('new_val')('publishDate'),
+        sentiment: join('left')('new_val')('sentiment'),
+        summary: join('left')('new_val')('summary'),
+        summary2: join('left')('new_val')('summary2'),
+        topImage: join('left')('new_val')('topImage'),
+        categories: join('left')('new_val')('categories').filter((category) => category('score').gt(0)),
+        locations: join('left')('new_val')('locations').map((loc) => ({
+          formattedAddress: loc('location')('formattedAddress'),
+          position: loc('location')('position').toGeojson()('coordinates'),
+        })),
+        source: {
+          url: join('right')('contentData')('dataUrl'),
+          title: join('right')('contentData')('siteData')('title'),
+          description: join('right')('contentData')('siteData')('description'),
+          aboutUsUrl: join('right')('aboutUsUrl'),
+          contactUsUrl: join('right')('contactUsUrl'),
+          faviconUrl: join('right')('faviconUrl'),
+          relatedLinks: join('right')('related')('relatedLinks')('relatedLink'),
+        },
+      },
+    }))
     .run(conn, (err, cursor) => {
       if (err) throw err;
-      cursor.each((e, article) => {
+
+      cursor.each((e, feed) => {
         if (e) throw e;
 
-        console.log(article);
-        io.of('/client').emit('newArticle', article);
+        if (feed.type === 'add') {
+          io.of('/client').emit('newArticle', feed.article);
+        }
       });
     });
 

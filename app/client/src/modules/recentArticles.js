@@ -11,7 +11,7 @@ export default (state = initialState, action) => {
         ...state,
         articles: [
           ...state.articles,
-          action.newArticles,
+          action.newArticle,
         ],
       };
     default:

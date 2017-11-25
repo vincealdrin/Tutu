@@ -155,7 +155,7 @@
 }, {
     "ISO": "PH-BTG",
     "name": "Batangas",
-    "capital": "Batangas City",
+    "capital": "Batangas",
     "area": "7009311972000000000 km^2",
     "division": "Luzon",
     "region": "IV-A",
@@ -337,7 +337,7 @@
 }, {
     "ISO": "PH-CEB",
     "name": "Cebu",
-    "capital": "Cebu City",
+    "capital": "Cebu",
     "area": "7009534200000000000 km^2",
     "division": "Visayas",
     "region": "VII",
@@ -519,7 +519,7 @@
 }, {
     "ISO": "PH-ILI",
     "name": "Iloilo",
-    "capital": "Iloilo City",
+    "capital": "Iloilo",
     "area": "7009507917000000000 km^2",
     "division": "Visayas",
     "region": "VI",
@@ -659,7 +659,7 @@
 }, {
     "ISO": "PH-MAS",
     "name": "Masbate",
-    "capital": "Masbate City",
+    "capital": "Masbate",
     "area": "7009415177999999999 km^2",
     "division": "Luzon",
     "region": "V",
@@ -953,7 +953,7 @@
 }, {
     "ISO": "PH-SOR",
     "name": "Sorsogon",
-    "capital": "Sorsogon City",
+    "capital": "Sorsogon",
     "area": "7009211901000000000 km^2",
     "division": "Luzon",
     "region": "V",
@@ -1023,7 +1023,7 @@
 }, {
     "ISO": "PH-SUN",
     "name": "Surigao del Norte",
-    "capital": "Surigao City",
+    "capital": "Surigao",
     "area": "7009197293000000000 km^2",
     "division": "Mindanao",
     "region": "XIII",
@@ -1051,7 +1051,7 @@
 }, {
     "ISO": "PH-TAR",
     "name": "Tarlac",
-    "capital": "Tarlac City",
+    "capital": "Tarlac",
     "area": "7009305360000000000 km^2",
     "division": "Luzon",
     "region": "III",

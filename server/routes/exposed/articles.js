@@ -52,6 +52,7 @@ module.exports = (conn, io) => {
             title: doc('right')('contentData')('siteData')('title'),
             description: doc('right')('contentData')('siteData')('description'),
             aboutUsUrl: doc('right')('aboutUsUrl'),
+            faviconUrl: doc('right')('faviconUrl'),
             contactUsUrl: doc('right')('contactUsUrl'),
             relatedLinks: doc('right')('related')('relatedLinks')('relatedLink'),
           },
@@ -69,7 +70,7 @@ module.exports = (conn, io) => {
   router.get('/recent', async (req, res, next) => {
     try {
       // const totalCount = await r.table(tbl).count().run(conn);
-      const cursor = await r.table(tbl).getAll(r.now()).run(conn);
+      const cursor = await r.table(tbl).filter((article) => r.now()).run(conn);
       const articles = await cursor.toArray();
 
       // res.setHeader('X-Total-Count', totalCount);

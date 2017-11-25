@@ -6,6 +6,8 @@
     "axios": "^0.17.1",
     "google-map-react": "^0.25.0",
     "history": "^4.7.2",
+    "lodash": "^4.17.4",
+    "points-cluster": "^0.1.4",
     "react": "^16.1.0",
     "react-datepicker": "^0.61.0",
     "react-dom": "^16.1.0",
@@ -19,7 +21,8 @@
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
     "semantic-ui-css": "^2.2.12",
-    "semantic-ui-react": "^0.76.0"
+    "semantic-ui-react": "^0.76.0",
+    "shortid": "^2.2.8"
   },
   "scripts": {
     "start": "react-scripts start",

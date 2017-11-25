@@ -2,3 +2,17 @@
   width: 100%;
   height: 100%;
 }
+
+.simple-marker-container {
+  width: 15px;
+  height: 15px;
+  background-color: coral;
+  border-radius: 50px;
+}
+
+.cluster-marker-container {
+  width: 15px;
+  height: 15px;
+  background-color: darksalmon;
+  border-radius: 50px;
+}

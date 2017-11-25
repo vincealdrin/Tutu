@@ -2,99 +2,22 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GoogleMapReact from 'google-map-react';
-import { fitBounds } from 'google-map-react/utils';
+import shortid from 'shortid';
 import { fetchArticles } from '../../modules/mapArticles';
-import Marker from '../Marker';
+import SimpleMarker from './SimpleMarker';
+import ClusterMarker from './ClusterMarker';
+import mapStyle from './mapStyle.json';
 import './styles.css';
-
-const mapStyle = [
-  {
-    featureType: 'all',
-    elementType: 'all',
-    stylers: [
-      {
-        invert_lightness: true,
-      },
-      {
-        saturation: 20,
-      },
-      {
-        lightness: 50,
-      },
-      {
-        gamma: 0.4,
-      },
-      {
-        hue: '#00ffee',
-      },
-    ],
-  },
-  {
-    featureType: 'all',
-    elementType: 'geometry',
-    stylers: [
-      {
-        visibility: 'simplified',
-      },
-    ],
-  },
-  {
-    featureType: 'all',
-    elementType: 'labels',
-    stylers: [
-      {
-        visibility: 'on',
-      },
-    ],
-  },
-  {
-    featureType: 'administrative',
-    elementType: 'all',
-    stylers: [
-      {
-        color: '#ffffff',
-      },
-      {
-        visibility: 'simplified',
-      },
-    ],
-  },
-  {
-    featureType: 'administrative.land_parcel',
-    elementType: 'geometry.stroke',
-    stylers: [
-      {
-        visibility: 'simplified',
-      },
-    ],
-  },
-  {
-    featureType: 'landscape',
-    elementType: 'all',
-    stylers: [
-      {
-        color: '#405769',
-      },
-    ],
-  },
-  {
-    featureType: 'water',
-    elementType: 'geometry.fill',
-    stylers: [
-      {
-        color: '#232f3a',
-      },
-    ],
-  },
-];
 
 const mapStateToProps = ({
   mapArticles: {
     articles,
+    clusters,
     fetchStatus,
   },
 }) => ({
   articles,
+  clusters,
   fetchStatus,
 });
 
@@ -109,7 +32,7 @@ class MapView extends Component {
   }
 
   render() {
-    const { articles } = this.props;
+    const { articles, clusters } = this.props;
     return (
       <div className="mapview-container">
         <GoogleMapReact
@@ -122,17 +45,35 @@ class MapView extends Component {
             styles: mapStyle,
             gestureHandling: 'greedy',
           }}
-          onChange={(data) => {
-            this.props.fetchArticles(data.bounds, 15);
+          onChange={({ center, zoom, bounds }) => {
+            this.props.fetchArticles(center, zoom, bounds, 15);
           }}
         >
-          {articles.map((article) => article.locations.map(([lng, lat]) => (
-            <Marker
-              lng={lng}
-              lat={lat}
-              article={article}
-            />
-          )))}
+          {clusters.map(({
+              wx, wy, numPoints, points,
+            }) => {
+            if (numPoints === 1) {
+              const article = articles[points[0].id];
+
+              return article.locations.map(([lng, lat]) => (
+                <SimpleMarker
+                  key={shortid.generate()}
+                  article={article}
+                  lng={lng}
+                  lat={lat}
+                />
+              ));
+            }
+
+            return (
+              <ClusterMarker
+                key={shortid.generate()}
+                count={numPoints}
+                lng={wx}
+                lat={wy}
+              />
+            );
+          })}
         </GoogleMapReact>
       </div>
     );

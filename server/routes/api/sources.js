@@ -1,89 +1,11 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
-const awis = require('awis');
 const rp = require('request-promise');
-const cheerio = require('cheerio');
-
-const awisClient = awis({
-  key: process.env.AMAZON_ACCESS_KEY,
-  secret: process.env.AMAZON_SECRET_KEY,
-});
+const { getAboutContactUrl, getFaviconUrl, getSourceInfo } = require('../../utils');
 
 const responseGroups = ['RelatedLinks', 'Categories', 'Rank', 'ContactInfo', 'RankByCountry',
   'UsageStats', 'Speed', 'Language', 'OwnedDomains', 'LinksInCount',
   'SiteData', 'AdultContent'];
-const getSourceInfo = (url) => new Promise((resolve, reject) => {
-  awisClient({
-    Action: 'UrlInfo',
-    Url: url,
-    ResponseGroup: responseGroups.join(),
-  }, (err, info) => {
-    if (err) reject(err);
-    resolve(info);
-  });
-});
-
-const getAboutContactUrl = async (url) => {
-  try {
-    const htmlDoc = await rp(url);
-    const $ = cheerio.load(htmlDoc);
-
-    let aboutUsUrl = $('a:contains("About")')
-      .filter(function() {
-        return (/about ?(us)?/i).test($(this).text());
-      })
-      .attr('href') || '';
-
-    if (aboutUsUrl[0] === '/') {
-      aboutUsUrl = url + aboutUsUrl;
-    }
-
-    if (aboutUsUrl.substring(0, 2) === '//') {
-      aboutUsUrl = `http:${aboutUsUrl}`;
-    } else if (aboutUsUrl && !/^https?:\/\//.test(aboutUsUrl)) {
-      aboutUsUrl = `http://${aboutUsUrl}`;
-    }
-
-    let contactUsUrl = $('a:contains("Contact")')
-      .filter(function() {
-        return (/contact ?(us)?/i).test($(this).text());
-      })
-      .attr('href') || '';
-
-    if (contactUsUrl[0] === '/') {
-      contactUsUrl = url + contactUsUrl;
-    } else if (contactUsUrl.substring(0, 2) === '//') {
-      contactUsUrl = `http:${contactUsUrl}`;
-    }
-
-    if (contactUsUrl && !/^https?:\/\//.test(contactUsUrl)) {
-      contactUsUrl = `http://${contactUsUrl}`;
-    }
-
-    if (!aboutUsUrl) {
-      $('a').each(function() {
-        if ((/about-? ?us?/i).test($(this).attr('href'))) {
-          aboutUsUrl = $(this).attr('href');
-          return false;
-        }
-      });
-    }
-
-    if (!contactUsUrl) {
-      $('a').each(function() {
-        if ((/about-? ?us?/i).test($(this).attr('href'))) {
-          aboutUsUrl = $(this).attr('href');
-          return false;
-        }
-      });
-    }
-
-    return { aboutUsUrl, contactUsUrl };
-  } catch (e) {
-    console.error(e);
-    return { error: 'Source Error' };
-  }
-};
 
 module.exports = (conn, io) => {
   const tbl = 'sources';
@@ -123,14 +45,17 @@ module.exports = (conn, io) => {
     const dateAdded = new Date();
     const sourcesInfo = await Promise.all(sources.map(async (source) => {
       const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
+      const htmlDoc = await rp(url);
 
-      const { aboutUsUrl, contactUsUrl } = await getAboutContactUrl(url);
-      const infoPromise = await getSourceInfo(source);
+      const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, url);
+      const faviconUrl = getFaviconUrl(htmlDoc);
+      const infoPromise = await getSourceInfo(source, responseGroups);
       const info = await infoPromise;
       delete info.contactInfo;
 
       return {
         ...info,
+        faviconUrl,
         aboutUsUrl,
         contactUsUrl,
         dateAdded,

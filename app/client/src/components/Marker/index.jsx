@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
+import './styles.css';
 
 class Marker extends Component {
   render() {
     return (
       <div>
-        aa
+        aaaweaweaweawe
       </div>
     );
   }

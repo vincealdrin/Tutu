@@ -11,7 +11,7 @@ axios.defaults.baseURL = 'http://localhost:5000/exposed';
 
 const App = () => (
   <div>
-    <MainMenu />
+    {/* <MainMenu /> */}
 
     <main className="container">
       <Route exact path="/" component={MapView} />

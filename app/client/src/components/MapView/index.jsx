@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GoogleMapReact from 'google-map-react';
+import { fitBounds } from 'google-map-react/utils';
 import { fetchArticles } from '../../modules/mapArticles';
 import Marker from '../Marker';
 import './styles.css';
@@ -116,28 +117,22 @@ class MapView extends Component {
           defaultCenter={this.defaultCenter}
           bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
           options={{
-            minZoom: 9,
+            minZoom: 8,
             maxZoom: 21,
             styles: mapStyle,
             gestureHandling: 'greedy',
           }}
-          onChange={({ center: { lng, lat }, zoom }) => {
-            const maxDist = zoom >= 13
-            ? (900 / zoom) / 8
-            : 1200 / zoom;
-
-            this.props.fetchArticles(lng, lat, maxDist, 15);
+          onChange={(data) => {
+            this.props.fetchArticles(data.bounds, 15);
           }}
         >
-          {articles.map((article) => {
-            console.log(article);
-            return (
-              <Marker
-                lat={14}
-                lng={14}
-              />
-            );
-          })}
+          {articles.map((article) => article.locations.map(([lng, lat]) => (
+            <Marker
+              lng={lng}
+              lat={lat}
+              article={article}
+            />
+          )))}
         </GoogleMapReact>
       </div>
     );

@@ -23,14 +23,23 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchArticles = (lng, lat, maxDist, limit) => async (dispatch) => {
+export const fetchArticles = (bounds, maxDist, limit) => async (dispatch) => {
   dispatch({ type: FETCH_ARTICLES, statusText: 'pending' });
 
   try {
+    const {
+      ne, nw, se, sw,
+    } = bounds;
     const { data: articles, headers, status } = await axios.get('/articles', {
       params: {
-        lng,
-        lat,
+        neLng: ne.lng,
+        neLat: ne.lat,
+        nwLng: nw.lng,
+        nwLat: nw.lat,
+        seLng: se.lng,
+        seLat: se.lat,
+        swLng: sw.lng,
+        swLat: sw.lat,
         maxDist,
         limit,
       },

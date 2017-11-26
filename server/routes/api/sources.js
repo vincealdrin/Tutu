@@ -42,7 +42,7 @@ module.exports = (conn, io) => {
 
   router.post('/', async (req, res, next) => {
     const sources = req.body;
-    const dateAdded = new Date();
+    const timestamp = new Date();
     const sourcesInfo = await Promise.all(sources.map(async (source) => {
       const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
       const htmlDoc = await rp(url);
@@ -58,7 +58,7 @@ module.exports = (conn, io) => {
         faviconUrl,
         aboutUsUrl,
         contactUsUrl,
-        dateAdded,
+        timestamp,
         id: await r.uuid(url).run(conn),
       };
     }));

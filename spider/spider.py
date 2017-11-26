@@ -116,7 +116,7 @@ provinces = list(
             'province': doc['left'].without({ 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True }),
             'location': doc['right'].without({ 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True})
         }).without({ 'right': True, 'left': True }).run(conn))
-news_sources = list(r.table('sources').order_by(r.desc('dateAdded')).run(conn))
+news_sources = list(r.table('sources').order_by(r.desc('timestamp')).run(conn))
 
 text_client = textapi.Client(AYLIEN_APP_ID, AYLIEN_APP_KEY)
 text_client2 = textapi.Client(AYLIEN_APP_ID2, AYLIEN_APP_KEY2)

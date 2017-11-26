@@ -23,7 +23,7 @@ const App = () => (
       </main>
     </Grid.Column>
 
-    <Grid.Column width={4}>
+    <Grid.Column width={4} className="sidebar-container-column">
       <AppSidebar>
         <Route exact path="/" component={RecentArticles} />
       </AppSidebar>

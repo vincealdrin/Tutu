@@ -7,7 +7,7 @@ class SimpleMarker extends Component {
   render() {
     const {
       article: {
-        topImage,
+        topImageUrl,
         url,
         sourceUrl,
         source,
@@ -32,7 +32,7 @@ class SimpleMarker extends Component {
             <Item>
               <Item.Image>
                 <Image
-                  src={topImage}
+                  src={topImageUrl}
                   shape="rounded"
                   className="simple-marker-image"
                 />

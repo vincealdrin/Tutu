@@ -16,6 +16,7 @@ module.exports = async (cb) => {
     'pendingSources',
     'locations',
     'provinces',
+    'crawlerLogs',
   ];
 
   try {
@@ -50,6 +51,13 @@ module.exports = async (cb) => {
     console.log('sameDay index created on articles table');
   } catch (e) {
     console.log('sameDay index already exists on articles table');
+  }
+
+  try {
+    await r.table('crawlerLogs').indexCreate('status', (article) => article('timestamp').date()).run(conn);
+    console.log('status index created on crawlerLogs table');
+  } catch (e) {
+    console.log('status index already exists on crawlerLogs table');
   }
 
   // try {

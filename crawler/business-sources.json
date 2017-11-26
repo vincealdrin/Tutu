@@ -1,0 +1,26 @@
+[
+  {
+    "name": "ABS-CBN Business",
+    "urls": ["news.abs-cbn.com/business"]
+  },
+  {
+    "name": "Rappler Business",
+    "urls": ["www.rappler.com/business"]
+  },
+  {
+    "name": "Inquirer Business",
+    "urls": ["business.inquirer.net/"]
+  },
+  {
+    "name": "CNN Philippines Business",
+    "urls": ["cnnphilippines.com/business/"]
+  },
+  {
+    "name": "GMA News Business",
+    "urls": ["www.gmanetwork.com/news/money/"]
+  },
+  {
+    "name": "Sunstar Business",
+    "urls": ["www.sunstar.com.ph/business"]
+  }
+]

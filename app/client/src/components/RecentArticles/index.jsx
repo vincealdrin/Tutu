@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import io from 'socket.io-client';
+import shortid from 'shortid';
 import { List } from 'semantic-ui-react';
 import { addRecentArticle, fetchRecentArticles } from '../../modules/recentArticles';
 import './styles.css';
@@ -37,7 +38,7 @@ class RecentArticles extends Component {
       <div className="recent-articles-container">
         <List divided relaxed>
           {articles.map((article) => (
-            <List.Item>
+            <List.Item key={shortid.generate()}>
               <List.Content>
                 <List.Header as="a" href={article.url} target="__blank">{article.title}</List.Header>
                 <List.Description>

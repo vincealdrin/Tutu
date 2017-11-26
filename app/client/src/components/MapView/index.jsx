@@ -29,7 +29,7 @@ const mapOption = {
   zoomControl: false,
   fullscreenControl: false,
   minZoom: 7,
-  maxZoom: 16,
+  maxZoom: 12,
   styles: mapStyle,
   gestureHandling: 'greedy',
 };
@@ -50,7 +50,7 @@ class MapView extends Component {
         options={mapOption}
         onChange={({ center, zoom, bounds }) => {
             this.props.fetchArticles(center, zoom, bounds, 15);
-          }}
+        }}
       >
         {clusters.map(({
               wx, wy, numPoints, points,

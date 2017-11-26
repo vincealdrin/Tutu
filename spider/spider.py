@@ -221,7 +221,7 @@ for news_source in news_sources:
 
             matched_locations = []
             for location in locations:
-                location_pattern = re.compile('\W(City of '+location['location']['name']+'|'+location['location']['name']+' City|'+location['location']['name']+' Municipality|'+location['location']['name']+')+,? ?('+location['province']['name']+' Province|'+location['province']['name']+'|Metro '+location['province']['name']+')+,? ?(Philippines|PH)?\W', re.IGNORECASE)
+                location_pattern = re.compile('\W*((City of '+location['location']['name']+'|'+location['location']['name']+' City|'+location['location']['name']+' Municipality|Municipality of '+location['location']['name']+')|('+location['location']['name']+',? ?('+location['province']['name']+'|Metro '+location['province']['name']+')),? ?(Philippines|PH)?\W', re.IGNORECASE)
 
                 matched = location_pattern.search(combined_body)
                 if matched:

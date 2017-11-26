@@ -25,6 +25,15 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchArticles,
 }, dispatch);
 
+const mapOption = {
+  zoomControl: false,
+  fullscreenControl: false,
+  minZoom: 7,
+  maxZoom: 16,
+  styles: mapStyle,
+  gestureHandling: 'greedy',
+};
+
 class MapView extends Component {
   defaultCenter = {
     lat: 14.60,
@@ -38,14 +47,8 @@ class MapView extends Component {
         defaultZoom={9}
         defaultCenter={this.defaultCenter}
         bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
-        options={{
-            minZoom: 7,
-            maxZoom: 16,
-            styles: mapStyle,
-            gestureHandling: 'greedy',
-          }}
+        options={mapOption}
         onChange={({ center, zoom, bounds }) => {
-            console.log(zoom);
             this.props.fetchArticles(center, zoom, bounds, 15);
           }}
       >

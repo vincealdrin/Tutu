@@ -15,7 +15,7 @@ axios.defaults.baseURL = 'http://localhost:5000/exposed';
 const App = () => (
   <Grid columns={2}>
     {/* <MainMenu /> */}
-    <Grid.Column width={12} className="app-container-column">
+    <Grid.Column width={14} className="app-container-column">
       <main className="app-container">
         <Route exact path="/" component={MapView} />
         <Route exact path="/counter" component={Counter} />
@@ -23,7 +23,7 @@ const App = () => (
       </main>
     </Grid.Column>
 
-    <Grid.Column width={4} className="sidebar-container-column">
+    <Grid.Column width={2} className="sidebar-container-column">
       <AppSidebar>
         <Route exact path="/" component={RecentArticles} />
       </AppSidebar>

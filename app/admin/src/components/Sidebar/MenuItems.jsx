@@ -6,19 +6,23 @@ const MenuItems = () => (
   <div>
     <Menu.Item to="/" as={Link}>
       <Icon name="dashboard" />
-              Dashboard
+      Dashboard
     </Menu.Item>
     <Menu.Item to="/sources" as={Link}>
       <Icon name="world" />
-              Sources
+      Sources
     </Menu.Item>
     <Menu.Item to="/articles" as={Link}>
       <Icon name="newspaper" />
-              Articles
+      Articles
     </Menu.Item>
     <Menu.Item to="/users" as={Link}>
       <Icon name="users" />
-              Users
+      Users
+    </Menu.Item>
+    <Menu.Item to="/crawler" as={Link}>
+      <Icon name="bug" />
+      Crawler
     </Menu.Item>
   </div>
 );

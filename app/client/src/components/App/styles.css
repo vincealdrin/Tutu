@@ -13,6 +13,10 @@
   padding-bottom: 0;
 }
 
+#root div.sidebar-container-column {
+  padding-bottom: 0;
+}
+
 .app-container {
   width: 100%;
   height: 100vh;

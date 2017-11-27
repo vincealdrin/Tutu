@@ -1,0 +1,18 @@
+[
+  {
+    "name": "ABS-CBN Sports",
+    "urls": ["sports.abs-cbn.com/"]
+  },
+  {
+    "name": "Rappler Sports",
+    "urls": ["www.rappler.com/sports"]
+  },
+  {
+    "name": "GMA News Sports",
+    "urls": ["www.gmanetwork.com/news/sports/"]
+  },
+  {
+    "name": "Sunstar Sports",
+    "urls": ["www.sunstar.com.ph/sports"]
+  }
+]

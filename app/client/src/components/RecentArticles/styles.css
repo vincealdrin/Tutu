@@ -1,0 +1,4 @@
+.recent-articles-container {
+  height: 100vh;
+  overflow-y: auto;
+}

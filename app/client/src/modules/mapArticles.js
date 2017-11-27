@@ -1,7 +1,7 @@
 import axios from 'axios';
 import supercluster from 'points-cluster';
 import flattenDeep from 'lodash/flattenDeep';
-import { crudStatus, updateCrudStatus } from '../util';
+import { crudStatus, updateCrudStatus } from '../utils';
 
 export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
 
@@ -9,7 +9,6 @@ const initialState = {
   articles: [],
   clusters: [],
   totalCount: 0,
-  isFetching: false,
   fetchStatus: crudStatus,
 };
 

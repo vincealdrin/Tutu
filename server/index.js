@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const express = require('express');
 const socketIo = require('socket.io');
 const morgan = require('morgan');
@@ -12,6 +11,7 @@ const r = require('rethinkdb');
 const cors = require('cors');
 const initDb = require('./db');
 const routes = require('./routes');
+const { mapFeedArticle } = require('./utils');
 
 const app = express();
 const server = http.Server(app);
@@ -44,15 +44,18 @@ initDb((conn) => {
   });
 
   r.table('articles')
-    .changes()
-    .eqJoin(r.row('sourceId'), r.table('sources'))
+    .changes({ includeTypes: true })
+    .eqJoin(r.row('new_val')('sourceId'), r.table('sources'))
+    .map(mapFeedArticle)
     .run(conn, (err, cursor) => {
       if (err) throw err;
-      cursor.each((e, article) => {
+
+      cursor.each((e, feed) => {
         if (e) throw e;
 
-        console.log(article);
-        io.of('/client').emit('newArticle', article);
+        if (feed.type === 'add') {
+          io.of('/client').emit('newArticle', feed.article);
+        }
       });
     });
 

@@ -1,0 +1,40 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+"newspaper3k" = "*"
+requests = "*"
+"psycopg2" = "*"
+nltk = "*"
+textblob = "*"
+"beautifulsoup4" = "*"
+xmltodict = "*"
+python-dotenv = "*"
+"pypiwin32" = "*"
+pandas = "*"
+langdetect = "*"
+fake-useragent = "*"
+scikit-learn = "*"
+numpy = "*"
+scipy = "*"
+socketio-client = "*"
+rethinkdb = "*"
+sumy = "*"
+matplotlib = "*"
+aylien-apiclient = "*"
+date-extractor = "*"
+htmldate = "*"
+
+
+[dev-packages]
+
+
+
+[requires]
+
+python_version = "3.6"

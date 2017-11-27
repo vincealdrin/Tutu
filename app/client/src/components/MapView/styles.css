@@ -4,10 +4,20 @@
 }
 
 .simple-marker-container {
-  width: 15px;
-  height: 15px;
-  background-color: coral;
-  border-radius: 50px;
+  position: absolute;
+  right: 2em;
+  bottom: 3.9em;
+  width: 100%;
+  height: 100%;
+  background-color: red;
+}
+
+.simple-marker-image {
+  height: 127px !important;
+}
+
+.simple-marker-description {
+  width: 600px;
 }
 
 .cluster-marker-container {

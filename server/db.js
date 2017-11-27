@@ -2,11 +2,15 @@ const r = require('rethinkdb');
 
 module.exports = async (cb) => {
   const db = process.env.DB_NAME;
-  const conn = await r.connect({
-    db,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-  });
+  try {
+    const conn = await r.connect({
+      db,
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+    });
+  } catch (e) {
+    console.log(e);
+  }
   const tables = [
     'sources',
     'articles',

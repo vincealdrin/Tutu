@@ -4,7 +4,6 @@ import { bindActionCreators } from 'redux';
 import GoogleMapReact from 'google-map-react';
 import shortid from 'shortid';
 import { fetchArticles } from '../../modules/mapArticles';
-import MainMenu from '../MainMenu';
 import SimpleMarker from './SimpleMarker';
 import ClusterMarker from './ClusterMarker';
 import mapStyle from './mapStyle.json';
@@ -78,7 +77,7 @@ class MapView extends Component {
               />
             );
           })}
-        </GoogleMapReact>
+      </GoogleMapReact>
     );
   }
 }

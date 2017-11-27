@@ -71,7 +71,7 @@ export const fetchArticles = (center, zoom, bounds, maxDist, limit) => async (di
     dispatch({
       type: FETCH_ARTICLES,
       statusText: 'error',
-      status: e.response.status,
+      // status: e.response.status,
     });
   }
 };

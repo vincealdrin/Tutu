@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { Grid, Image, Header } from 'semantic-ui-react';
+import { Grid, Image, Header, List } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import io from 'socket.io-client';
 import shortid from 'shortid';
-import { List } from 'semantic-ui-react';
 import { addRecentArticle, fetchRecentArticles } from '../../modules/recentArticles';
 import './styles.css';
 
@@ -50,7 +49,7 @@ class RecentArticles extends Component {
                 </p>
               </Grid.Column>
             </Grid.Row>
-						))}
+          ))}
         </Grid>
       </div>
     );

@@ -1,8 +1,8 @@
-import SpiderSection from './SpiderSection';
 import { HorizontalBar, Bar } from 'react-chartjs-2';
 import React, { Component } from 'react';
 import { Grid, Label, Segment } from 'semantic-ui-react';
 import Statistics from './Statistics';
+import SpiderSection from './SpiderSection';
 import './styles.css';
 
 const data = {

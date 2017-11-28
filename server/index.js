@@ -40,7 +40,7 @@ initDb((conn) => {
   });
 
   ioClient.on('connection', (socket) => {
-    console.log(`${socket.id} has connected`);
+    // console.log(`${socket.id} has connected`);
   });
 
   r.table('articles')
@@ -76,6 +76,20 @@ initDb((conn) => {
       io.emit('newUsers', user);
     });
   });
+
+  r.table('crawlerLogs')
+    .changes({ includeTypes: true })
+    .run(conn, (err, cursor) => {
+      if (err) throw err;
+
+      cursor.each((e, feed) => {
+        if (e) throw e;
+
+        if (feed.type === 'add') {
+          io.emit('articleCrawl', feed.new_val);
+        }
+      });
+    });
 
   app.use(routes(conn, io));
 

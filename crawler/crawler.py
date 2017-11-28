@@ -46,9 +46,8 @@ def get_proxies():
 
     return proxies
 
-def sleep(should_slp):
-    if should_slp:
-        slp_time = randrange(2, 6)
+def sleep(slp_time):
+    if slp_time:
         print('\n> ' + str(slp_time) + 's sleep...\n')
 
         time.sleep(slp_time)
@@ -91,6 +90,7 @@ def logError(error, sourceId, url=None, title=None):
         'sourceId': sourceId,
         'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
         'status': 'error',
+        'type': 'articleCrawl',
         'error': error
     }).run(conn)
 
@@ -142,31 +142,38 @@ count = 0
 if not news_sources:
     print('EMPTY NEWS SOURCES')
 
-should_slp = False
+slp_time = None
 for news_source in news_sources:
     url = news_source['contentData']['dataUrl']
     config = newspaper.Config()
     config.browser_user_agent = UserAgent().random
     config.follow_meta_refresh = True
+    src_art_count = 0
     # config.proxies = get_proxies()
 
     try:
-        source = newspaper.build('http://'+url, config=config, memoize_articles=False)
+        source = newspaper.build('http://'+url, config=config,  memoize_articles=False)
     except Exception as e:
         print('(SOURCE ERROR) Source Skipped\n')
         print(e)
         r.table('crawlerLogs').insert({
-            articleUrl: url,
-            articleTitle: title,
-            sourceId: sourceId,
+            sourceId: news_source['id'],
             timestamp: r.expr(datetime.now(r.make_timezone('+08:00'))),
+            type: 'sourceCrawl',
             status: 'error',
             error: 'SOURCE ERROR',
-            errorMsg: str(e)
         }).run(conn)
         continue
 
     print('\n' + source.domain + ' has ' + str(len(source.articles)) + ' articles\n')
+
+    r.table('crawlerLogs').insert({
+        'sourceId': news_source['id'],
+        'articlesCount': len(source.articles),
+        'type': 'sourceCrawl',
+        'status': 'pending',
+        'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
+    }).run(conn)
 
     if (not source.articles):
         print('(ZERO ARTICLES) Source Skipped\n')
@@ -175,18 +182,30 @@ for news_source in news_sources:
 
     for article in source.articles:
         start_time = time.clock()
-        sleep(should_slp)
+
+        sleep(slp_time)
 
         defragged_url = urldefrag(article.url).url
         clean_url = defragged_url[:defragged_url.find('?')]
         url_uuid = r.uuid(clean_url).run(conn)
+
+        r.table('crawlerLogs').insert({
+            'articleUrl': article.url,
+            'articleTitle': article.title,
+            'sourceId': news_source['id'],
+            'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
+            'type': 'articleCrawl',
+            'status': 'pending',
+            'sleepTime': slp_time
+        }).run(conn)
+
         found_article = r.table('articles').get(url_uuid).run(conn)
 
         if found_article:
             print('\n(EXISTING URL) Skipped: ' + str(article.url))
             print(' -- ' + found_article['id'] + '\n')
             logError('EXISTING URL', news_source['id'], article.url)
-            should_slp = False
+            slp_time = None
             continue
 
         try:
@@ -206,24 +225,20 @@ for news_source in news_sources:
                 if langdetect.detect(body) != 'en':
                     print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
                     logError('NOT ENGLISH', news_source['id'], article.url, article.title)
-                    should_slp = True
                     continue
             except:
                 print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
                 logError('NOT ENGLISH', news_source['id'], article.url, article.title)
-                should_slp = True
                 continue
 
             if  len(article.title.split()) < 5 and len(body.split()) < 100:
                 print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
                 logError('SHORT CONTENT', news_source['id'], article.url, article.title)
-                should_slp = True
                 continue
 
             if source.brand in body:
                 print('\n(SOURCE IS IN BODY) Skipped: ' + str(article.url) + '\n')
                 logError('SOURCE IS IN BODY', news_source['id'], article.url, article.title)
-                should_slp = True
                 continue
 
             if not body:
@@ -234,7 +249,6 @@ for news_source in news_sources:
 
                 with open(folder_path + '/no-text-articles.json', 'w+') as no_text_json_file:
                     json.dump(no_text_articles, no_text_json_file, indent=2, default=str)
-                should_slp = True
                 continue
 
             with open('./world-countries.json') as countries_file:
@@ -265,7 +279,7 @@ for news_source in news_sources:
                     print('\n(OTHER COUNTRY BUT NO PH) Skipped: ' + str(article.url) + '\n')
                     logError('OTHER COUNTRY BUT NO PH', news_source['id'], article.url, article.title)
 
-                    should_slp = True
+                    slp_time = randrange(2, 6)
                     continue
 
             if not matched_locations:
@@ -273,7 +287,7 @@ for news_source in news_sources:
                     print('\n(NO PH LOCATIONS) Skipped: ' + str(article.url) + '\n')
                     logError('NO PH LOCATIONS', news_source['id'], article.url, article.title)
 
-                    should_slp = True
+                    slp_time = randrange(2, 6)
                     continue
                 else:
                     print(nation_pattern.search(combined_body))
@@ -315,6 +329,7 @@ for news_source in news_sources:
 
             r.table('articles').insert(new_article).run(conn)
             count += 1
+            src_art_count += 1
 
             aylien_status = text_client.RateLimits()
             aylien_status2 = text_client2.RateLimits()
@@ -327,22 +342,33 @@ for news_source in news_sources:
                 'articleId': url_uuid,
                 'sourceId': news_source['id'],
                 'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
+                'type': 'articleCrawl',
                 'status': 'success'
             }).run(conn)
 
-            should_slp = True
+            slp_time = randrange(2, 6)
 
         except newspaper.ArticleException as e:
             print('\n(ARTICLE ERROR) Article Skipped\n')
             r.table('crawlerLogs').insert({
                 'articleUrl': url,
-                'articleTitle': title,
-                'sourceId': sourceId,
+                'articleTitle': article.title if article.title else None,
+                'sourceId': news_source['id'],
                 'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
+                'type': 'articleCrawl',
                 'status': 'error',
                 'error': 'ARTICLE ERROR',
-                'errorMsg': str(e)
             }).run(conn)
+
+            slp_time = randrange(2, 6)
             continue
+
+    r.table('crawlerLogs').insert({
+        'sourceId': news_source['id'],
+        'articlesCrawledCount': src_art_count,
+        'type': 'sourceCrawl',
+        'status': 'success',
+        'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
+    }).run(conn)
 
     print('\n' + source.domain + ' done!')

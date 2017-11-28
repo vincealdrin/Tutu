@@ -46,12 +46,12 @@ module.exports = async (cb) => {
     console.log('positions index already exists on articles table');
   }
 
-  try {
-    await r.table('articles').indexCreate('sameDay', (article) => article('timestamp').date()).run(conn);
-    console.log('sameDay index created on articles table');
-  } catch (e) {
-    console.log('sameDay index already exists on articles table');
-  }
+  // try {
+  //   await r.table('articles').indexCreate('thisWeek', (article) => article('timestamp').date()).run(conn);
+  //   console.log('thisWeek index created on articles table');
+  // } catch (e) {
+  //   console.log('thisWeek index already exists on articles table');
+  // }
 
   try {
     await r.table('crawlerLogs').indexCreate('status', (article) => article('timestamp').date()).run(conn);

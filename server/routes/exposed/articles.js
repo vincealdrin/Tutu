@@ -49,7 +49,11 @@ module.exports = (conn, io) => {
   router.get('/recent', async (req, res, next) => {
     try {
       const { limit = 15 } = req.query;
-      const query = r.table(tbl).getAll(r.now().inTimezone('+08:00').date(), { index: 'sameDay' });
+      const lastWk = new Date();
+      lastWk.setDate(lastWk.getDate() - 7);
+      const now = r.now().inTimezone('+08:00').date();
+      const query = r.table(tbl)
+        .filter(r.row('timestamp').date().during(lastWk, now), { leftBound: 'closed', rightBound: 'closed' });
       const totalCount = await query.count().run(conn);
       const cursor = await query
         .eqJoin(r.row('sourceId'), r.table('sources'))

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Grid, Image, Header } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import io from 'socket.io-client';
@@ -36,18 +37,21 @@ class RecentArticles extends Component {
 
     return (
       <div className="recent-articles-container">
-        <List divided relaxed>
+        <Grid>
           {articles.map((article) => (
-            <List.Item key={shortid.generate()}>
-              <List.Content>
-                <List.Header as="a" href={article.url} target="__blank">{article.title}</List.Header>
-                <List.Description>
-                  {article.summary[0]} -- {new Date(article.timestamp).toLocaleTimeString()}
-                </List.Description>
-              </List.Content>
-            </List.Item>
-          ))}
-        </List>
+            <Grid.Row className="articles" style={{ padding: '2rem' }}>
+              <Grid.Column width={7}>
+                <Image src={article.topImage} href={article.url} target="_blank" />
+              </Grid.Column>
+              <Grid.Column width={9}>
+                <Header as="h3">{article.title}</Header>
+                <p>
+                  {article.summary[0]}
+                </p>
+              </Grid.Column>
+            </Grid.Row>
+						))}
+        </Grid>
       </div>
     );
   }

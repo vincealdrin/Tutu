@@ -1,4 +1,4 @@
-.in-front {
+/* .in-front {
   position: fixed;
   z-index: 10;
   height: 100vh;
@@ -6,7 +6,7 @@
   border-right: 1px solid #aaa !important;
   border-radius: 0 !important;
   box-shadow: 0 0 12px #343841 !important;
-}
+} */
 
 #root div.app-container-column {
   padding-right: 0;

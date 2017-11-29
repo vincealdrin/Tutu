@@ -1,4 +1,4 @@
-.wrapper {
+/* .wrapper {
   position: fixed;
   top: 0;
   right: 0;
@@ -31,4 +31,68 @@
 
 .tutu-logo { margin-bottom: 6rem !important; }
 .map.icon::before { font-size: 2rem; }
-.icon::before { font-size: 1rem; }
+.icon::before { font-size: 1rem; } */
+
+.container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  display: flex;
+}
+
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  background-color: pink;
+}
+
+.thin {
+  width: 75px;
+}
+
+.wide {
+  width: 225px;
+}
+
+.logo {
+  display: flex;
+  flex-basis: 15%;
+  align-items: center;
+  width: 100%;
+  padding-left: 23px;
+}
+
+.menu {
+  display: flex;
+  flex-basis: 30%;
+  flex-direction: column;
+  width: 100%;
+  padding-left: 26px;
+}
+
+.menu a:not(:last-child) {
+  margin-bottom: 18px;
+}
+
+.popular {
+  display: flex;
+  flex-basis: 30%;
+  width: 100%;
+}
+
+.top-places {
+  display: flex;
+  flex-basis: 30%;
+  width: 100%;
+}
+
+.label {
+  position: relative;
+  /* right: 50px; */
+  /* bottom: 15px; */
+}
+
+.item-container {
+}

@@ -1,78 +1,61 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Icon, Label, Sidebar, Segment, Button } from 'semantic-ui-react';
-import RecentArticles from '../RecentArticles';
+import { Menu, Icon, Label, Segment, Button } from 'semantic-ui-react';
 import './style.css';
 
 class AppSidebar extends Component {
-  state = { activeItem: 'map', visible: true };
-  toggleVisibility = () => this.setState({ visible: !this.state.visible });
-  handleItemClick = (e, { name }) => this.setState({ activeItem: name });
+  state = {
+    isWide: true,
+  };
+
+  expandSidebar = () => this.setState({ isWide: true })
+  shrinkSidebar = () => this.setState({ isWide: false })
 
   render() {
-    const { activeItem, visible } = this.state;
+    const { isWide } = this.state;
 
     return (
-      <div className="wrapper">
-        <div className="sidebar">
-          <Sidebar.Pushable className="articles">
-            <Sidebar
-              animation="overlay"
-              width="wide"
-              direction="right"
-              visible={visible}
-              icon="labeled"
-              className="inherit-width"
-              vertical
-            >
-              <Label as="a" color="red" ribbon className="remove-overflow">Recent News</Label>
-          HELLO
-            </Sidebar>
-          </Sidebar.Pushable>
-
-          <section className="menu">
-            <Menu secondary vertical icon="labeled">
-              <Menu.Item
-                name="home"
-                to="/"
-                as={Link}
-                onClick={this.handleItemClick}
-                className="tutu-logo"
-              >
-                <Icon name="map" color="grey" />
-              </Menu.Item>
-              <Menu.Item
-                name="map"
-                to="/"
-                as={Link}
-                active={activeItem === 'map'}
-                onClick={this.handleItemClick}
-              >
-                <Icon name="newspaper" />
-              </Menu.Item>
-              <Menu.Item
-                name="grid"
-                to="/grid"
-                as={Link}
-                active={activeItem === 'grid'}
-                onClick={this.handleItemClick}
-              >
-                <Icon name="grid layout" />
-              </Menu.Item>
-              <Menu.Item
-                name="list"
-                to="/list"
-                as={Link}
-                active={activeItem === 'list'}
-                onClick={this.handleItemClick}
-              >
-                <Icon name="list layout" />
-              </Menu.Item>
-              <Menu.Item onClick={this.toggleVisibility}>
-                <Icon name="eye" />
-              </Menu.Item>
-            </Menu>
-          </section>
+      <div className="container">
+        <div className="item-container">
+          {this.props.children}
+        </div>
+        <div
+          className={`sidebar-container ${isWide ? 'wide' : 'thin'}`}
+          onMouseEnter={this.expandSidebar}
+          onMouseLeave={this.shrinkSidebar}
+        >
+          <div className="logo">
+            <Icon name="map" color="grey" size="big" />
+          </div>
+          <div className="menu">
+            {isWide ? <span className="label">MENU</span> : null}
+            <Link to="/top">
+              <Icon name="newspaper" color="grey" size="large" />
+              {isWide ? 'Top News' : null}
+            </Link>
+            <Link to="/recent">
+              <Icon name="plus square outline" color="grey" size="large" />
+              {isWide ? 'Recent Articles' : null}
+            </Link>
+            <Link to="/filter">
+              <Icon name="filter" color="grey" size="large" />
+              {isWide ? 'Filter' : null}
+            </Link>
+            <Link to="/categories">
+              <Icon name="tags" color="grey" size="large" />
+              {isWide ? 'Categories' : null}
+            </Link>
+            <Link to="/themes">
+              <Icon name="world" color="grey" size="large" />
+              {isWide ? 'Map Themes' : null}
+            </Link>
+          </div>
+          <div className="popular">
+            {isWide ? <span className="label">POPULAR</span> : null}
+          </div>
+          <div className="top-places">
+            {isWide ? <span className="label">TOP PLACES</span> : null}
+          </div>
         </div>
       </div>
     );

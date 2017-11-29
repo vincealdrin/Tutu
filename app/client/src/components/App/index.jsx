@@ -1,6 +1,7 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import axios from 'axios';
+import 'semantic-ui-css/semantic.min.css';
 import MapView from '../MapView';
 import AppSidebar from '../AppSidebar';
 import RecentArticles from '../RecentArticles';
@@ -14,15 +15,20 @@ axios.defaults.baseURL = 'http://localhost:5000/exposed';
 const App = () => (
   <div>
     <main className="app-container">
-      <Route exact path="/" component={MapView} />
-      <Route exact path="/counter" component={Counter} />
-      <Route exact path="/grid" component={GridLayout} />
+      <Switch>
+        <Route exact path="/(top|recent)?" component={MapView} />
+        <Route path="/counter" component={Counter} />
+        <Route path="/grid" component={GridLayout} />
+        <Redirect to="/" />
+      </Switch>
     </main>
 
     <AppSidebar>
-      <Route to="/" component={RecentArticles} />
-      <Route to="/" component={TestComponent} />
-      <Route to="/" component={RecentArticles} />
+      <Switch>
+        <Route path="(.*)/recent" exact component={RecentArticles} />
+        <Route path="/(.*)/" exact component={TestComponent} />
+        <Redirect to="/" />
+      </Switch>
     </AppSidebar>
   </div>
 );

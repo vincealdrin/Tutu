@@ -3,7 +3,8 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { HorizontalBar, Bar, Line } from 'react-chartjs-2';
 import { Sidebar, Segment, Grid, Label } from 'semantic-ui-react';
-import { incErrorCount, incSuccessCount, fetchStats } from '../../modules/crawler';
+import { addLog, fetchLogs, fetchStats, incErrorCount, incSuccessCount } from '../../modules/crawler';
+import CrawlerFeed from './CrawlerFeed';
 import './styles.css';
 
 const data = {
@@ -45,16 +46,20 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchStats,
   incSuccessCount,
   incErrorCount,
+  fetchLogs,
+  addLog,
 }, dispatch);
 
 
 class Crawler extends Component {
   componentDidMount() {
+    const { socket } = this.props;
+
     this.props.fetchStats(() => {
-      const { socket, stats: { labels } } = this.props;
+      const { stats: { labels } } = this.props;
       let latest = labels[labels.length - 1];
 
-      socket.on('articleCrawl', (log) => {
+      socket.on('crawlLog', (log) => {
         const logDate = new Date(log.timestamp).toLocaleDateString();
 
         if (logDate !== latest) {
@@ -65,8 +70,12 @@ class Crawler extends Component {
         } else {
           this.props.incErrorCount();
         }
+
+        this.props.addLog(log);
       });
     });
+
+    this.props.fetchLogs();
   }
 
   componentWillUnmount() {
@@ -75,13 +84,13 @@ class Crawler extends Component {
   }
 
   render() {
-    const { stats } = this.props;
+    const { stats, logs } = this.props;
     const statsData = {
       labels: stats.labels,
       datasets: [
         {
           label: 'Success',
-          fill: true,
+          fill: false,
           lineTension: 0.1,
           backgroundColor: 'rgba(75,192,192,0.4)',
           borderColor: 'rgba(75,192,192,1)',
@@ -102,7 +111,7 @@ class Crawler extends Component {
         },
         {
           label: 'Error',
-          fill: true,
+          fill: false,
           lineTension: 0.1,
           backgroundColor: 'rgba(255,99,132,0.4)',
           borderColor: 'rgba(255,99,132,1)',
@@ -132,40 +141,19 @@ class Crawler extends Component {
               <Segment>
                 <Line data={statsData} />
               </Segment>
+              <Segment>
+                <Line data={statsData} />
+              </Segment>
             </Grid.Column>
 
             <Grid.Column width={9}>
               <Segment>
-                <Bar
-                  data={data}
-                />
+                <Label color="teal" ribbon>Logs</Label>
+                <CrawlerFeed logs={logs} />
               </Segment>
             </Grid.Column>
           </Grid.Row>
         </Grid>
-
-        <Grid.Row>
-          <Grid.Column width={6}>
-            <Segment>
-              <Line data={statsData} />
-            </Segment>
-          </Grid.Column>
-
-          <Grid.Column width={10}>
-            <Grid columns={2}>
-              <Grid.Column>
-                <Segment>
-              3gg<Label attached="top right">Code</Label>
-                </Segment>
-              </Grid.Column>
-              <Grid.Column>
-                <Segment>
-              3gg<Label attached="top right">Code</Label>
-                </Segment>
-              </Grid.Column>
-            </Grid>
-          </Grid.Column>
-        </Grid.Row>
       </div>
     );
   }

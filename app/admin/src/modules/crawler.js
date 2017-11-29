@@ -2,13 +2,14 @@ import axios from 'axios';
 import { updateCrudStatus, crudStatus } from '../utils';
 
 export const FETCH_LOGS = 'crawler/FETCH_LOGS';
+export const ADD_LOG = 'crawler/ADD_LOG';
 export const FETCH_STATS = 'crawler/FETCH_STATS';
 export const FETCH_CRAWL_SCHEDULES = 'crawler/FETCH_CRAWL_SCHEDULES';
 export const SCHEDULE_CRAWL = 'crawler/SCHEDULE_CRAWL';
 export const START_CRAWL = 'crawler/START_CRAWL';
 export const STOP_CRAWL = 'crawler/STOP_CRAWL';
-export const ADD_SUCCESS_COUNT = 'crawler/ADD_SUCCESS_COUNT';
-export const ADD_ERROR_COUNT = 'crawler/ADD_ERROR_COUNT';
+export const INCREMENT_SUCCESS_COUNT = 'crawler/INCREMENT_SUCCESS_COUNT';
+export const INCREMENT_ERROR_COUNT = 'crawler/INCREMENT_ERROR_COUNT';
 
 const initialState = {
   logs: [],
@@ -29,7 +30,14 @@ export default (state = initialState, action) => {
         logs: action.logs || state.logs,
         fetchLogsStatus: updateCrudStatus(action),
       };
-    case ADD_SUCCESS_COUNT:
+    case ADD_LOG:
+      return {
+        ...state,
+        logs: state.logs.length >= 30
+          ? [action.newLog, ...state.logs.slice(1)]
+          : [action.newLog, ...state.logs],
+      };
+    case INCREMENT_SUCCESS_COUNT:
       return {
         ...state,
         stats: {
@@ -40,7 +48,7 @@ export default (state = initialState, action) => {
           ],
         },
       };
-    case ADD_ERROR_COUNT:
+    case INCREMENT_ERROR_COUNT:
       return {
         ...state,
         stats: {
@@ -66,6 +74,28 @@ export default (state = initialState, action) => {
   }
 };
 
+export const fetchLogs = () => async (dispatch) => {
+  dispatch({ type: FETCH_LOGS, statusText: 'pending' });
+
+  try {
+    const { data: logs } = await axios.get('/crawler/logs');
+
+    dispatch({
+      type: FETCH_LOGS,
+      statusText: 'success',
+      logs,
+    });
+  } catch (e) {
+    dispatch({
+      type: FETCH_LOGS,
+      statusText: 'error',
+      status: e.response.status,
+    });
+  }
+};
+
+export const addLog = (newLog) => ({ type: ADD_LOG, newLog });
+
 export const fetchStats = (cb) => async (dispatch) => {
   dispatch({ type: FETCH_STATS, statusText: 'pending' });
 
@@ -88,5 +118,5 @@ export const fetchStats = (cb) => async (dispatch) => {
   if (cb) cb();
 };
 
-export const incSuccessCount = () => ({ type: ADD_SUCCESS_COUNT });
-export const incErrorCount = () => ({ type: ADD_ERROR_COUNT });
+export const incSuccessCount = () => ({ type: INCREMENT_SUCCESS_COUNT });
+export const incErrorCount = () => ({ type: INCREMENT_ERROR_COUNT });

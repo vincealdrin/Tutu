@@ -7,11 +7,10 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 const http = require('http');
 const errorhandler = require('errorhandler');
-const r = require('rethinkdb');
 const cors = require('cors');
 const initDb = require('./db');
 const routes = require('./routes');
-const { mapFeedArticle } = require('./utils');
+const { startIoClient, startIoAdmin } = require('./socket-server');
 
 const app = express();
 const server = http.Server(app);
@@ -43,53 +42,8 @@ initDb((conn) => {
     // console.log(`${socket.id} has connected`);
   });
 
-  r.table('articles')
-    .changes({ includeTypes: true })
-    .eqJoin(r.row('new_val')('sourceId'), r.table('sources'))
-    .map(mapFeedArticle)
-    .run(conn, (err, cursor) => {
-      if (err) throw err;
-
-      cursor.each((e, feed) => {
-        if (e) throw e;
-
-        if (feed.type === 'add') {
-          io.of('/client').emit('newArticle', feed.article);
-        }
-      });
-    });
-
-  r.table('sources').changes().run(conn, (err, cursor) => {
-    if (err) throw err;
-
-    cursor.each((e, source) => {
-      if (e) throw e;
-      io.emit('newSources', source);
-    });
-  });
-
-  r.table('users').changes().run(conn, (err, cursor) => {
-    if (err) throw err;
-
-    cursor.each((e, user) => {
-      if (e) throw e;
-      io.emit('newUsers', user);
-    });
-  });
-
-  r.table('crawlerLogs')
-    .changes({ includeTypes: true })
-    .run(conn, (err, cursor) => {
-      if (err) throw err;
-
-      cursor.each((e, feed) => {
-        if (e) throw e;
-
-        if (feed.type === 'add') {
-          io.emit('articleCrawl', feed.new_val);
-        }
-      });
-    });
+  startIoAdmin(io, conn);
+  startIoClient(ioClient, conn);
 
   app.use(routes(conn, io));
 

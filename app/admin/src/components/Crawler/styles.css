@@ -1,0 +1,5 @@
+.crawlerfeed-container {
+  height: 76vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}

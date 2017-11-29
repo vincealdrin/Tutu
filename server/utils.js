@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const awis = require('awis');
+const r = require('rethinkdb');
 
 const awisClient = awis({
   key: process.env.AMAZON_ACCESS_KEY,
@@ -133,3 +134,44 @@ module.exports.mapFeedArticle = (join) => {
     article,
   };
 };
+
+module.exports.mapFeedLog = (join) => ({
+  type: join('left')('type'),
+  log: {
+    status: join('left')('new_val')('status'),
+    type: join('left')('new_val')('type'),
+    runtime: join('left')('new_val')('runtime').default(0),
+    articleUrl: join('left')('new_val')('articleUrl').default(''),
+    sleepTime: join('left')('new_val')('sleepTime').default(0),
+    timestamp: join('left')('new_val')('timestamp'),
+    articlesCount: join('left')('new_val')('articlesCount').default(0),
+    articlesCrawledCount: join('left')('new_val')('articlesCrawledCount').default(0),
+    error: join('left')('error').default(''),
+    sourceUrl: join('right')('contentData')('dataUrl'),
+    sourceTitle: join('right')('contentData')('siteData')('title'),
+    article: r.table('articles')
+      .get(join('left')('new_val')('articleId'))
+      .pluck('authors', 'title', 'summary', 'url', 'publishDate')
+      .merge((article) => ({ summary: article('summary').nth(0) }))
+      .default({}),
+  },
+});
+
+module.exports.mapLog = (join) => ({
+  status: join('left')('status'),
+  type: join('left')('type'),
+  runtime: join('left')('runtime').default(0),
+  articleUrl: join('left')('articleUrl').default(''),
+  sleepTime: join('left')('sleepTime').default(0),
+  timestamp: join('left')('timestamp'),
+  articlesCount: join('left')('articlesCount').default(0),
+  articlesCrawledCount: join('left')('articlesCrawledCount').default(0),
+  error: join('left')('error').default(''),
+  sourceUrl: join('right')('contentData')('dataUrl'),
+  sourceTitle: join('right')('contentData')('siteData')('title'),
+  article: r.table('articles')
+    .get(join('left')('articleId'))
+    .pluck('authors', 'title', 'summary', 'url', 'publishDate')
+    .merge((article) => ({ summary: article('summary').nth(0) }))
+    .default({}),
+});

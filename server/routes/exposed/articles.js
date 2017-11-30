@@ -16,7 +16,11 @@ module.exports = (conn, io) => {
       seLat,
       swLng,
       swLat,
-      limit = 15,
+      limit = 500,
+      keywords,
+      categories = '',
+      sources,
+      timeWindow,
     } = req.query;
     const bounds = r.polygon(
       [parseFloat(swLng), parseFloat(swLat)],
@@ -24,19 +28,57 @@ module.exports = (conn, io) => {
       [parseFloat(neLng), parseFloat(neLat)],
       [parseFloat(nwLng), parseFloat(nwLat)],
     );
+    const catsArr = categories.split(',');
 
     const params = {
       index: 'positions',
-      // maxResults: parseInt(limit),
     };
 
     try {
       const totalCount = await r.table(tbl).count().run(conn);
-      const cursor = await r.table(tbl)
-        .getIntersecting(bounds, params)
-        .eqJoin(r.row('sourceId'), r.table('sources'))
-        .map(mapArticle(bounds))
-        .run(conn);
+
+      let query = await r.table(tbl).getIntersecting(bounds, params);
+
+      if (timeWindow) {
+        const [start, end] = timeWindow.split(',');
+        const now = new Date();
+        const startDate = new Date();
+        startDate.setDate(now.getDate() - parseInt(start));
+        const endDate = new Date();
+        endDate.setDate(now.getDate() - parseInt(end));
+
+        query = query.filter((article) => article('publishDate').date().during(
+          r.time(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate(), '+08:00'),
+          r.time(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate(), '+08:00'),
+          { rightBound: 'closed' }
+        ));
+      }
+
+      if (keywords) {
+        query = query.filter((article) => article('keywords')
+          .contains((keyword) => r.expr(keywords.split(',')).contains(keyword)));
+      }
+
+      if (categories) {
+        query = query.filter((article) => article('categories')
+          .orderBy(r.desc((category) => category('score')))
+          .slice(0, catsArr.length)
+          .concatMap((c) => [c('label')])
+          .eq(r.expr(catsArr)));
+      }
+
+      query = query.eqJoin(r.row('sourceId'), r.table('sources'));
+
+      if (sources) {
+        query = query.filter((article) => r.expr(sources.split(',')
+          .contains(article('right')('contentData')('siteData')('title'))));
+      }
+
+      if (limit) {
+        query = query.limit(parseInt(limit));
+      }
+
+      const cursor = await query.map(mapArticle(bounds, catsArr.length)).run(conn);
       const articles = await cursor.toArray();
 
       res.setHeader('X-Total-Count', totalCount);

@@ -80,7 +80,7 @@ module.exports.getAboutContactUrl = (htmlDoc, baseUrl) => {
   }
 };
 
-module.exports.mapArticle = (bounds) => (join) => {
+module.exports.mapArticle = (bounds, catsLength) => (join) => {
   const article = {
     url: join('left')('url'),
     title: join('left')('title'),
@@ -92,11 +92,22 @@ module.exports.mapArticle = (bounds) => (join) => {
     summary2: join('left')('summary2'),
     topImageUrl: join('left')('topImageUrl'),
     timestamp: join('left')('timestamp'),
-    categories: join('left')('categories').filter((category) => category('score').gt(0)),
     source: join('right')('contentData')('siteData')('title'),
     sourceUrl: join('right')('contentData')('dataUrl'),
     sourceFaviconUrl: join('right')('faviconUrl'),
   };
+
+  if (catsLength) {
+    article.categories = join('left')('categories')
+      .filter((category) => category('score').gt(0))
+      .orderBy(r.desc((category) => category('score')))
+      .slice(0, catsLength);
+  } else {
+    article.categories = join('left')('categories')
+      .filter((category) => category('score').gt(0))
+      .orderBy(r.desc((category) => category('score')))
+      .slice(0, 3);
+  }
 
   if (bounds) {
     article.locations = join('left')('locations')
@@ -122,7 +133,10 @@ module.exports.mapFeedArticle = (join) => {
     summary2: join('left')('new_val')('summary2'),
     topImageUrl: join('left')('new_val')('topImageUrl'),
     timestamp: join('left')('new_val')('timestamp'),
-    categories: join('left')('new_val')('categories').filter((category) => category('score').gt(0)),
+    categories: join('left')('new_val')('categories')
+      .filter((category) => category('score').gt(0))
+      .orderBy(r.desc((category) => category('score')))
+      .slice(0, 3),
     locations: join('left')('new_val')('locations').map((loc) => loc('location')('position').toGeojson()('coordinates')),
     source: join('right')('contentData')('siteData')('title'),
     sourceUrl: join('right')('contentData')('dataUrl'),

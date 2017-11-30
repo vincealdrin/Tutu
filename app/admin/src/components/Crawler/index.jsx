@@ -67,7 +67,7 @@ class Crawler extends Component {
           this.props.fetchStats();
         } else if (log.status === 'success') {
           this.props.incSuccessCount();
-        } else {
+        } else if (log.status === 'error') {
           this.props.incErrorCount();
         }
 
@@ -148,7 +148,7 @@ class Crawler extends Component {
 
             <Grid.Column width={9}>
               <Segment>
-                <Label color="teal" ribbon>Logs</Label>
+                <Label color="teal" ribbon>Activity Feed</Label>
                 <CrawlerFeed logs={logs} />
               </Segment>
             </Grid.Column>

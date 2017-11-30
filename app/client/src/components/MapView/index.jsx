@@ -14,11 +14,15 @@ const mapStateToProps = ({
     articles,
     clusters,
     fetchStatus,
+    filters,
+    mapState,
   },
 }) => ({
   articles,
   clusters,
   fetchStatus,
+  filters,
+  mapState,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -41,15 +45,22 @@ class MapView extends Component {
   }
 
   render() {
-    const { articles, clusters } = this.props;
+    const {
+      articles,
+      clusters,
+      filters,
+      mapState,
+    } = this.props;
+
     return (
       <GoogleMapReact
-        defaultZoom={9}
-        defaultCenter={this.defaultCenter}
+        defaultZoom={mapState.zoom}
+        defaultCenter={mapState.center}
         bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
         options={mapOption}
         onChange={({ center, zoom, bounds }) => {
-            this.props.fetchArticles(center, zoom, bounds, 15);
+          console.log(JSON.stringify(bounds));
+            this.props.fetchArticles(center, zoom, bounds, filters);
         }}
       >
         {clusters.map(({

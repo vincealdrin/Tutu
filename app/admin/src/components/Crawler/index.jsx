@@ -67,7 +67,7 @@ class Crawler extends Component {
           this.props.fetchStats();
         } else if (log.status === 'success') {
           this.props.incSuccessCount();
-        } else {
+        } else if (log.status === 'error') {
           this.props.incErrorCount();
         }
 

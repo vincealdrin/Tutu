@@ -4,12 +4,41 @@ import flattenDeep from 'lodash/flattenDeep';
 import { crudStatus, updateCrudStatus } from '../utils';
 
 export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
+export const CHANGE_KEYWORDS_FILTER = 'mapArticles/CHANGE_KEYWORDS_FILTER';
+export const CHANGE_CATEGORIES_FILTER = 'mapArticles/CHANGE_CATEGORIES_FILTER';
+export const CHANGE_SOURCES_FILTER = 'mapArticles/CHANGE_SOURCES_FILTER';
+export const CHANGE_TIMEWINDOW_FILTER = 'mapArticles/CHANGE_TIMEWINDOW_FILTER';
+export const CHANGE_LIMIT_FILTER = 'mapArticles/CHANGE_LIMIT_FILTER';
+export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
 
 const initialState = {
   articles: [],
   clusters: [],
   totalCount: 0,
   fetchStatus: crudStatus,
+  mapState: {
+    zoom: 8,
+    center: {
+      lat: 14.84438951326129,
+      lng: 121.64467285156252,
+    },
+    bounds: {
+      nw: { lat: 16.783969147595457, lng: 117.42592285156252 },
+      se: { lat: 12.887251816780562, lng: 125.86342285156252 },
+      sw: { lat: 12.887251816780562, lng: 117.42592285156252 },
+      ne: { lat: 16.783969147595457, lng: 125.86342285156252 },
+    },
+  },
+  filters: {
+    keywords: [],
+    categories: [],
+    sources: [],
+    timeWindow: {
+      start: 7,
+      end: 0,
+    },
+    limit: 1500,
+  },
 };
 
 export default (state = initialState, action) => {
@@ -21,12 +50,65 @@ export default (state = initialState, action) => {
         clusters: action.clusters || state.clusters,
         fetchStatus: updateCrudStatus(action),
       };
+    case CHANGE_KEYWORDS_FILTER:
+      return {
+        ...state,
+        filters: {
+          ...state.filters,
+          keywords: action.keywords,
+        },
+      };
+    case CHANGE_CATEGORIES_FILTER:
+      return {
+        ...state,
+        filters: {
+          ...state.filters,
+          categories: action.categories,
+        },
+      };
+    case CHANGE_SOURCES_FILTER:
+      return {
+        ...state,
+        filters: {
+          ...state.filters,
+          sources: action.sources,
+        },
+      };
+    case CHANGE_TIMEWINDOW_FILTER:
+      return {
+        ...state,
+        filters: {
+          ...state.filters,
+          timeWindow: action.timeWindow,
+        },
+      };
+    case CHANGE_LIMIT_FILTER:
+      return {
+        ...state,
+        filters: {
+          ...state.filters,
+          limit: action.limit,
+        },
+      };
+    case UPDATE_MAP_STATE:
+      return {
+        ...state,
+        mapState: action.mapState,
+      };
     default:
       return state;
   }
 };
 
-export const fetchArticles = (center, zoom, bounds, maxDist, limit) => async (dispatch) => {
+export const fetchArticles = (center, zoom, bounds, filters) => async (dispatch) => {
+  dispatch({
+    type: UPDATE_MAP_STATE,
+    mapState: {
+      center,
+      zoom,
+      bounds,
+    },
+  });
   dispatch({ type: FETCH_ARTICLES, statusText: 'pending' });
 
   try {
@@ -43,8 +125,11 @@ export const fetchArticles = (center, zoom, bounds, maxDist, limit) => async (di
         seLat: se.lat,
         swLng: sw.lng,
         swLat: sw.lat,
-        maxDist,
-        limit,
+        keywords: filters.keywords.join(),
+        categories: filters.categories.join(),
+        sources: filters.sources.join(),
+        timeWindow: `${filters.timeWindow.start},${filters.timeWindow.end}`,
+        limit: filters.limit,
       },
     });
     const coords = flattenDeep(articles.map(({ locations }, index) =>
@@ -75,3 +160,28 @@ export const fetchArticles = (center, zoom, bounds, maxDist, limit) => async (di
     });
   }
 };
+
+export const changeKeywordsFilter = (keywords) => ({
+  type: CHANGE_KEYWORDS_FILTER,
+  keywords,
+});
+
+export const changeCategoriesFilter = (categories) => ({
+  type: CHANGE_CATEGORIES_FILTER,
+  categories,
+});
+
+export const changeSourcesFilter = (sources) => ({
+  type: CHANGE_SOURCES_FILTER,
+  sources,
+});
+
+export const changTimeWindowFilter = (timeWindow) => ({
+  type: CHANGE_TIMEWINDOW_FILTER,
+  timeWindow,
+});
+
+export const changeLimitFilter = (limit) => ({
+  type: CHANGE_LIMIT_FILTER,
+  limit,
+});

@@ -30,14 +30,12 @@ module.exports = (conn, io) => {
     );
     const catsArr = categories.split(',');
 
-    const params = {
-      index: 'positions',
-    };
-
     try {
       const totalCount = await r.table(tbl).count().run(conn);
 
-      let query = await r.table(tbl).getIntersecting(bounds, params);
+      let query = await r.table(tbl).getIntersecting(bounds, {
+        index: 'positions',
+      });
 
       if (timeWindow) {
         const [start, end] = timeWindow.split(',');

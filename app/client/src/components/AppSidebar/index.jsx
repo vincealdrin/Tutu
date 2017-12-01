@@ -66,9 +66,9 @@ class AppSidebar extends Component {
               <Icon name="send outline" color="grey" />
               <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Submit News</span>
             </Link>
-            <Link to="/about" onClick={this.beVisible}>
-              <Icon name="browser" color="grey" />
-              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>About</span>
+            <Link to="/themes" onClick={this.beVisible}>
+              <Icon name="globe" color="grey" />
+              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Map Themes</span>
             </Link>
           </div>
           <div className="popular">

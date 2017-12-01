@@ -14,14 +14,12 @@ const mapStateToProps = ({
     articles,
     clusters,
     fetchStatus,
-    filters,
     mapState,
   },
 }) => ({
   articles,
   clusters,
   fetchStatus,
-  filters,
   mapState,
 });
 
@@ -48,7 +46,6 @@ class MapView extends Component {
     const {
       articles,
       clusters,
-      filters,
       mapState,
     } = this.props;
 
@@ -59,8 +56,7 @@ class MapView extends Component {
         bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
         options={mapOption}
         onChange={({ center, zoom, bounds }) => {
-          console.log(JSON.stringify(bounds));
-            this.props.fetchArticles(center, zoom, bounds, filters);
+          this.props.fetchArticles(center, zoom, bounds);
         }}
       >
         {clusters.map(({

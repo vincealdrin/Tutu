@@ -1,3 +1,33 @@
+.menu-item-container {
+  position: relative;
+  height: 100vh;
+  max-width: 500px;
+  min-width: 500px;
+  background: #fff;
+  box-shadow: -3px 0 1rem -3px #1b272b;
+}
+
+.article-display-button {
+  position: absolute;
+  top: 40%;
+  left: -2rem;
+  z-index: 100;
+  display: flex;
+  align-content: center;
+  width: 1rem;
+  height: 6rem;
+  padding: 2rem 1rem;
+  cursor: pointer;
+  background: #fff;
+  border-bottom-left-radius: 7px;
+  border-top-left-radius: 7px;
+  box-shadow: -3px 3px 1rem -3px #1b272b;
+}
+
+.article-info p {
+  font-size: 12px;
+}
+
 .container {
   position: fixed;
   top: 0;
@@ -15,6 +45,10 @@
   transition: all 0.3s ease-in-out;
 }
 
+.sidebar-text {
+  margin-left: 1rem;
+}
+
 .thin {
   width: 75px;
 }
@@ -23,19 +57,30 @@
   width: 225px;
 }
 
+.full { display: block; }
+.hidden { display: none; }
+
 .logo {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin-bottom: 3rem;
+  margin-bottom: 0.67rem;
+}
+
+.ui.header:last-child {
+  color: #767676;
+}
+
+.tutu-logo {
+  margin-top: 0 !important;
 }
 
 .menu {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding-left: 26px;
+  padding: 14px 26px;
 }
 
 .menu i {
@@ -45,10 +90,8 @@
 .menu a {
   display: flex;
   align-items: center;
-}
-
-.menu a.icon::before {
-  font-size: 1.35rem !important;
+  width: 200px;
+  color: #1b272b;
 }
 
 .menu a:not(:last-child) {
@@ -58,14 +101,32 @@
 .popular {
   display: flex;
   width: 100%;
+  padding-left: 26px;
 }
 
 .top-places {
   display: flex;
   width: 100%;
+  padding-left: 26px;
 }
 
 .label {
   position: relative;
-  margin: 2rem 0;
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  color: #969696;
+}
+
+.show {
+  opacity: 1;
+}
+
+.hide {
+  opacity: 0;
+}
+
+.tutu-logo,
+.sidebar-text,
+.label {
+  transition: all 0.2s ease-in-out;
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Image, Icon, Button, Header, Divider, Label, Segment } from 'semantic-ui-react';
+import { Grid, Image, Header, Divider, Label, Segment } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import io from 'socket.io-client';
@@ -22,8 +22,6 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 const socket = io.connect('http://localhost:5000/client');
 
 class RecentArticles extends Component {
-  state = { visible: true };
-
   componentDidMount() {
     this.props.fetchRecentArticles();
 
@@ -32,45 +30,36 @@ class RecentArticles extends Component {
     });
   }
 
-  toggleVisibility = () => {
-    this.setState({ visible: !this.state.visible });
-  };
-
   render() {
-    const { visible } = this.state;
     const { articles } = this.props;
 
     return (
       <div>
-        <div className="article-display-button" onClick={this.toggleVisibility}>
-          <Icon name={`angle ${visible ? 'right' : 'left'}`} />
-        </div>
-        <div className={`recent-articles-container ${visible ? 'full' : 'hidden'}`}>
-          <Segment>
-            <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Newly Added Articles</Label>
-            <div className="scrollable-section">
-              {articles.map((article) => (
-                <div>
-                  <Grid>
+        <Segment>
+          <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Newly Added Articles</Label>
+          <div className="scrollable-section">
+            {articles.map((article) => (
+              <div>
+                <Grid>
                   <Grid.Row className="article-item">
-                    <Grid.Column width={6} className="article-info">
+                    <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important' }}>
                       <Image src={article.topImageUrl} href={article.url} target="_blank" />
                     </Grid.Column>
 
                     <Grid.Column width={10} className="article-info">
-                      <Header as="h3">{article.title}</Header>
-                      <p>
-                        {article.summary[0]}
-                      </p>
+                      <Header as="h4">{article.title}</Header>
+                      <p> {article.summary[0]} </p>
+                      {article.categories.map((category) => (
+                        <Label as="a" size="small" style={{ margin: '0.14285714em' }}> { category.label } </Label>
+                      ))}
                     </Grid.Column>
                   </Grid.Row>
                 </Grid>
-                  <Divider section />
-                </div>
+                <Divider section />
+              </div>
           ))}
-            </div>
-          </Segment>
-        </div>
+          </div>
+        </Segment>
       </div>
     );
   }

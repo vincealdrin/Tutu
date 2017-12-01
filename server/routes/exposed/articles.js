@@ -1,7 +1,6 @@
-const { mapArticle } = require('../../utils');
-
 const router = require('express').Router();
 const r = require('rethinkdb');
+const { mapArticle } = require('../../utils');
 
 module.exports = (conn, io) => {
   const tbl = 'articles';
@@ -17,9 +16,9 @@ module.exports = (conn, io) => {
       swLng,
       swLat,
       limit = 500,
-      keywords,
+      keywords = '',
       categories = '',
-      sources,
+      sources = '',
       timeWindow,
     } = req.query;
     const bounds = r.polygon(
@@ -53,8 +52,7 @@ module.exports = (conn, io) => {
       }
 
       if (keywords) {
-        query = query.filter((article) => article('keywords')
-          .contains((keyword) => r.expr(keywords.split(',')).contains(keyword)));
+        query = query.filter((article) => article('body').match(`${keywords.replace(',', '|')}`));
       }
 
       if (categories) {

@@ -35,6 +35,6 @@
     "radix": "off",
     "prefer-arrow-callback": "warn",
     "sort-imports": "error",
-    "camelcase": "warn"
+    "camelcase": "warn",
   }
 }

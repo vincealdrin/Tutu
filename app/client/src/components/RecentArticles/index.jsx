@@ -52,22 +52,22 @@ class RecentArticles extends Component {
               {articles.map((article) => (
                 <div>
                   <Grid>
-                  <Grid.Row className="article-item">
-                    <Grid.Column width={6} className="article-info">
-                      <Image src={article.topImageUrl} href={article.url} target="_blank" />
-                    </Grid.Column>
+                    <Grid.Row className="article-item">
+                      <Grid.Column width={6} className="article-info">
+                        <Image src={article.topImageUrl} href={article.url} target="_blank" />
+                      </Grid.Column>
 
-                    <Grid.Column width={10} className="article-info">
-                      <Header as="h3">{article.title}</Header>
-                      <p>
-                        {article.summary[0]}
-                      </p>
-                    </Grid.Column>
-                  </Grid.Row>
-                </Grid>
+                      <Grid.Column width={10} className="article-info">
+                        <Header as="h3">{article.title}</Header>
+                        <p>
+                          {article.summary[0]}
+                        </p>
+                      </Grid.Column>
+                    </Grid.Row>
+                  </Grid>
                   <Divider section />
                 </div>
-          ))}
+              ))}
             </div>
           </Segment>
         </div>

@@ -3,19 +3,6 @@
   height: 100%;
 }
 
-.simple-marker-container {
-  position: absolute;
-  right: 2em;
-  bottom: 3.9em;
-  width: 100%;
-  height: 100%;
-  background-color: red;
-}
-
-.simple-marker-image {
-  height: 127px !important;
-}
-
 .simple-marker-description {
   width: 600px;
 }
@@ -25,4 +12,20 @@
   height: 2rem;
   background-color: darksalmon;
   border-radius: 50px;
+}
+
+.popup-container {
+  max-width: 400px !important;
+  min-height: 400px !important;
+}
+
+.image-container {
+  position: relative;
+  margin-bottom: 0.3rem;
+}
+
+.read-more-button {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
 }

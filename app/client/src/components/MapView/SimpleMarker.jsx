@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Label, Popup, Item, Icon, Image } from 'semantic-ui-react';
+import { Label, Popup, Header, Icon, Image, Button } from 'semantic-ui-react';
 import shortid from 'shortid';
 import './styles.css';
 
@@ -15,92 +15,89 @@ class SimpleMarker extends Component {
         authors,
         publishDate,
         summary,
-        summary2,
+        categories,
+        keywords,
+        sentiment,
       },
     } = this.props;
+
+    const length = 400;
+    const shortSummary = `${summary[0].substring(0, length)}...`;
+    const multiAuthor = authors.map((author) => (
+      <span>
+        {author},
+      </span>
+    ));
+
+    const sentimentValue = Math.round(sentiment.subjectivity * 100);
+    let theSentiment;
+
+    if (sentimentValue < 45) {
+      theSentiment = <Label tag>Bad {sentimentValue}%</Label>;
+    } else if (sentimentValue > 45 && sentimentValue <= 55) {
+      theSentiment = <Label tag>Neutral {sentimentValue}%</Label>;
+    } else if (sentimentValue > 55 && sentimentValue <= 100) {
+      theSentiment = <Label tag>Good {sentimentValue}%</Label>;
+    }
 
     return (
       <div className="simple-marker-container">
         <Popup
-          position="right center"
-          wide="very"
+          position="top left"
           trigger={<Icon color="red" name="marker" size="huge" />}
           hoverable
-          flowing
+          className="popup-container"
         >
-          <Item.Group>
-            <Item>
-              <Item.Image>
-                <Image
-                  src={topImageUrl}
-                  shape="rounded"
-                  className="simple-marker-image"
-                />
-                <Item.Extra>
-                  <Label>
-                    <Icon name="newspaper" />
-                    <a href={sourceUrl} target="_blank">{source}</a>
-                  </Label>
-                  {authors.map((author) => (
-                    <Label
-                      key={shortid.generate()}
-                      icon="user outline"
-                      content={author}
-                    />
-                    ))}
-                  {/* {categories.map((category, i) => {
-                    const [main, sub] = category.label.split('-');
-                    return (
-                      <Popup
-                        position="left center"
-                        key={i}
-                        trigger={<Label content={toTitleCase(main)} />}
-                        hoverable
-                      >
-                        {toTitleCase(sub)}
-                      </Popup>
-                    );
-                  })} */}
-                </Item.Extra>
-                <Item.Extra>{new Date(publishDate).toLocaleDateString()}</Item.Extra>
-              </Item.Image>
-              <Item.Content>
-                <Item.Header>
-                  <a href={url} target="_blank">
-                    {title}
-                  </a>
-                </Item.Header>
-                <Item.Meta>Summary</Item.Meta>
-                <Item.Description className="simple-marker-description">
-                  {summary2}
-                </Item.Description>
-                <Item.Extra style={{ width: '500px' }}>
-                  <Label color="red" pointing="right" basic>Entities</Label>
-                  {/* {entities.person && entities.person.map((person, i) => (
-                    <Label
-                      icon="user outline"
-                      key={i}
-                      content={person}
-                    />
-                  ))}
-                  {entities.organization && entities.organization.map((org, i) => (
-                    <Label
-                      icon="briefcase"
-                      key={i}
-                      content={org}
-                    />
-                  ))}
-                  {entities.location && entities.location.map((loc, i) => (
-                    <Label
-                      icon="world"
-                      key={i}
-                      content={loc}
-                    />
-                  ))} */}
-                </Item.Extra>
-              </Item.Content>
-            </Item>
-          </Item.Group>
+          <div className="image-container">
+            <Image
+              src={topImageUrl}
+              shape="rounded"
+              className="simple-marker-image"
+            />
+            <Button color="blue" content="Read More" className="read-more-button" circular href={url} target="_blank" />
+          </div>
+
+          <Header as="a" href={url} target="_blank" color="blue">{title}</Header>
+
+          <div style={{ color: '#a4a4a4', margin: '0.3rem 0 1.3rem' }} >
+            <Label as="a" href={sourceUrl} color="yellow" ribbon >{source}</Label>
+            <div style={{ float: 'right' }}>
+              {multiAuthor}
+              <br />
+              {new Date(publishDate).toDateString()}
+            </div>
+          </div>
+
+          <article style={{ margin: '0 0 1.3rem' }}>
+            {shortSummary}
+          </article>
+
+          <section className="article-extra">
+            <Label.Group size="tiny" style={{ display: 'flex', marginBottom: '0.4rem' }}>
+              <div style={{ marginRight: '0.4rem' }}>
+                <Label basic color="pink">Category</Label>
+              </div>
+              <div>
+                {categories.map((category) => (<Label tag>{category.label}</Label>))}
+              </div>
+            </Label.Group>
+            <Label.Group size="tiny" style={{ display: 'flex', marginBottom: '0.4rem' }}>
+              <div style={{ marginRight: '0.4rem' }}>
+                <Label basic color="teal">Keywords</Label>
+              </div>
+              <div>
+                {keywords.slice(0, 5).map((keyword) => (<Label as="a" tag style={{ marginBottom: '0.3rem' }}>{keyword}</Label>))}
+              </div>
+            </Label.Group>
+            <Label.Group size="tiny" style={{ display: 'flex' }}>
+              <div style={{ marginRight: '0.4rem' }}>
+                <Label basic color="orange">Sentiment</Label>
+              </div>
+              <div>
+                {theSentiment}
+              </div>
+            </Label.Group>
+          </section>
         </Popup>
       </div>
     );

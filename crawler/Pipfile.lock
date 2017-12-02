@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "980889cc5d98ec615875a81428c576ef3a61b41280236eb7eb1488f337fc97cb"
+            "sha256": "9ca4f429c3ef4ace4a46b14c1fae06a649c106fa457acce0de2c75e3a055f8b0"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -593,9 +593,9 @@
         },
         "tzlocal": {
             "hashes": [
-                "sha256:05a2908f7fb1ba8843f03b2360d6ad314dbf2bce4644feb702ccd38527e13059"
+                "sha256:4ebeb848845ac898da6519b9b31879cf13b6626f7184c496037b818e238f2c4e"
             ],
-            "version": "==1.4"
+            "version": "==1.5.1"
         },
         "urllib3": {
             "hashes": [

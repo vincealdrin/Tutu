@@ -1,156 +1,38 @@
 import newspaper
 import json
 import time
-from requests import get
-from bs4 import BeautifulSoup
 import re
-from dotenv import load_dotenv, find_dotenv
-import os
 import langdetect
-import sys
 from random import randrange
-from fake_useragent import UserAgent
 import rethinkdb as r
-from datetime import datetime
 from urllib.parse import urldefrag, urlparse
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.summarizers.lsa import LsaSummarizer as Summarizer
-from sumy.nlp.stemmers import Stemmer
-from sumy.utils import get_stop_words
-from aylienapiclient import textapi
 from textblob import TextBlob
-import hashlib
-import htmldate
-import pytz
+from dotenv import load_dotenv, find_dotenv
+from db import get_locations, get_news_sources, get_provinces, get_article, insert_article, insert_log, get_uuid
+from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep
+from aylien import categorize
+from nlp import get_entities, summarize
+from fake_useragent import UserAgent
 
 load_dotenv(find_dotenv(), override=True)
-# get free proxies from us-proxy.org
-def get_proxies():
-    html_doc = get('https://www.us-proxy.org/').text
-    soup = BeautifulSoup(html_doc, 'html.parser')
-    rows = soup.find_all('tr')[1:-1]
 
-    http_rows = [row for row in rows if row.select('td[class=\'hx\']')[0].text == 'no']
-    http_rand_idx = randrange(0, len(http_rows))
-    http_ip = http_rows[http_rand_idx].find_all('td')[0].text
-    http_port = http_rows[http_rand_idx].find_all('td')[1].text
-
-    https_rows = [row for row in rows if row.select('td[class=\'hx\']')[0].text == 'yes']
-    https_rand_idx = randrange(0, len(https_rows))
-    https_ip = https_rows[https_rand_idx].find_all('td')[0].text
-    https_port = https_rows[https_rand_idx].find_all('td')[1].text
-    proxies = { 'http': http_ip + ':' + http_port, 'https': https_ip + ':' + https_port }
-    print('\nProxies: ' + json.dumps(proxies, indent=2))
-    sleep()
-
-    return proxies
-
-def sleep(slp_time):
-    if slp_time:
-        print('\n> ' + str(slp_time) + 's sleep...\n')
-
-        time.sleep(slp_time)
-
-
-def get_author(html_doc):
-    soup = BeautifulSoup(html_doc, 'html.parser')
-    anchors = soup.find_all('a', href=True)
-    author = ''
-
-    for anchor in anchors:
-        if 'author' in anchor['href'] and anchor:
-            author = anchor.extract().get_text()
-
-    if not author:
-        byline_tags = soup.select('[class*=byline]')
-        for byline_tag in byline_tags:
-            author = byline_tag.extract().get_text()
-            if author:
-                break
-
-    if not author:
-        byline_tags = soup.select('[id*=byline]')
-        for byline_tag in byline_tags:
-            author = byline_tag.extract().get_text()
-            if author:
-                break
-
-    author = re.sub('(?i)By ?', '', author)
-
-    if len(author) > 50:
-        author = ''
-
-    return author.strip()
-
-def logError(error, sourceId, runtime, url='', title=''):
-    r.table('crawlerLogs').insert({
-        'articleUrl': url,
-        'articleTitle': title,
-        'sourceId': sourceId,
-        'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
-        'status': 'error',
-        'type': 'articleCrawl',
-        'error': error,
-        'runtime': runtime
-    }).run(conn)
-
-AMAZON_ACCESS_KEY = os.environ.get('AMAZON_ACCESS_KEY')
-AMAZON_SECRET_KEY = os.environ.get('AMAZON_SECRET_KEY')
-DB_NAME = os.environ.get('DB_NAME')
-DB_HOST = os.environ.get('DB_HOST')
-DB_PORT = os.environ.get('DB_PORT')
-AYLIEN_APP_ID = os.environ.get('AYLIEN_APP_ID')
-AYLIEN_APP_KEY = os.environ.get('AYLIEN_APP_KEY')
-AYLIEN_APP_ID2 = os.environ.get('AYLIEN_APP_ID2')
-AYLIEN_APP_KEY2 = os.environ.get('AYLIEN_APP_KEY2')
-AYLIEN_APP_ID3 = os.environ.get('AYLIEN_APP_ID3')
-AYLIEN_APP_KEY3= os.environ.get('AYLIEN_APP_KEY3')
-LANGUAGE = 'english'
-SENTENCES_COUNT = 5
-
-stemmer = Stemmer(LANGUAGE)
-summarizer = Summarizer(stemmer)
-summarizer.stop_words = get_stop_words(LANGUAGE)
-
-conn = r.connect(DB_HOST, DB_PORT, db=DB_NAME)
-locations = list(
-    r.table('locations').eq_join('provinceId', r.table('provinces')).merge(lambda doc:
-        {
-            'location': doc['left'].without({ 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True}),
-            'province': doc['right'].without({ 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True })
-        }).without({ 'right': True, 'left': True }).run(conn))
-provinces = list(
-    r.table('provinces').eq_join('capitalId', r.table('locations')).merge(lambda doc:
-        {
-            'province': doc['left'].without({ 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True }),
-            'location': doc['right'].without({ 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True})
-        }).without({ 'right': True, 'left': True }).run(conn))
-news_sources = list(r.table('sources').order_by(r.desc('timestamp')).run(conn))
-
-text_client = textapi.Client(AYLIEN_APP_ID, AYLIEN_APP_KEY)
-text_client2 = textapi.Client(AYLIEN_APP_ID2, AYLIEN_APP_KEY2)
-text_client3 = textapi.Client(AYLIEN_APP_ID3, AYLIEN_APP_KEY3)
-
-classes = [
-    'Business', 'Economy & Finance', 'Lifestyle', 'Accident',
-    'Entertainment', 'Sports', 'Government & Politics',
-    'Health', 'Science & Technology', 'Crime', 'Weather',
-    'Calamity', 'Nation', 'Education', 'Food'
-]
-count = 0
+locations = get_locations()
+provinces = get_provinces()
+news_sources = get_news_sources('timestamp', True)
 
 if not news_sources:
     print('EMPTY NEWS SOURCES')
 
+count = 0
 slp_time = 0
 for news_source in news_sources:
     src_start_time = time.clock()
     url = news_source['contentData']['dataUrl']
     config = newspaper.Config()
-    config.browser_user_agent = UserAgent().random
+    # config.browser_user_agent = UserAgent().random
     config.follow_meta_refresh = True
     src_art_count = 0
+    source_id = news_source['id']
     # config.proxies = get_proxies()
 
     try:
@@ -158,30 +40,20 @@ for news_source in news_sources:
     except Exception as e:
         print('(SOURCE ERROR) Source Skipped\n')
         print(e)
-        r.table('crawlerLogs').insert({
-            sourceId: news_source['id'],
-            timestamp: r.expr(datetime.now(r.make_timezone('+08:00'))),
-            type: 'sourceCrawl',
-            status: 'error',
-            error: 'SOURCE ERROR',
-            'runtime': float(time.clock() - src_start_time)
-        }).run(conn)
+        insert_log(source_id, 'sourceCrawl', 'error', float(time.clock() - src_start_time), {
+            'errorMsg': 'SOURCE ERROR'
+        })
         continue
 
     print('\n' + source.domain + ' has ' + str(len(source.articles)) + ' articles\n')
 
-    r.table('crawlerLogs').insert({
-        'sourceId': news_source['id'],
-        'articlesCount': len(source.articles),
-        'type': 'sourceCrawl',
-        'status': 'pending',
-        'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
-        'runtime': float(time.clock() - src_start_time)
-    }).run(conn)
+    insert_log(source_id, 'sourceCrawl', 'pending', float(time.clock() - src_start_time), {
+        'articlesCount': len(source.articles)
+    })
 
     if (not source.articles):
         print('(ZERO ARTICLES) Source Skipped\n')
-        logError('ZERO ARTICLES', news_source['id'], float(time.clock() - start_time))
+        insert_log(source_id, 'SOURCE ERROR', 'error', float(time.clock() - src_start_time))
         continue
 
     for article in source.articles:
@@ -191,23 +63,20 @@ for news_source in news_sources:
 
         defragged_url = urldefrag(article.url).url
         clean_url = defragged_url[:defragged_url.find('?')]
-        url_uuid = r.uuid(clean_url).run(conn)
+        url_uuid = get_uuid(clean_url)
 
-        r.table('crawlerLogs').insert({
-            'articleUrl': article.url,
-            'sourceId': news_source['id'],
-            'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
-            'type': 'articleCrawl',
-            'status': 'pending',
-            'sleepTime': slp_time
-        }).run(conn)
+        insert_log(source_id, 'articleCrawl', 'pending', float(time.clock() - start_time), {
+            'articleUrl': article.url
+        })
 
-        found_article = r.table('articles').get(url_uuid).run(conn)
-
-        if found_article:
+        existing_article = get_article(url_uuid)
+        if existing_article:
             print('\n(EXISTING URL) Skipped: ' + str(article.url))
-            print(' -- ' + found_article['id'] + '\n')
-            logError('EXISTING URL', news_source['id'], float(time.clock() - start_time), article.url)
+            print(' -- ' + existing_article['id'] + '\n')
+            insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
+                'articleUrl': article.url,
+                'errorMsg': 'EXISTING URL'
+            })
             slp_time = 0
             continue
 
@@ -216,89 +85,84 @@ for news_source in news_sources:
             article.parse()
             article.nlp()
 
-            categories = []
-            category1 = text_client.UnsupervisedClassify({ 'url': article.url, 'class': classes[:5] })
-            category2 = text_client2.UnsupervisedClassify({ 'url': article.url, 'class': classes[5:10] })
-            category3 = text_client3.UnsupervisedClassify({ 'url': article.url, 'class': classes[10:] })
-            categories = category1['classes'] + category2['classes'] + category3['classes']
-
-            body = category1['text']
+            cat_result = categorize(article.url)
+            categories, body, rate_limits = categorize(article.url)
 
             try:
                 if langdetect.detect(body) != 'en':
                     print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
-                    logError('NOT ENGLISH', news_source['id'], float(time.clock() - start_time), article.url, article.title)
+                    slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
+                        'articleUrl': article.url,
+                        'articleTitle': article.title,
+                        'errorMsg': 'NOT ENGLISH',
+                    })
                     continue
             except:
                 print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
-                logError('NOT ENGLISH', news_source['id'], float(time.clock() - start_time), article.url, article.title)
+                slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
+                    'articleUrl': article.url,
+                    'articleTitle': article.title,
+                    'errorMsg': 'NOT ENGLISH',
+                })
                 continue
 
             if  len(article.title.split()) < 5 and len(body.split()) < 100:
                 print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
-                logError('SHORT CONTENT', news_source['id'], float(time.clock() - start_time), article.url, article.title)
+                slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
+                    'articleUrl': article.url,
+                    'articleTitle': article.title,
+                    'errorMsg': 'SHORT CONTENT',
+
+                })
                 continue
 
             if source.brand in body:
                 print('\n(SOURCE IS IN BODY) Skipped: ' + str(article.url) + '\n')
-                logError('SOURCE IS IN BODY', news_source['id'], float(time.clock() - start_time), article.url, article.title)
+                slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
+                    'articleUrl': article.url,
+                    'articleTitle': article.title,
+                    'errorMsg': 'SOURCE IS IN BODY',
+
+                })
                 continue
 
             if not body:
                 print('\n(NO TEXT) Skipped: ' + str(article.url) + '\n')
-                logError('NO TEXT', news_source['id'], float(time.clock() - start_time), article.url, article.title)
-
-                no_text_articles.append(article.url)
-
-                with open(folder_path + '/no-text-articles.json', 'w+') as no_text_json_file:
-                    json.dump(no_text_articles, no_text_json_file, indent=2, default=str)
+                slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
+                    'articleUrl': article.url,
+                    'articleTitle': article.title,
+                    'errorMsg': 'NO TEXT',
+                })
                 continue
 
-            with open('./world-countries.json') as countries_file:
-                countries = json.load(countries_file)
+            combined_body = body + ' ' + article.text + ' ' + article.title + ' ' + urlparse(article.url).path
+            matched_locations = search_locations(combined_body, locations, provinces)
 
             nation_terms = '\WPH|Philippines?|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos\W'
             nation_pattern = re.compile('(\W('+nation_terms+')$|^('+nation_terms+')\W|\W('+nation_terms+')\W)', re.IGNORECASE)
-            combined_body = body + ' ' + article.text + ' ' + article.title + ' ' + urlparse(article.url).path
 
-            matched_locations = []
-            for location in locations:
-                location_pattern = re.compile('\W*(City of '+location['location']['name']+'|'+location['location']['name']+' City|'+location['location']['name']+' Municipality|Municipality of '+location['location']['name']+'|'+location['location']['name']+',? ?('+location['province']['name']+'|Metro '+location['province']['name']+')+),? ?(Philippines|PH)?\W', re.IGNORECASE)
-
-                matched = location_pattern.search(combined_body)
-                if matched:
-                    matched_locations.append(location)
-
-            if not matched_locations:
-                for province in provinces:
-                    province_pattern = re.compile('\W('+province['province']['name']+' Province|'+province['province']['name']+'|Metro '+province['province']['name']+'|'+province['province']['name']+')+,? ?(Philippines|PH)?\W', re.IGNORECASE)
-                    matched = province_pattern.search(combined_body)
-
-                    if matched:
-                        matched_locations.append(province)
-
+            with open('./world-countries.json') as countries_file:
+                countries = json.load(countries_file)
             for country in countries:
                 if country in combined_body and not nation_pattern.search(combined_body):
                     print('\n(OTHER COUNTRY BUT NO PH) Skipped: ' + str(article.url) + '\n')
-                    logError('OTHER COUNTRY BUT NO PH', news_source['id'], float(time.clock() - start_time), article.url, article.title)
-
-                    slp_time = randrange(2, 6)
+                    slp_time = insert_log(source_id, 'OTHER COUNTRY BUT NO PH', 'error', float(time.clock() - start_time), {
+                        'articleUrl': article.url,
+                        'articleTitle': article.title
+                    })
                     continue
 
             if not matched_locations:
                 if not nation_pattern.search(combined_body):
                     print('\n(NO PH LOCATIONS) Skipped: ' + str(article.url) + '\n')
-                    logError('NO PH LOCATIONS', news_source['id'], float(time.clock() - start_time), article.url, article.title)
-
-                    slp_time = randrange(2, 6)
+                    slp_time = insert_log(source_id, 'NO PH LOCATIONS', 'error', float(time.clock() - start_time), {
+                        'articleUrl': article.url,
+                        'articleTitle': article.title
+                    })
                     continue
-                else:
-                    print(nation_pattern.search(combined_body))
 
-            summary_sentences = []
-            for summary in summarizer(PlaintextParser.from_string(body, Tokenizer(LANGUAGE)).document, SENTENCES_COUNT):
-                summary_sentences.append(str(summary))
-
+            people, organizations = get_entities(body)
+            summary_sentences = summarize(body)
             blob = TextBlob(body)
             sentiment = {
                 'polarity': blob.polarity,
@@ -306,7 +170,7 @@ for news_source in news_sources:
             }
 
             if not article.authors:
-                author = get_author(article.html)
+                author = search_authors(article.html)
                 if author:
                     article.authors.append(author)
 
@@ -317,64 +181,44 @@ for news_source in news_sources:
                 'title': article.title.encode('ascii', 'ignore').decode('utf-8'),
                 'authors': article.authors,
                 'body': body,
-                'publishDate': r.expr(article.publish_date.replace(tzinfo=r.make_timezone('+08:00'))) if article.publish_date else datetime.strptime(htmldate.find_date(article.html), '%Y-%m-%d').astimezone(r.make_timezone('+08:00')),
+                'publishDate': search_publish_date(article.publish_date, article.html),
                 'topImageUrl': article.top_image,
-                'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
                 'summary': summary_sentences,
                 'summary2': article.summary,
                 'keywords': article.keywords,
                 'locations': matched_locations,
                 'categories': categories,
-                'sentiment': sentiment
-                # 'images': article.images,
-                # 'movies': article.movies
+                'sentiment': sentiment,
+                'organizations': organizations,
+                'people': people
             }
 
-            r.table('articles').insert(new_article).run(conn)
+            insert_article(new_article)
             count += 1
             src_art_count += 1
+
             runtime = float(time.clock() - start_time)
-            aylien_status = text_client.RateLimits()
-            aylien_status2 = text_client2.RateLimits()
-            aylien_status3 = text_client3.RateLimits()
+            aylien_status = rate_limits[0]
+            aylien_status2 = rate_limits[1]
+            aylien_status3 = rate_limits[2]
             print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
             print('Locations: ' + ' | '.join([ml['location']['formattedAddress'] for ml in matched_locations]))
             print('AYLIEN REMAINING CALL: ['+str(aylien_status['remaining'])+', '+str(aylien_status2['remaining'])+', '+str(aylien_status3['remaining'])+'] -- ' + str('%.2f' % runtime + 's scraping runtime'))
 
-            r.table('crawlerLogs').insert({
-                'articleId': url_uuid,
-                'sourceId': news_source['id'],
-                'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
-                'type': 'articleCrawl',
-                'status': 'success',
-                'runtime': runtime
-            }).run(conn)
-
-            slp_time = randrange(2, 6)
+            slp_time = insert_log(source_id, 'articleCrawl', 'success', float(time.clock() - start_time), {
+                'articleId': url_uuid
+            })
 
         except newspaper.ArticleException as e:
             print('\n(ARTICLE ERROR) Article Skipped\n')
-            r.table('crawlerLogs').insert({
+            slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                 'articleUrl': url,
                 'articleTitle': article.title if article.title else '',
-                'sourceId': news_source['id'],
-                'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
-                'type': 'articleCrawl',
-                'status': 'error',
-                'error': 'ARTICLE ERROR',
-                'runtime': float(time.clock() - start_time)
-            }).run(conn)
-
-            slp_time = randrange(2, 6)
+            })
             continue
 
-    r.table('crawlerLogs').insert({
-        'sourceId': news_source['id'],
+    insert_log(source_id, 'sourceCrawl', 'success', float(time.clock() - src_start_time), {
         'articlesCrawledCount': src_art_count,
-        'type': 'sourceCrawl',
-        'status': 'success',
-        'timestamp': r.expr(datetime.now(r.make_timezone('+08:00'))),
-        'runtime': float(time.clock() - src_start_time)
-    }).run(conn)
+    })
 
     print('\n' + source.domain + ' done!')

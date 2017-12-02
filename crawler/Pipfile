@@ -10,7 +10,6 @@ name = "pypi"
 "newspaper3k" = "*"
 requests = "*"
 "psycopg2" = "*"
-nltk = "*"
 textblob = "*"
 "beautifulsoup4" = "*"
 xmltodict = "*"
@@ -29,6 +28,10 @@ matplotlib = "*"
 aylien-apiclient = "*"
 date-extractor = "*"
 htmldate = "*"
+nltk = "*"
+chardet = "*"
+certifi = "*"
+idna = "*"
 
 
 [dev-packages]

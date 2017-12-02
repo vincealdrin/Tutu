@@ -6,6 +6,7 @@ import MapView from '../MapView';
 import AppSidebar from '../AppSidebar';
 import RecentArticles from '../RecentArticles';
 import Filter from '../Filter';
+import About from '../About';
 import TestComponent from '../TestComponent';
 import Counter from '../Counter';
 import GridLayout from '../GridView';
@@ -17,7 +18,7 @@ const App = () => (
   <div>
     <main className="app-container">
       <Switch>
-        <Route exact path="/(top|recent|filter)?" component={MapView} />
+        <Route exact path="/(top|recent|filter|about)?" component={MapView} />
         <Route path="/counter" component={Counter} />
         <Route path="/grid" component={GridLayout} />
         <Redirect to="/" />
@@ -26,9 +27,10 @@ const App = () => (
 
     <AppSidebar>
       <Switch>
+        <Route path="(.*)/top" exact component={TestComponent} />
         <Route path="(.*)/recent" exact component={RecentArticles} />
         <Route path="(.*)/Filter" exact component={Filter} />
-        <Route path="/(.*)/" exact component={TestComponent} />
+        <Route path="(.*)/about" exact component={About} />
         <Redirect to="/" />
       </Switch>
     </AppSidebar>

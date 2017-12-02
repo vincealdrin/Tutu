@@ -1,45 +1,15 @@
-.recent-articles-container {
-  position: relative;
-  max-width: 500px;
-  background: #fff;
-  box-shadow: -3px 0 1rem -3px #666;
-  transition: all 0.3s ease-in-out;
-}
-
-.ui.segment {
-  height: 100vh;
-}
-
 .scrollable-section {
-  height: 100vh;
+  height: 90vh;
   padding-top: 2rem;
+  overflow-x: hidden;
   overflow-y: auto;
 }
 
-.full {
-  display: block;
-}
-
-.hidden {
-  display: none;
-}
-
-.article-display-button {
-  position: absolute;
-  top: 40%;
-  left: -2rem;
-  z-index: 100;
-  display: flex;
-  align-content: center;
-  width: 1rem;
-  height: 6rem;
-  padding: 2rem 1rem;
-  cursor: pointer;
-  background: #fff;
-  border-bottom-left-radius: 7px;
-  border-top-left-radius: 7px;
-  box-shadow: -3px 3px 1rem -3px #666;
-}
-
-.row { align-items: center !important; }
+.row { align-items: flex-start !important; }
 .article-item { padding: 0 !important; }
+
+@media screen and (min-width: 1367px) {
+  .scrollable-section {
+    height: 100vh;
+  }
+}

@@ -6,10 +6,10 @@ import langdetect
 from random import randrange
 import rethinkdb as r
 from urllib.parse import urldefrag, urlparse
-from textblob import TextBlob
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
 from db import get_locations, get_news_sources, get_provinces, get_article, insert_article, insert_log, get_uuid
-from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep
+from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_shared_count
 from aylien import categorize
 from nlp import get_entities, summarize
 from fake_useragent import UserAgent
@@ -161,13 +161,9 @@ for news_source in news_sources:
                     })
                     continue
 
-            people, organizations = get_entities(body)
+            organizations, people = get_entities(body)
             summary_sentences = summarize(body)
-            blob = TextBlob(body)
-            sentiment = {
-                'polarity': blob.polarity,
-                'subjectivity': blob.subjectivity
-            }
+            sentiment  SentimentIntensityAnalyzer().polarity_scores(text)
 
             if not article.authors:
                 author = search_authors(article.html)
@@ -190,7 +186,8 @@ for news_source in news_sources:
                 'categories': categories,
                 'sentiment': sentiment,
                 'organizations': organizations,
-                'people': people
+                'people': people,
+                'sharedCount': get_shared_count(article.url)
             }
 
             insert_article(new_article)

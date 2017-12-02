@@ -5,7 +5,9 @@ import re
 import rethinkdb as r
 from datetime import datetime
 import htmldate
+import os
 
+SHARED_COUNT_API_KEY = os.environ.get('SHARED_COUNT_API_KEY')
 PH_TIMEZONE = '+08:00'
 # get free proxies from us-proxy.org
 def get_proxies():
@@ -28,14 +30,28 @@ def get_proxies():
 
     return proxies
 
-
 def sleep(slp_time):
     if slp_time:
         print('\n> ' + str(slp_time) + 's sleep...\n')
         time.sleep(slp_time)
 
+
+def get_shared_count(url):
+    return get('https://api.sharedcount.com/v1.0/', {
+        'url': url,
+        'apikey': SHARED_COUNT_API_KEY
+    }).json()
+
+
 def search_publish_date(publish_date, html):
-    return r.expr(publish_date.replace(tzinfo=r.make_timezone(PH_TIMEZONE))) if publish_date else datetime.strptime(htmldate.find_date(html), '%Y-%m-%d').astimezone(r.make_timezone(PH_TIMEZONE))
+    if publish_date:
+        return r.expr(publish_date.replace(tzinfo=r.make_timezone(PH_TIMEZONE)))
+
+    found_date = htmldate.find_date(html)
+    if found_date:
+        return datetime.strptime(htmldate.find_date(html), '%Y-%m-%d').astimezone(r.make_timezone(PH_TIMEZONE))
+
+    return None
 
 def search_authors(html_doc):
     soup = BeautifulSoup(html_doc, 'html.parser')

@@ -32,6 +32,9 @@ chardet = "*"
 certifi = "*"
 idna = "*"
 twython = "*"
+gensim = "*"
+stop-words = "*"
+concepts = "*"
 
 
 [dev-packages]

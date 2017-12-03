@@ -7,7 +7,7 @@ from sumy.nlp.stemmers import Stemmer
 from sumy.utils import get_stop_words
 from itertools import groupby
 
-# start CoreNLP server first
+# start CoreNLP server
 # java -mx4g -cp "*" --add-modules java.xml.bind edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
 
 non_org = ['Purok']

@@ -12,6 +12,7 @@ from db import get_locations, get_news_sources, get_provinces, get_article, inse
 from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_shared_count
 from aylien import categorize
 from nlp import get_entities, summarize
+from nlp.keywords import parse_topics
 from fake_useragent import UserAgent
 
 load_dotenv(find_dotenv(), override=True)
@@ -45,6 +46,7 @@ for news_source in news_sources:
         })
         continue
 
+    print(source.brand)
     print('\n' + source.domain + ' has ' + str(len(source.articles)) + ' articles\n')
 
     insert_log(source_id, 'sourceCrawl', 'pending', float(time.clock() - src_start_time), {
@@ -88,6 +90,9 @@ for news_source in news_sources:
             cat_result = categorize(article.url)
             categories, body, rate_limits = categorize(article.url)
 
+            pattern = re.compile(source.brand, re.IGNORECASE)
+            body = pattern.sub('', body)
+
             try:
                 if langdetect.detect(body) != 'en':
                     print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
@@ -106,7 +111,7 @@ for news_source in news_sources:
                 })
                 continue
 
-            if  len(article.title.split()) < 5 and len(body.split()) < 100:
+            if  len(body.split()) < 100:
                 print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
                 slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                     'articleUrl': article.url,
@@ -163,7 +168,7 @@ for news_source in news_sources:
 
             organizations, people = get_entities(body)
             summary_sentences = summarize(body)
-            sentiment  SentimentIntensityAnalyzer().polarity_scores(text)
+            sentiment = SentimentIntensityAnalyzer().polarity_scores(body)
 
             if not article.authors:
                 author = search_authors(article.html)
@@ -182,6 +187,7 @@ for news_source in news_sources:
                 'summary': summary_sentences,
                 'summary2': article.summary,
                 'keywords': article.keywords,
+                'topics': parse_topics(body),
                 'locations': matched_locations,
                 'categories': categories,
                 'sentiment': sentiment,

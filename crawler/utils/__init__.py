@@ -87,11 +87,11 @@ def search_locations(text, locations, provinces):
     matched_locations = []
 
     for location in locations:
-        location_pattern = re.compile('\W*(City of '+location['location']['name']+'|'+location['location']['name']+' City|'+location['location']['name']+' Municipality|Municipality of '+location['location']['name']+'|'+location['location']['name']+',? ?('+location['province']['name']+'|Metro '+location['province']['name']+')+),? ?(Philippines|PH)?\W', re.IGNORECASE)
+        if location['location']['name'] in text:
+            province_pattern = re.compile('\W('+location['province']['name']+' Province|'+location['province']['name']+'|Metro '+location['province']['name']+'|'+location['province']['name']+')+,? ?(Philippines|PH)?\W', re.IGNORECASE)
 
-        matched = location_pattern.search(text)
-        if matched:
-            matched_locations.append(location)
+            if province_pattern.search(text):
+                matched_locations.append(location)
 
     if not matched_locations:
         for province in provinces:

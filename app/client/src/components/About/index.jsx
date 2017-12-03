@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { Segment, Label, Icon, Header, Divider, List } from 'semantic-ui-react';
-import './style.css';
 import { Link } from 'react-router-dom';
+import './style.css';
 
 class About extends Component {
   render() {
     return (
       <div className="about-section-container">
         <Segment>
-          <Label as="a" color="red" ribbon style={{ marginBottom: '1rem' }}>Top News</Label>
+          <Label as="a" color="red" ribbon style={{ marginBottom: '1rem' }}>About</Label>
           <div className="scrollable-section about-section-info">
             <Header as="h2" style={{ marginBottom: 32 }}>
               TUTÛ: A Web-based Interactive Map of Credible News Outlets in the Philippines

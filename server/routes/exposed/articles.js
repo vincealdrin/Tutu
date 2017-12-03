@@ -75,7 +75,10 @@ module.exports = (conn, io) => {
         query = query.limit(parseInt(limit));
       }
 
-      const cursor = await query.map(mapArticle(bounds, catsArr.length)).run(conn);
+      const cursor = await query
+        .distinct()
+        .map(mapArticle(bounds, catsArr.length))
+        .run(conn);
       const articles = await cursor.toArray();
 
       res.setHeader('X-Total-Count', totalCount);

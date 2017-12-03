@@ -56,7 +56,7 @@ class SimpleMarker extends Component {
     }
 
     return (
-      <div className="simple-marker-container" onMouseOver={this.fetchRelated}>
+      <div className="simple-marker-container">
         <Popup
           position="top left"
           trigger={<Icon color="red" name="marker" size="huge" className="marker" />}

@@ -101,12 +101,14 @@ module.exports.mapArticle = (bounds, catsLength) => (join) => {
     article.categories = join('left')('categories')
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
-      .slice(0, catsLength);
+      .slice(0, catsLength)
+      .concatMap((c) => [c('label')]);
   } else {
     article.categories = join('left')('categories')
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
-      .slice(0, 3);
+      .slice(0, 2)
+      .concatMap((c) => [c('label')]);
   }
 
   if (bounds) {

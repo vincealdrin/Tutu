@@ -46,7 +46,6 @@ for news_source in news_sources:
         })
         continue
 
-    print(source.brand)
     print('\n' + source.domain + ' has ' + str(len(source.articles)) + ' articles\n')
 
     insert_log(source_id, 'sourceCrawl', 'pending', float(time.clock() - src_start_time), {
@@ -64,7 +63,7 @@ for news_source in news_sources:
         sleep(slp_time)
 
         defragged_url = urldefrag(article.url).url
-        clean_url = defragged_url[:defragged_url.find('?')]
+        clean_url = defragged_url[:defragged_url.find('?')].replace('www.', '')
         url_uuid = get_uuid(clean_url)
 
         insert_log(source_id, 'articleCrawl', 'pending', float(time.clock() - start_time), {

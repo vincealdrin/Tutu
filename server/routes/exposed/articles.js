@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
+const natural = require('natural');
 const { mapArticle } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -103,6 +104,36 @@ module.exports = (conn, io) => {
 
       res.setHeader('X-Total-Count', totalCount);
       return res.json(articles);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/related', async (req, res, next) => {
+    try {
+      const {
+        title,
+        topics,
+        people,
+        orgs,
+        categories,
+      } = req.query;
+      const catsArr = categories.split(',');
+      const cursor = await r.table('articles').filter((article) => article('categories')
+        .orderBy(r.desc((category) => category('score')))
+        .slice(0, catsArr.length)
+        .concatMap((c) => [c('label')])
+        .eq(r.expr(catsArr))
+        .and(article('topics')('common').match(`(?i)${topics.replace(',', '|')}`))
+        .and(article('people').contains((person) => person.match(`(?i)${people.replace(',', '|')}`))
+          .or(article('organizations').contains((org) => org.match(`(?i)${orgs.replace(',', '|')}`)))))
+        .pluck('title', 'url')
+        .run(conn);
+      const articles = await cursor.toArray();
+      const relatedArticles = articles
+        .filter((article) => natural.DiceCoefficient(title, article.title) > 0.40);
+
+      res.json(relatedArticles);
     } catch (e) {
       next(e);
     }

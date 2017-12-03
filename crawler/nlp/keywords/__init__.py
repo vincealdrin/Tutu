@@ -4,6 +4,7 @@ import requests
 from nltk import *
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
+from difflib import SequenceMatcher
 
 class TopicDetector(object):
     def tokenize_sent(self, words):
@@ -70,7 +71,6 @@ class TopicDetector(object):
         top10 = [w for w, c in FreqDist(data).most_common(10)]
         topics = [e for e in top10 if e.split()[0] in freq]
         topics = self.readable(topics)
-        topics = topics
         return topics
 
     def main_topics(self, words):
@@ -80,17 +80,16 @@ class TopicDetector(object):
         et = word_tokenize(self.extract_topics(words))
         main_topics = set([e for e in et if e.split()[0] in freq])
         main_topics = self.readable(main_topics)
-        main_topics = main_topics
         return main_topics
 
     def readable(self, words):
-        data = ', '.join(words)
+        data = ','.join(words)
         return data
 
 def parse_topics(text):
     td = TopicDetector()
 
     return {
-        'common': td.extract_topics(text).split(', '),
-        'main': td.main_topics(text).split(', ')
+        'common': td.extract_topics(text),
+        'main': td.main_topics(text)
     }

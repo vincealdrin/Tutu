@@ -80,12 +80,22 @@ module.exports.getAboutContactUrl = (htmlDoc, baseUrl) => {
   }
 };
 
+const mapLocation = (loc) => {
+  const coords = loc('location')('position').toGeojson()('coordinates');
+  return {
+    lng: coords.nth(0),
+    lat: coords.nth(1),
+  };
+};
 module.exports.mapArticle = (bounds, catsLength) => (join) => {
   const article = {
     url: join('left')('url'),
     title: join('left')('title'),
     authors: join('left')('authors'),
-    keywords: join('left')('keywords'),
+    // keywords: join('left')('keywords'),
+    keywords: join('left')('topics')('common').split(','),
+    people: join('left')('people'),
+    organizations: join('left')('organizations'),
     publishDate: join('left')('publishDate'),
     sentiment: join('left')('sentiment'),
     summary: join('left')('summary'),
@@ -113,11 +123,9 @@ module.exports.mapArticle = (bounds, catsLength) => (join) => {
 
   if (bounds) {
     article.locations = join('left')('locations')
-      .filter((loc) => bounds.intersects(loc('location')('position')))
-      .map((loc) => loc('location')('position').toGeojson()('coordinates'));
+      .filter((loc) => bounds.intersects(loc('location')('position'))).map(mapLocation);
   } else {
-    article.locations = join('left')('locations')
-      .map((loc) => loc('location')('position').toGeojson()('coordinates'));
+    article.locations = join('left')('locations').map(mapLocation);
   }
 
   return article;
@@ -139,7 +147,7 @@ module.exports.mapFeedArticle = (join) => {
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
       .slice(0, 3),
-    locations: join('left')('new_val')('locations').map((loc) => loc('location')('position').toGeojson()('coordinates')),
+    locations: join('left')('new_val')('locations').map(mapLocation),
     source: join('right')('contentData')('siteData')('title'),
     sourceUrl: join('right')('contentData')('dataUrl'),
     sourceFaviconUrl: join('right')('faviconUrl'),
@@ -166,7 +174,7 @@ module.exports.mapFeedLog = (join) => ({
     sourceUrl: join('right')('contentData')('dataUrl'),
     sourceTitle: join('right')('contentData')('siteData')('title'),
     article: r.table('articles')
-      .get(join('left')('new_val')('articleId'))
+      .nth(join('left')('new_val')('articleId'))
       .pluck('authors', 'title', 'summary', 'url', 'publishDate')
       .merge((article) => ({ summary: article('summary').nth(0) }))
       .default({}),
@@ -186,7 +194,7 @@ module.exports.mapLog = (join) => ({
   sourceUrl: join('right')('contentData')('dataUrl'),
   sourceTitle: join('right')('contentData')('siteData')('title'),
   article: r.table('articles')
-    .get(join('left')('articleId'))
+    .nth(join('left')('articleId'))
     .pluck('authors', 'title', 'summary', 'url', 'publishDate')
     .merge((article) => ({ summary: article('summary').nth(0) }))
     .default({}),

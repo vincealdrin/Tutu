@@ -119,19 +119,23 @@ module.exports = (conn, io) => {
         categories,
       } = req.query;
       const catsArr = categories.split(',');
-      const cursor = await r.table('articles').filter((article) => article('categories')
-        .orderBy(r.desc((category) => category('score')))
-        .slice(0, catsArr.length)
-        .concatMap((c) => [c('label')])
-        .eq(r.expr(catsArr))
-        .and(article('topics')('common').match(`(?i)${topics.replace(',', '|')}`))
-        .and(article('people').contains((person) => person.match(`(?i)${people.replace(',', '|')}`))
-          .or(article('organizations').contains((org) => org.match(`(?i)${orgs.replace(',', '|')}`)))))
+      const cursor = await r.table('articles').filter((article) =>
+        article('timestamp')
+          .during(article('timestamp').date(), r.time(article('timestamp').year(), article('timestamp').month(), article('timestamp').day(), '+08:00'))
+          .and(article('categories')
+            .orderBy(r.desc((category) => category('score')))
+            .slice(0, catsArr.length)
+            .concatMap((c) => [c('label')])
+            .eq(r.expr(catsArr))
+            .and(article('topics')('common').match(`(?i)${topics.replace(',', '|')}`))
+            .and(article('people').contains((person) => person.match(`(?i)${people.replace(',', '|')}`))
+              .or(article('organizations').contains((org) => org.match(`(?i)${orgs.replace(',', '|')}`))))))
         .pluck('title', 'url')
         .run(conn);
       const articles = await cursor.toArray();
       const relatedArticles = articles
-        .filter((article) => natural.DiceCoefficient(title, article.title) > 0.40);
+        .filter((article) => natural.DiceCoefficient(title, article.title) > 0.40)
+        .slice(0, 5);
 
       res.json(relatedArticles);
     } catch (e) {

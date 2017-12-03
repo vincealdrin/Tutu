@@ -29,3 +29,9 @@
   right: 7px;
   bottom: 7px;
 }
+
+.marker {
+  position: absolute;
+  bottom: 1px;
+  left: -26px;
+}

@@ -1,9 +1,23 @@
 import React, { Component } from 'react';
 import { Label, Popup, Header, Icon, Image, Button } from 'semantic-ui-react';
-import shortid from 'shortid';
 import './styles.css';
 
 class SimpleMarker extends Component {
+  fetchRelated = () => {
+    const {
+      article: {
+        title,
+        keywords,
+        people,
+        organizations,
+        categories,
+      },
+      fetchRelatedArticles,
+    } = this.props;
+
+    fetchRelatedArticles(title, keywords.join(), people.join(), organizations.join(), categories.join());
+  }
+
   render() {
     const {
       article: {
@@ -41,10 +55,10 @@ class SimpleMarker extends Component {
     }
 
     return (
-      <div className="simple-marker-container">
+      <div className="simple-marker-container" onMouseOver={this.fetchRelated} >
         <Popup
           position="top left"
-          trigger={<Icon color="red" name="marker" size="huge" />}
+          trigger={<Icon color="red" name="marker" size="huge" className="marker" />}
           hoverable
           className="popup-container"
         >
@@ -78,7 +92,7 @@ class SimpleMarker extends Component {
                 <Label basic color="pink">Category</Label>
               </div>
               <div>
-                {categories.map((category) => (<Label tag>{category.label}</Label>))}
+                {categories.map((category) => <Label tag>{category}</Label>)}
               </div>
             </Label.Group>
             <Label.Group size="tiny" style={{ display: 'flex', marginBottom: '0.4rem' }}>

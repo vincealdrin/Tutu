@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Label, Popup, Header, Icon, Image, Button } from 'semantic-ui-react';
+import shortid from 'shortid';
 import './styles.css';
 
 class SimpleMarker extends Component {
@@ -92,7 +93,7 @@ class SimpleMarker extends Component {
                 <Label basic color="pink">Category</Label>
               </div>
               <div>
-                {categories.map((category) => <Label tag>{category}</Label>)}
+                {categories.map((category) => <Label key={shortid.generate()} tag>{category}</Label>)}
               </div>
             </Label.Group>
             <Label.Group size="tiny" style={{ display: 'flex', marginBottom: '0.4rem' }}>
@@ -100,7 +101,7 @@ class SimpleMarker extends Component {
                 <Label basic color="teal">Keywords</Label>
               </div>
               <div>
-                {keywords.slice(0, 5).map((keyword) => (<Label as="a" tag style={{ marginBottom: '0.3rem' }}>{keyword}</Label>))}
+                {keywords.slice(0, 5).map((keyword) => (<Label as="a" key={shortid.generate()} tag style={{ marginBottom: '0.3rem' }}>{keyword}</Label>))}
               </div>
             </Label.Group>
             <Label.Group size="tiny" style={{ display: 'flex' }}>

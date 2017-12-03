@@ -185,7 +185,7 @@ for news_source in news_sources:
                 'topImageUrl': article.top_image,
                 'summary': summary_sentences,
                 'summary2': article.summary,
-                'keywords': article.keywords,
+                # 'keywords': article.keywords,
                 'topics': parse_topics(body),
                 'locations': matched_locations,
                 'categories': categories,

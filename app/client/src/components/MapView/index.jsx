@@ -54,7 +54,7 @@ class MapView extends Component {
 
     return (
       <GoogleMapReact
-        defaultZoom={mapState.zoom}
+        defaultZoom={7}
         defaultCenter={this.defaultCenter}
         bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
         options={mapOption}

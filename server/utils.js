@@ -136,7 +136,7 @@ module.exports.mapFeedArticle = (join) => {
     url: join('left')('new_val')('url'),
     title: join('left')('new_val')('title'),
     authors: join('left')('new_val')('authors'),
-    keywords: join('left')('new_val')('keywords'),
+    keywords: join('left')('new_val')('topics')('common').split(','),
     publishDate: join('left')('new_val')('publishDate'),
     sentiment: join('left')('new_val')('sentiment'),
     summary: join('left')('new_val')('summary'),
@@ -146,7 +146,7 @@ module.exports.mapFeedArticle = (join) => {
     categories: join('left')('new_val')('categories')
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
-      .slice(0, 3),
+      .slice(0, 2),
     locations: join('left')('new_val')('locations').map(mapLocation),
     source: join('right')('contentData')('siteData')('title'),
     sourceUrl: join('right')('contentData')('dataUrl'),
@@ -174,7 +174,7 @@ module.exports.mapFeedLog = (join) => ({
     sourceUrl: join('right')('contentData')('dataUrl'),
     sourceTitle: join('right')('contentData')('siteData')('title'),
     article: r.table('articles')
-      .nth(join('left')('new_val')('articleId'))
+      .get(join('left')('new_val')('articleId'))
       .pluck('authors', 'title', 'summary', 'url', 'publishDate')
       .merge((article) => ({ summary: article('summary').nth(0) }))
       .default({}),
@@ -194,7 +194,7 @@ module.exports.mapLog = (join) => ({
   sourceUrl: join('right')('contentData')('dataUrl'),
   sourceTitle: join('right')('contentData')('siteData')('title'),
   article: r.table('articles')
-    .nth(join('left')('articleId'))
+    .get(join('left')('articleId'))
     .pluck('authors', 'title', 'summary', 'url', 'publishDate')
     .merge((article) => ({ summary: article('summary').nth(0) }))
     .default({}),

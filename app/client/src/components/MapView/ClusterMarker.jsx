@@ -1,14 +1,23 @@
 import React, { Component } from 'react';
+import { Popup, List } from 'semantic-ui-react';
+import shortid from 'shortid';
 import './styles.css';
 
 class ClusterMarker extends Component {
   render() {
-    const { count } = this.props;
+    const { count, clusters } = this.props;
 
     return (
-      <div className="cluster-marker-container">
-        <p style={{ width: '1000px', color: 'red' }}>{count}</p>
-      </div>
+      <Popup
+        position="top left"
+        trigger={<div className="cluster-marker-container"><p>{count}</p></div>}
+        hoverable
+        className="popup-container"
+      >
+        <List divided relaxed>
+          {clusters.map((cluster) => cluster.points.map((point) => (<List.Item>{point.id}</List.Item>)))}
+        </List>
+      </Popup>
     );
   }
 }

@@ -78,6 +78,7 @@ class MapView extends Component {
             return (
               <ClusterMarker
                 key={shortid.generate()}
+                clusters={clusters}
                 count={numPoints}
                 lng={wx}
                 lat={wy}

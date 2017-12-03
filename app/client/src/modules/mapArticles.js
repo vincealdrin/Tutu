@@ -102,7 +102,7 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
     dispatch({
       type: FETCH_ARTICLES,
       statusText: 'error',
-      // status: e.response.status,
+      status: e.response.status,
     });
   }
 };

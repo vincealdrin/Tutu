@@ -1,17 +1,15 @@
-.mapview-container {
-  width: 100%;
-  height: 100%;
-}
-
-.simple-marker-description {
-  width: 600px;
-}
-
 .cluster-marker-container {
-  width: 2rem;
-  height: 2rem;
-  background-color: darksalmon;
-  border-radius: 50px;
+  display: flex;
+  width: 3rem;
+  height: 3rem;
+  background: #fff;
+  border: 5px solid #f25100;
+  border-radius: 100%;
+}
+
+.cluster-marker-container > p {
+  margin: auto;
+  font-size: 1.7rem;
 }
 
 .popup-container {

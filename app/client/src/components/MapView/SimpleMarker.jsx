@@ -24,7 +24,7 @@ class SimpleMarker extends Component {
     const length = 400;
     const shortSummary = `${summary[0].substring(0, length)}...`;
     const multiAuthor = authors.map((author) => (
-      <span>
+      <span key={shortid.generate()}>
         {author},
       </span>
     ));
@@ -78,7 +78,7 @@ class SimpleMarker extends Component {
                 <Label basic color="pink">Category</Label>
               </div>
               <div>
-                {categories.map((category) => (<Label tag>{category.label}</Label>))}
+                {categories.map((category) => (<Label tag key={shortid.generate()}>{category.label}</Label>))}
               </div>
             </Label.Group>
             <Label.Group size="tiny" style={{ display: 'flex', marginBottom: '0.4rem' }}>
@@ -86,7 +86,7 @@ class SimpleMarker extends Component {
                 <Label basic color="teal">Keywords</Label>
               </div>
               <div>
-                {keywords.slice(0, 5).map((keyword) => (<Label as="a" tag style={{ marginBottom: '0.3rem' }}>{keyword}</Label>))}
+                {keywords.slice(0, 5).map((keyword) => (<Label as="a" tag style={{ marginBottom: '0.3rem' }} key={shortid.generate()}>{keyword}</Label>))}
               </div>
             </Label.Group>
             <Label.Group size="tiny" style={{ display: 'flex' }}>

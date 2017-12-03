@@ -33,10 +33,10 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 const mapOption = {
   zoomControl: false,
   fullscreenControl: false,
+  hoverDistance: 30,
   minZoom: 7,
   maxZoom: 12,
   styles: mapStyle,
-  gestureHandling: 'greedy',
 };
 
 class MapView extends Component {
@@ -67,7 +67,6 @@ class MapView extends Component {
             }) => {
             if (numPoints === 1) {
               const article = articles[points[0].id];
-
               return article.locations.map(({ lng, lat }) => (
                 <SimpleMarker
                   key={shortid.generate()}
@@ -78,6 +77,7 @@ class MapView extends Component {
                 />
               ));
             }
+            console.log('hi');
 
             const ids = points.map((point) => point.id);
             return (

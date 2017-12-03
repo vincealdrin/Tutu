@@ -60,8 +60,11 @@ class SimpleMarker extends Component {
         <Popup
           position="top left"
           trigger={<Icon color="red" name="marker" size="huge" className="marker" />}
-          hoverable
           className="popup-container"
+          onOpen={() => {
+            // this.fetchRelated();
+          }}
+          hoverable
         >
           <div className="image-container">
             <Image

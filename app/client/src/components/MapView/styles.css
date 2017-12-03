@@ -8,6 +8,15 @@
 }
 
 .cluster-marker-container {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
   background-color: darksalmon;
   border-radius: 50px;
 }

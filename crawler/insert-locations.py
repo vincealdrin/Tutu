@@ -52,3 +52,4 @@ for location in locations:
       }).run(conn)
 
   r.table('locations').get(loc_id).update({ 'provinceId': p_id }).run(conn)
+

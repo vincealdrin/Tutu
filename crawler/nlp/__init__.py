@@ -7,9 +7,11 @@ from sumy.nlp.stemmers import Stemmer
 from sumy.utils import get_stop_words
 from itertools import groupby
 
-# start CoreNLP server first
+# start CoreNLP server
 # java -mx4g -cp "*" --add-modules java.xml.bind edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
 
+non_org = ['Purok']
+non_person = ['Brgy']
 def get_entities(text):
     sttok = CoreNLPTokenizer('http://localhost:9000')
     stner = CoreNLPNERTagger('http://localhost:9000')
@@ -21,11 +23,18 @@ def get_entities(text):
 
     for tag, chunk in groupby(tagged_text, lambda x:x[1]):
         if tag == 'ORGANIZATION':
-            organizations.append(" ".join(w for w, t in chunk))
-        if tag == 'PERSON':
-            people.append(" ".join(w for w, t in chunk))
+            organization = " ".join(w for w, t in chunk)
 
-    return people, organizations
+            if not any(no in organization for no in non_org):
+                organizations.append(organization)
+
+        if tag == 'PERSON':
+            person = " ".join(w for w, t in chunk)
+
+            if not any(np in person for np in non_person) and len(person.split(' ')) != 1:
+                people.append(person)
+
+    return set(organizations), set(people)
 
 LANGUAGE = 'english'
 SENTENCES_COUNT = 5

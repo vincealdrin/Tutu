@@ -5,7 +5,9 @@ import re
 import rethinkdb as r
 from datetime import datetime
 import htmldate
+import os
 
+SHARED_COUNT_API_KEY = os.environ.get('SHARED_COUNT_API_KEY')
 PH_TIMEZONE = '+08:00'
 # get free proxies from us-proxy.org
 def get_proxies():
@@ -28,14 +30,28 @@ def get_proxies():
 
     return proxies
 
-
 def sleep(slp_time):
     if slp_time:
         print('\n> ' + str(slp_time) + 's sleep...\n')
         time.sleep(slp_time)
 
+
+def get_shared_count(url):
+    return get('https://api.sharedcount.com/v1.0/', {
+        'url': url,
+        'apikey': SHARED_COUNT_API_KEY
+    }).json()
+
+
 def search_publish_date(publish_date, html):
-    return r.expr(publish_date.replace(tzinfo=r.make_timezone(PH_TIMEZONE))) if publish_date else datetime.strptime(htmldate.find_date(html), '%Y-%m-%d').astimezone(r.make_timezone(PH_TIMEZONE))
+    if publish_date:
+        return r.expr(publish_date.replace(tzinfo=r.make_timezone(PH_TIMEZONE)))
+
+    found_date = htmldate.find_date(html)
+    if found_date:
+        return datetime.strptime(htmldate.find_date(html), '%Y-%m-%d').astimezone(r.make_timezone(PH_TIMEZONE))
+
+    return None
 
 def search_authors(html_doc):
     soup = BeautifulSoup(html_doc, 'html.parser')
@@ -71,11 +87,11 @@ def search_locations(text, locations, provinces):
     matched_locations = []
 
     for location in locations:
-        location_pattern = re.compile('\W*(City of '+location['location']['name']+'|'+location['location']['name']+' City|'+location['location']['name']+' Municipality|Municipality of '+location['location']['name']+'|'+location['location']['name']+',? ?('+location['province']['name']+'|Metro '+location['province']['name']+')+),? ?(Philippines|PH)?\W', re.IGNORECASE)
+        if location['location']['name'] in text:
+            province_pattern = re.compile('\W('+location['province']['name']+' Province|'+location['province']['name']+'|Metro '+location['province']['name']+'|'+location['province']['name']+')+,? ?(Philippines|PH)?\W', re.IGNORECASE)
 
-        matched = location_pattern.search(text)
-        if matched:
-            matched_locations.append(location)
+            if province_pattern.search(text):
+                matched_locations.append(location)
 
     if not matched_locations:
         for province in provinces:

@@ -12,9 +12,34 @@
   font-size: 1.7rem;
 }
 
+
 .popup-container {
   max-width: 300px !important;
   min-height: 100px;
+}
+
+.hovered {
+  left: -27px !important;
+}
+
+.marker {
+  position: absolute;
+  bottom: 1px;
+  left: -13.5px;
+}
+
+.cluster-marker-container {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  background-color: darksalmon;
+  border-radius: 50px;
 }
 
 .author-date-container {

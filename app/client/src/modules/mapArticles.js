@@ -83,7 +83,9 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
         keywords: filters.keywords.join(),
         categories: filters.categories.join(),
         sources: filters.sources.join(),
-        timeWindow: `${filters.timeWindow.start},${filters.timeWindow.end}`,
+        people: filters.people.join(),
+        orgs: filters.organizations.join(),
+        timeWindow: `${31 - filters.timeWindow[0]},${31 - filters.timeWindow[1]}`,
         limit: filters.limit,
       },
     });
@@ -94,9 +96,9 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
         lat,
       }))));
     const cluster = supercluster(coords, {
-      minZoom: 0,
-      maxZoom: 14,
-      radius: 30,
+      minZoom: 7,
+      maxZoom: 12,
+      radius: 20,
     });
 
     dispatch({
@@ -133,9 +135,8 @@ export const fetchRelatedArticles = (
       },
     });
 
-
     dispatch({
-      type: FETCH_ARTICLES,
+      type: FETCH_RELATED_ARTICLES,
       statusText: 'success',
       relatedArticles,
       status,

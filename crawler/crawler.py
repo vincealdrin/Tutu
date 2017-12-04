@@ -19,7 +19,7 @@ load_dotenv(find_dotenv(), override=True)
 
 locations = get_locations()
 provinces = get_provinces()
-news_sources = get_news_sources('timestamp', True)
+news_sources = get_news_sources('timestamp', False)
 
 if not news_sources:
     print('EMPTY NEWS SOURCES')
@@ -63,7 +63,8 @@ for news_source in news_sources:
         sleep(slp_time)
 
         defragged_url = urldefrag(article.url).url
-        clean_url = defragged_url[:defragged_url.find('?')].replace('www.', '')
+        qs_idx = defragged_url.find('?')
+        clean_url = defragged_url[:qs_idx if qs_idx != -1 else None].replace('www.', '')
         url_uuid = get_uuid(clean_url)
 
         insert_log(source_id, 'articleCrawl', 'pending', float(time.clock() - start_time), {
@@ -176,7 +177,7 @@ for news_source in news_sources:
 
             new_article = {
                 'id': url_uuid,
-                'url': clean_url,
+                'url': article.url,
                 'sourceId': news_source['id'],
                 'title': article.title.encode('ascii', 'ignore').decode('utf-8'),
                 'authors': article.authors,

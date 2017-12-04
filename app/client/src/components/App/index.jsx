@@ -1,7 +1,9 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import axios from 'axios';
+import 'react-tippy/dist/tippy.css';
 import 'semantic-ui-css/semantic.min.css';
+import 'rc-slider/assets/index.css';
 import MapView from '../MapView';
 import AppSidebar from '../AppSidebar';
 import RecentArticles from '../RecentArticles';

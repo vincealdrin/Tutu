@@ -11,3 +11,9 @@ export const crudStatus = {
   error: false,
   status: null,
 };
+
+export const mapOptions = (opt) => ({
+  key: opt,
+  text: opt,
+  value: opt,
+});

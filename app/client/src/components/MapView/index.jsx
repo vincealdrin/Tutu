@@ -75,10 +75,13 @@ class MapView extends Component {
               ));
             }
 
+            const ids = points.map((point) => point.id);
+
             return (
               <ClusterMarker
                 key={shortid.generate()}
                 clusters={clusters}
+                articles={articles.filter((_, i) => ids.includes(i))}
                 count={numPoints}
                 lng={wx}
                 lat={wy}

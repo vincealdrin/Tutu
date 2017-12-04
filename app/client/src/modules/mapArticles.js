@@ -96,9 +96,9 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
     const cluster = supercluster(coords, {
       minZoom: 7,
       maxZoom: 12,
-      radius: 200,
+      radius: 20,
     });
-    console.log(1000 / zoom);
+
     dispatch({
       type: FETCH_ARTICLES,
       totalCount: parseInt(headers['x-total-count'], 10),

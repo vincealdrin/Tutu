@@ -7,6 +7,16 @@
   width: 600px;
 }
 
+.hovered {
+  left: -27px !important;
+}
+
+.marker {
+  position: absolute;
+  bottom: 1px;
+  left: -13.5px;
+}
+
 .cluster-marker-container {
   position: absolute;
   top: -20px;
@@ -35,10 +45,4 @@
   position: absolute;
   right: 7px;
   bottom: 7px;
-}
-
-.marker {
-  position: absolute;
-  bottom: 1px;
-  left: -27px;
 }

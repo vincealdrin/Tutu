@@ -4,13 +4,16 @@ import flattenDeep from 'lodash/flattenDeep';
 import { crudStatus, updateCrudStatus } from '../utils';
 
 export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
+export const FETCH_RELATED_ARTICLES = 'mapArticles/FETCH_RELATED_ARTICLES';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
 
 const initialState = {
   articles: [],
   clusters: [],
   totalCount: 0,
-  fetchStatus: crudStatus,
+  fetchArtsStatus: crudStatus,
+  fetchRelArtsStatus: crudStatus,
+  relatedArticles: [],
   mapState: {
     zoom: 8,
     center: {
@@ -33,12 +36,18 @@ export default (state = initialState, action) => {
         ...state,
         articles: action.articles || state.articles,
         clusters: action.clusters || state.clusters,
-        fetchStatus: updateCrudStatus(action),
+        fetchArtStatus: updateCrudStatus(action),
       };
     case UPDATE_MAP_STATE:
       return {
         ...state,
         mapState: action.mapState,
+      };
+    case FETCH_RELATED_ARTICLES:
+      return {
+        ...state,
+        relatedArticles: action.relatedArticles,
+        fetchRelArtsStatus: updateCrudStatus(action),
       };
     default:
       return state;
@@ -79,7 +88,7 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
       },
     });
     const coords = flattenDeep(articles.map(({ locations }, index) =>
-      locations.map(([lng, lat]) => ({
+      locations.map(({ lng, lat }) => ({
         id: index,
         lng,
         lat,
@@ -87,7 +96,7 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
     const cluster = supercluster(coords, {
       minZoom: 0,
       maxZoom: 14,
-      radius: 50,
+      radius: 30,
     });
 
     dispatch({
@@ -106,3 +115,37 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
     });
   }
 };
+
+export const fetchRelatedArticles = (
+  title, topics,
+  people, orgs, categories,
+) => async (dispatch) => {
+  try {
+    dispatch({ type: FETCH_RELATED_ARTICLES, statusText: 'pending' });
+
+    const { data: relatedArticles, status } = await axios.get('/articles/related', {
+      params: {
+        title,
+        topics,
+        people,
+        orgs,
+        categories,
+      },
+    });
+
+
+    dispatch({
+      type: FETCH_ARTICLES,
+      statusText: 'success',
+      relatedArticles,
+      status,
+    });
+  } catch (e) {
+    dispatch({
+      type: FETCH_RELATED_ARTICLES,
+      statusText: 'error',
+      status: e.response.status,
+    });
+  }
+};
+

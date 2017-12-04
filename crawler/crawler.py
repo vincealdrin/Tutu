@@ -6,12 +6,13 @@ import langdetect
 from random import randrange
 import rethinkdb as r
 from urllib.parse import urldefrag, urlparse
-from textblob import TextBlob
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
 from db import get_locations, get_news_sources, get_provinces, get_article, insert_article, insert_log, get_uuid
-from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep
+from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_shared_count
 from aylien import categorize
 from nlp import get_entities, summarize
+from nlp.keywords import parse_topics
 from fake_useragent import UserAgent
 
 load_dotenv(find_dotenv(), override=True)
@@ -62,7 +63,7 @@ for news_source in news_sources:
         sleep(slp_time)
 
         defragged_url = urldefrag(article.url).url
-        clean_url = defragged_url[:defragged_url.find('?')]
+        clean_url = defragged_url[:defragged_url.find('?')].replace('www.', '')
         url_uuid = get_uuid(clean_url)
 
         insert_log(source_id, 'articleCrawl', 'pending', float(time.clock() - start_time), {
@@ -88,6 +89,9 @@ for news_source in news_sources:
             cat_result = categorize(article.url)
             categories, body, rate_limits = categorize(article.url)
 
+            pattern = re.compile(source.brand, re.IGNORECASE)
+            body = pattern.sub('', body)
+
             try:
                 if langdetect.detect(body) != 'en':
                     print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
@@ -106,7 +110,7 @@ for news_source in news_sources:
                 })
                 continue
 
-            if  len(article.title.split()) < 5 and len(body.split()) < 100:
+            if  len(body.split()) < 100:
                 print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
                 slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                     'articleUrl': article.url,
@@ -161,13 +165,9 @@ for news_source in news_sources:
                     })
                     continue
 
-            people, organizations = get_entities(body)
+            organizations, people = get_entities(body)
             summary_sentences = summarize(body)
-            blob = TextBlob(body)
-            sentiment = {
-                'polarity': blob.polarity,
-                'subjectivity': blob.subjectivity
-            }
+            sentiment = SentimentIntensityAnalyzer().polarity_scores(body)
 
             if not article.authors:
                 author = search_authors(article.html)
@@ -185,12 +185,14 @@ for news_source in news_sources:
                 'topImageUrl': article.top_image,
                 'summary': summary_sentences,
                 'summary2': article.summary,
-                'keywords': article.keywords,
+                # 'keywords': article.keywords,
+                'topics': parse_topics(body),
                 'locations': matched_locations,
                 'categories': categories,
                 'sentiment': sentiment,
                 'organizations': organizations,
-                'people': people
+                'people': people,
+                'sharedCount': get_shared_count(article.url)
             }
 
             insert_article(new_article)

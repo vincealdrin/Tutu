@@ -80,12 +80,22 @@ module.exports.getAboutContactUrl = (htmlDoc, baseUrl) => {
   }
 };
 
+const mapLocation = (loc) => {
+  const coords = loc('location')('position').toGeojson()('coordinates');
+  return {
+    lng: coords.nth(0),
+    lat: coords.nth(1),
+  };
+};
 module.exports.mapArticle = (bounds, catsLength) => (join) => {
   const article = {
     url: join('left')('url'),
     title: join('left')('title'),
     authors: join('left')('authors'),
-    keywords: join('left')('keywords'),
+    // keywords: join('left')('keywords'),
+    keywords: join('left')('topics')('common').split(','),
+    people: join('left')('people'),
+    organizations: join('left')('organizations'),
     publishDate: join('left')('publishDate'),
     sentiment: join('left')('sentiment'),
     summary: join('left')('summary'),
@@ -101,21 +111,21 @@ module.exports.mapArticle = (bounds, catsLength) => (join) => {
     article.categories = join('left')('categories')
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
-      .slice(0, catsLength);
+      .slice(0, catsLength)
+      .concatMap((c) => [c('label')]);
   } else {
     article.categories = join('left')('categories')
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
-      .slice(0, 3);
+      .slice(0, 2)
+      .concatMap((c) => [c('label')]);
   }
 
   if (bounds) {
     article.locations = join('left')('locations')
-      .filter((loc) => bounds.intersects(loc('location')('position')))
-      .map((loc) => loc('location')('position').toGeojson()('coordinates'));
+      .filter((loc) => bounds.intersects(loc('location')('position'))).map(mapLocation);
   } else {
-    article.locations = join('left')('locations')
-      .map((loc) => loc('location')('position').toGeojson()('coordinates'));
+    article.locations = join('left')('locations').map(mapLocation);
   }
 
   return article;
@@ -126,7 +136,7 @@ module.exports.mapFeedArticle = (join) => {
     url: join('left')('new_val')('url'),
     title: join('left')('new_val')('title'),
     authors: join('left')('new_val')('authors'),
-    keywords: join('left')('new_val')('keywords'),
+    keywords: join('left')('new_val')('topics')('common').split(','),
     publishDate: join('left')('new_val')('publishDate'),
     sentiment: join('left')('new_val')('sentiment'),
     summary: join('left')('new_val')('summary'),
@@ -136,8 +146,8 @@ module.exports.mapFeedArticle = (join) => {
     categories: join('left')('new_val')('categories')
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
-      .slice(0, 3),
-    locations: join('left')('new_val')('locations').map((loc) => loc('location')('position').toGeojson()('coordinates')),
+      .slice(0, 2),
+    locations: join('left')('new_val')('locations').map(mapLocation),
     source: join('right')('contentData')('siteData')('title'),
     sourceUrl: join('right')('contentData')('dataUrl'),
     sourceFaviconUrl: join('right')('faviconUrl'),

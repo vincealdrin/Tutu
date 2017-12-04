@@ -2808,7 +2808,7 @@
         "googlePlaceId": "ChIJ3w9mhNBtvTMRe_eSKDUTt1k"
     },
     {
-        "name": "Batangas",
+        "name": "Batangas City",
         "province": "Batangas",
         "type": "City",
         "brgyCount": "105",
@@ -8136,7 +8136,7 @@
         "googlePlaceId": "ChIJE5zVD7FNqDMRw92JE2G0enY"
     },
     {
-        "name": "Cebu",
+        "name": "Cebu City",
         "province": "Cebu",
         "type": "City",
         "brgyCount": "80",
@@ -12222,7 +12222,7 @@
         "googlePlaceId": "ChIJ3ZyRp3VarjMRPDcdh982wY0"
     },
     {
-        "name": "Iloilo",
+        "name": "Iloilo City",
         "province": "Iloilo",
         "type": "City",
         "brgyCount": "180",
@@ -17190,7 +17190,7 @@
         "googlePlaceId": "ChIJ9UEUvB2RpjMRB2EusiuaUpw"
     },
     {
-        "name": "Masbate",
+        "name": "Masbate City",
         "province": "Masbate",
         "type": "City",
         "brgyCount": "30",
@@ -23634,7 +23634,7 @@
         "googlePlaceId": "ChIJA0DX-Ck0mDMRwiLd8pgns_o"
     },
     {
-        "name": "Quezon",
+        "name": "Quezon, Quezon",
         "province": "Quezon",
         "type": "Municipality",
         "brgyCount": "24",
@@ -24390,7 +24390,7 @@
         "googlePlaceId": "ChIJKZ2-pXDCpDMRSI56x5aQuKQ"
     },
     {
-        "name": "Romblon",
+        "name": "Romblon, Romblon",
         "province": "Romblon",
         "type": "Municipality",
         "brgyCount": "31",
@@ -25200,7 +25200,7 @@
         "googlePlaceId": "ChIJQ6sjXos-qzMRPZz_-bcdT5E"
     },
     {
-        "name": "Siquijor",
+        "name": "Siquijor, Siquijor",
         "province": "Siquijor",
         "type": "Municipality",
         "brgyCount": "42",
@@ -25470,7 +25470,7 @@
         "googlePlaceId": "ChIJxU5seRvJoDMRorDZRsMZqI4"
     },
     {
-        "name": "Sorsogon",
+        "name": "Sorsogon City",
         "province": "Sorsogon",
         "type": "City",
         "brgyCount": "64",
@@ -27612,7 +27612,7 @@
         "googlePlaceId": "ChIJ0WrTUfizljMRqrzIrwc2iow"
     },
     {
-        "name": "Tarlac",
+        "name": "Tarlac City",
         "province": "Tarlac",
         "type": "City",
         "brgyCount": "76",

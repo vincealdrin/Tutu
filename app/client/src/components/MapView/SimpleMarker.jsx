@@ -15,6 +15,20 @@ class SimpleMarker extends Component {
 
     this.setState({ activeIndex: newIndex });
   })
+  fetchRelated = () => {
+    const {
+      article: {
+        title,
+        keywords,
+        people,
+        organizations,
+        categories,
+      },
+      fetchRelatedArticles,
+    } = this.props;
+
+    fetchRelatedArticles(title, keywords.join(), people.join(), organizations.join(), categories.join());
+  }
 
   render() {
     const {
@@ -65,10 +79,10 @@ class SimpleMarker extends Component {
     }
 
     return (
-      <div className="simple-marker-container">
+      <div className="simple-marker-container" onMouseOver={this.fetchRelated}>
         <Popup
           position="top left"
-          trigger={<Icon color="red" name="marker" size="huge" />}
+          trigger={<Icon color="red" name="marker" size="huge" className="marker" />}
           hoverable
           className="popup-container"
         >

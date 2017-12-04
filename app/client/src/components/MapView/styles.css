@@ -142,3 +142,9 @@
 .ui.accordion .title:not(.ui) {
   padding: 0;
 }
+
+.marker {
+  position: absolute;
+  bottom: 1px;
+  left: -26px;
+}

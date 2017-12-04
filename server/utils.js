@@ -7,6 +7,8 @@ const awisClient = awis({
   secret: process.env.AMAZON_SECRET_KEY,
 });
 
+module.exports.PH_TIMEZONE = '+08:00';
+
 module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, reject) => {
   awisClient({
     Action: 'UrlInfo',

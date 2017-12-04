@@ -34,9 +34,9 @@ class RecentArticles extends Component {
     const { articles } = this.props;
 
     return (
-      <div>
+      <div className="recent-section-container">
         <Segment>
-          <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Newly Added Articles</Label>
+          <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Recent Articles</Label>
           <div className="scrollable-section">
             {articles.map((article) => (
               <div>

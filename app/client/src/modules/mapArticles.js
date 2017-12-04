@@ -83,7 +83,9 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
         keywords: filters.keywords.join(),
         categories: filters.categories.join(),
         sources: filters.sources.join(),
-        timeWindow: `${filters.timeWindow.start},${filters.timeWindow.end}`,
+        people: filters.people.join(),
+        orgs: filters.organizations.join(),
+        timeWindow: `${31 - filters.timeWindow[0]},${31 - filters.timeWindow[1]}`,
         limit: filters.limit,
       },
     });

@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const natural = require('natural');
-const { mapArticle } = require('../../utils');
+const { mapArticle, PH_TIMEZONE } = require('../../utils');
 
 module.exports = (conn, io) => {
   const tbl = 'articles';
@@ -19,8 +19,10 @@ module.exports = (conn, io) => {
       limit = 500,
       keywords = '',
       categories = '',
+      orgs = '',
+      people = '',
       sources = '',
-      timeWindow,
+      timeWindow = '7,0',
     } = req.query;
     const bounds = r.polygon(
       [parseFloat(swLng), parseFloat(swLat)],
@@ -46,8 +48,8 @@ module.exports = (conn, io) => {
         endDate.setDate(now.getDate() - parseInt(end));
 
         query = query.filter((article) => article('publishDate').date().during(
-          r.time(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate(), '+08:00'),
-          r.time(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate(), '+08:00'),
+          r.time(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate(), PH_TIMEZONE),
+          r.time(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate(), PH_TIMEZONE),
           { rightBound: 'closed' }
         ));
       }
@@ -64,11 +66,22 @@ module.exports = (conn, io) => {
           .eq(r.expr(catsArr)));
       }
 
+      if (orgs) {
+        query = query.filter((article) => r.expr(orgs.split(','))
+          .contains((org) => article('organizations').contains(org)));
+      }
+
+      if (people) {
+        query = query.filter((article) => r.expr(people.split(','))
+          .contains((person) => article('people').contains(person)));
+      }
+
       query = query.eqJoin(r.row('sourceId'), r.table('sources'));
 
       if (sources) {
-        query = query.filter((article) => r.expr(sources.split(',')
-          .contains(article('right')('contentData')('siteData')('title'))));
+        query = query.filter((article) => r.expr(sources.split(','))
+          .contains((source) => article('right')('contentData')('siteData')('title')
+            .match(source)));
       }
 
       if (limit) {
@@ -124,7 +137,7 @@ module.exports = (conn, io) => {
       const catsArr = categories.split(',');
       const cursor = await r.table('articles').filter((article) =>
         article('timestamp')
-          .during(article('timestamp').date(), r.time(article('timestamp').year(), article('timestamp').month(), article('timestamp').day(), '+08:00'))
+          .during(article('timestamp').date(), r.time(article('timestamp').year(), article('timestamp').month(), article('timestamp').day(), PH_TIMEZONE))
           .and(article('categories')
             .orderBy(r.desc((category) => category('score')))
             .slice(0, catsArr.length)

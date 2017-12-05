@@ -41,35 +41,28 @@ def get_reddit_shared_count(url):
     headers = { 'User-Agent': UserAgent().random }
     infos = get('https://www.reddit.com/api/info.json?url='+url,
         headers=headers).json()['data']['children']
+    sub_shared_count = len(infos)
+    total_score = reduce((lambda x, info: x + info['data']['score']), infos, 0)
+    total_num_comments =  reduce((lambda x, info: x + info['data']['num_comments']), infos, 0)
 
-    return {
-        'shareCount': len(infos),
-        'totalScore': reduce((lambda x, info: x + info['data']['score']), infos, 0),
-        'totalNumComments': reduce((lambda x, info: x + info['data']['num_comments']), infos, 0)
-    }
+    return total_score + sub_shared_count + total_num_comments
 
-def get_shared_count(url):
+def get_popularity(url):
     res = get('https://api.sharedcount.com/v1.0', {
         'url': url,
         'apikey': SHARED_COUNT_API_KEY
     }).json()
+    reddit_total = get_reddit_shared_count(url)
 
-    sharedCount = {
-        'facebook': {
-            'commentCount': res['Facebook']['comment_count'],
-            'commentPluginCount': res['Facebook']['comment_plugin_count'],
-            'reactionCount': res['Facebook']['reaction_count'],
-            'shareCount': res['Facebook']['share_count'],
-            'totalCount': res['Facebook']['total_count'],
-        },
-        'reddit': get_reddit_shared_count(url),
+    return {
+        'totalCount': res['Facebook']['total_count'] + reddit_total['total']
+            + res['LinkedIn'] + res['Pinterest'] + res['StumbleUpon'],
+        'facebook': res['Facebook']['total_count'],
+        'reddit': reddit_total,
         'linkedin': res['LinkedIn'],
         'stumbleupon': res['StumbleUpon'],
         'pinterest': res['Pinterest']
     }
-
-    return sharedCount
-
 
 def search_publish_date(publish_date, html):
     if publish_date:

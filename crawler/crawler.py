@@ -9,7 +9,7 @@ from urllib.parse import urldefrag, urlparse
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
 from db import get_locations, get_news_sources, get_provinces, get_article, insert_article, insert_log, get_uuid
-from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_shared_count
+from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_popularity
 from aylien import categorize
 from nlp import get_entities, summarize
 from nlp.keywords import parse_topics
@@ -193,7 +193,7 @@ for news_source in news_sources:
                 'sentiment': sentiment,
                 'organizations': organizations,
                 'people': people,
-                'sharedCount': get_shared_count(article.url)
+                'popularity': get_popularity(article.url)
             }
 
             insert_article(new_article)

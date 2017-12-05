@@ -78,6 +78,31 @@ module.exports = (conn, io) => {
           .contains((person) => article('people').contains(person)));
       }
 
+      if (sentiment) {
+        if (sentiment === 'positive') {
+          query = query.filter((article) => article('sentiment')('compound').ge(0.5));
+        } else if (sentiment === 'negative') {
+          query = query.filter((article) => article('sentiment')('compound').le(-0.5));
+        } else {
+          query = query.filter((article) => article('sentiment')('compound').between(-0.5, 0.5));
+        }
+      }
+
+      if (popular) {
+        const [social, top] = popular.split(',');
+        const topCount = parseInt(top);
+
+        if (social === 'all') {
+          query = query.filter((article) => article('popularity')('totalCount').gt(0))
+            .orderBy(r.desc('popularity')('totalCount'));
+        } else {
+          query = query.filter((article) => article('popularity')(social).gt(0))
+            .orderBy(r.desc('popularity')(social));
+        }
+
+        query = query.slice(0, topCount);
+      }
+
       query = query.eqJoin(r.row('sourceId'), r.table('sources'));
 
       if (sources) {
@@ -103,14 +128,31 @@ module.exports = (conn, io) => {
     }
   });
 
+  router.get('/popular', async (req, res, next) => {
+    try {
+      const { limit = 15 } = req.query;
+      const lastWk = new Date();
+      lastWk.setDate(lastWk.getDate() - 7);
+
+      const cursor = await r.table(tbl).filter((article) => article('popularity')('totalCount').gt(0))
+        .orderBy(r.desc('popularity')('totalCount'))
+        .slice(0, limit)
+        .run(conn);
+      const articles = await cursor.toArray();
+
+      return res.json(articles);
+    } catch (e) {
+      next(e);
+    }
+  });
+
   router.get('/recent', async (req, res, next) => {
     try {
       const { limit = 15 } = req.query;
       const lastWk = new Date();
       lastWk.setDate(lastWk.getDate() - 7);
 
-      const query = r.table(tbl)
-        .filter(r.row('timestamp').date().ge(lastWk));
+      const query = r.table(tbl).filter(r.row('timestamp').date().ge(lastWk));
       const totalCount = await query.count().run(conn);
       const cursor = await query
         .eqJoin(r.row('sourceId'), r.table('sources'))

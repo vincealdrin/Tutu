@@ -89,6 +89,15 @@ const mapLocation = (loc) => {
     lat: coords.nth(1),
   };
 };
+
+const getSentiment = (sentiment) => r.branch(
+  sentiment('compound').ge(0.5),
+  { result: 'positive', pct: sentiment('pos') },
+  sentiment('compound').le(-0.5),
+  { result: 'positive', pct: sentiment('neg') },
+  { result: 'neutral', pct: sentiment('neu') },
+);
+
 module.exports.mapArticle = (bounds, catsLength) => (join) => {
   const article = {
     url: join('left')('url'),
@@ -99,7 +108,7 @@ module.exports.mapArticle = (bounds, catsLength) => (join) => {
     people: join('left')('people'),
     organizations: join('left')('organizations'),
     publishDate: join('left')('publishDate'),
-    sentiment: join('left')('sentiment'),
+    sentiment: getSentiment(join('left')('sentiment')),
     summary: join('left')('summary'),
     summary2: join('left')('summary2'),
     topImageUrl: join('left')('topImageUrl'),
@@ -140,7 +149,7 @@ module.exports.mapFeedArticle = (join) => {
     authors: join('left')('new_val')('authors'),
     keywords: join('left')('new_val')('topics')('common').split(','),
     publishDate: join('left')('new_val')('publishDate'),
-    sentiment: join('left')('new_val')('sentiment'),
+    sentiment: getSentiment(join('left')('new_val')('sentiment')),
     summary: join('left')('new_val')('summary'),
     summary2: join('left')('new_val')('summary2'),
     topImageUrl: join('left')('new_val')('topImageUrl'),

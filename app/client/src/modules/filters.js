@@ -5,6 +5,8 @@ export const CHANGE_TIMEWINDOW = 'filters/CHANGE_TIMEWINDOW';
 export const CHANGE_LIMIT = 'filters/CHANGE_LIMIT';
 export const CHANGE_ORGANIZATIONS = 'filters/CHANGE_ORGANIZATIONS';
 export const CHANGE_PEOPLE = 'filters/CHANGE_PEOPLE';
+export const CHANGE_SENTIMENT = 'filters/CHANGE_SENTIMENT';
+export const CHANGE_SOCIAL_SHARES = 'filters/CHANGE_SOCIAL_SHARES';
 export const UPDATE_MAP_STATE = 'filters/UPDATE_MAP_STATE';
 
 const initialState = {

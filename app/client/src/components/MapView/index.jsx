@@ -83,21 +83,21 @@ class MapView extends Component {
             if (numPoints === 1) {
               const article = articles[points[0].id];
               return article.locations.map(({ lng, lat }) => (
-                <SimpleMarker2
-                  key={shortid.generate()}
-                  article={article}
-                  hidePopup={this.hidePopup}
-                  fetchRelatedArticles={this.props.fetchRelatedArticles}
-                  lng={lng}
-                  lat={lat}
-                />
-                // <SimpleMarker
+                // <SimpleMarker2
                 //   key={shortid.generate()}
                 //   article={article}
+                //   hidePopup={this.hidePopup}
                 //   fetchRelatedArticles={this.props.fetchRelatedArticles}
                 //   lng={lng}
                 //   lat={lat}
                 // />
+                <SimpleMarker
+                  key={shortid.generate()}
+                  article={article}
+                  fetchRelatedArticles={this.props.fetchRelatedArticles}
+                  lng={lng}
+                  lat={lat}
+                />
               ));
             }
 
@@ -108,7 +108,6 @@ class MapView extends Component {
                 clusters={clusters}
                 articles={articles.filter((_, i) => ids.includes(i))}
                 count={numPoints}
-                articles={articles.filter((_, i) => ids.includes(i))}
                 lng={wx}
                 lat={wy}
               />

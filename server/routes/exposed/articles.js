@@ -23,6 +23,8 @@ module.exports = (conn, io) => {
       people = '',
       sources = '',
       timeWindow = '7,0',
+      popular = '',
+      sentiment = '',
     } = req.query;
     const bounds = r.polygon(
       [parseFloat(swLng), parseFloat(swLat)],

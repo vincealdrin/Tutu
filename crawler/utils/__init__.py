@@ -6,6 +6,8 @@ import rethinkdb as r
 from datetime import datetime
 import htmldate
 import os
+from functools import reduce
+from fake_useragent import UserAgent
 
 SHARED_COUNT_API_KEY = os.environ.get('SHARED_COUNT_API_KEY')
 PH_TIMEZONE = '+08:00'
@@ -35,12 +37,38 @@ def sleep(slp_time):
         print('\n> ' + str(slp_time) + 's sleep...\n')
         time.sleep(slp_time)
 
+def get_reddit_shared_count(url):
+    headers = { 'User-Agent': UserAgent().random }
+    infos = get('https://www.reddit.com/api/info.json?url='+url,
+        headers=headers).json()['data']['children']
+
+    return {
+        'shareCount': len(infos),
+        'totalScore': reduce((lambda x, info: x + info['data']['score']), infos, 0),
+        'totalNumComments': reduce((lambda x, info: x + info['data']['num_comments']), infos, 0)
+    }
 
 def get_shared_count(url):
-    return get('https://api.sharedcount.com/v1.0/', {
+    res = get('https://api.sharedcount.com/v1.0', {
         'url': url,
         'apikey': SHARED_COUNT_API_KEY
     }).json()
+
+    sharedCount = {
+        'facebook': {
+            'commentCount': res['Facebook']['comment_count'],
+            'commentPluginCount': res['Facebook']['comment_plugin_count'],
+            'reactionCount': res['Facebook']['reaction_count'],
+            'shareCount': res['Facebook']['share_count'],
+            'totalCount': res['Facebook']['total_count'],
+        },
+        'reddit': get_reddit_shared_count(url),
+        'linkedin': res['LinkedIn'],
+        'stumbleupon': res['StumbleUpon'],
+        'pinterest': res['Pinterest']
+    }
+
+    return sharedCount
 
 
 def search_publish_date(publish_date, html):

@@ -105,6 +105,8 @@ class MapView extends Component {
             return (
               <ClusterMarker
                 key={shortid.generate()}
+                clusters={clusters}
+                articles={articles.filter((_, i) => ids.includes(i))}
                 count={numPoints}
                 articles={articles.filter((_, i) => ids.includes(i))}
                 lng={wx}

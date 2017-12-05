@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Grid, Image, Header, Divider, Label, Segment } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import shortid from 'shortid';
 import io from 'socket.io-client';
 import { addRecentArticle, fetchRecentArticles } from '../../modules/recentArticles';
 import './styles.css';
@@ -39,7 +40,7 @@ class RecentArticles extends Component {
           <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Recent Articles</Label>
           <div className="scrollable-section">
             {articles.map((article) => (
-              <div>
+              <div key={shortid.generate()}>
                 <Grid>
                   <Grid.Row className="article-item">
                     <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important' }}>
@@ -50,7 +51,7 @@ class RecentArticles extends Component {
                       <Header as="h4">{article.title}</Header>
                       <p> {article.summary[0]} </p>
                       {article.categories.map((category) => (
-                        <Label as="a" size="small" style={{ margin: '0.14285714em' }}> { category.label } </Label>
+                        <Label key={shortid.generate()} as="a" size="small" style={{ margin: '0.14285714em' }}> { category.label } </Label>
                       ))}
                     </Grid.Column>
                   </Grid.Row>

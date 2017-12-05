@@ -1,9 +1,20 @@
 import React, { Component } from 'react';
-import { Label, Popup, Header, Icon, Image, Button } from 'semantic-ui-react';
+import { Label, Popup, Header, Icon, Image, Button, Accordion } from 'semantic-ui-react';
 import shortid from 'shortid';
+// import 'react-tippy/'
+import logo from './sentiments/5.svg';
 import './styles.css';
 
+
 class SimpleMarker extends Component {
+  state = { activeIndex: 0 };
+  changeIndex = ((e, titleProps) => {
+    const { index } = titleProps;
+    const { activeIndex } = this.state;
+    const newIndex = activeIndex === index ? -1 : index;
+
+    this.setState({ activeIndex: newIndex });
+  })
   fetchRelated = () => {
     const {
       article: {
@@ -37,10 +48,22 @@ class SimpleMarker extends Component {
       $hover,
     } = this.props;
 
+    const sentiments = [
+      './sentiments/5.svg',
+      './sentiments/4.svg',
+      './sentiments/3.svg',
+      './sentiments/2.svg',
+      './sentiments/1.svg',
+      './sentiments/0.svg',
+      './sentiments/-1.svg',
+    ];
+
+    const { activeIndex } = this.state;
+
     const length = 400;
     const shortSummary = `${summary[0].substring(0, length)}...`;
     const multiAuthor = authors.map((author) => (
-      <span>
+      <span key={shortid.generate()}>
         {author},
       </span>
     ));
@@ -57,6 +80,7 @@ class SimpleMarker extends Component {
     }
 
     return (
+      <div className="simple-marker-container" onMouseOver={this.fetchRelated}>
       <Popup
         position="bottom left"
         className="popup-container"
@@ -84,46 +108,65 @@ class SimpleMarker extends Component {
 
         <Header as="a" href={url} target="_blank" color="blue">{title}</Header>
 
-        <div style={{ color: '#a4a4a4', margin: '0.3rem 0 1.3rem' }} >
-          <Label as="a" href={sourceUrl} color="yellow" ribbon >{source}</Label>
-          <div style={{ float: 'right' }}>
-            {multiAuthor}
-            <br />
-            {new Date(publishDate).toDateString()}
+        <div className="author-date-container">
+          <div className="author-name">
+            {multiAuthor} | {new Date(publishDate).toDateString()}
           </div>
         </div>
 
-        <article style={{ margin: '0 0 1.3rem' }}>
-          {shortSummary}
-        </article>
-
-        <section className="article-extra">
-          <Label.Group size="tiny" style={{ display: 'flex', marginBottom: '0.4rem' }}>
-            <div style={{ marginRight: '0.4rem' }}>
-              <Label basic color="pink">Category</Label>
-            </div>
-            <div>
-              {categories.map((category) => <Label key={shortid.generate()} tag>{category}</Label>)}
-            </div>
-          </Label.Group>
-          <Label.Group size="tiny" style={{ display: 'flex', marginBottom: '0.4rem' }}>
-            <div style={{ marginRight: '0.4rem' }}>
-              <Label basic color="teal">Keywords</Label>
-            </div>
-            <div>
-              {keywords.slice(0, 5).map((keyword) => (<Label as="a" key={shortid.generate()} tag style={{ marginBottom: '0.3rem' }}>{keyword}</Label>))}
-            </div>
-          </Label.Group>
-          <Label.Group size="tiny" style={{ display: 'flex' }}>
-            <div style={{ marginRight: '0.4rem' }}>
-              <Label basic color="orange">Sentiment</Label>
-            </div>
-            <div>
-              {theSentiment}
-            </div>
-          </Label.Group>
+        <Accordion basic className="accordion-container">
+          <Accordion.Title active={activeIndex === 0} index={0} onClick={this.changeIndex}>
+            <Icon name="dropdown" />
+            Summary
+          </Accordion.Title>
+          <Accordion.Content active={activeIndex === 0}>
+            {shortSummary}
+          </Accordion.Content>
+          <Accordion.Title active={activeIndex === 1} index={1} onClick={this.changeIndex}>
+            <Icon name="dropdown" />
+            Tags
+          </Accordion.Title>
+          <Accordion.Content active={activeIndex === 1}>
+            <Label.Group size="tiny" className="label-group">
+              <div className="label-master">
+                <Label basic color="pink">Category</Label>
+              </div>
+              <div>
+                {categories.map((category) => (<Label tag key={shortid.generate()}>{category.label}</Label>))}
+              </div>
+            </Label.Group>
+            <Label.Group size="tiny" className="label-group">
+              <div className="label-master">
+                <Label basic color="teal">Keywords</Label>
+              </div>
+              <div>
+                {keywords.slice(0, 5).map((keyword) => (<Label as="a" tag style={{ marginBottom: '0.3rem' }} key={shortid.generate()}>{keyword}</Label>))}
+              </div>
+            </Label.Group>
+            <Label.Group size="tiny" className="label-group">
+              <div className="label-master">
+                <Label basic color="orange">Sentiment</Label>
+              </div>
+              <div>
+                {theSentiment}
+              </div>
+            </Label.Group>
+          </Accordion.Content>
+          <Accordion.Title active={activeIndex === 2} index={2} onClick={this.changeIndex}>
+            <Icon name="dropdown" />
+            Related Stories
+          </Accordion.Title>
+          <Accordion.Content active={activeIndex === 2}>
+            <Header as="a" href={url} target="_blank" color="blue" className="tooltip-related-article">{title}</Header>
+            <br />
+            <span className="tooltip-author">{new Date(publishDate).toDateString()} | {multiAuthor}</span>
+          </Accordion.Content>
+        </Accordion>
+        <section className="sentiments">
+          <Image src={logo} alt="" />
         </section>
       </Popup>
+    </div>
     );
   }
 }

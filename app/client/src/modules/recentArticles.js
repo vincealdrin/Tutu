@@ -51,7 +51,7 @@ export const fetchRecentArticles = (limit) => async (dispatch) => {
     dispatch({
       type: FETCH_RECENT_ARTICLES,
       statusText: 'error',
-      status: e.response.status,
+      status: e.response ? e.response.status : 500,
     });
   }
 };

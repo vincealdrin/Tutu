@@ -68,7 +68,7 @@ export const fetchSources = () => async (dispatch) => {
     dispatch({
       type: FETCH_FAKE_SOURCES,
       statusText: 'error',
-      status: e.response.status,
+      status: e.response ? e.response.status : 500,
     });
   }
 };
@@ -88,7 +88,7 @@ export const createSource = (source) => async (dispatch) => {
     dispatch({
       type: CREATE_FAKE_SOURCE,
       statusText: 'error',
-      status: e.response.status,
+      status: e.response ? e.response.status : 500,
     });
   }
 };
@@ -110,7 +110,7 @@ export const updateSource = (sourceId, source, isIdChanged = false) => async (di
     dispatch({
       type: UPDATE_FAKE_SOURCE,
       statusText: 'error',
-      status: e.response.status,
+      status: e.response ? e.response.status : 500,
     });
   }
 };
@@ -130,7 +130,7 @@ export const deleteSources = (ids) => async (dispatch) => {
     dispatch({
       type: DELETE_FAKE_SOURCES,
       statusText: 'error',
-      status: e.response.status,
+      status: e.response ? e.response.status : 500,
     });
   }
 };

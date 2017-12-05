@@ -83,7 +83,7 @@ export const fetchUsers = (page, limit, filter, search) => async (dispatch) => {
     dispatch({
       type: FETCH_USERS,
       statusText: 'error',
-      status: e.response.status,
+      status: e.response ? e.response.status : 500,
     });
   }
 };
@@ -103,7 +103,7 @@ export const createUser = (user) => async (dispatch) => {
     dispatch({
       type: CREATE_USER,
       statusText: 'error',
-      status: e.response.status,
+      status: e.response ? e.response.status : 500,
     });
   }
 };
@@ -125,7 +125,7 @@ export const updateUser = (userId, user, isIdChanged = false) => async (dispatch
     dispatch({
       type: UPDATE_USER,
       statusText: 'error',
-      status: e.response.status,
+      status: e.response ? e.response.status : 500,
     });
   }
 };
@@ -145,7 +145,7 @@ export const deleteUsers = (ids) => async (dispatch) => {
     dispatch({
       type: DELETE_USERS,
       statusText: 'error',
-      status: e.response.status,
+      status: e.response ? e.response.status : 500,
     });
   }
 };

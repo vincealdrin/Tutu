@@ -1,0 +1,19 @@
+.scrollable-section {
+  height: 90vh;
+  padding-top: 2rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.row { align-items: flex-start !important; }
+.article-item { padding: 0 !important; }
+
+@media screen and (min-width: 1367px) {
+  .scrollable-section {
+    height: 100vh;
+  }
+}
+
+.popular-section-container {
+  width: 320px;
+}

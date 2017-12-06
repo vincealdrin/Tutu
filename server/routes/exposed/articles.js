@@ -179,7 +179,9 @@ module.exports = (conn, io) => {
       lastWk.setDate(lastWk.getDate() - 7);
 
       const cursor = await r.table(tbl).filter((article) => article('popularity')('totalCount').gt(0))
-        .orderBy(r.desc('popularity')('totalCount'))
+        .orderBy(r.desc(r.row('popularity')('totalCount')))
+        .eqJoin(r.row('sourceId'), r.table('sources'))
+        .map(mapArticle())
         .slice(0, limit)
         .run(conn);
       const articles = await cursor.toArray();

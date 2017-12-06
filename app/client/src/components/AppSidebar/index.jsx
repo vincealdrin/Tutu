@@ -42,9 +42,9 @@ class AppSidebar extends Component {
           </div>
           <div className="menu">
             <span className={`label ${isWide ? 'show' : 'hide'}`}>MENU</span>
-            <Link to="/top" onClick={this.beVisible}>
+            <Link to="/popular" onClick={this.beVisible}>
               <Icon name="newspaper" color="grey" />
-              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Top News</span>
+              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Popular News</span>
             </Link>
             <Link to="/recent" onClick={this.beVisible}>
               <Icon name="plus square outline" color="grey" />
@@ -54,10 +54,10 @@ class AppSidebar extends Component {
               <Icon name="filter" color="grey" />
               <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Filter</span>
             </Link>
-            <Link to="/categories" onClick={this.beVisible}>
+            {/* <Link to="/categories" onClick={this.beVisible}>
               <Icon name="tags" color="grey" />
               <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Categories</span>
-            </Link>
+            </Link> */}
             <Link to="/about" onClick={this.beVisible}>
               <Icon name="browser" color="grey" />
               <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>About</span>

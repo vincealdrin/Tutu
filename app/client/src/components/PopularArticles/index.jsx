@@ -3,12 +3,11 @@ import { Grid, Image, Header, Divider, Label, Segment } from 'semantic-ui-react'
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
-import io from 'socket.io-client';
-import { addRecentArticle, fetchRecentArticles } from '../../modules/recentArticles';
+import { fetchPopularArticles } from '../../modules/popularArticles';
 import './styles.css';
 
 const mapStateToProps = ({
-  recentArticles: {
+  popularArticles: {
     articles,
   },
 }) => ({
@@ -16,28 +15,21 @@ const mapStateToProps = ({
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
-  addRecentArticle,
-  fetchRecentArticles,
+  fetchPopularArticles,
 }, dispatch);
 
-const socket = io.connect('http://localhost:5000/client');
-
-class RecentArticles extends Component {
+class PopularArticles extends Component {
   componentDidMount() {
-    this.props.fetchRecentArticles();
-
-    socket.on('newArticle', (article) => {
-      this.props.addRecentArticle(article);
-    });
+    this.props.fetchPopularArticles();
   }
 
   render() {
     const { articles } = this.props;
 
     return (
-      <div className="recent-section-container">
+      <div className="popular-section-container">
         <Segment>
-          <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Recent Articles</Label>
+          <Label as="a" color="red" ribbon style={{ marginBottom: '1rem' }}>Popular Articles</Label>
           <div className="scrollable-section">
             {articles.map((article) => (
               <div key={shortid.generate()}>
@@ -51,7 +43,7 @@ class RecentArticles extends Component {
                       <Header as="h4">{article.title}</Header>
                       <p> {article.summary[0]} </p>
                       {article.categories.map((category) => (
-                        <Label key={shortid.generate()} size="small" style={{ margin: '0.14285714em' }}>{category}</Label>
+                        <Label key={shortid.generate()} size="small" style={{ margin: '0.14285714em' }}>{category }</Label>
                       ))}
                     </Grid.Column>
                   </Grid.Row>
@@ -69,5 +61,5 @@ class RecentArticles extends Component {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(RecentArticles);
+)(PopularArticles);
 

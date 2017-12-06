@@ -7,6 +7,7 @@ import 'rc-slider/assets/index.css';
 import MapView from '../MapView';
 import AppSidebar from '../AppSidebar';
 import RecentArticles from '../RecentArticles';
+import PopularArticles from '../PopularArticles';
 import Filter from '../Filter';
 import About from '../About';
 import TestComponent from '../TestComponent';
@@ -20,7 +21,7 @@ const App = () => (
   <div>
     <main className="app-container">
       <Switch>
-        <Route exact path="/(top|recent|filter|about)?" component={MapView} />
+        <Route exact path="/(popular|recent|filter|about)?" component={MapView} />
         <Route path="/counter" component={Counter} />
         <Route path="/grid" component={GridLayout} />
         <Redirect to="/" />
@@ -29,9 +30,9 @@ const App = () => (
 
     <AppSidebar>
       <Switch>
-        <Route path="(.*)/top" exact component={TestComponent} />
+        <Route path="(.*)/popular" exact component={PopularArticles} />
         <Route path="(.*)/recent" exact component={RecentArticles} />
-        <Route path="(.*)/Filter" exact component={Filter} />
+        <Route path="(.*)/filter" exact component={Filter} />
         <Route path="(.*)/about" exact component={About} />
         <Redirect to="/" />
       </Switch>

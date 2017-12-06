@@ -5,13 +5,16 @@ import { bindActionCreators } from 'redux';
 import { fetchArticles } from '../../modules/mapArticles';
 import Slider from 'rc-slider';
 import {
-  changeKeywordsFilter,
   changeCategoriesFilter,
-  changeSourcesFilter,
-  changTimeWindowFilter,
+  changeKeywordsFilter,
   changeLimitFilter,
   changeOrganizationsFilter,
   changePeopleFilter,
+  changePopularSocialsFilter,
+  changePopularTopFilter,
+  changeSentimentFilter,
+  changeSourcesFilter,
+  changTimeWindowFilter,
 } from '../../modules/filters';
 import { mapOptions } from '../../utils';
 import './styles.css';
@@ -32,6 +35,9 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   changeLimitFilter,
   changeOrganizationsFilter,
   changePeopleFilter,
+  changePopularSocialsFilter,
+  changePopularTopFilter,
+  changeSentimentFilter,
   fetchArticles,
 }, dispatch);
 
@@ -51,7 +57,32 @@ const categoriesOptions = [
   { key: 'Calamity', text: 'Calamity', value: 'Calamity' },
 ];
 
+const sentimentsOptions = [
+  { key: 'none', text: 'None', value: 'none' },
+  { key: 'positive', text: 'Positive', value: 'positive' },
+  { key: 'neutral', text: 'Neutral', value: 'neutral' },
+  { key: 'negative', text: 'Negative', value: 'negative' },
+];
+
+const popularTopOptions = [
+  { key: '100', text: '100', value: '100' },
+  { key: '300', text: '300', value: '300' },
+  { key: '500', text: '500', value: '500' },
+  { key: '1000', text: '1000', value: '1000' },
+];
+
 class Filter extends Component {
+  state = {
+    popularSocialOptions: [
+      { key: 'all', text: 'All', value: 'all' },
+      { key: 'facebook', text: 'Facebook', value: 'facebook' },
+      { key: 'reddit', text: 'Reddit', value: 'reddit' },
+      { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
+      { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
+      { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
+    ],
+  }
+
   render() {
     const {
       filters,
@@ -72,7 +103,7 @@ class Filter extends Component {
         <Segment>
           <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
           <div className="scrollable-section">
-            filter -
+            keywords -
             <Dropdown
               placeholder="Keywords"
               options={keywords.map(mapOptions)}
@@ -87,6 +118,7 @@ class Filter extends Component {
               multiple
               allowAdditions
             />
+            categories -
             <Dropdown
               placeholder="Categories"
               options={categoriesOptions}
@@ -114,7 +146,7 @@ class Filter extends Component {
               multiple
               allowAdditions
             />
-            filter -
+            orgs -
             <Dropdown
               placeholder="Organizations"
               options={organizations.map(mapOptions)}
@@ -129,7 +161,7 @@ class Filter extends Component {
               multiple
               allowAdditions
             />
-            filter -
+            pips -
             <Dropdown
               placeholder="People"
               options={people.map(mapOptions)}
@@ -144,6 +176,70 @@ class Filter extends Component {
               multiple
               allowAdditions
             />
+            sentiment -
+            <Dropdown
+              placeholder="Sentiment"
+              defaultValue="none"
+              options={sentimentsOptions}
+              onChange={(_, { value }) => {
+                this.props.changeSentimentFilter(value);
+                this.props.fetchArticles(center, zoom, bounds);
+              }}
+              search
+              selection
+              fluid
+            />
+            Popular social -
+            <Dropdown
+              placeholder="Popular"
+              options={this.state.popularSocialOptions}
+              onChange={(_, { value }) => {
+                if (value[0] === 'all') {
+                  this.setState({ popularSocialOptions: [{ key: 'all', text: 'All', value: 'all' }] });
+                } else if (!value.length) {
+                  this.setState({
+                    popularSocialOptions: [
+                      { key: 'all', text: 'All', value: 'all' },
+                      { key: 'facebook', text: 'Facebook', value: 'facebook' },
+                      { key: 'reddit', text: 'Reddit', value: 'reddit' },
+                      { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
+                      { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
+                      { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
+                    ],
+                  });
+                } else {
+                  this.setState({
+                    popularSocialOptions: [
+                      { key: 'facebook', text: 'Facebook', value: 'facebook' },
+                      { key: 'reddit', text: 'Reddit', value: 'reddit' },
+                      { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
+                      { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
+                      { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
+                    ],
+                  });
+                }
+                this.props.changePopularSocialsFilter(value);
+                this.props.fetchArticles(center, zoom, bounds);
+              }}
+              search
+              selection
+              multiple
+              fluid
+            />
+            Popular top -
+            <Dropdown
+              placeholder="Popular top"
+              defaultValue="100"
+              options={popularTopOptions}
+              onChange={(_, { value }) => {
+                this.props.changePopularTopFilter(value);
+                this.props.fetchArticles(center, zoom, bounds);
+              }}
+              search
+              selection
+              // fluid
+            />
+            <br />
             timewindow
             <Slider.Range
               min={0}

@@ -1,3 +1,6 @@
+# start CoreNLP server
+# java -mx4g -cp "*" --add-modules java.xml.bind edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
+
 import newspaper
 import json
 import time
@@ -19,7 +22,7 @@ load_dotenv(find_dotenv(), override=True)
 
 locations = get_locations()
 provinces = get_provinces()
-news_sources = get_news_sources('timestamp', False)
+news_sources = get_news_sources('timestamp', True)
 
 if not news_sources:
     print('EMPTY NEWS SOURCES')
@@ -87,7 +90,6 @@ for news_source in news_sources:
             article.parse()
             article.nlp()
 
-            cat_result = categorize(article.url)
             categories, body, rate_limits = categorize(article.url)
 
             pattern = re.compile(source.brand, re.IGNORECASE)
@@ -169,6 +171,9 @@ for news_source in news_sources:
             organizations, people = get_entities(body)
             summary_sentences = summarize(body)
             sentiment = SentimentIntensityAnalyzer().polarity_scores(body)
+            topics = parse_topics(body)
+            publishDate = search_publish_date(article.publish_date, article.html)
+            popularity = get_popularity(article.url)
 
             if not article.authors:
                 author = search_authors(article.html)
@@ -182,18 +187,18 @@ for news_source in news_sources:
                 'title': article.title.encode('ascii', 'ignore').decode('utf-8'),
                 'authors': article.authors,
                 'body': body,
-                'publishDate': search_publish_date(article.publish_date, article.html),
+                'publishDate': publishDate,
                 'topImageUrl': article.top_image,
                 'summary': summary_sentences,
                 'summary2': article.summary,
                 # 'keywords': article.keywords,
-                'topics': parse_topics(body),
+                'topics': topics,
                 'locations': matched_locations,
                 'categories': categories,
                 'sentiment': sentiment,
                 'organizations': organizations,
                 'people': people,
-                'popularity': get_popularity(article.url)
+                'popularity': popularity
             }
 
             insert_article(new_article)

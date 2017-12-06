@@ -84,20 +84,64 @@ module.exports = (conn, io) => {
         } else if (sentiment === 'negative') {
           query = query.filter((article) => article('sentiment')('compound').le(-0.5));
         } else {
-          query = query.filter((article) => article('sentiment')('compound').between(-0.5, 0.5));
+          query = query.filter((article) => article('sentiment')('compound').gt(0.5)
+            .and(article('sentiment')('compound').lt(-0.5)));
         }
       }
 
       if (popular) {
-        const [social, top] = popular.split(',');
+        const [socialNetworks, top] = popular.split('|');
+        const socials = socialNetworks.split(',');
         const topCount = parseInt(top);
 
-        if (social === 'all') {
-          query = query.filter((article) => article('popularity')('totalCount').gt(0))
-            .orderBy(r.desc('popularity')('totalCount'));
+        if (socials[0] === 'all') {
+          query = query.filter((article) => article('popularity')('totalCount').gt(0));
         } else {
-          query = query.filter((article) => article('popularity')(social).gt(0))
-            .orderBy(r.desc('popularity')(social));
+          switch (socials.length) {
+          case 2:
+            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+              .or(article('popularity')(socials[1]).gt(0)));
+            break;
+          case 3:
+            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+              .or(article('popularity')(socials[1]).gt(0))
+              .or(article('popularity')(socials[2]).gt(0)));
+            break;
+          case 4:
+            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+              .or(article('popularity')(socials[1]).gt(0))
+              .or(article('popularity')(socials[2]).gt(0))
+              .or(article('popularity')(socials[3]).gt(0)));
+            break;
+          case 5:
+            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+              .or(article('popularity')(socials[1]).gt(0))
+              .or(article('popularity')(socials[2]).gt(0))
+              .or(article('popularity')(socials[3]).gt(0))
+              .or(article('popularity')(socials[4]).gt(0)));
+            break;
+          default:
+            query = query.filter((article) => article('popularity')(socials[0]).gt(0));
+          }
+
+          if (socials[0] === 'all') {
+            query = query.orderBy(r.desc(r.row('popularity')('totalCount')));
+          } else {
+            query = query.orderBy(r.desc(r.row('popularity')(socials[0])));
+          }
+
+          if (socials[1]) {
+            query = query.orderBy(r.desc(r.row('popularity')(socials[1])));
+          }
+          if (socials[2]) {
+            query = query.orderBy(r.desc(r.row('popularity')(socials[2])));
+          }
+          if (socials[3]) {
+            query = query.orderBy(r.desc(r.row('popularity')(socials[3])));
+          }
+          if (socials[4]) {
+            query = query.orderBy(r.desc(r.row('popularity')(socials[4])));
+          }
         }
 
         query = query.slice(0, topCount);

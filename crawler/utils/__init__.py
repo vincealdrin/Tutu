@@ -48,14 +48,14 @@ def get_reddit_shared_count(url):
     return total_score + sub_shared_count + total_num_comments
 
 def get_popularity(url):
-    res = get('https://api.sharedcount.com/v1.0', {
+    res = get('https://api.sharedcount.com/v1.0/', {
         'url': url,
         'apikey': SHARED_COUNT_API_KEY
     }).json()
     reddit_total = get_reddit_shared_count(url)
 
     return {
-        'totalCount': res['Facebook']['total_count'] + reddit_total['total']
+        'totalCount': res['Facebook']['total_count'] + reddit_total
             + res['LinkedIn'] + res['Pinterest'] + res['StumbleUpon'],
         'facebook': res['Facebook']['total_count'],
         'reddit': reddit_total,

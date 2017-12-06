@@ -90,7 +90,6 @@ class Filter extends Component {
     } = this.props;
     const {
       keywords,
-      categories,
       sources,
       people,
       organizations,
@@ -103,6 +102,19 @@ class Filter extends Component {
         <Segment>
           <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
           <div className="scrollable-section">
+            timewindow
+            <Slider.Range
+              min={0}
+              max={31}
+              allowCross={false}
+              value={timeWindow}
+              onChange={(value) => {
+                this.props.changTimeWindowFilter(value);
+                this.props.fetchArticles(center, zoom, bounds);
+              }}
+            />
+            {`${31 - timeWindow[0]}days ago - ${31 - timeWindow[1]}days ago`}
+            <br />
             keywords -
             <Dropdown
               placeholder="Keywords"
@@ -239,19 +251,7 @@ class Filter extends Component {
               selection
               // fluid
             />
-            <br />
-            timewindow
-            <Slider.Range
-              min={0}
-              max={31}
-              allowCross={false}
-              value={timeWindow}
-              onChange={(value) => {
-                this.props.changTimeWindowFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-            />
-            {`${31 - timeWindow[0]}days ago - ${31 - timeWindow[1]}days ago`}
+
           </div>
         </Segment>
       </div>

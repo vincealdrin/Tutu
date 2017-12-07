@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { Label, Popup, Header, Icon, Image, Button, Accordion } from 'semantic-ui-react';
 import shortid from 'shortid';
-// import 'react-tippy/'
-import logo from './sentiments/5.svg';
 import './styles.css';
+import { fetchRelatedArticles } from '../../modules/mapArticles';
 
 
 class SimpleMarker extends Component {
@@ -47,16 +46,6 @@ class SimpleMarker extends Component {
       },
     } = this.props;
 
-    const sentiments = [
-      './sentiments/5.svg',
-      './sentiments/4.svg',
-      './sentiments/3.svg',
-      './sentiments/2.svg',
-      './sentiments/1.svg',
-      './sentiments/0.svg',
-      './sentiments/-1.svg',
-    ];
-
     const { activeIndex } = this.state;
 
     const length = 400;
@@ -67,16 +56,7 @@ class SimpleMarker extends Component {
       </span>
     ));
 
-    const sentimentValue = Math.round(sentiment.subjectivity * 100);
-    let theSentiment;
-
-    if (sentimentValue < 45) {
-      theSentiment = <Label tag>Bad {sentimentValue}%</Label>;
-    } else if (sentimentValue > 45 && sentimentValue <= 55) {
-      theSentiment = <Label tag>Neutral {sentimentValue}%</Label>;
-    } else if (sentimentValue > 55 && sentimentValue <= 100) {
-      theSentiment = <Label tag>Good {sentimentValue}%</Label>;
-    }
+    const sentimentValue = Math.round(sentiment.pct * 1000);
 
     return (
       <div className="simple-marker-container">
@@ -87,8 +67,6 @@ class SimpleMarker extends Component {
             <Icon
               color="red"
               name="marker"
-              // size={$hover ? 'huge' : 'big'}
-              // className={`marker ${$hover ? 'hovered' : ''}`}
               size="huge"
               className="marker hovereds"
             />
@@ -99,6 +77,7 @@ class SimpleMarker extends Component {
           hoverable
         >
           <div className="image-container">
+						<Label as="a" href={sourceUrl} color="yellow" target="_blank">{source}</Label>
             <Image
               src={topImageUrl}
               shape="rounded"
@@ -133,7 +112,7 @@ class SimpleMarker extends Component {
                   <Label basic color="pink">Category</Label>
                 </div>
                 <div>
-                  {categories.map((category) => (<Label tag key={shortid.generate()}>{category.label}</Label>))}
+                  {categories.map((category) => (<Label tag key={shortid.generate()}>{category}</Label>))}
                 </div>
               </Label.Group>
               <Label.Group size="tiny" className="label-group">
@@ -141,7 +120,7 @@ class SimpleMarker extends Component {
                   <Label basic color="teal">Keywords</Label>
                 </div>
                 <div>
-                  {keywords.slice(0, 5).map((keyword) => (<Label as="a" tag style={{ marginBottom: '0.3rem' }} key={shortid.generate()}>{keyword}</Label>))}
+                  {keywords.map((keyword) => (<Label as="a" tag style={{ marginBottom: '0.3rem' }} key={shortid.generate()}>{keyword}</Label>))}
                 </div>
               </Label.Group>
               <Label.Group size="tiny" className="label-group">
@@ -149,7 +128,7 @@ class SimpleMarker extends Component {
                   <Label basic color="orange">Sentiment</Label>
                 </div>
                 <div>
-                  {theSentiment}
+                  <Label as="a" tag style={{ textTransform: 'capitalize' }}>{`${sentimentValue}%`} {sentiment.result}</Label>
                 </div>
               </Label.Group>
             </Accordion.Content>
@@ -158,13 +137,11 @@ class SimpleMarker extends Component {
             Related Stories
             </Accordion.Title>
             <Accordion.Content active={activeIndex === 2}>
-              <Header as="a" href={url} target="_blank" color="blue" className="tooltip-related-article">{title}</Header>
-              <br />
-              <span className="tooltip-author">{new Date(publishDate).toDateString()} | {multiAuthor}</span>
+              {fetchRelatedArticles}
             </Accordion.Content>
           </Accordion>
           <section className="sentiments">
-            <Image src={logo} alt="" />
+            {/* <Image src={logo} alt="" /> */}
           </section>
         </Popup>
       </div>

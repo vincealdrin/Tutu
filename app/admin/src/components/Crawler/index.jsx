@@ -79,8 +79,7 @@ class Crawler extends Component {
   }
 
   componentWillUnmount() {
-    const { socket } = this.props;
-    socket.removeAllListeners();
+    this.props.socket.removeAllListeners();
   }
 
   render() {

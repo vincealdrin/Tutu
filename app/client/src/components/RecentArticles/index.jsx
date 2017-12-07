@@ -3,7 +3,6 @@ import { Grid, Image, Header, Divider, Label, Segment } from 'semantic-ui-react'
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
-import io from 'socket.io-client';
 import { addRecentArticle, fetchRecentArticles } from '../../modules/recentArticles';
 import './styles.css';
 
@@ -20,16 +19,21 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchRecentArticles,
 }, dispatch);
 
-const socket = io.connect('http://localhost:5000/client');
-
 class RecentArticles extends Component {
   componentDidMount() {
-    this.props.fetchRecentArticles();
+    const { socket } = this.props;
 
-    socket.on('newArticle', (article) => {
-      this.props.addRecentArticle(article);
+    this.props.fetchRecentArticles(() => {
+      socket.on('newArticle', (article) => {
+        this.props.addRecentArticle(article);
+      });
     });
   }
+
+  componentWillUnmount() {
+    this.props.socket.removeAllListeners();
+  }
+
 
   render() {
     const { articles } = this.props;

@@ -38,11 +38,11 @@ class ClusterMarker extends Component {
             {articles.map((article) => (
               <List.Item key={shortid.generate()} className="cluster-article-container">
                 <div className="favicon-container">
-                  <Image src={article.sourceFaviconUrl} className="news-source-favicon" />
+                  {/* <Image src={article.sourceFaviconUrl} className="news-source-favicon" /> */}
                 </div>
                 <div className="article-title-container">
-                  <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
-                  <List.Description className="article-date">{new Date(article.publishDate).toDateString()}</List.Description>
+                  {/* <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header> */}
+                  {/* <List.Description className="article-date">{new Date(article.publishDate).toDateString()}</List.Description> */}
                 </div>
               </List.Item>
             ))}
@@ -58,7 +58,7 @@ class ClusterMarker extends Component {
           className="modal-container"
         >
           <Modal.Content scrolling>
-            {articles.map((article) => {
+            {/* {articles.map((article) => {
               const sentimentValue = Math.round(article.sentiment.pct * 1000);
               return (
                 <Segment key={shortid.generate()} raised className="modal-article-container">
@@ -114,7 +114,7 @@ class ClusterMarker extends Component {
                   </Grid>
                 </Segment>
             );
-            })}
+            })} */}
           </Modal.Content>
         </Modal>
       </div>

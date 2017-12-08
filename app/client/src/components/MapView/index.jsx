@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GoogleMapReact from 'google-map-react';
 import shortid from 'shortid';
-import { fetchArticles, fetchRelatedArticles } from '../../modules/mapArticles';
+import { fetchArticles, fetchArticleInfo } from '../../modules/mapArticles';
 import SimpleMarker from './SimpleMarker';
 import SimpleMarker2 from './SimpleMarker2';
 import ClusterMarker from './ClusterMarker';
@@ -17,6 +17,8 @@ const mapStateToProps = ({
     fetchStatus,
     mapState,
     relatedArticles,
+    fetchArticleInfoStatus,
+    articleInfo,
   },
 }) => ({
   articles,
@@ -24,11 +26,13 @@ const mapStateToProps = ({
   fetchStatus,
   mapState,
   relatedArticles,
+  fetchArticleInfoStatus,
+  articleInfo,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchArticles,
-  fetchRelatedArticles,
+  fetchArticleInfo,
 }, dispatch);
 
 const mapOption = {
@@ -47,7 +51,7 @@ const K_MARGIN_LEFT = 30;
 
 const K_HOVER_DISTANCE = 30;
 
-class MapView extends Component {
+class MapView extends PureComponent {
   state = {
     hoveredChildKey: -1,
   }
@@ -61,7 +65,7 @@ class MapView extends Component {
     center, zoom,
     bounds, marginBounds,
   }) => {
-    this.props.fetchArticles(center, zoom, bounds);
+    this.props.fetchArticles(center, zoom, marginBounds);
   }
 
   render() {
@@ -69,6 +73,8 @@ class MapView extends Component {
       articles,
       clusters,
       mapState,
+      articleInfo,
+      fetchArticleInfoStatus,
     } = this.props;
 
     return (
@@ -82,7 +88,13 @@ class MapView extends Component {
         onChange={this.mapOnChange}
         onChildClick={(_, childProps) => {
           if (!childProps.clusters) {
-            this.setState({ hoveredChildKey: `${childProps.article.url}-${childProps.lng}-${childProps.lat}` });
+            const key = `${childProps.article.url}-${childProps.lng}-${childProps.lat}`;
+
+            if (this.state.hoveredChildKey !== key) {
+              this.setState({ hoveredChildKey: key }, () => {
+                this.props.fetchArticleInfo(childProps.article.url);
+              });
+            }
           }
         }}
       >
@@ -91,16 +103,20 @@ class MapView extends Component {
             }) => {
             if (numPoints === 1) {
               const article = articles[points[0].id];
-              return article.locations.map(({ lng, lat }) => (
-                <SimpleMarker
-                  key={shortid.generate()}
-                  showFullInfo={this.state.hoveredChildKey === `${article.url}-${lng}-${lat}`}
-                  article={article}
-                  fetchRelatedArticles={this.props.fetchRelatedArticles}
-                  lng={lng}
-                  lat={lat}
-                />
-              ));
+              return article.locations.map(({ lng, lat }) => {
+                const isFocused = this.state.hoveredChildKey === `${article.url}-${lng}-${lat}`;
+
+                return (
+                  <SimpleMarker
+                    key={shortid.generate()}
+                    showFullInfo={isFocused}
+                    status={fetchArticleInfoStatus}
+                    article={isFocused ? { ...articleInfo, ...article } : article}
+                    lng={lng}
+                    lat={lat}
+                  />
+              );
+              });
             }
 
             const ids = points.map((point) => point.id);

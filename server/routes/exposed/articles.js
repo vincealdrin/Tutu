@@ -1,7 +1,9 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const natural = require('natural');
-const { mapArticle, PH_TIMEZONE } = require('../../utils');
+const {
+  mapArticle, mapArticleInfo, getSentiment, PH_TIMEZONE,
+} = require('../../utils');
 
 module.exports = (conn, io) => {
   const tbl = 'articles';
@@ -161,12 +163,51 @@ module.exports = (conn, io) => {
 
       const cursor = await query
         .distinct()
-        .map(mapArticle(bounds, catsArr.length))
+        .map(mapArticle(bounds))
         .run(conn);
       const articles = await cursor.toArray();
 
       res.setHeader('X-Total-Count', totalCount);
       return res.json(articles);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/info', async (req, res, next) => {
+    try {
+      const {
+        url,
+        catsFilterLength,
+      } = req.query;
+      const uuid = await r.uuid(url).run(conn);
+      const article = await r.table(tbl)
+        .get(uuid)
+        .merge(mapArticleInfo(catsFilterLength))
+        .without('timestamp', 'body', 'id', 'summary2', 'url', 'title')
+        .run(conn);
+
+      const cursor = await r.table('articles').filter((doc) =>
+        doc('timestamp')
+          .during(doc('timestamp').date(), r.time(doc('timestamp').year(), doc('timestamp').month(), doc('timestamp').day(), PH_TIMEZONE))
+          .and(doc('categories')
+            .orderBy(r.desc((category) => category('score')))
+            .slice(0, 2)
+            .concatMap((c) => [c('label')])
+            .eq(article.categories.slice(0, 2))
+            .and(doc('topics')('common').contains((topic) => topic.match(`(?i)${article.keywords.join('|')}`)))
+            .and(doc('people').contains((person) => person.match(`(?i)${article.people.join('|')}`))
+              .or(doc('organizations').contains((org) => org.match(`(?i)${article.organizations.join('|')}`))))))
+        .pluck('title', 'url')
+        .run(conn);
+      const relatedArticles = await cursor.toArray();
+      const filteredRelArticles = relatedArticles
+        .filter(({ title }) => natural.DiceCoefficient(article.title, title) > 0.40)
+        .slice(0, 5);
+
+      article.relatedArticles = filteredRelArticles;
+
+      res.json(article);
     } catch (e) {
       next(e);
     }
@@ -201,7 +242,7 @@ module.exports = (conn, io) => {
       const query = r.table(tbl).filter(r.row('timestamp').date().ge(lastWk));
       const totalCount = await query.count().run(conn);
       const cursor = await query
-        .eqJoin(r.row('sourceId'), r.table('sources'))
+        .eqJoin('sourceId', r.table('sources'))
         .map(mapArticle())
         .orderBy(r.desc('timestamp'))
         .limit(parseInt(limit))

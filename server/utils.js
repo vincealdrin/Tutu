@@ -7,7 +7,8 @@ const awisClient = awis({
   secret: process.env.AMAZON_SECRET_KEY,
 });
 
-module.exports.PH_TIMEZONE = '+08:00';
+const PH_TIMEZONE = '+08:00';
+module.exports.PH_TIMEZONE = PH_TIMEZONE;
 
 module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, reject) => {
   awisClient({
@@ -96,43 +97,60 @@ const getSentiment = (sentiment) => r.branch(
   'neutral',
 );
 
-module.exports.mapArticle = (bounds, catsLength) => (join) => {
-  const article = {
-    url: join('left')('url'),
-    title: join('left')('title'),
-    authors: join('left')('authors'),
-    // keywords: join('left')('keywords'),
-    keywords: join('left')('topics')('common').split(','),
-    people: join('left')('people'),
-    organizations: join('left')('organizations'),
-    publishDate: join('left')('publishDate'),
-    sentiment: getSentiment(join('left')('sentiment')),
-    summary: join('left')('summary'),
-    summary2: join('left')('summary2'),
-    topImageUrl: join('left')('topImageUrl'),
-    timestamp: join('left')('timestamp'),
-    source: join('right')('contentData')('siteData')('title'),
-    sourceUrl: join('right')('contentData')('dataUrl'),
-    sourceFaviconUrl: join('right')('faviconUrl'),
+module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
+  const doc = {
+    authors: article('authors'),
+    keywords: article('topics')('common').split(','),
+    people: article('people'),
+    organizations: article('organizations'),
+    publishDate: article('publishDate'),
+    sentiment: getSentiment(article('sentiment')),
+    summary: article('summary'),
+    topImageUrl: article('topImageUrl'),
+    source: r.table('sources').get(article('sourceId'))
+      .pluck({
+        faviconUrl: true,
+        contentData: {
+          siteData: { title: true },
+          dataUrl: true,
+        },
+      })
+      .merge((source) => ({
+        title: source('contentData')('siteData')('title'),
+        url: source('contentData')('dataUrl'),
+        favicon: source('faviconUrl'),
+      }))
+      .without('contentData', 'faviconUrl'),
   };
 
-  if (catsLength) {
-    article.categories = join('left')('categories')
+  if (catsFilterLength) {
+    doc.categories = article('categories')
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
-      .slice(0, catsLength)
+      .slice(0, catsFilterLength)
       .concatMap((c) => [c('label')]);
   } else {
-    article.categories = join('left')('categories')
+    doc.categories = article('categories')
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
       .slice(0, 2)
       .concatMap((c) => [c('label')]);
   }
 
+  return doc;
+};
+
+
+module.exports.mapArticle = (bounds) => (join) => {
+  const article = {
+    url: join('left')('url'),
+    title: join('left')('title'),
+  };
+
   if (bounds) {
     article.locations = join('left')('locations')
-      .filter((loc) => bounds.intersects(loc('location')('position'))).map(mapLocation);
+      .filter((loc) => bounds.intersects(loc('location')('position')))
+      .map(mapLocation);
   } else {
     article.locations = join('left')('locations').map(mapLocation);
   }

@@ -4,7 +4,7 @@ import flattenDeep from 'lodash/flattenDeep';
 import { crudStatus, updateCrudStatus } from '../utils';
 
 export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
-export const FETCH_RELATED_ARTICLES = 'mapArticles/FETCH_RELATED_ARTICLES';
+export const FETCH_ARTICLE_INFO = 'mapArticles/FETCH_ARTICLE_INFO';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
 
 const initialState = {
@@ -12,8 +12,9 @@ const initialState = {
   clusters: [],
   totalCount: 0,
   fetchArtsStatus: crudStatus,
-  fetchRelArtsStatus: crudStatus,
-  relatedArticles: [],
+  fetchArticleInfoStatus: crudStatus,
+  articleInfo: [],
+  articleFocused: {},
   mapState: {
     zoom: 8,
     center: {
@@ -43,11 +44,11 @@ export default (state = initialState, action) => {
         ...state,
         mapState: action.mapState,
       };
-    case FETCH_RELATED_ARTICLES:
+    case FETCH_ARTICLE_INFO:
       return {
         ...state,
-        relatedArticles: action.relatedArticles,
-        fetchRelArtsStatus: updateCrudStatus(action),
+        articleInfo: action.articleInfo,
+        fetchArticleInfoStatus: updateCrudStatus(action),
       };
     default:
       return state;
@@ -120,32 +121,26 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
   }
 };
 
-export const fetchRelatedArticles = (
-  title, topics,
-  people, orgs, categories,
-) => async (dispatch) => {
+export const fetchArticleInfo = (url) => async (dispatch, getState) => {
   try {
-    dispatch({ type: FETCH_RELATED_ARTICLES, statusText: 'pending' });
-
-    const { data: relatedArticles, status } = await axios.get('/articles/related', {
+    dispatch({ type: FETCH_ARTICLE_INFO, statusText: 'pending' });
+    const { filters: { categories } } = getState();
+    const { data: articleInfo, status } = await axios.get('/articles/info', {
       params: {
-        title,
-        topics,
-        people,
-        orgs,
-        categories,
+        url,
+        catsFilter: categories.length,
       },
     });
 
     dispatch({
-      type: FETCH_RELATED_ARTICLES,
+      type: FETCH_ARTICLE_INFO,
       statusText: 'success',
-      relatedArticles,
+      articleInfo,
       status,
     });
   } catch (e) {
     dispatch({
-      type: FETCH_RELATED_ARTICLES,
+      type: FETCH_ARTICLE_INFO,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
     });

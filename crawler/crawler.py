@@ -22,7 +22,7 @@ load_dotenv(find_dotenv(), override=True)
 
 locations = get_locations()
 provinces = get_provinces()
-news_sources = get_news_sources('timestamp', True)
+news_sources = get_news_sources('timestamp', False)
 
 if not news_sources:
     print('EMPTY NEWS SOURCES')
@@ -129,7 +129,6 @@ for news_source in news_sources:
                     'articleUrl': article.url,
                     'articleTitle': article.title,
                     'errorMsg': 'SOURCE IS IN BODY',
-
                 })
                 continue
 
@@ -182,7 +181,7 @@ for news_source in news_sources:
 
             new_article = {
                 'id': url_uuid,
-                'url': article.url,
+                'url': clean_url,
                 'sourceId': news_source['id'],
                 'title': article.title.encode('ascii', 'ignore').decode('utf-8'),
                 'authors': article.authors,

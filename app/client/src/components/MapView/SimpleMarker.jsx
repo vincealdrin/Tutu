@@ -25,7 +25,7 @@ class SimpleMarker extends PureComponent {
     fetchRelatedArticles(title, keywords.join(), people.join(), organizations.join(), categories.join());
   }
 
-  render() {
+  renderArticle() {
     const {
       article: {
         topImageUrl,
@@ -42,58 +42,79 @@ class SimpleMarker extends PureComponent {
         organizations,
         people,
       },
+      status,
+      article,
+    } = this.props;
+    const length = 400;
+    console.log(article);
+    if (status.success) {
+      const shortSummary = `${summary[0].substring(0, length)}...`;
+      const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
+      return (
+        <div>
+          <Label as="a" href={`http://${source.url}`} ribbon color={colors[Math.floor(Math.random() * colors.length)]} target="_blank" className="news-label news-marker-tooltip">{source.title}</Label>
+          <div className="image-container">
+            <Image
+              src={topImageUrl}
+              shape="rounded"
+              className="simple-marker-image"
+            />
+            <Button color="blue" content="Read More" className="read-more-button" circular href={url} target="_blank" />
+          </div>
+
+          <Header as="a" href={url} target="_blank" color="blue">{title}</Header>
+
+          <div className="author-date-container">
+            <div className="author-name">
+              {authors.join(', ')} | {new Date(publishDate).toDateString()}
+            </div>
+          </div>
+
+          <MarkerAccordion
+            summary={shortSummary}
+            categories={categories}
+            keywords={keywords}
+            sentiment={sentiment}
+            organizations={organizations}
+            people={people}
+          />
+
+          <Reactions />
+        </div>
+      );
+    } else if (status.error) {
+      return 'error';
+    }
+
+    return 'loading';
+  }
+
+  render() {
+    const {
+      article: {
+        title,
+      },
       $hover,
       showFullInfo,
     } = this.props;
-    const length = 400;
-    const shortSummary = `${summary[0].substring(0, length)}...`;
-    const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
 
     return (
       <Tooltip
+        position={showFullInfo ? 'top-end' : 'left-start'}
         distance={15}
         html={
           <div>
-            {showFullInfo ? (
-              <div>
-                <Label as="a" href={`http://${sourceUrl}`} ribbon color={colors[Math.floor(Math.random() * colors.length)]} target="_blank" className="news-label news-marker-tooltip">{source}</Label>
-                <div className="image-container">
-                  <Image
-                    src={topImageUrl}
-                    shape="rounded"
-                    className="simple-marker-image"
-                  />
-                  <Button color="blue" content="Read More" className="read-more-button" circular href={url} target="_blank" />
-                </div>
-
-                <Header as="a" href={url} target="_blank" color="blue">{title}</Header>
-
-                <div className="author-date-container">
-                  <div className="author-name">
-                    {authors.join(', ')} | {new Date(publishDate).toDateString()}
-                  </div>
-                </div>
-
-                <MarkerAccordion
-                  summary={shortSummary}
-                  categories={categories}
-                  keywords={keywords}
-                  sentiment={sentiment}
-                  organizations={organizations}
-                  people={people}
-                />
-
-                <Reactions />
-              </div>
-                ) : (
-                  'hi'
-                )}
+            {showFullInfo ? this.renderArticle() : (
+              <p>{title}</p>
+            )}
           </div>
         }
         open={$hover || showFullInfo}
+        interactive={!$hover && showFullInfo}
+        useContext
+        multiple
         arrow
         sticky
-        interactive
       >
         <Icon
           color="red"

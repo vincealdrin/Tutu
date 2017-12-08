@@ -48,6 +48,10 @@ const K_MARGIN_LEFT = 30;
 const K_HOVER_DISTANCE = 30;
 
 class MapView extends Component {
+  state = {
+    hoveredChildKey: -1,
+  }
+
   defaultCenter = {
     lat: 14.84438951326129,
     lng: 121.64467285156252,
@@ -76,6 +80,11 @@ class MapView extends Component {
         margin={[K_MARGIN_TOP, K_MARGIN_RIGHT, K_MARGIN_BOTTOM, K_MARGIN_LEFT]}
         hoverDistance={K_HOVER_DISTANCE}
         onChange={this.mapOnChange}
+        onChildClick={(_, childProps) => {
+          if (!childProps.clusters) {
+            this.setState({ hoveredChildKey: `${childProps.article.url}-${childProps.lng}-${childProps.lat}` });
+          }
+        }}
       >
         {clusters.map(({
               wx, wy, numPoints, points,
@@ -85,6 +94,7 @@ class MapView extends Component {
               return article.locations.map(({ lng, lat }) => (
                 <SimpleMarker
                   key={shortid.generate()}
+                  showFullInfo={this.state.hoveredChildKey === `${article.url}-${lng}-${lat}`}
                   article={article}
                   fetchRelatedArticles={this.props.fetchRelatedArticles}
                   lng={lng}

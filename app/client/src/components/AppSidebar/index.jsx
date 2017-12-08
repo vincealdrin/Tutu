@@ -54,10 +54,10 @@ class AppSidebar extends Component {
               <Icon name="filter" color="grey" />
               <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Filter</span>
             </Link>
-            {/* <Link to="/categories" onClick={this.beVisible}>
+            <Link to="/categories" onClick={this.beVisible}>
               <Icon name="tags" color="grey" />
               <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Categories</span>
-            </Link> */}
+            </Link>
             <Link to="/about" onClick={this.beVisible}>
               <Icon name="browser" color="grey" />
               <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>About</span>

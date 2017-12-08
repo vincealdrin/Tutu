@@ -35,7 +35,7 @@ class RecentArticles extends Component {
     const { articles } = this.props;
 
     return (
-      <div className="recent-section-container">
+      <div>
         <Segment>
           <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Recent Articles</Label>
           <div className="scrollable-section">

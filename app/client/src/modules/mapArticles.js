@@ -13,8 +13,7 @@ const initialState = {
   totalCount: 0,
   fetchArtsStatus: crudStatus,
   fetchArticleInfoStatus: crudStatus,
-  articleInfo: [],
-  articleFocused: {},
+  articleInfo: {},
   mapState: {
     zoom: 8,
     center: {
@@ -47,7 +46,7 @@ export default (state = initialState, action) => {
     case FETCH_ARTICLE_INFO:
       return {
         ...state,
-        articleInfo: action.articleInfo,
+        articleInfo: action.articleInfo || state.articleInfo,
         fetchArticleInfoStatus: updateCrudStatus(action),
       };
     default:
@@ -121,13 +120,13 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
   }
 };
 
-export const fetchArticleInfo = (url) => async (dispatch, getState) => {
+export const fetchArticleInfo = (article) => async (dispatch, getState) => {
   try {
     dispatch({ type: FETCH_ARTICLE_INFO, statusText: 'pending' });
     const { filters: { categories } } = getState();
     const { data: articleInfo, status } = await axios.get('/articles/info', {
       params: {
-        url,
+        url: article.url,
         catsFilter: categories.length,
       },
     });
@@ -135,7 +134,10 @@ export const fetchArticleInfo = (url) => async (dispatch, getState) => {
     dispatch({
       type: FETCH_ARTICLE_INFO,
       statusText: 'success',
-      articleInfo,
+      articleInfo: {
+        ...articleInfo,
+        ...article,
+      },
       status,
     });
   } catch (e) {

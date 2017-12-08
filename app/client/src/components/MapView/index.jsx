@@ -5,6 +5,7 @@ import GoogleMapReact from 'google-map-react';
 import shortid from 'shortid';
 import { fetchArticles, fetchArticleInfo } from '../../modules/mapArticles';
 import SimpleMarker from './SimpleMarker';
+import FocusedSimpleMarker from './FocusedSimpleMarker';
 import SimpleMarker2 from './SimpleMarker2';
 import ClusterMarker from './ClusterMarker';
 import mapStyle from './mapStyle.json';
@@ -88,34 +89,46 @@ class MapView extends PureComponent {
         onChange={this.mapOnChange}
         onChildClick={(_, childProps) => {
           if (!childProps.clusters) {
-            const key = `${childProps.article.url}-${childProps.lng}-${childProps.lat}`;
+            const key = `${childProps.url}-${childProps.lng}-${childProps.lat}`;
 
             if (this.state.hoveredChildKey !== key) {
               this.setState({ hoveredChildKey: key }, () => {
-                this.props.fetchArticleInfo(childProps.article.url);
+                this.props.fetchArticleInfo(childProps);
               });
             }
           }
         }}
       >
+        {articleInfo ? (
+          <FocusedSimpleMarker
+            article={articleInfo}
+            status={fetchArticleInfoStatus}
+            lng={articleInfo.lng}
+            lat={articleInfo.lat}
+          />
+        ) : null}
+
         {clusters.map(({
               wx, wy, numPoints, points,
             }) => {
             if (numPoints === 1) {
               const article = articles[points[0].id];
               return article.locations.map(({ lng, lat }) => {
-                const isFocused = this.state.hoveredChildKey === `${article.url}-${lng}-${lat}`;
+                const isNotFocused = `${articleInfo.url}-${articleInfo.lng}-${articleInfo.lat}` !== `${article.url}-${lng}-${lat}`;
 
-                return (
-                  <SimpleMarker
-                    key={shortid.generate()}
-                    showFullInfo={isFocused}
-                    status={fetchArticleInfoStatus}
-                    article={isFocused ? { ...articleInfo, ...article } : article}
-                    lng={lng}
-                    lat={lat}
-                  />
-              );
+                if (isNotFocused) {
+                  return (
+                    <SimpleMarker
+                      key={shortid.generate()}
+                      status={fetchArticleInfoStatus}
+                      title={article.title}
+                      url={article.url}
+                      lng={lng}
+                      lat={lat}
+                    />
+                  );
+                }
+                return null;
               });
             }
 

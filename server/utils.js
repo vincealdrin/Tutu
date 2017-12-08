@@ -91,11 +91,9 @@ const mapLocation = (loc) => {
 };
 
 const getSentiment = (sentiment) => r.branch(
-  sentiment('compound').ge(0.5),
-  { result: 'positive', pct: sentiment('pos') },
-  sentiment('compound').le(-0.5),
-  { result: 'positive', pct: sentiment('neg') },
-  { result: 'neutral', pct: sentiment('neu') },
+  sentiment('compound').ge(0.5), 'positive',
+  sentiment('compound').le(-0.5), 'positive',
+  'neutral',
 );
 
 module.exports.mapArticle = (bounds, catsLength) => (join) => {

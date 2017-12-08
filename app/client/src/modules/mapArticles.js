@@ -98,7 +98,7 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
         lat,
       }))));
     const cluster = supercluster(coords, {
-      minZoom: 7,
+      minZoom: 6,
       maxZoom: 12,
       radius: 20,
     });

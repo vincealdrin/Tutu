@@ -10,8 +10,10 @@ const mapStateToProps = ({
   recentArticles: {
     articles,
   },
+  socket,
 }) => ({
   articles,
+  socket,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -23,7 +25,7 @@ class RecentArticles extends Component {
   componentDidMount() {
     const { socket } = this.props;
 
-    this.props.fetchRecentArticles(() => {
+    this.props.fetchRecentArticles(15, () => {
       socket.on('newArticle', (article) => {
         this.props.addRecentArticle(article);
       });

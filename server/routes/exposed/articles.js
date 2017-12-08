@@ -57,7 +57,7 @@ module.exports = (conn, io) => {
       }
 
       if (keywords) {
-        query = query.filter((article) => article('body').match(`${keywords.replace(',', '|')}`));
+        query = query.filter((article) => article('body').match(`(?i)${keywords.replace(',', '|')}`));
       }
 
       if (categories) {

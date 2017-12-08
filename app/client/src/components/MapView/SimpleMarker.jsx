@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { Label, Popup, Header, Icon, Image, Button, Accordion } from 'semantic-ui-react';
 import shortid from 'shortid';
-import Sentiments from './Sentiments';
-import './styles.css';
+import Reactions from './Reactions';
 import { fetchRelatedArticles } from '../../modules/mapArticles';
+import './styles.css';
 
 
 class SimpleMarker extends Component {
   state = { activeIndex: 0 };
+
   changeIndex = ((e, titleProps) => {
     const { index } = titleProps;
     const { activeIndex } = this.state;
@@ -15,6 +16,7 @@ class SimpleMarker extends Component {
 
     this.setState({ activeIndex: newIndex });
   })
+
   fetchRelated = () => {
     const {
       article: {
@@ -57,12 +59,11 @@ class SimpleMarker extends Component {
       </span>
     ));
     const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
-    const sentimentValue = Math.round(sentiment.pct * 1000);
 
     return (
       <div className="simple-marker-container">
         <Popup
-          position="top left"
+          position="bottom left"
           className="popup-container"
           trigger={
             <Icon
@@ -129,7 +130,7 @@ class SimpleMarker extends Component {
                   <Label basic color="orange">Sentiment</Label>
                 </div>
                 <div>
-                  <Label as="a" tag style={{ textTransform: 'capitalize' }}>{sentimentValue > 100 ? '100%' : `${sentimentValue}%`} {sentiment.result}</Label>
+                  <Label as="a" tag style={{ textTransform: 'capitalize' }}>{sentiment}</Label>
                 </div>
               </Label.Group>
             </Accordion.Content>
@@ -142,7 +143,7 @@ class SimpleMarker extends Component {
             </Accordion.Content>
           </Accordion>
           <div>
-            <Sentiments />
+            <Reactions />
           </div>
         </Popup>
       </div>

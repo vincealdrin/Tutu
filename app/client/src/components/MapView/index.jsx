@@ -62,11 +62,23 @@ class MapView extends PureComponent {
     lng: 121.64467285156252,
   }
 
-  mapOnChange = ({
+  _onChange = ({
     center, zoom,
     bounds, marginBounds,
   }) => {
     this.props.fetchArticles(center, zoom, marginBounds);
+  }
+
+  _onChildClick = (_, childProps) => {
+    if (!childProps.clusters) {
+      const key = `${childProps.url}-${childProps.lng}-${childProps.lat}`;
+
+      if (this.state.hoveredChildKey !== key && childProps.url) {
+        this.setState({ hoveredChildKey: key }, () => {
+          this.props.fetchArticleInfo(childProps);
+        });
+      }
+    }
   }
 
   render() {
@@ -86,18 +98,8 @@ class MapView extends PureComponent {
         options={mapOption}
         margin={[K_MARGIN_TOP, K_MARGIN_RIGHT, K_MARGIN_BOTTOM, K_MARGIN_LEFT]}
         hoverDistance={K_HOVER_DISTANCE}
-        onChange={this.mapOnChange}
-        onChildClick={(_, childProps) => {
-          if (!childProps.clusters) {
-            const key = `${childProps.url}-${childProps.lng}-${childProps.lat}`;
-
-            if (this.state.hoveredChildKey !== key) {
-              this.setState({ hoveredChildKey: key }, () => {
-                this.props.fetchArticleInfo(childProps);
-              });
-            }
-          }
-        }}
+        onChange={this._onChange}
+        onChildClick={this._onChildClick}
       >
         {articleInfo ? (
           <FocusedSimpleMarker
@@ -122,12 +124,16 @@ class MapView extends PureComponent {
                       key={shortid.generate()}
                       status={fetchArticleInfoStatus}
                       title={article.title}
+                      publishDate={article.publishDate}
+                      source={article.source}
+                      sourceUrl={article.sourceUrl}
                       url={article.url}
                       lng={lng}
                       lat={lat}
                     />
                   );
                 }
+
                 return null;
               });
             }

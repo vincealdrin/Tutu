@@ -24,6 +24,7 @@ class FocusedSimpleMarker extends PureComponent {
         sentiment,
         organizations,
         people,
+        sourceUrl,
       },
       status,
     } = this.props;
@@ -34,7 +35,7 @@ class FocusedSimpleMarker extends PureComponent {
       const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
       return (
         <div>
-          <Label as="a" href={`http://${source.url}`} ribbon color={colors[Math.floor(Math.random() * colors.length)]} target="_blank" className="news-label news-marker-tooltip">{source.title}</Label>
+          <Label as="a" href={`http://${sourceUrl}`} ribbon color={colors[Math.floor(Math.random() * colors.length)]} target="_blank" className="news-label news-marker-tooltip">{source}</Label>
           <div className="image-container">
             <Image
               src={topImageUrl}

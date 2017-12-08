@@ -1,5 +1,5 @@
 # start CoreNLP server
-# java -mx4g -cp "*" --add-modules java.xml.bind edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
+# java -mx4g -cp "*" --add-modules java.xml.bind edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 50000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
 
 import newspaper
 import json
@@ -60,7 +60,8 @@ for news_source in news_sources:
         insert_log(source_id, 'SOURCE ERROR', 'error', float(time.clock() - src_start_time))
         continue
 
-    for article in source.articles:
+    # 50 articles only for dev purposes
+    for article in source.articles[:50]:
         start_time = time.clock()
 
         sleep(slp_time)
@@ -151,8 +152,8 @@ for news_source in news_sources:
                 countries = json.load(countries_file)
             for country in countries:
                 if country in combined_body and not nation_pattern.search(combined_body):
-                    print('\n(OTHER COUNTRY BUT NO PH) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'OTHER COUNTRY BUT NO PH', 'error', float(time.clock() - start_time), {
+                    print('\n(HAS OTHER COUNTRY BUT NO PH) Skipped: ' + str(article.url) + '\n')
+                    slp_time = insert_log(source_id, 'HAS OTHER COUNTRY BUT NO PH', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
                         'articleTitle': article.title
                     })
@@ -160,18 +161,26 @@ for news_source in news_sources:
 
             if not matched_locations:
                 if not nation_pattern.search(combined_body):
-                    print('\n(NO PH LOCATIONS) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'NO PH LOCATIONS', 'error', float(time.clock() - start_time), {
+                    print('\n(UNPARSEABLE LOCATION) Skipped: ' + str(article.url) + '\n')
+                    slp_time = insert_log(source_id, 'UNPARSEABLE LOCATION', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
                         'articleTitle': article.title
                     })
                     continue
 
+            publishDate = search_publish_date(article.publish_date, article.html)
+
+            if (not publishDate):
+                print('\n(UNPARSEABLE PUBLISH DATE) Skipped: ' + str(article.url) + '\n')
+                    slp_time = insert_log(source_id, 'UNPARSEABLE PUBLISH DATE', 'error', float(time.clock() - start_time), {
+                        'articleUrl': article.url,
+                        'articleTitle': article.title
+                    })
+
             organizations, people = get_entities(body)
             summary_sentences = summarize(body)
             sentiment = SentimentIntensityAnalyzer().polarity_scores(body)
             topics = parse_topics(body)
-            publishDate = search_publish_date(article.publish_date, article.html)
             popularity = get_popularity(article.url)
 
             if not article.authors:

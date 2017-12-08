@@ -41,8 +41,8 @@ class ClusterMarker extends Component {
                   {/* <Image src={article.sourceFaviconUrl} className="news-source-favicon" /> */}
                 </div>
                 <div className="article-title-container">
-                  {/* <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header> */}
-                  {/* <List.Description className="article-date">{new Date(article.publishDate).toDateString()}</List.Description> */}
+                  <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
+                  <List.Description className="article-date">{new Date(article.publishDate).toDateString()}</List.Description>
                 </div>
               </List.Item>
             ))}

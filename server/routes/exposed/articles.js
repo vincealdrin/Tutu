@@ -2,7 +2,7 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 const natural = require('natural');
 const {
-  mapArticle, mapArticleInfo, getSentiment, PH_TIMEZONE,
+  mapArticle, mapArticleInfo, PH_TIMEZONE,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -184,7 +184,12 @@ module.exports = (conn, io) => {
       const article = await r.table(tbl)
         .get(uuid)
         .merge(mapArticleInfo(catsFilterLength))
-        .without('timestamp', 'body', 'id', 'summary2', 'url', 'title')
+        .without(
+          'timestamp', 'body', 'id',
+          'summary2', 'url', 'title',
+          'publishDate', 'sourceId', 'locations',
+          'popularity', 'topics'
+        )
         .run(conn);
 
       const cursor = await r.table('articles').filter((doc) =>

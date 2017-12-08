@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const awis = require('awis');
+const _ = require('lodash');
 const r = require('rethinkdb');
 
 const awisClient = awis({
@@ -20,6 +21,11 @@ module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, re
     resolve(info);
   });
 });
+
+module.exports.getSourceBrand = (url, title) => {
+  const titleArr = title.split(/-|\|/);
+  return titleArr.find((word) => new RegExp(_.trim(word), 'i').test(url));
+};
 
 const cleanUrl = (dirtyUrl = '', baseUrl) => {
   let url = dirtyUrl;
@@ -106,21 +112,21 @@ module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
     publishDate: article('publishDate'),
     sentiment: getSentiment(article('sentiment')),
     summary: article('summary'),
-    topImageUrl: article('topImageUrl'),
-    source: r.table('sources').get(article('sourceId'))
-      .pluck({
-        faviconUrl: true,
-        contentData: {
-          siteData: { title: true },
-          dataUrl: true,
-        },
-      })
-      .merge((source) => ({
-        title: source('contentData')('siteData')('title'),
-        url: source('contentData')('dataUrl'),
-        favicon: source('faviconUrl'),
-      }))
-      .without('contentData', 'faviconUrl'),
+    // topImageUrl: article('topImageUrl'),
+    // source: r.table('sources').get(article('sourceId'))
+    //   .pluck({
+    //     faviconUrl: true,
+    //     contentData: {
+    //       siteData: { title: true },
+    //       dataUrl: true,
+    //     },
+    //   })
+    //   .merge((source) => ({
+    //     title: source('contentData')('siteData')('title'),
+    //     url: source('contentData')('dataUrl'),
+    //     favicon: source('faviconUrl'),
+    //   }))
+    //   .without('contentData', 'faviconUrl'),
   };
 
   if (catsFilterLength) {
@@ -145,6 +151,10 @@ module.exports.mapArticle = (bounds) => (join) => {
   const article = {
     url: join('left')('url'),
     title: join('left')('title'),
+    publishDate: join('left')('publishDate'),
+    topImageUrl: join('left')('topImageUrl'),
+    source: join('right')('brand'),
+    sourceUrl: join('right')('contentData')('dataUrl'),
   };
 
   if (bounds) {

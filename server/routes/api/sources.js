@@ -1,7 +1,11 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
+const _ = require('lodash');
 const rp = require('request-promise');
-const { getAboutContactUrl, getFaviconUrl, getSourceInfo } = require('../../utils');
+const parseDomain = require('parse-domain');
+const {
+  getAboutContactUrl, getFaviconUrl, getSourceInfo, getSourceBrand,
+} = require('../../utils');
 
 const responseGroups = ['RelatedLinks', 'Categories', 'Rank', 'ContactInfo', 'RankByCountry',
   'UsageStats', 'Speed', 'Language', 'OwnedDomains', 'LinksInCount',
@@ -46,11 +50,15 @@ module.exports = (conn, io) => {
     const sourcesInfo = await Promise.all(sources.map(async (source) => {
       const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
       const htmlDoc = await rp(url);
-
+      const { domain } = parseDomain(url);
       const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, url);
       const faviconUrl = getFaviconUrl(htmlDoc);
       const infoPromise = await getSourceInfo(source, responseGroups);
       const info = await infoPromise;
+      const { title } = info.contentData.siteData;
+
+      const brand = getSourceBrand(url, title) || _.capitalize(domain);
+
       delete info.contactInfo;
 
       return {
@@ -59,6 +67,7 @@ module.exports = (conn, io) => {
         aboutUsUrl,
         contactUsUrl,
         timestamp,
+        brand,
         id: await r.uuid(url).run(conn),
       };
     }));

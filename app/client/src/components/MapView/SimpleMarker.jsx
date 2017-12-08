@@ -14,8 +14,8 @@ class SimpleMarker extends PureComponent {
     const {
       title,
       url,
+      publishDate,
       $hover,
-      showFullInfo,
     } = this.props;
 
     return (
@@ -25,6 +25,7 @@ class SimpleMarker extends PureComponent {
         html={
           <div>
             <a href={url}>{title}</a>
+            <p>{new Date(publishDate).toLocaleDateString()}</p>
           </div>
         }
         open={$hover}

@@ -12,9 +12,8 @@
   font-size: 1.7rem;
 }
 
-
 .popup-container {
-  max-width: 300px !important;
+  max-width: 324px !important;
   min-height: 100px;
 }
 
@@ -134,7 +133,7 @@
 }
 
 .news-marker-tooltip {
-  top: 0.7rem;
+  top: 1.4rem;
   left: -2rem;
 }
 
@@ -153,6 +152,16 @@
 
 .cluster-modal-sentiment {
   margin-bottom: 2rem !important;
+}
+
+.sentiment-list {
+  display: inline;
+  list-style: none;
+}
+.sentiments {
+  width: 3rem;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .accordion-container {

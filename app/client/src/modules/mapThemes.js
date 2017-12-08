@@ -3,7 +3,7 @@ import axios from 'axios';
 export const FETCH_MAPSTYLES = 'mapThemes/FETCH_MAPSTYLES';
 
 const initialState = {
-  themes: [],
+  themes: []
 };
 
 export default (state = initialState, action) => {
@@ -18,30 +18,20 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchMapStyle = (key, themes) => async (dispatch, getState) => {
-  dispatch({
-    type: FETCH_MAPSTYLES,
-    themes: {
-      themes,
-    },
-  });
+export const fetchMapStyle = () => async (dispatch) => {
   dispatch({ type: FETCH_MAPSTYLES, statusText: 'pending' });
 
   try {
-    const { styles } = getState();
-    const { data: mapStyle, status } = await axios.get('https://snazzymaps.com/explore.json?key=73a29a0d-d359-451c-a4e8-c9d9630eb46f', {
+    const { data: themes, status } = await axios.get('https://snazzymaps.com/explore.json', {
       params: {
-        id: styles.id.join(),
-        name: styles.name.join(),
-        url: styles.url.join(),
-        imageUrl: styles.imageUrl.join(),
+        key: '73a29a0d-d359-451c-a4e8-c9d9630eb46f'
       },
     });
 
     dispatch({
       type: FETCH_MAPSTYLES,
       statusText: 'success',
-      mapStyle,
+      themes,
       status,
     });
   } catch (e) {

@@ -1,13 +1,13 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const natural = require('natural');
+const requestIp = require('request-ip');
 const {
   mapArticle, mapArticleInfo, PH_TIMEZONE, mapSideArticle, mapClusterInfo,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
   const tbl = 'articles';
-
   router.get('/', async (req, res, next) => {
     const {
       neLng,
@@ -316,6 +316,7 @@ module.exports = (conn, io) => {
     }
   });
 
+
   router.get('/related', async (req, res, next) => {
     try {
       const {
@@ -345,6 +346,32 @@ module.exports = (conn, io) => {
         .slice(0, 5);
 
       res.json(relatedArticles);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.put('/reactions', async (req, res, next) => {
+    try {
+      const { url, reaction } = req.body;
+      const uuid = await r.uuid(url).run(conn);
+      const ip = requestIp.getClientIp(req);
+      const alreadyReacted = await r.table('articles').get(uuid)('reactions')
+        .contains((react) => react('ip').eq(ip))
+        .run(conn);
+
+      if (alreadyReacted) {
+        return res.status(400).end();
+      }
+
+      await r.table('articles').get(uuid).update({
+        reactions: r.row('reactions').append({
+          ip,
+          reaction,
+        }),
+      }).run(conn);
+
+      res.status(204).end();
     } catch (e) {
       next(e);
     }

@@ -112,6 +112,7 @@ module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
     publishDate: article('publishDate'),
     sentiment: getSentiment(article('sentiment')),
     summary: article('summary'),
+    reactions: article('reactions').group('reaction').count().ungroup(),
     // topImageUrl: article('topImageUrl'),
     // source: r.table('sources').get(article('sourceId'))
     //   .pluck({
@@ -155,6 +156,7 @@ module.exports.mapClusterInfo = (catsFilterLength) => (article) => {
     publishDate: article('publishDate'),
     sentiment: getSentiment(article('sentiment')),
     summary: article('summary'),
+    reactions: article('reactions').group('reaction').count().ungroup(),
   };
 
   if (catsFilterLength) {

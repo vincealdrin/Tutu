@@ -19,6 +19,7 @@
     "parse-domain": "^2.0.0",
     "passport": "^0.4.0",
     "request": "^2.83.0",
+    "request-ip": "^2.0.2",
     "request-promise": "^4.2.2",
     "rethinkdb": "^2.3.3",
     "socket.io": "^2.0.4"

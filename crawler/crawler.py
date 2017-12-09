@@ -172,10 +172,11 @@ for news_source in news_sources:
 
             if (not publishDate):
                 print('\n(UNPARSEABLE PUBLISH DATE) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'UNPARSEABLE PUBLISH DATE', 'error', float(time.clock() - start_time), {
-                        'articleUrl': article.url,
-                        'articleTitle': article.title
-                    })
+                slp_time = insert_log(source_id, 'UNPARSEABLE PUBLISH DATE', 'error', float(time.clock() - start_time), {
+                    'articleUrl': article.url,
+                    'articleTitle': article.title
+                })
+                continue
 
             organizations, people = get_entities(body)
             summary_sentences = summarize(body)
@@ -206,7 +207,8 @@ for news_source in news_sources:
                 'sentiment': sentiment,
                 'organizations': organizations,
                 'people': people,
-                'popularity': popularity
+                'popularity': popularity,
+                'reactions': []
             }
 
             insert_article(new_article)

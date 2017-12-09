@@ -7,6 +7,7 @@ export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
 export const FETCH_FOCUSED_INFO = 'mapArticles/FETCH_FOCUSED_INFO';
 export const FETCH_CLUSTER_INFO = 'mapArticles/FETCH_CLUSTER_INFO';
 export const REMOVE_FOCUSED = 'mapArticles/REMOVE_FOCUSED';
+export const UPDATE_REACTION = 'mapArticles/UPDATE_REACTION';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
 
 const initialState = {
@@ -16,9 +17,10 @@ const initialState = {
   fetchArtsStatus: crudStatus,
   fetchFocusedInfoStatus: crudStatus,
   fetchFocusedClusterInfoStatus: crudStatus,
+  updateReactionStatus: crudStatus,
   focusedInfo: {},
   focusedClusterInfo: [],
-  focusedKey: '',
+  focusedOn: '',
   mapState: {
     zoom: 8,
     center: {
@@ -52,10 +54,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         focusedInfo: action.focusedInfo || state.focusedInfo,
-        focusedKey: {
-          type: 'simple',
-          key: action.focusedKey || state.focusedKey,
-        },
+        focusedOn: 'simple',
         fetchFocusedInfoStatus: updateCrudStatus(action),
         focusedClusterInfo: [],
       };
@@ -63,19 +62,31 @@ export default (state = initialState, action) => {
       return {
         ...state,
         focusedClusterInfo: action.focusedClusterInfo || state.focusedClusterInfo,
-        focusedKey: {
-          type: 'cluster',
-          key: action.focusedKey || state.focusedKey,
-        },
+        focusedOn: 'cluster',
         fetchFocusedClusterInfoStatus: updateCrudStatus(action),
         focusedInfo: {},
+        isFocused: true,
       };
     case REMOVE_FOCUSED:
       return {
         ...state,
-        focusedKey: '',
+        focusedOn: '',
         focusedInfo: {},
         focusedClusterInfo: [],
+      };
+    case UPDATE_REACTION:
+      return {
+        ...state,
+        articles: state.articles.map((article) => {
+          if (article.url === action.url) {
+            return {
+              ...article,
+              reactions: {},
+            };
+          }
+          return article;
+        }),
+        updateReactionStatus: updateCrudStatus(action),
       };
     default:
       return state;
@@ -146,7 +157,7 @@ export const fetchArticles = () => async (dispatch, getState) => {
   }
 };
 
-export const fetchFocusedInfo = (focusedKey, article) => async (dispatch, getState) => {
+export const fetchFocusedInfo = (article) => async (dispatch, getState) => {
   try {
     dispatch({ type: FETCH_FOCUSED_INFO, statusText: 'pending' });
     const { filters: { categories } } = getState();
@@ -164,7 +175,6 @@ export const fetchFocusedInfo = (focusedKey, article) => async (dispatch, getSta
         ...focusedInfo,
         ...article,
       },
-      focusedKey,
       status,
     });
   } catch (e) {
@@ -176,7 +186,7 @@ export const fetchFocusedInfo = (focusedKey, article) => async (dispatch, getSta
   }
 };
 
-export const fetchFocusedClusterInfo = (focusedKey, articles) => async (dispatch, getState) => {
+export const fetchFocusedClusterInfo = (articles) => async (dispatch, getState) => {
   try {
     dispatch({ type: FETCH_CLUSTER_INFO, statusText: 'pending' });
     const { filters: { categories } } = getState();
@@ -194,12 +204,37 @@ export const fetchFocusedClusterInfo = (focusedKey, articles) => async (dispatch
         ...article,
         ...focusedClusterInfo[i],
       })),
-      focusedKey,
       status,
     });
   } catch (e) {
     dispatch({
       type: FETCH_CLUSTER_INFO,
+      statusText: 'error',
+      status: e.response ? e.response.status : 500,
+    });
+  }
+};
+
+export const updateReaction = (url, reaction) => async (dispatch) => {
+  try {
+    dispatch({ type: UPDATE_REACTION, statusText: 'pending' });
+    const { status } = await axios.put('/articles/reactions', {
+      data: {
+        url,
+        reaction,
+      },
+    });
+
+    dispatch({
+      type: UPDATE_REACTION,
+      statusText: 'success',
+      url,
+      reaction,
+      status,
+    });
+  } catch (e) {
+    dispatch({
+      type: UPDATE_REACTION,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
     });

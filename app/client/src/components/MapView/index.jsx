@@ -17,6 +17,7 @@ import FocusedSimpleMarker from './FocusedSimpleMarker';
 import SimpleMarker2 from './SimpleMarker2';
 import ClusterMarker from './ClusterMarker';
 import ClusterModal from './ClusterModal';
+import SimpleModal from './SimpleModal';
 import mapStyle from './mapStyle.json';
 import './styles.css';
 
@@ -31,7 +32,7 @@ const mapStateToProps = ({
     fetchFocusedClusterInfoStatus: clusterInfoStatus,
     focusedInfo,
     focusedClusterInfo,
-    focusedKey,
+    focusedOn,
   },
   map,
 }) => ({
@@ -45,7 +46,7 @@ const mapStateToProps = ({
   clusterInfoStatus,
   focusedInfo,
   focusedClusterInfo,
-  focusedKey,
+  focusedOn,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -99,19 +100,10 @@ class MapView extends PureComponent {
   }
 
   _onChildClick = (_, childProps) => {
-    const { focusedKey } = this.props;
-    const key = childProps.articles
-      ? `${childProps.count}-${childProps.lng}-${childProps.lat}`
-      : `${childProps.url || childProps.article.url}-${childProps.lng}-${childProps.lat}`;
-
-    if (focusedKey !== key) {
-      if (childProps.articles) {
-        this.props.fetchFocusedClusterInfo(key, childProps.articles);
-      } else {
-        this.props.fetchFocusedInfo(key, childProps);
-      }
+    if (childProps.articles) {
+      this.props.fetchFocusedClusterInfo(childProps.articles);
     } else {
-      this.props.removeFocused();
+      this.props.fetchFocusedInfo(childProps);
     }
   }
 
@@ -120,14 +112,13 @@ class MapView extends PureComponent {
       articles,
       clusters,
       mapState,
-      focusedInfo,
       infoStatus,
       clusterInfoStatus,
       focusedClusterInfo,
+      focusedOn,
       focusedKey,
+      focusedInfo,
     } = this.props;
-    const showFocusedSimple = !infoStatus.pending && infoStatus.success && focusedKey.type === 'simple';
-    const showFocusedCluster = !clusterInfoStatus.pending && clusterInfoStatus.success && focusedKey.type === 'cluster';
 
     return (
     // <ReactMapGL
@@ -203,7 +194,7 @@ class MapView extends PureComponent {
         onChange={this._onChange}
         onChildClick={this._onChildClick}
       >
-        {showFocusedSimple ? (
+        {/* {showFocusedSimple ? (
           <FocusedSimpleMarker
             removeFocused={this.props.removeFocused}
             status={infoStatus}
@@ -211,39 +202,35 @@ class MapView extends PureComponent {
             lng={focusedInfo.lng}
             lat={focusedInfo.lat}
           />
-        ) : null}
-        {showFocusedCluster ? (
-          <ClusterModal
-            articles={focusedClusterInfo}
-            removeFocused={removeFocused}
-          />
-        ) : null}
+        ) : null} */}
+        <ClusterModal
+          open={focusedOn === 'cluster'}
+          articles={focusedClusterInfo}
+          removeFocused={this.props.removeFocused}
+        />
+        <SimpleModal
+          open={focusedOn === 'simple'}
+          article={focusedInfo}
+          removeFocused={this.props.removeFocused}
+        />
 
         {clusters.map(({
             wx, wy, numPoints, points,
           }) => {
           if (numPoints === 1) {
             const article = articles[points[0].id];
-            return article.locations.map(({ lng, lat }) => {
-              const isNotFocused = focusedKey !== `${article.url}-${lng}-${lat}`;
-
-              if (isNotFocused) {
-                return (
-                  <SimpleMarker
-                    key={shortid.generate()}
-                    title={article.title}
-                    publishDate={article.publishDate}
-                    source={article.source}
-                    sourceUrl={article.sourceUrl}
-                    url={article.url}
-                    lng={lng}
-                    lat={lat}
-                  />
-                );
-              }
-
-              return null;
-            });
+            return article.locations.map(({ lng, lat }) => (
+              <SimpleMarker
+                key={shortid.generate()}
+                title={article.title}
+                publishDate={article.publishDate}
+                source={article.source}
+                sourceUrl={article.sourceUrl}
+                url={article.url}
+                lng={lng}
+                lat={lat}
+              />
+            ));
           }
 
           const ids = points.map((point) => point.id);

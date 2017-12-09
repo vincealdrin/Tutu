@@ -5,11 +5,17 @@ import './styles.css';
 
 class ClusterModal extends Component {
   render() {
-    const { articles } = this.props;
+    const { articles, open, removeFocused } = this.props;
     const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
 
     return (
-      <Modal className="modal-container" defaultOpen dimmer>
+      <Modal
+        className="modal-container"
+        open={open}
+        onClose={removeFocused}
+        closeOnDimmerClick
+        dimmer
+      >
         <Modal.Content scrolling>
           {articles.map((article) => {
               const sentimentValue = Math.round(article.sentiment.pct * 1000);

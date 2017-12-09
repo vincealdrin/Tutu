@@ -128,6 +128,8 @@ export const fetchArticles = () => async (dispatch, getState) => {
         limit: filters.limit,
       },
     });
+
+
     const coords = flattenDeep(articles.map(({ locations }, index) =>
       locations.map(({ lng, lat }) => ({
         id: index,
@@ -136,15 +138,16 @@ export const fetchArticles = () => async (dispatch, getState) => {
       }))));
     const cluster = supercluster(coords, {
       minZoom: 6,
-      maxZoom: 12,
-      radius: 20,
+      maxZoom: 16,
+      radius: 30,
     });
+    const clusters = cluster({ center, zoom, bounds });
 
     dispatch({
       type: FETCH_ARTICLES,
       totalCount: parseInt(headers['x-total-count'], 10),
       statusText: 'success',
-      clusters: cluster({ center, zoom, bounds }),
+      clusters,
       articles,
       status,
     });

@@ -20,7 +20,7 @@ class SimpleMarker extends PureComponent {
 
     return (
       <Tooltip
-        position="left-start"
+        position="right-start"
         distance={15}
         html={
           <div>

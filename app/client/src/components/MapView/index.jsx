@@ -84,19 +84,8 @@ class MapView extends PureComponent {
     center, zoom,
     bounds, marginBounds,
   }) => {
-    // const upperRight = nw.lat > 24.742282253941596 || nw.lng > 118.0181546020508;
-    // const upperLeft = ne.lat > 24.742282253941596 || ne.lng > 123.7804837036133;
-    // if (upperRight || upperLeft) {
-    //   // console.log(this.defaultCenter);
-    //   this.props.updateMapState({
-    //     lat: 14.413869136504943,
-    //     lng: 120.6329006958008,
-    //   }, zoom, bounds);
-    // } else {
-    //   console.log('not lagpas');
     this.props.updateMapState(center, zoom, bounds);
     this.props.fetchArticles();
-    // }
   }
 
   _onChildClick = (_, childProps) => {
@@ -116,7 +105,6 @@ class MapView extends PureComponent {
       clusterInfoStatus,
       focusedClusterInfo,
       focusedOn,
-      focusedKey,
       focusedInfo,
     } = this.props;
 
@@ -183,7 +171,7 @@ class MapView extends PureComponent {
     //   })}
     // </ReactMapGL>
       <GoogleMapReact
-        defaultZoom={7}
+        defaultZoom={6}
       // defaultCenter={this.defaultCenter}
         bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
         options={mapOption}
@@ -215,11 +203,11 @@ class MapView extends PureComponent {
         />
 
         {clusters.map(({
-            wx, wy, numPoints, points,
+            wx: lng, wy: lat, numPoints, points,
           }) => {
           if (numPoints === 1) {
             const article = articles[points[0].id];
-            return article.locations.map(({ lng, lat }) => (
+            return (
               <SimpleMarker
                 key={shortid.generate()}
                 title={article.title}
@@ -230,7 +218,7 @@ class MapView extends PureComponent {
                 lng={lng}
                 lat={lat}
               />
-            ));
+            );
           }
 
           const ids = points.map((point) => point.id);
@@ -239,8 +227,8 @@ class MapView extends PureComponent {
               key={shortid.generate()}
               articles={articles.filter((_, i) => ids.includes(i))}
               count={numPoints}
-              lng={wx}
-              lat={wy}
+              lng={lng}
+              lat={lat}
             />
           );
         })}

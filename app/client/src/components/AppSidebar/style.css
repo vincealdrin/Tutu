@@ -1,7 +1,8 @@
 .menu-item-container {
   position: relative;
+  width: 50vw;
   height: 100vh;
-  max-width: 450px;
+  max-width: 390px;
   background: #fff;
   box-shadow: -3px 0 1rem -3px #1b272b;
 }

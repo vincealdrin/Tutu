@@ -98,6 +98,8 @@ class Filter extends Component {
       timeWindow,
       limit,
     } = filters;
+    const startRange = 31 - timeWindow[0];
+    const endRange = 31 - timeWindow[1];
 
     return (
       <Segment>
@@ -134,7 +136,6 @@ class Filter extends Component {
             selection
             fluid
             multiple
-            allowAdditions
           />
           <Divider />
           <span className="input-label">SOURCE</span>
@@ -145,9 +146,9 @@ class Filter extends Component {
             options={sources.map(mapOptions)}
             value={sources}
             onChange={(_, { value }) => {
-                this.props.changeSourcesFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
+              this.props.changeSourcesFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
             search
             selection
             fluid
@@ -162,13 +163,13 @@ class Filter extends Component {
             allowCross={false}
             value={timeWindow}
             onChange={(value) => {
-                this.props.changTimeWindowFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
+              this.props.changTimeWindowFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
           />
           <span className="timewindow-text">
-            <span>{`${31 - timeWindow[0]} days ago`}</span>
-            <span>{`${31 - timeWindow[1]} days ago`}</span>
+            <span>{`${startRange} day${startRange === 1 ? '' : 's'} ago`}</span>
+            <span>{`${endRange} day${endRange === 1 ? '' : 's'} ago`}</span>
           </span>
           <Divider />
           <span className="input-label">ORGANIZATIONS</span>

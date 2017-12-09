@@ -36,7 +36,6 @@ class RecentArticles extends Component {
     this.props.socket.removeAllListeners();
   }
 
-
   render() {
     const { articles } = this.props;
 

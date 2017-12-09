@@ -168,6 +168,32 @@ module.exports.mapArticle = (bounds) => (join) => {
   return article;
 };
 
+module.exports.mapSideArticle = (join) => {
+  const article = {
+    url: join('left')('url'),
+    title: join('left')('title'),
+    authors: join('left')('authors'),
+    keywords: join('left')('topics')('common').split(','),
+    publishDate: join('left')('publishDate'),
+    sentiment: getSentiment(join('left')('sentiment')),
+    summary: join('left')('summary'),
+    // summary2: join('left')('summary2'),
+    topImageUrl: join('left')('topImageUrl'),
+    timestamp: join('left')('timestamp'),
+    categories: join('left')('categories')
+      .filter((category) => category('score').gt(0))
+      .orderBy(r.desc((category) => category('score')))
+      .slice(0, 2)
+      .concatMap((c) => [c('label')]),
+    // locations: join('left')('locations').map(mapLocation),
+    source: join('right')('contentData')('siteData')('title'),
+    sourceUrl: join('right')('contentData')('dataUrl'),
+    sourceFaviconUrl: join('right')('faviconUrl'),
+  };
+
+  return article;
+};
+
 module.exports.mapFeedArticle = (join) => {
   const article = {
     url: join('left')('new_val')('url'),
@@ -183,8 +209,9 @@ module.exports.mapFeedArticle = (join) => {
     categories: join('left')('new_val')('categories')
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
-      .slice(0, 2),
-    locations: join('left')('new_val')('locations').map(mapLocation),
+      .slice(0, 2)
+      .concatMap((c) => [c('label')]),
+    // locations: join('left')('new_val')('locations').map(mapLocation),
     source: join('right')('contentData')('siteData')('title'),
     sourceUrl: join('right')('contentData')('dataUrl'),
     sourceFaviconUrl: join('right')('faviconUrl'),

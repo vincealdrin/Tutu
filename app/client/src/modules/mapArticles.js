@@ -4,7 +4,8 @@ import flattenDeep from 'lodash/flattenDeep';
 import { crudStatus, updateCrudStatus } from '../utils';
 
 export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
-export const FETCH_ARTICLE_INFO = 'mapArticles/FETCH_ARTICLE_INFO';
+export const FETCH_FOCUSED_INFO = 'mapArticles/FETCH_FOCUSED_INFO';
+export const REMOVE_FOCUSED_INFO = 'mapArticles/REMOVE_FOCUSED_INFO';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
 
 const initialState = {
@@ -12,8 +13,10 @@ const initialState = {
   clusters: [],
   totalCount: 0,
   fetchArtsStatus: crudStatus,
-  fetchArticleInfoStatus: crudStatus,
-  articleInfo: {},
+  fetchFocusedInfoStatus: crudStatus,
+  focusedInfo: {},
+  focusedClusterInfo: [],
+  focusedKey: '',
   mapState: {
     zoom: 8,
     center: {
@@ -43,33 +46,38 @@ export default (state = initialState, action) => {
         ...state,
         mapState: action.mapState,
       };
-    case FETCH_ARTICLE_INFO:
+    case FETCH_FOCUSED_INFO:
       return {
         ...state,
-        articleInfo: action.articleInfo || state.articleInfo,
-        fetchArticleInfoStatus: updateCrudStatus(action),
+        focusedInfo: action.focusedInfo || state.focusedInfo,
+        focusedKey: action.focusedKey || state.focusedKey,
+        fetchFocusedInfoStatus: updateCrudStatus(action),
+      };
+    case REMOVE_FOCUSED_INFO:
+      return {
+        ...state,
+        focusedKey: '',
+        focusedInfo: {},
       };
     default:
       return state;
   }
 };
 
-export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState) => {
-  dispatch({
-    type: UPDATE_MAP_STATE,
-    mapState: {
-      center,
-      zoom,
-      bounds,
-    },
-  });
+export const fetchArticles = () => async (dispatch, getState) => {
   dispatch({ type: FETCH_ARTICLES, statusText: 'pending' });
 
   try {
+    const { filters, mapArticles: { mapState } } = getState();
     const {
-      ne, nw, se, sw,
+      center,
+      zoom,
+      bounds,
+    } = mapState;
+    const {
+      ne, nw,
+      se, sw,
     } = bounds;
-    const { filters } = getState();
     const { data: articles, headers, status } = await axios.get('/articles', {
       params: {
         neLng: ne.lng,
@@ -120,32 +128,46 @@ export const fetchArticles = (center, zoom, bounds) => async (dispatch, getState
   }
 };
 
-export const fetchArticleInfo = (article) => async (dispatch, getState) => {
+export const fetchFocusedInfo = (article) => async (dispatch, getState) => {
   try {
-    dispatch({ type: FETCH_ARTICLE_INFO, statusText: 'pending' });
+    dispatch({ type: FETCH_FOCUSED_INFO, statusText: 'pending' });
     const { filters: { categories } } = getState();
-    const { data: articleInfo, status } = await axios.get('/articles/info', {
+    const { data: focusedInfo, status } = await axios.get('/articles/info', {
       params: {
         url: article.url,
         catsFilter: categories.length,
       },
     });
+    const focusedKey = `${article.url}-${article.lng}-${article.lat}`;
 
     dispatch({
-      type: FETCH_ARTICLE_INFO,
+      type: FETCH_FOCUSED_INFO,
       statusText: 'success',
-      articleInfo: {
-        ...articleInfo,
+      focusedInfo: {
+        ...focusedInfo,
         ...article,
       },
+      focusedKey,
       status,
     });
   } catch (e) {
     dispatch({
-      type: FETCH_ARTICLE_INFO,
+      type: FETCH_FOCUSED_INFO,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
     });
   }
 };
 
+export const removeFocusedInfo = () => ({
+  type: REMOVE_FOCUSED_INFO,
+});
+
+export const updateMapState = (center, zoom, bounds) => ({
+  type: UPDATE_MAP_STATE,
+  mapState: {
+    center,
+    zoom,
+    bounds,
+  },
+});

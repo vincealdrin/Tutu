@@ -2,7 +2,7 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 const natural = require('natural');
 const {
-  mapArticle, mapArticleInfo, PH_TIMEZONE,
+  mapArticle, mapArticleInfo, PH_TIMEZONE, mapSideArticle,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -224,14 +224,16 @@ module.exports = (conn, io) => {
       const lastWk = new Date();
       lastWk.setDate(lastWk.getDate() - 7);
 
-      const cursor = await r.table(tbl).filter((article) => article('popularity')('totalCount').gt(0))
+      const query = await r.table(tbl).filter((article) => article('popularity')('totalCount').gt(0))
         .orderBy(r.desc(r.row('popularity')('totalCount')))
         .eqJoin(r.row('sourceId'), r.table('sources'))
-        .map(mapArticle())
-        .slice(0, limit)
-        .run(conn);
+        .map(mapSideArticle)
+        .slice(0, limit);
+      const totalCount = query.count().run(conn);
+      const cursor = await query.run(conn);
       const articles = await cursor.toArray();
 
+      res.setHeader('X-Total-Count', totalCount);
       return res.json(articles);
     } catch (e) {
       next(e);
@@ -248,7 +250,7 @@ module.exports = (conn, io) => {
       const totalCount = await query.count().run(conn);
       const cursor = await query
         .eqJoin('sourceId', r.table('sources'))
-        .map(mapArticle())
+        .map(mapSideArticle)
         .orderBy(r.desc('timestamp'))
         .limit(parseInt(limit))
         .run(conn);

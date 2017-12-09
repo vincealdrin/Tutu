@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Icon, Label, Segment, Dropdown } from 'semantic-ui-react';
+import { Label, Segment, Dropdown, Divider } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { fetchArticles } from '../../modules/mapArticles';
@@ -102,22 +102,10 @@ class Filter extends Component {
         <Segment>
           <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
           <div className="scrollable-section">
-            timewindow
-            <Slider.Range
-              min={0}
-              max={31}
-              allowCross={false}
-              value={timeWindow}
-              onChange={(value) => {
-                this.props.changTimeWindowFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-            />
-            {`${31 - timeWindow[0]}days ago - ${31 - timeWindow[1]}days ago`}
-            <br />
-            keywords -
+            <span className="input-label">SEARCH KEYWORDS</span>
             <Dropdown
               placeholder="Keywords"
+              icon="search"
               options={keywords.map(mapOptions)}
               value={keywords}
               onChange={(_, { value }) => {
@@ -130,35 +118,56 @@ class Filter extends Component {
               multiple
               allowAdditions
             />
-            categories -
+            <Divider />
+            <span className="input-label">CATEGORIES</span>
             <Dropdown
-              placeholder="Categories"
+              text="Select Category"
+              icon="globe"
+              className="icon half-width"
               options={categoriesOptions}
               onChange={(_, { value }) => {
                 this.props.changeCategoriesFilter(value);
                 this.props.fetchArticles(center, zoom, bounds);
               }}
-              search
-              selection
+              labeled
               fluid
+              button
               multiple
             />
-            Sources -
+            <Divider />
+            <span className="input-label">SOURCE</span>
             <Dropdown
-              placeholder="Sources"
+              text="Source"
+              icon="browser"
+              className="icon half-width"
               options={sources.map(mapOptions)}
               value={sources}
               onChange={(_, { value }) => {
                 this.props.changeSourcesFilter(value);
                 this.props.fetchArticles(center, zoom, bounds);
               }}
-              search
-              selection
+              labeled
               fluid
+              button
               multiple
-              allowAdditions
             />
-            orgs -
+            <Divider />
+            <span className="input-label">TIME WINDOW</span>
+            <Slider.Range
+              min={0}
+              max={31}
+              allowCross={false}
+              value={timeWindow}
+              onChange={(value) => {
+                this.props.changTimeWindowFilter(value);
+                this.props.fetchArticles(center, zoom, bounds);
+              }}
+            />
+            <span className="timewindow-text">
+              {`${31 - timeWindow[0]} days ago - ${31 - timeWindow[1]} days ago`}
+            </span>
+            <Divider />
+            <span className="input-label">ORGANIZATIONS</span>
             <Dropdown
               placeholder="Organizations"
               options={organizations.map(mapOptions)}
@@ -173,7 +182,8 @@ class Filter extends Component {
               multiple
               allowAdditions
             />
-            pips -
+            <Divider />
+            <span className="input-label">PEOPLE</span>
             <Dropdown
               placeholder="People"
               options={people.map(mapOptions)}
@@ -188,24 +198,33 @@ class Filter extends Component {
               multiple
               allowAdditions
             />
-            sentiment -
+            <Divider />
+            <span className="input-label">SENTIMENT</span>
             <Dropdown
-              placeholder="Sentiment"
+              text="Sentiment"
+              icon="smile"
+              className="icon little-width"
               defaultValue="none"
               options={sentimentsOptions}
               onChange={(_, { value }) => {
                 this.props.changeSentimentFilter(value);
                 this.props.fetchArticles(center, zoom, bounds);
               }}
-              search
-              selection
+              labeled
               fluid
+              button
+              multiple
             />
-            Popular social -
-            <Dropdown
-              placeholder="Popular"
-              options={this.state.popularSocialOptions}
-              onChange={(_, { value }) => {
+            <Divider />
+            <div className="popular-container">
+              <div className="popular-in-container">
+                <span className="input-label">POPULAR IN</span>
+                <Dropdown
+                  text="Popular in..."
+                  icon="internet explorer"
+                  className="icon"
+                  options={this.state.popularSocialOptions}
+                  onChange={(_, { value }) => {
                 if (value[0] === 'all') {
                   this.setState({ popularSocialOptions: [{ key: 'all', text: 'All', value: 'all' }] });
                 } else if (!value.length) {
@@ -233,24 +252,30 @@ class Filter extends Component {
                 this.props.changePopularSocialsFilter(value);
                 this.props.fetchArticles(center, zoom, bounds);
               }}
-              search
-              selection
-              multiple
-              fluid
-            />
-            Popular top -
-            <Dropdown
-              placeholder="Popular top"
-              defaultValue="100"
-              options={popularTopOptions}
-              onChange={(_, { value }) => {
+                  labeled
+                  button
+                  multiple
+                  fluid
+                />
+              </div>
+              <div className="popular-top-container">
+                <span className="input-label">POPULAR TOP</span>
+                <Dropdown
+                  icon="sort"
+                  className="icon"
+                  defaultValue="100"
+                  options={popularTopOptions}
+                  onChange={(_, { value }) => {
                 this.props.changePopularTopFilter(value);
                 this.props.fetchArticles(center, zoom, bounds);
               }}
-              search
-              selection
-              // fluid
-            />
+                  labeled
+                  button
+                  selection
+                  fluid
+                />
+              </div>
+            </div>
 
           </div>
         </Segment>

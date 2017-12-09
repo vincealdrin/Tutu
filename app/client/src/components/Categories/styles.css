@@ -1,3 +1,7 @@
 .category-icon {
-  margin-right: 1rem;
+  margin-right: 1rem !important;
+}
+
+.scrollable-section {
+  padding: 1rem 1rem 0 0;
 }

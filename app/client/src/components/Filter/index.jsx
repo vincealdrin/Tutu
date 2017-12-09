@@ -64,6 +64,15 @@ const sentimentsOptions = [
   { key: 'negative', text: 'Negative', value: 'negative' },
 ];
 
+const popularSocialOptions = [
+  { key: 'all', text: 'All', value: 'all' },
+  { key: 'facebook', text: 'Facebook', value: 'facebook' },
+  { key: 'reddit', text: 'Reddit', value: 'reddit' },
+  { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
+  { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
+  { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
+];
+
 const popularTopOptions = [
   { key: '100', text: '100', value: '100' },
   { key: '300', text: '300', value: '300' },
@@ -73,14 +82,7 @@ const popularTopOptions = [
 
 class Filter extends Component {
   state = {
-    popularSocialOptions: [
-      { key: 'all', text: 'All', value: 'all' },
-      { key: 'facebook', text: 'Facebook', value: 'facebook' },
-      { key: 'reddit', text: 'Reddit', value: 'reddit' },
-      { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
-      { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
-      { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
-    ],
+    popularSocialOptions,
   }
 
   render() {
@@ -98,188 +100,175 @@ class Filter extends Component {
     } = filters;
 
     return (
-      <div>
-        <Segment>
-          <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
-          <div className="scrollable-section">
-            <span className="input-label">SEARCH KEYWORDS</span>
-            <Dropdown
-              placeholder="Keywords"
-              icon="search"
-              options={keywords.map(mapOptions)}
-              value={keywords}
-              onChange={(_, { value }) => {
+      <Segment>
+        <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
+        <div className="scrollable-section filter-scrollable">
+          <span className="input-label">SEARCH KEYWORDS</span>
+          <Dropdown
+            placeholder="Keywords"
+            icon="search"
+            options={keywords.map(mapOptions)}
+            value={keywords}
+            onChange={(_, { value }) => {
                 this.props.changeKeywordsFilter(value);
                 this.props.fetchArticles(center, zoom, bounds);
               }}
-              search
-              selection
-              fluid
-              multiple
-              allowAdditions
-            />
-            <Divider />
-            <span className="input-label">CATEGORIES</span>
-            <Dropdown
-              text="Select Category"
-              icon="globe"
-              className="icon half-width"
-              options={categoriesOptions}
-              onChange={(_, { value }) => {
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <Divider />
+          <span className="input-label">CATEGORIES</span>
+          <Dropdown
+            text="Select Category"
+              // icon="globe"
+              // className="icon half-width"
+            options={categoriesOptions}
+            onChange={(_, { value }) => {
                 this.props.changeCategoriesFilter(value);
                 this.props.fetchArticles(center, zoom, bounds);
               }}
-              labeled
-              fluid
-              button
-              multiple
-            />
-            <Divider />
-            <span className="input-label">SOURCE</span>
-            <Dropdown
-              text="Source"
-              icon="browser"
-              className="icon half-width"
-              options={sources.map(mapOptions)}
-              value={sources}
-              onChange={(_, { value }) => {
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <Divider />
+          <span className="input-label">SOURCE</span>
+          <Dropdown
+            text="Source"
+              // icon="browser"
+              // className="icon half-width"
+            options={sources.map(mapOptions)}
+            value={sources}
+            onChange={(_, { value }) => {
                 this.props.changeSourcesFilter(value);
                 this.props.fetchArticles(center, zoom, bounds);
               }}
-              labeled
-              fluid
-              button
-              multiple
-            />
-            <Divider />
-            <span className="input-label">TIME WINDOW</span>
-            <Slider.Range
-              min={0}
-              max={31}
-              allowCross={false}
-              value={timeWindow}
-              onChange={(value) => {
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <Divider />
+          <span className="input-label">TIME WINDOW</span>
+          <Slider.Range
+            min={0}
+            max={31}
+            allowCross={false}
+            value={timeWindow}
+            onChange={(value) => {
                 this.props.changTimeWindowFilter(value);
                 this.props.fetchArticles(center, zoom, bounds);
               }}
-            />
-            <span className="timewindow-text">
-              {`${31 - timeWindow[0]} days ago - ${31 - timeWindow[1]} days ago`}
-            </span>
-            <Divider />
-            <span className="input-label">ORGANIZATIONS</span>
-            <Dropdown
-              placeholder="Organizations"
-              options={organizations.map(mapOptions)}
-              value={organizations}
-              onChange={(_, { value }) => {
+          />
+          <span className="timewindow-text">
+            <span>{`${31 - timeWindow[0]} days ago`}</span>
+            <span>{`${31 - timeWindow[1]} days ago`}</span>
+          </span>
+          <Divider />
+          <span className="input-label">ORGANIZATIONS</span>
+          <Dropdown
+            placeholder="Organizations"
+            options={organizations.map(mapOptions)}
+            value={organizations}
+            onChange={(_, { value }) => {
                 this.props.changeOrganizationsFilter(value);
                 this.props.fetchArticles(center, zoom, bounds);
               }}
-              search
-              selection
-              fluid
-              multiple
-              allowAdditions
-            />
-            <Divider />
-            <span className="input-label">PEOPLE</span>
-            <Dropdown
-              placeholder="People"
-              options={people.map(mapOptions)}
-              value={people}
-              onChange={(_, { value }) => {
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <Divider />
+          <span className="input-label">PEOPLE</span>
+          <Dropdown
+            placeholder="People"
+            options={people.map(mapOptions)}
+            value={people}
+            onChange={(_, { value }) => {
                 this.props.changePeopleFilter(value);
                 this.props.fetchArticles(center, zoom, bounds);
               }}
-              search
-              selection
-              fluid
-              multiple
-              allowAdditions
-            />
-            <Divider />
-            <span className="input-label">SENTIMENT</span>
-            <Dropdown
-              text="Sentiment"
-              icon="smile"
-              className="icon little-width"
-              defaultValue="none"
-              options={sentimentsOptions}
-              onChange={(_, { value }) => {
-                this.props.changeSentimentFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-              labeled
-              fluid
-              button
-              multiple
-            />
-            <Divider />
-            <div className="popular-container">
-              <div className="popular-in-container">
-                <span className="input-label">POPULAR IN</span>
-                <Dropdown
-                  text="Popular in..."
-                  icon="internet explorer"
-                  className="icon"
-                  options={this.state.popularSocialOptions}
-                  onChange={(_, { value }) => {
-                if (value[0] === 'all') {
-                  this.setState({ popularSocialOptions: [{ key: 'all', text: 'All', value: 'all' }] });
-                } else if (!value.length) {
-                  this.setState({
-                    popularSocialOptions: [
-                      { key: 'all', text: 'All', value: 'all' },
-                      { key: 'facebook', text: 'Facebook', value: 'facebook' },
-                      { key: 'reddit', text: 'Reddit', value: 'reddit' },
-                      { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
-                      { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
-                      { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
-                    ],
-                  });
-                } else {
-                  this.setState({
-                    popularSocialOptions: [
-                      { key: 'facebook', text: 'Facebook', value: 'facebook' },
-                      { key: 'reddit', text: 'Reddit', value: 'reddit' },
-                      { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
-                      { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
-                      { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
-                    ],
-                  });
-                }
-                this.props.changePopularSocialsFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-                  labeled
-                  button
-                  multiple
-                  fluid
-                />
-              </div>
-              <div className="popular-top-container">
-                <span className="input-label">POPULAR TOP</span>
-                <Dropdown
-                  icon="sort"
-                  className="icon"
-                  defaultValue="100"
-                  options={popularTopOptions}
-                  onChange={(_, { value }) => {
-                this.props.changePopularTopFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-                  labeled
-                  button
-                  selection
-                  fluid
-                />
-              </div>
-            </div>
-
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <Divider />
+          <span className="input-label">SENTIMENT</span>
+          <Dropdown
+              // text="Sentiment"
+              // icon="smile"
+              // className="icon little-width"
+            defaultValue="none"
+            options={sentimentsOptions}
+            onChange={(_, { value }) => {
+              this.props.changeSentimentFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            search
+            upward
+            selection
+            fluid
+          />
+          <Divider />
+          <span className="input-label">POPULAR IN</span>
+          <Dropdown
+            text="Popular in..."
+                  // icon="internet explorer"
+                  // className="icon"
+            options={this.state.popularSocialOptions}
+            onChange={(_, { value }) => {
+              if (value[0] === 'all') {
+                this.setState({ popularSocialOptions: popularSocialOptions[0] });
+              } else if (!value.length) {
+                this.setState({ popularSocialOptions });
+              } else {
+                this.setState({
+                  popularSocialOptions: popularSocialOptions.slice(0),
+                });
+              }
+              this.props.changePopularSocialsFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            upward
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <span className="input-label">POPULAR TOP</span>
+          <Dropdown
+            icon="sort"
+            className="icon"
+            defaultValue="100"
+            options={popularTopOptions}
+            onChange={(_, { value }) => {
+              this.props.changePopularTopFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            fluid
+            upward
+            labeled
+            button
+            selection
+          />
+          <div className="popular-container">
+            <div className="popular-in-container" />
+            <div className="popular-top-container" />
           </div>
-        </Segment>
-      </div>
+
+        </div>
+      </Segment>
     );
   }
 }

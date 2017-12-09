@@ -146,6 +146,34 @@ module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
   return doc;
 };
 
+module.exports.mapClusterInfo = (catsFilterLength) => (article) => {
+  const doc = {
+    authors: article('authors'),
+    keywords: article('topics')('common').split(','),
+    people: article('people'),
+    organizations: article('organizations'),
+    publishDate: article('publishDate'),
+    sentiment: getSentiment(article('sentiment')),
+    summary: article('summary'),
+  };
+
+  if (catsFilterLength) {
+    doc.categories = article('categories')
+      .filter((category) => category('score').gt(0))
+      .orderBy(r.desc((category) => category('score')))
+      .slice(0, catsFilterLength)
+      .concatMap((c) => [c('label')]);
+  } else {
+    doc.categories = article('categories')
+      .filter((category) => category('score').gt(0))
+      .orderBy(r.desc((category) => category('score')))
+      .slice(0, 2)
+      .concatMap((c) => [c('label')]);
+  }
+
+  return doc;
+};
+
 
 module.exports.mapArticle = (bounds) => (join) => {
   const article = {

@@ -4,6 +4,9 @@
 }
 
 .timewindow-text {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
   font-size: 0.7rem;
   color: #767676;
 }
@@ -35,7 +38,17 @@
   overflow-y: auto;
 }
 
-.ui.fluid.dropdown {
+.filter-scrollable {
+  min-width: 288.42px;
+}
+
+/* .filter-scrollable-section {
+  width: 300px;
+  height: 90vh;
+  overflow-y: auto;
+} */
+
+/* .ui.fluid.dropdown {
   border-radius: 100px !important;
 }
 
@@ -45,4 +58,4 @@
 
 .ui.selection.dropdown > .search.icon {
   top: 0.5rem;
-}
+} */

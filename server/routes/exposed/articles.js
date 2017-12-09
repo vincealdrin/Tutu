@@ -2,7 +2,7 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 const natural = require('natural');
 const {
-  mapArticle, mapArticleInfo, PH_TIMEZONE, mapSideArticle,
+  mapArticle, mapArticleInfo, PH_TIMEZONE, mapSideArticle, mapClusterInfo,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -152,9 +152,8 @@ module.exports = (conn, io) => {
       query = query.eqJoin(r.row('sourceId'), r.table('sources'));
 
       if (sources) {
-        query = query.filter((article) => r.expr(sources.split(','))
-          .contains((source) => article('right')('contentData')('siteData')('title')
-            .match(source)));
+        query = query.filter((article) => article('right')('brand')
+          .match(`(?i)${sources.replace(',', '|')}`));
       }
 
       if (limit) {
@@ -203,6 +202,8 @@ module.exports = (conn, io) => {
             .and(doc('topics')('common').contains((topic) => topic.match(`(?i)${article.keywords.join('|')}`)))
             .and(doc('people').contains((person) => person.match(`(?i)${article.people.join('|')}`))
               .or(doc('organizations').contains((org) => org.match(`(?i)${article.organizations.join('|')}`))))))
+        .orderBy(r.desc('timestamp'))
+        .slice(0, 20)
         .pluck('title', 'url')
         .run(conn);
       const relatedArticles = await cursor.toArray();
@@ -213,6 +214,58 @@ module.exports = (conn, io) => {
       article.relatedArticles = filteredRelArticles;
 
       res.json(article);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/clusterInfo', async (req, res, next) => {
+    try {
+      const {
+        urls,
+        catsFilterLength,
+      } = req.query;
+      const uuids = await Promise.all(urls.split(',').map((url) => r.uuid(url).run(conn)));
+      const cursor = await r.table(tbl)
+        .getAll(r.args(uuids))
+        .map(mapClusterInfo(catsFilterLength))
+        .merge((article) => ({
+          relatedArticles: r.table('articles').filter((doc) =>
+            doc('timestamp')
+              .during(doc('timestamp').date(), r.time(doc('timestamp').year(), doc('timestamp').month(), doc('timestamp').day(), PH_TIMEZONE))
+              .and(doc('categories')
+                .orderBy(r.desc((category) => category('score')))
+                .slice(0, 2)
+                .concatMap((c) => [c('label')])
+                .eq(article('categories')
+                  .orderBy(r.desc((category) => category('score')))
+                  .slice(0, 2)
+                  .concatMap((c) => [c('label')]))
+                .and(doc('topics')('common').contains((topic) => article('topics')('common').contains(topic)))
+                .and(doc('people').contains((person) => article('people').contains(person))
+                  .or(doc('organizations').contains((org) => article('organizations').contains(org))))))
+            .orderBy(r.desc('timestamp'))
+            .slice(0, 20)
+            .pluck('title', 'url'),
+        }))
+        .without(
+          'timestamp', 'body', 'id',
+          'summary2', 'url', 'title',
+          'publishDate', 'sourceId', 'locations',
+          'popularity', 'topics'
+        )
+        .run(conn);
+      const articles = await cursor.toArray();
+
+      // console.log(articles);
+      const filteredArticles = articles.map((article) => ({
+        ...article,
+        relatedArticles: article.relatedArticles
+          .filter(({ title }) => natural.DiceCoefficient(article.title, title) > 0.40)
+          .slice(0, 5),
+      }));
+
+      res.json(filteredArticles);
     } catch (e) {
       next(e);
     }

@@ -4,13 +4,19 @@ import { bindActionCreators } from 'redux';
 import GoogleMapReact from 'google-map-react';
 import ReactMapGL from 'react-map-gl';
 import { onChangeViewport } from 'redux-map-gl';
-import WebMercatorViewport from 'viewport-mercator-project';
 import shortid from 'shortid';
-import { fetchArticles, fetchFocusedInfo, removeFocusedInfo, updateMapState } from '../../modules/mapArticles';
+import {
+  fetchArticles,
+  fetchFocusedInfo,
+  removeFocused,
+  updateMapState,
+  fetchFocusedClusterInfo,
+} from '../../modules/mapArticles';
 import SimpleMarker from './SimpleMarker';
 import FocusedSimpleMarker from './FocusedSimpleMarker';
 import SimpleMarker2 from './SimpleMarker2';
 import ClusterMarker from './ClusterMarker';
+import ClusterModal from './ClusterModal';
 import mapStyle from './mapStyle.json';
 import './styles.css';
 
@@ -21,8 +27,10 @@ const mapStateToProps = ({
     fetchStatus,
     mapState,
     relatedArticles,
-    fetchFocusedInfoStatus,
+    fetchFocusedInfoStatus: infoStatus,
+    fetchFocusedClusterInfoStatus: clusterInfoStatus,
     focusedInfo,
+    focusedClusterInfo,
     focusedKey,
   },
   map,
@@ -33,17 +41,20 @@ const mapStateToProps = ({
   clusters,
   fetchStatus,
   relatedArticles,
-  fetchFocusedInfoStatus,
+  infoStatus,
+  clusterInfoStatus,
   focusedInfo,
+  focusedClusterInfo,
   focusedKey,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchArticles,
   fetchFocusedInfo,
-  removeFocusedInfo,
+  removeFocused,
   updateMapState,
   onChangeViewport,
+  fetchFocusedClusterInfo,
 }, dispatch);
 
 const mapOption = {
@@ -89,12 +100,18 @@ class MapView extends PureComponent {
 
   _onChildClick = (_, childProps) => {
     const { focusedKey } = this.props;
-    if (!childProps.clusters) {
-      const key = `${childProps.url}-${childProps.lng}-${childProps.lat}`;
+    const key = childProps.articles
+      ? `${childProps.count}-${childProps.lng}-${childProps.lat}`
+      : `${childProps.url || childProps.article.url}-${childProps.lng}-${childProps.lat}`;
 
-      if (focusedKey !== key) {
-        this.props.fetchFocusedInfo(childProps);
+    if (focusedKey !== key) {
+      if (childProps.articles) {
+        this.props.fetchFocusedClusterInfo(key, childProps.articles);
+      } else {
+        this.props.fetchFocusedInfo(key, childProps);
       }
+    } else {
+      this.props.removeFocused();
     }
   }
 
@@ -104,10 +121,13 @@ class MapView extends PureComponent {
       clusters,
       mapState,
       focusedInfo,
-      fetchFocusedInfoStatus,
+      infoStatus,
+      clusterInfoStatus,
+      focusedClusterInfo,
       focusedKey,
     } = this.props;
-    const showFocused = !fetchFocusedInfoStatus.pending && fetchFocusedInfoStatus.success && focusedKey;
+    const showFocusedSimple = !infoStatus.pending && infoStatus.success && focusedKey.type === 'simple';
+    const showFocusedCluster = !clusterInfoStatus.pending && clusterInfoStatus.success && focusedKey.type === 'cluster';
 
     return (
     // <ReactMapGL
@@ -122,7 +142,7 @@ class MapView extends PureComponent {
     // >
     //   {showFocused ? (
     //     <FocusedSimpleMarker
-    //       removeFocusedInfo={this.props.removeFocusedInfo}
+    //       removeFocused={this.props.removeFocused}
     //       status={fetchFocusedInfoStatus}
     //       article={focusedInfo}
     //       lng={focusedInfo.lng}
@@ -183,15 +203,21 @@ class MapView extends PureComponent {
         onChange={this._onChange}
         onChildClick={this._onChildClick}
       >
-        {showFocused ? (
+        {showFocusedSimple ? (
           <FocusedSimpleMarker
-            removeFocusedInfo={this.props.removeFocusedInfo}
-            status={fetchFocusedInfoStatus}
+            removeFocused={this.props.removeFocused}
+            status={infoStatus}
             article={focusedInfo}
             lng={focusedInfo.lng}
             lat={focusedInfo.lat}
           />
-      ) : null}
+        ) : null}
+        {showFocusedCluster ? (
+          <ClusterModal
+            articles={focusedClusterInfo}
+            removeFocused={removeFocused}
+          />
+        ) : null}
 
         {clusters.map(({
             wx, wy, numPoints, points,
@@ -205,7 +231,6 @@ class MapView extends PureComponent {
                 return (
                   <SimpleMarker
                     key={shortid.generate()}
-                    status={fetchFocusedInfoStatus}
                     title={article.title}
                     publishDate={article.publishDate}
                     source={article.source}
@@ -225,7 +250,6 @@ class MapView extends PureComponent {
           return (
             <ClusterMarker
               key={shortid.generate()}
-              clusters={clusters}
               articles={articles.filter((_, i) => ids.includes(i))}
               count={numPoints}
               lng={wx}

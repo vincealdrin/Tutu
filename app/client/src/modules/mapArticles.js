@@ -5,7 +5,8 @@ import { crudStatus, updateCrudStatus } from '../utils';
 
 export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
 export const FETCH_FOCUSED_INFO = 'mapArticles/FETCH_FOCUSED_INFO';
-export const REMOVE_FOCUSED_INFO = 'mapArticles/REMOVE_FOCUSED_INFO';
+export const FETCH_CLUSTER_INFO = 'mapArticles/FETCH_CLUSTER_INFO';
+export const REMOVE_FOCUSED = 'mapArticles/REMOVE_FOCUSED';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
 
 const initialState = {
@@ -14,6 +15,7 @@ const initialState = {
   totalCount: 0,
   fetchArtsStatus: crudStatus,
   fetchFocusedInfoStatus: crudStatus,
+  fetchFocusedClusterInfoStatus: crudStatus,
   focusedInfo: {},
   focusedClusterInfo: [],
   focusedKey: '',
@@ -50,14 +52,30 @@ export default (state = initialState, action) => {
       return {
         ...state,
         focusedInfo: action.focusedInfo || state.focusedInfo,
-        focusedKey: action.focusedKey || state.focusedKey,
+        focusedKey: {
+          type: 'simple',
+          key: action.focusedKey || state.focusedKey,
+        },
         fetchFocusedInfoStatus: updateCrudStatus(action),
+        focusedClusterInfo: [],
       };
-    case REMOVE_FOCUSED_INFO:
+    case FETCH_CLUSTER_INFO:
+      return {
+        ...state,
+        focusedClusterInfo: action.focusedClusterInfo || state.focusedClusterInfo,
+        focusedKey: {
+          type: 'cluster',
+          key: action.focusedKey || state.focusedKey,
+        },
+        fetchFocusedClusterInfoStatus: updateCrudStatus(action),
+        focusedInfo: {},
+      };
+    case REMOVE_FOCUSED:
       return {
         ...state,
         focusedKey: '',
         focusedInfo: {},
+        focusedClusterInfo: [],
       };
     default:
       return state;
@@ -128,7 +146,7 @@ export const fetchArticles = () => async (dispatch, getState) => {
   }
 };
 
-export const fetchFocusedInfo = (article) => async (dispatch, getState) => {
+export const fetchFocusedInfo = (focusedKey, article) => async (dispatch, getState) => {
   try {
     dispatch({ type: FETCH_FOCUSED_INFO, statusText: 'pending' });
     const { filters: { categories } } = getState();
@@ -138,7 +156,6 @@ export const fetchFocusedInfo = (article) => async (dispatch, getState) => {
         catsFilter: categories.length,
       },
     });
-    const focusedKey = `${article.url}-${article.lng}-${article.lat}`;
 
     dispatch({
       type: FETCH_FOCUSED_INFO,
@@ -159,8 +176,38 @@ export const fetchFocusedInfo = (article) => async (dispatch, getState) => {
   }
 };
 
-export const removeFocusedInfo = () => ({
-  type: REMOVE_FOCUSED_INFO,
+export const fetchFocusedClusterInfo = (focusedKey, articles) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: FETCH_CLUSTER_INFO, statusText: 'pending' });
+    const { filters: { categories } } = getState();
+    const { data: focusedClusterInfo, status } = await axios.get('/articles/clusterInfo', {
+      params: {
+        urls: articles.map((article) => article.url).join(),
+        catsFilter: categories.length,
+      },
+    });
+
+    dispatch({
+      type: FETCH_CLUSTER_INFO,
+      statusText: 'success',
+      focusedClusterInfo: articles.map((article, i) => ({
+        ...article,
+        ...focusedClusterInfo[i],
+      })),
+      focusedKey,
+      status,
+    });
+  } catch (e) {
+    dispatch({
+      type: FETCH_CLUSTER_INFO,
+      statusText: 'error',
+      status: e.response ? e.response.status : 500,
+    });
+  }
+};
+
+export const removeFocused = () => ({
+  type: REMOVE_FOCUSED,
 });
 
 export const updateMapState = (center, zoom, bounds) => ({

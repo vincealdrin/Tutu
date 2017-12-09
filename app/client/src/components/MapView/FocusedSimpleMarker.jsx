@@ -26,7 +26,7 @@ class FocusedSimpleMarker extends PureComponent {
         people,
         sourceUrl,
       },
-      removeFocusedInfo,
+      removeFocused,
       status,
     } = this.props;
     const length = 400;
@@ -46,7 +46,7 @@ class FocusedSimpleMarker extends PureComponent {
             <Button
               color="blue"
               content="Close"
-              onClick={removeFocusedInfo}
+              onClick={removeFocused}
               circular
             />
             <Button color="blue" content="Read More" className="read-more-button" circular href={url} target="_blank" />

@@ -1,0 +1,48 @@
+.input-label {
+  font-size: 0.8rem;
+  color: #767676;
+}
+
+.timewindow-text {
+  font-size: 0.7rem;
+  color: #767676;
+}
+
+.popular-container {
+  display: flex;
+}
+
+.popular-in-container {
+  display: flex;
+  flex-direction: column;
+  padding-right: 0.5rem;
+}
+.popular-top-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown.icon.half-width {
+  width: 70%;
+}
+.dropdown.icon.button.little-width {
+  width: 55%;
+  padding-left: 3rem !important;
+}
+
+.menu.visible {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.ui.fluid.dropdown {
+  border-radius: 100px !important;
+}
+
+.ui.fluid.dropdown > .dropdown.icon {
+  display: none;
+}
+
+.ui.selection.dropdown > .search.icon {
+  top: 0.5rem;
+}

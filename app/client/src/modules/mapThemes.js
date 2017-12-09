@@ -1,17 +1,17 @@
 import axios from 'axios';
 
-export const FETCH_MAPSTYLES = 'mapThemes/FETCH_MAPSTYLES';
+export const FETCH_MAP_STYLES = 'mapThemes/FETCH_MAP_STYLES';
 
 const initialState = {
-  themes: []
+  styles: [],
 };
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_MAPSTYLES:
+    case FETCH_MAP_STYLES:
       return {
         ...state,
-        themes: action.themes,
+        themes: action.styles,
       };
     default:
       return state;
@@ -19,24 +19,24 @@ export default (state = initialState, action) => {
 };
 
 export const fetchMapStyle = () => async (dispatch) => {
-  dispatch({ type: FETCH_MAPSTYLES, statusText: 'pending' });
+  dispatch({ type: FETCH_MAP_STYLES, statusText: 'pending' });
 
   try {
-    const { data: themes, status } = await axios.get('https://snazzymaps.com/explore.json', {
+    const { data: styles, status } = await axios.get('https://snazzymaps.com/explore.json', {
       params: {
-        key: '73a29a0d-d359-451c-a4e8-c9d9630eb46f'
+        key: '73a29a0d-d359-451c-a4e8-c9d9630eb46f',
       },
     });
 
     dispatch({
-      type: FETCH_MAPSTYLES,
+      type: FETCH_MAP_STYLES,
       statusText: 'success',
-      themes,
+      styles,
       status,
     });
   } catch (e) {
     dispatch({
-      type: FETCH_MAPSTYLES,
+      type: FETCH_MAP_STYLES,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
     });

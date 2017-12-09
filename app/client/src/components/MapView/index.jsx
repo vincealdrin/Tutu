@@ -2,6 +2,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GoogleMapReact from 'google-map-react';
+import ReactMapGL from 'react-map-gl';
+import { onChangeViewport } from 'redux-map-gl';
+import WebMercatorViewport from 'viewport-mercator-project';
 import shortid from 'shortid';
 import { fetchArticles, fetchFocusedInfo, removeFocusedInfo, updateMapState } from '../../modules/mapArticles';
 import SimpleMarker from './SimpleMarker';
@@ -22,11 +25,13 @@ const mapStateToProps = ({
     focusedInfo,
     focusedKey,
   },
+  map,
 }) => ({
+  // mapState: map.viewport.toJS(),
+  mapState,
   articles,
   clusters,
   fetchStatus,
-  mapState,
   relatedArticles,
   fetchFocusedInfoStatus,
   focusedInfo,
@@ -38,6 +43,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchFocusedInfo,
   removeFocusedInfo,
   updateMapState,
+  onChangeViewport,
 }, dispatch);
 
 const mapOption = {
@@ -66,24 +72,19 @@ class MapView extends PureComponent {
     center, zoom,
     bounds, marginBounds,
   }) => {
-    const {
-      ne, nw,
-      se, sw,
-    } = bounds;
-
-    const upperRight = nw.lat > 24.742282253941596 || nw.lng > 118.0181546020508;
-    const upperLeft = ne.lat > 24.742282253941596 || ne.lng > 123.7804837036133;
-    if (upperRight || upperLeft) {
-      // console.log(this.defaultCenter);
-      this.props.updateMapState({
-        lat: 14.413869136504943,
-        lng: 120.6329006958008,
-      }, zoom, bounds);
-    } else {
-      console.log('not lagpas');
-      this.props.updateMapState(center, zoom, bounds);
-      this.props.fetchArticles();
-    }
+    // const upperRight = nw.lat > 24.742282253941596 || nw.lng > 118.0181546020508;
+    // const upperLeft = ne.lat > 24.742282253941596 || ne.lng > 123.7804837036133;
+    // if (upperRight || upperLeft) {
+    //   // console.log(this.defaultCenter);
+    //   this.props.updateMapState({
+    //     lat: 14.413869136504943,
+    //     lng: 120.6329006958008,
+    //   }, zoom, bounds);
+    // } else {
+    //   console.log('not lagpas');
+    this.props.updateMapState(center, zoom, bounds);
+    this.props.fetchArticles();
+    // }
   }
 
   _onChildClick = (_, childProps) => {
@@ -109,9 +110,70 @@ class MapView extends PureComponent {
     const showFocused = !fetchFocusedInfoStatus.pending && fetchFocusedInfoStatus.success && focusedKey;
 
     return (
+    // <ReactMapGL
+    //   mapboxApiAccessToken="pk.eyJ1Ijoidm5jZWNhYiIsImEiOiJjajIydnljYXcwMDB3MzNsb2djODdoYTNhIn0.u4LykI1u90a98Fd7VJ77Vw"
+    //   {...mapState}
+    //   showZoomControls
+    //   width={1000}
+    //   height={1000}
+    //   onChangeViewport={(a) => {
+    //     this.props.onChangeViewport(a);
+    //   }}
+    // >
+    //   {showFocused ? (
+    //     <FocusedSimpleMarker
+    //       removeFocusedInfo={this.props.removeFocusedInfo}
+    //       status={fetchFocusedInfoStatus}
+    //       article={focusedInfo}
+    //       lng={focusedInfo.lng}
+    //       lat={focusedInfo.lat}
+    //     />
+    // ) : null}
+
+    //   {clusters.map(({
+    //       wx, wy, numPoints, points,
+    //     }) => {
+    //     if (numPoints === 1) {
+    //       const article = articles[points[0].id];
+    //       return article.locations.map(({ lng, lat }) => {
+    //         const isNotFocused = focusedKey !== `${article.url}-${lng}-${lat}`;
+
+    //         if (isNotFocused) {
+    //           return (
+    //             <SimpleMarker
+    //               key={shortid.generate()}
+    //               status={fetchFocusedInfoStatus}
+    //               title={article.title}
+    //               publishDate={article.publishDate}
+    //               source={article.source}
+    //               sourceUrl={article.sourceUrl}
+    //               url={article.url}
+    //               lng={lng}
+    //               lat={lat}
+    //             />
+    //           );
+    //         }
+
+    //         return null;
+    //       });
+    //     }
+
+    //     const ids = points.map((point) => point.id);
+    //     return (
+    //       <ClusterMarker
+    //         key={shortid.generate()}
+    //         clusters={clusters}
+    //         articles={articles.filter((_, i) => ids.includes(i))}
+    //         count={numPoints}
+    //         lng={wx}
+    //         lat={wy}
+    //       />
+    //     );
+    //   })}
+    // </ReactMapGL>
       <GoogleMapReact
         defaultZoom={7}
-        // defaultCenter={this.defaultCenter}
+      // defaultCenter={this.defaultCenter}
         bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
         options={mapOption}
         margin={[K_MARGIN_TOP, K_MARGIN_RIGHT, K_MARGIN_BOTTOM, K_MARGIN_LEFT]}
@@ -129,48 +191,48 @@ class MapView extends PureComponent {
             lng={focusedInfo.lng}
             lat={focusedInfo.lat}
           />
-        ) : null}
+      ) : null}
 
         {clusters.map(({
-              wx, wy, numPoints, points,
-            }) => {
-            if (numPoints === 1) {
-              const article = articles[points[0].id];
-              return article.locations.map(({ lng, lat }) => {
-                const isNotFocused = focusedKey !== `${article.url}-${lng}-${lat}`;
+            wx, wy, numPoints, points,
+          }) => {
+          if (numPoints === 1) {
+            const article = articles[points[0].id];
+            return article.locations.map(({ lng, lat }) => {
+              const isNotFocused = focusedKey !== `${article.url}-${lng}-${lat}`;
 
-                if (isNotFocused) {
-                  return (
-                    <SimpleMarker
-                      key={shortid.generate()}
-                      status={fetchFocusedInfoStatus}
-                      title={article.title}
-                      publishDate={article.publishDate}
-                      source={article.source}
-                      sourceUrl={article.sourceUrl}
-                      url={article.url}
-                      lng={lng}
-                      lat={lat}
-                    />
-                  );
-                }
+              if (isNotFocused) {
+                return (
+                  <SimpleMarker
+                    key={shortid.generate()}
+                    status={fetchFocusedInfoStatus}
+                    title={article.title}
+                    publishDate={article.publishDate}
+                    source={article.source}
+                    sourceUrl={article.sourceUrl}
+                    url={article.url}
+                    lng={lng}
+                    lat={lat}
+                  />
+                );
+              }
 
-                return null;
-              });
-            }
+              return null;
+            });
+          }
 
-            const ids = points.map((point) => point.id);
-            return (
-              <ClusterMarker
-                key={shortid.generate()}
-                clusters={clusters}
-                articles={articles.filter((_, i) => ids.includes(i))}
-                count={numPoints}
-                lng={wx}
-                lat={wy}
-              />
-            );
-          })}
+          const ids = points.map((point) => point.id);
+          return (
+            <ClusterMarker
+              key={shortid.generate()}
+              clusters={clusters}
+              articles={articles.filter((_, i) => ids.includes(i))}
+              count={numPoints}
+              lng={wx}
+              lat={wy}
+            />
+          );
+        })}
       </GoogleMapReact>
     );
   }

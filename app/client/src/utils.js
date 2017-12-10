@@ -22,14 +22,19 @@ export const mapOptions = (opt) => ({
 
 export const httpThunk = (type, cb) => async (dispatch, getState) => {
   dispatch({ statusText: 'pending', type });
-  const payload = await cb(getState);
+  const payload = await cb(getState, dispatch);
 
   if (payload instanceof Error) {
-    const { response } = payload;
+    const {
+      response = {
+        data: { msg: '' },
+        status: 500,
+      },
+    } = payload;
     dispatch({
       statusText: 'error',
-      status: response ? response.status : 500,
       errorMsg: response.data.msg,
+      status: response.status,
       type,
     });
   } else {

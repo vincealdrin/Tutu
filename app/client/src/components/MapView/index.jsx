@@ -12,9 +12,10 @@ import {
   updateMapState,
   fetchFocusedClusterInfo,
   updateReaction,
+  updateFilterMapState,
 } from '../../modules/mapArticles';
 import SimpleMarker from './SimpleMarker';
-import { HOVER_DISTANCE, MAX_ZOOM, MIN_ZOOM } from '../../constants';
+import { HOVER_DISTANCE, MAX_ZOOM, MIN_ZOOM, DEFAULT_ZOOM } from '../../constants';
 import ClusterMarker from './ClusterMarker';
 import ClusterModal from './ClusterModal';
 import SimpleModal from './SimpleModal';
@@ -53,6 +54,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchArticles,
   fetchFocusedInfo,
   removeFocused,
+  updateFilterMapState,
   updateMapState,
   onChangeViewport,
   fetchFocusedClusterInfo,
@@ -69,12 +71,18 @@ const mapOption = {
 };
 
 class MapView extends PureComponent {
-  _onChange = ({
-    center, zoom,
-    bounds,
-  }) => {
-    this.props.updateMapState(center, zoom, bounds);
-    this.props.fetchArticles();
+  componentWillMount() {
+    navigator.geolocation.getCurrentPosition(({ coords }) => {
+      this.props.updateMapState({
+        lat: coords.latitude,
+        lng: coords.longitude,
+      }, 11);
+    });
+  }
+
+  _onChange = ({ center, zoom, bounds }) => {
+    this.props.updateFilterMapState(center, zoom, bounds);
+    this.props.fetchArticles(center, zoom, bounds);
   }
 
   _onChildClick = (_, childProps) => {
@@ -99,7 +107,7 @@ class MapView extends PureComponent {
 
     return (
       <GoogleMapReact
-        defaultZoom={6}
+        defaultZoom={DEFAULT_ZOOM}
         bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
         options={mapOption}
         center={mapState.center}

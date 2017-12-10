@@ -21,10 +21,10 @@ import './styles.css';
 
 const mapStateToProps = ({
   filters,
-  mapArticles: { mapState },
+  mapArticles: { filterMapState },
 }) => ({
   filters,
-  mapState,
+  filterMapState,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -88,7 +88,7 @@ class Filter extends Component {
   render() {
     const {
       filters,
-      mapState: { center, zoom, bounds },
+      filterMapState: { center, zoom, bounds },
     } = this.props;
     const {
       keywords,

@@ -11,6 +11,7 @@ import {
   removeFocused,
   updateMapState,
   fetchFocusedClusterInfo,
+  updateReaction,
 } from '../../modules/mapArticles';
 import SimpleMarker from './SimpleMarker';
 import FocusedSimpleMarker from './FocusedSimpleMarker';
@@ -56,6 +57,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   updateMapState,
   onChangeViewport,
   fetchFocusedClusterInfo,
+  updateReaction,
 }, dispatch);
 
 const mapOption = {
@@ -195,11 +197,15 @@ class MapView extends PureComponent {
           open={focusedOn === 'cluster'}
           articles={focusedClusterInfo}
           removeFocused={this.props.removeFocused}
+          updateReaction={this.props.updateReaction}
+          status={clusterInfoStatus}
         />
         <SimpleModal
           open={focusedOn === 'simple'}
           article={focusedInfo}
           removeFocused={this.props.removeFocused}
+          updateReaction={this.props.updateReaction}
+          status={infoStatus}
         />
 
         {clusters.map(({

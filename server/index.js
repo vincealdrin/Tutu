@@ -65,7 +65,8 @@ initDb((conn) => {
       res.status(err.status || 500);
 
       res.json({
-        errors: {
+        msg: err.msg,
+        error: {
           message: err.message,
           error: err,
         },
@@ -78,10 +79,7 @@ initDb((conn) => {
   app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.json({
-      errors: {
-        message: err.message,
-        error: {},
-      },
+      msg: err.msg,
     });
   });
 

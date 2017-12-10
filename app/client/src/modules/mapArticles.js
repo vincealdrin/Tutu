@@ -1,7 +1,7 @@
 import axios from 'axios';
 import supercluster from 'points-cluster';
 import flattenDeep from 'lodash/flattenDeep';
-import { crudStatus, updateCrudStatus } from '../utils';
+import { crudStatus, updateCrudStatus, errPayload, httpThunk } from '../utils';
 
 export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
 export const FETCH_FOCUSED_INFO = 'mapArticles/FETCH_FOCUSED_INFO';
@@ -139,7 +139,7 @@ export const fetchArticles = () => async (dispatch, getState) => {
     const cluster = supercluster(coords, {
       minZoom: 6,
       maxZoom: 16,
-      radius: 30,
+      radius: 40,
     });
     const clusters = cluster({ center, zoom, bounds });
 
@@ -156,6 +156,7 @@ export const fetchArticles = () => async (dispatch, getState) => {
       type: FETCH_ARTICLES,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
     });
   }
 };
@@ -185,6 +186,7 @@ export const fetchFocusedInfo = (article) => async (dispatch, getState) => {
       type: FETCH_FOCUSED_INFO,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
     });
   }
 };
@@ -214,35 +216,27 @@ export const fetchFocusedClusterInfo = (articles) => async (dispatch, getState) 
       type: FETCH_CLUSTER_INFO,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
     });
   }
 };
 
-export const updateReaction = (url, reaction) => async (dispatch) => {
+export const updateReaction = (url, reaction) => httpThunk(UPDATE_REACTION, async () => {
   try {
-    dispatch({ type: UPDATE_REACTION, statusText: 'pending' });
     const { status } = await axios.put('/articles/reactions', {
-      data: {
-        url,
-        reaction,
-      },
+      url,
+      reaction,
     });
 
-    dispatch({
-      type: UPDATE_REACTION,
-      statusText: 'success',
+    return {
       url,
       reaction,
       status,
-    });
+    };
   } catch (e) {
-    dispatch({
-      type: UPDATE_REACTION,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-    });
+    return e;
   }
-};
+});
 
 export const removeFocused = () => ({
   type: REMOVE_FOCUSED,

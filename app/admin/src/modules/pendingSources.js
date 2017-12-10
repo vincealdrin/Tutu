@@ -69,6 +69,7 @@ export const fetchSources = () => async (dispatch) => {
       type: FETCH_PENDING_SOURCES,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
     });
   }
 };
@@ -89,6 +90,7 @@ export const createSource = (source) => async (dispatch) => {
       type: CREATE_PENDING_SOURCE,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
     });
   }
 };
@@ -111,6 +113,7 @@ export const updateSource = (sourceId, source, isIdChanged = false) => async (di
       type: UPDATE_PENDING_SOURCE,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
     });
   }
 };
@@ -131,6 +134,7 @@ export const deleteSources = (ids) => async (dispatch) => {
       type: DELETE_PENDING_SOURCES,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
     });
   }
 };

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { updateCrudStatus, crudStatus } from '../utils';
+import { updateCrudStatus, crudStatus, errPayload } from '../utils';
 
 export const FETCH_ARTICLES = 'articles/FETCH_ARTICLES';
 export const CREATE_ARTICLE = 'articles/CREATE_ARTICLE';
@@ -66,11 +66,7 @@ export const fetchArticles = () => async (dispatch) => {
       articles,
     });
   } catch (e) {
-    dispatch({
-      type: FETCH_ARTICLES,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-    });
+    dispatch(errPayload(FETCH_ARTICLES, e));
   }
 };
 
@@ -86,11 +82,7 @@ export const createArticle = (article) => async (dispatch) => {
       newArticle: { ...article, id },
     });
   } catch (e) {
-    dispatch({
-      type: CREATE_ARTICLE,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-    });
+    dispatch(errPayload(CREATE_ARTICLE, e));
   }
 };
 
@@ -108,11 +100,7 @@ export const updateArticle = (articleId, article, isIdChanged = false) => async 
       updatedArticle,
     });
   } catch (e) {
-    dispatch({
-      type: UPDATE_ARTICLE,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-    });
+    dispatch(errPayload(UPDATE_ARTICLE, e));
   }
 };
 
@@ -128,10 +116,6 @@ export const deleteArticles = (ids) => async (dispatch) => {
       deletedIds: ids,
     });
   } catch (e) {
-    dispatch({
-      type: DELETE_ARTICLES,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-    });
+    dispatch(errPayload(DELETE_ARTICLES, e));
   }
 };

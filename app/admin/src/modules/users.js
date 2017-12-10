@@ -84,6 +84,7 @@ export const fetchUsers = (page, limit, filter, search) => async (dispatch) => {
       type: FETCH_USERS,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
     });
   }
 };
@@ -104,6 +105,7 @@ export const createUser = (user) => async (dispatch) => {
       type: CREATE_USER,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
     });
   }
 };
@@ -126,6 +128,7 @@ export const updateUser = (userId, user, isIdChanged = false) => async (dispatch
       type: UPDATE_USER,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
     });
   }
 };
@@ -146,6 +149,7 @@ export const deleteUsers = (ids) => async (dispatch) => {
       type: DELETE_USERS,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
     });
   }
 };

@@ -354,14 +354,24 @@ module.exports = (conn, io) => {
   router.put('/reactions', async (req, res, next) => {
     try {
       const { url, reaction } = req.body;
+
+      if (!/happy|sad|angry|amused|afraid|inspired/.test(reaction)) {
+        next({ msg: 'Invalid reaction', status: 400 });
+      }
+
       const uuid = await r.uuid(url).run(conn);
       const ip = requestIp.getClientIp(req);
-      const alreadyReacted = await r.table('articles').get(uuid)('reactions')
-        .contains((react) => react('ip').eq(ip))
+      const existingReact = await r.table('articles').get(uuid)('reactions')
+        .filter((react) => react('ip').eq(ip))
+        .nth(0)
+        .default(null)
         .run(conn);
 
-      if (alreadyReacted) {
-        return res.status(400).end();
+      if (existingReact) {
+        return next({
+          msg: `You already reacted "${existingReact.reaction}"`,
+          status: 400,
+        });
       }
 
       await r.table('articles').get(uuid).update({
@@ -373,7 +383,11 @@ module.exports = (conn, io) => {
 
       res.status(204).end();
     } catch (e) {
-      next(e);
+      next({
+        msg: 'URL not found',
+        status: 404,
+        ...e,
+      });
     }
   });
 

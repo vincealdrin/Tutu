@@ -3,6 +3,7 @@ export const updateCrudStatus = (action) => ({
   success: action.statusText === 'success',
   error: action.statusText === 'error',
   status: action.status,
+  errorMsg: action.errorMsg,
 });
 
 export const crudStatus = {
@@ -10,4 +11,12 @@ export const crudStatus = {
   success: false,
   error: false,
   status: null,
+  errorMsg: '',
 };
+
+export const errPayload = (type, e) => ({
+  statusText: 'error',
+  status: e.response ? e.response.status : 500,
+  errorMsg: e.response.data.msg,
+  type,
+});

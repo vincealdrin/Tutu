@@ -56,6 +56,7 @@ class RecentArticles extends Component {
 
                     <Grid.Column width={10} className="article-info">
                       <Header as="h4">{article.title}</Header>
+                      <span className="source-name">{article.source}</span>
                       <p> {article.summary[0]} </p>
                       <Button onClick={() => this.props.fetchFocusedInfo(article)} content="focus" />
                     </Grid.Column>

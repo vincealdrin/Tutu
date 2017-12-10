@@ -21,16 +21,17 @@ class SimpleMarker extends PureComponent {
     return (
       <Tooltip
         position="right-start"
+        className="this-tooltip"
         distance={15}
         html={
           <div>
-            <a href={url}>{title}</a>
+            <a href={url} target="_blank">{title}</a>
             <p>{new Date(publishDate).toLocaleDateString()}</p>
           </div>
         }
-        open={$hover}
         arrow
         sticky
+        interactive
       >
         <Icon
           color="red"

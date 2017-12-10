@@ -25,19 +25,34 @@
   position: absolute;
   bottom: 1px;
   left: -13.5px;
+  transition: all 0.1s ease-in-out;
+}
+
+.tippy-tooltip {
+  top: -2rem;
+  left: 1.4rem;
+}
+
+.tippy-tooltip {
+  background: #fff;
+  box-shadow: 0 0 3px #94989b;
+}
+
+.arrow-regular {
+  border-right-color: #fff !important;
 }
 
 .cluster-marker-container {
   position: absolute;
-  top: -20px;
-  left: -20px;
+  top: -3rem;
+  left: -3rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 20px;
-  height: 20px;
+  width: 3rem;
+  height: 3rem;
   cursor: pointer;
-  background-color: darksalmon;
+  /* background-color: darksalmon; */
   border-radius: 50px;
 }
 
@@ -101,6 +116,7 @@
 .cluster-article-container {
   display: flex !important;
   align-items: center;
+  text-align: left;
 }
 
 .article-title-container {

@@ -1,7 +1,8 @@
 import axios from 'axios';
 import supercluster from 'points-cluster';
 import flattenDeep from 'lodash/flattenDeep';
-import { crudStatus, updateCrudStatus, errPayload, httpThunk } from '../utils';
+import { crudStatus, updateCrudStatus, httpThunk } from '../utils';
+import { MIN_ZOOM, MAX_ZOOM } from '../constants';
 
 export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
 export const FETCH_FOCUSED_INFO = 'mapArticles/FETCH_FOCUSED_INFO';
@@ -14,10 +15,10 @@ const initialState = {
   articles: [],
   clusters: [],
   totalCount: 0,
-  fetchArtsStatus: crudStatus,
-  fetchFocusedInfoStatus: crudStatus,
-  fetchFocusedClusterInfoStatus: crudStatus,
-  updateReactionStatus: crudStatus,
+  articlesStatus: crudStatus,
+  infoStatus: crudStatus,
+  clusterStatus: crudStatus,
+  reactionStatus: crudStatus,
   focusedInfo: {},
   focusedClusterInfo: [],
   focusedOn: '',
@@ -43,7 +44,7 @@ export default (state = initialState, action) => {
         ...state,
         articles: action.articles || state.articles,
         clusters: action.clusters || state.clusters,
-        fetchArtStatus: updateCrudStatus(action),
+        articlesStatus: updateCrudStatus(action),
       };
     case UPDATE_MAP_STATE:
       return {
@@ -55,7 +56,7 @@ export default (state = initialState, action) => {
         ...state,
         focusedInfo: action.focusedInfo || state.focusedInfo,
         focusedOn: 'simple',
-        fetchFocusedInfoStatus: updateCrudStatus(action),
+        infoStatus: updateCrudStatus(action),
         focusedClusterInfo: [],
       };
     case FETCH_CLUSTER_INFO:
@@ -63,7 +64,7 @@ export default (state = initialState, action) => {
         ...state,
         focusedClusterInfo: action.focusedClusterInfo || state.focusedClusterInfo,
         focusedOn: 'cluster',
-        fetchFocusedClusterInfoStatus: updateCrudStatus(action),
+        clusterStatus: updateCrudStatus(action),
         focusedInfo: {},
         isFocused: true,
       };
@@ -86,16 +87,14 @@ export default (state = initialState, action) => {
           }
           return article;
         }),
-        updateReactionStatus: updateCrudStatus(action),
+        reactionStatus: updateCrudStatus(action),
       };
     default:
       return state;
   }
 };
 
-export const fetchArticles = () => async (dispatch, getState) => {
-  dispatch({ type: FETCH_ARTICLES, statusText: 'pending' });
-
+export const fetchArticles = () => httpThunk(FETCH_ARTICLES, async (getState) => {
   try {
     const { filters, mapArticles: { mapState } } = getState();
     const {
@@ -129,7 +128,6 @@ export const fetchArticles = () => async (dispatch, getState) => {
       },
     });
 
-
     const coords = flattenDeep(articles.map(({ locations }, index) =>
       locations.map(({ lng, lat }) => ({
         id: index,
@@ -137,33 +135,25 @@ export const fetchArticles = () => async (dispatch, getState) => {
         lat,
       }))));
     const cluster = supercluster(coords, {
-      minZoom: 6,
-      maxZoom: 16,
+      minZoom: MIN_ZOOM,
+      maxZoom: MAX_ZOOM,
       radius: 40,
     });
     const clusters = cluster({ center, zoom, bounds });
 
-    dispatch({
-      type: FETCH_ARTICLES,
+    return {
       totalCount: parseInt(headers['x-total-count'], 10),
-      statusText: 'success',
       clusters,
       articles,
       status,
-    });
+    };
   } catch (e) {
-    dispatch({
-      type: FETCH_ARTICLES,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
-    });
+    return e;
   }
-};
+});
 
-export const fetchFocusedInfo = (article) => async (dispatch, getState) => {
+export const fetchFocusedInfo = (article) => httpThunk(FETCH_FOCUSED_INFO, async (getState) => {
   try {
-    dispatch({ type: FETCH_FOCUSED_INFO, statusText: 'pending' });
     const { filters: { categories } } = getState();
     const { data: focusedInfo, status } = await axios.get('/articles/info', {
       params: {
@@ -172,54 +162,40 @@ export const fetchFocusedInfo = (article) => async (dispatch, getState) => {
       },
     });
 
-    dispatch({
-      type: FETCH_FOCUSED_INFO,
-      statusText: 'success',
+    return {
       focusedInfo: {
         ...focusedInfo,
         ...article,
       },
       status,
-    });
+    };
   } catch (e) {
-    dispatch({
-      type: FETCH_FOCUSED_INFO,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
-    });
+    return e;
   }
-};
+});
 
-export const fetchFocusedClusterInfo = (articles) => async (dispatch, getState) => {
-  try {
-    dispatch({ type: FETCH_CLUSTER_INFO, statusText: 'pending' });
-    const { filters: { categories } } = getState();
-    const { data: focusedClusterInfo, status } = await axios.get('/articles/clusterInfo', {
-      params: {
-        urls: articles.map((article) => article.url).join(),
-        catsFilter: categories.length,
-      },
-    });
+export const fetchFocusedClusterInfo = (articles) =>
+  httpThunk(FETCH_CLUSTER_INFO, async (getState) => {
+    try {
+      const { filters: { categories } } = getState();
+      const { data: focusedClusterInfo, status } = await axios.get('/articles/clusterInfo', {
+        params: {
+          urls: articles.map((article) => article.url).join(),
+          catsFilter: categories.length,
+        },
+      });
 
-    dispatch({
-      type: FETCH_CLUSTER_INFO,
-      statusText: 'success',
-      focusedClusterInfo: articles.map((article, i) => ({
-        ...article,
-        ...focusedClusterInfo[i],
-      })),
-      status,
-    });
-  } catch (e) {
-    dispatch({
-      type: FETCH_CLUSTER_INFO,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
-    });
-  }
-};
+      return {
+        focusedClusterInfo: articles.map((article, i) => ({
+          ...article,
+          ...focusedClusterInfo[i],
+        })),
+        status,
+      };
+    } catch (e) {
+      return e;
+    }
+  });
 
 export const updateReaction = (url, reaction) => httpThunk(UPDATE_REACTION, async () => {
   try {

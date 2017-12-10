@@ -20,13 +20,6 @@ export const mapOptions = (opt) => ({
   value: opt,
 });
 
-export const errPayload = (type, e) => ({
-  statusText: 'error',
-  status: e.response ? e.response.status : 500,
-  errorMsg: e.response.data.msg,
-  type,
-});
-
 export const httpThunk = (type, cb) => async (dispatch, getState) => {
   dispatch({ statusText: 'pending', type });
   const payload = await cb(getState);

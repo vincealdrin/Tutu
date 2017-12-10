@@ -14,9 +14,23 @@ export const crudStatus = {
   errorMsg: '',
 };
 
-export const errPayload = (type, e) => ({
-  statusText: 'error',
-  status: e.response ? e.response.status : 500,
-  errorMsg: e.response.data.msg,
-  type,
-});
+export const httpThunk = (type, cb) => async (dispatch, getState) => {
+  dispatch({ statusText: 'pending', type });
+  const payload = await cb(getState);
+
+  if (payload instanceof Error) {
+    const { response } = payload;
+    dispatch({
+      statusText: 'error',
+      status: response ? response.status : 500,
+      errorMsg: response.data.msg,
+      type,
+    });
+  } else {
+    dispatch({
+      ...payload,
+      statusText: 'success',
+      type,
+    });
+  }
+};

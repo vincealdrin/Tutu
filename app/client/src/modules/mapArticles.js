@@ -34,7 +34,6 @@ const initialState = {
       lat: 12.238496434320027,
       lng: 122.11708496093752,
     },
-    bounds: {},
   },
 };
 let source;

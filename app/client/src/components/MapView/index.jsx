@@ -110,6 +110,7 @@ class MapView extends PureComponent {
         defaultZoom={DEFAULT_ZOOM}
         bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
         options={mapOption}
+        // defaultCenter={mapState.center}
         center={mapState.center}
         zoom={mapState.zoom}
         hoverDistance={HOVER_DISTANCE}

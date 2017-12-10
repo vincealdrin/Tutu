@@ -112,9 +112,9 @@ class Filter extends Component {
             options={keywords.map(mapOptions)}
             value={keywords}
             onChange={(_, { value }) => {
-                this.props.changeKeywordsFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
+              this.props.changeKeywordsFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
             search
             selection
             fluid

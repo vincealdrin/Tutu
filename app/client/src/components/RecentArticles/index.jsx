@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Grid, Image, Header, Divider, Label, Segment } from 'semantic-ui-react';
+import { Grid, Image, Header, Divider, Label, Segment, Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
 import { addRecentArticle, fetchRecentArticles } from '../../modules/recentArticles';
+import { fetchFocusedInfo } from '../../modules/mapArticles';
 import './styles.css';
 
 const mapStateToProps = ({
@@ -19,6 +20,7 @@ const mapStateToProps = ({
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   addRecentArticle,
   fetchRecentArticles,
+  fetchFocusedInfo,
 }, dispatch);
 
 class RecentArticles extends Component {
@@ -55,9 +57,7 @@ class RecentArticles extends Component {
                     <Grid.Column width={10} className="article-info">
                       <Header as="h4">{article.title}</Header>
                       <p> {article.summary[0]} </p>
-                      {article.categories.map((category) => (
-                        <Label key={shortid.generate()} size="small" style={{ margin: '0.14285714em' }}>{category}</Label>
-                      ))}
+                      <Button onClick={() => this.props.fetchFocusedInfo(article)} content="focus" />
                     </Grid.Column>
                   </Grid.Row>
                 </Grid>

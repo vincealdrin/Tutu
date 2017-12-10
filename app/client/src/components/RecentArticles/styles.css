@@ -5,6 +5,12 @@
   overflow-y: auto;
 }
 
+.source-name {
+  padding: 1rem 0 !important;
+  font-size: 0.86rem;
+  color: #767676;
+}
+
 .row { align-items: flex-start !important; }
 .article-item { padding: 0 !important; }
 

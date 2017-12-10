@@ -54,6 +54,7 @@ class RecentArticles extends Component {
 
                     <Grid.Column width={10} className="article-info">
                       <Header as="h4">{article.title}</Header>
+                      <span className="source-name">{article.source}</span>
                       <p> {article.summary[0]} </p>
                       {article.categories.map((category) => (
                         <Label key={shortid.generate()} size="small" style={{ margin: '0.14285714em' }}>{category}</Label>

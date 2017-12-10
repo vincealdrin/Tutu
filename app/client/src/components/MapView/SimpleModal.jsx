@@ -64,6 +64,26 @@ class SimpleModal extends Component {
             onClick={() => updateReaction(url, 'happy')}
             content="happy"
           />
+          <Button
+            onClick={() => updateReaction(url, 'sad')}
+            content="sad"
+          />
+          <Button
+            onClick={() => updateReaction(url, 'angry')}
+            content="angry"
+          />
+          <Button
+            onClick={() => updateReaction(url, 'amused')}
+            content="amused"
+          />
+          <Button
+            onClick={() => updateReaction(url, 'afraid')}
+            content="afraid"
+          />
+          <Button
+            onClick={() => updateReaction(url, 'inspired')}
+            content="inspired"
+          />
         </Modal.Content>
       </Modal>
     );

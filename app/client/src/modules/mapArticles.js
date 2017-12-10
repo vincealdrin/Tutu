@@ -74,19 +74,43 @@ export default (state = initialState, action) => {
         focusedOn: '',
         focusedInfo: {},
         focusedClusterInfo: [],
+        infoStatus: crudStatus,
+        clusterStatus: crudStatus,
+        reactionStatus: crudStatus,
       };
     case UPDATE_REACTION:
       return {
         ...state,
-        articles: state.articles.map((article) => {
-          if (article.url === action.url) {
-            return {
-              ...article,
-              reactions: {},
-            };
-          }
-          return article;
-        }),
+        focusedInfo: state.focusedOn === 'simple' ? {
+          ...state.focusedInfo,
+          reactions: state.focusedInfo.reactions.map((reaction) => {
+            if (reaction.group === action.reaction) {
+              return {
+                group: reaction.group,
+                reduction: reaction.reduction + 1,
+              };
+            }
+            return reaction;
+          }),
+        } : state.focusedInfo,
+        focusedClusterInfo: state.focusedOn === 'cluster' ?
+          state.focusedClusterInfo.map((article) => {
+            if (article.url === action.url) {
+              return {
+                ...article,
+                reactions: article.reactions.map((reaction) => {
+                  if (reaction.group === action.reaction) {
+                    return {
+                      group: reaction.group,
+                      reduction: reaction.reduction + 1,
+                    };
+                  }
+                  return reaction;
+                }),
+              };
+            }
+            return article;
+          }) : state.focusedClusterInfo,
         reactionStatus: updateCrudStatus(action),
       };
     default:

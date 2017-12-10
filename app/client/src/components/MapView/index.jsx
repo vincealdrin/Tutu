@@ -2,8 +2,6 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GoogleMapReact from 'google-map-react';
-import ReactMapGL from 'react-map-gl';
-import { onChangeViewport } from 'redux-map-gl';
 import shortid from 'shortid';
 import {
   fetchArticles,
@@ -24,13 +22,13 @@ import './styles.css';
 
 const mapStateToProps = ({
   mapArticles: {
+    clusterStatus,
     articles,
     clusters,
     fetchStatus,
     mapState,
     relatedArticles,
     infoStatus,
-    clusterStatus: clusterInfoStatus,
     focusedInfo,
     focusedClusterInfo,
     focusedOn,
@@ -44,7 +42,7 @@ const mapStateToProps = ({
   fetchStatus,
   relatedArticles,
   infoStatus,
-  clusterInfoStatus,
+  clusterStatus,
   focusedInfo,
   focusedClusterInfo,
   focusedOn,
@@ -56,7 +54,6 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   removeFocused,
   updateFilterMapState,
   updateMapState,
-  onChangeViewport,
   fetchFocusedClusterInfo,
   updateReaction,
 }, dispatch);
@@ -99,7 +96,7 @@ class MapView extends PureComponent {
       clusters,
       mapState,
       infoStatus,
-      clusterInfoStatus,
+      clusterStatus,
       focusedClusterInfo,
       focusedOn,
       focusedInfo,
@@ -122,7 +119,7 @@ class MapView extends PureComponent {
           articles={focusedClusterInfo}
           removeFocused={this.props.removeFocused}
           updateReaction={this.props.updateReaction}
-          status={clusterInfoStatus}
+          status={clusterStatus}
         />
         <SimpleModal
           open={focusedOn === 'simple'}
@@ -162,6 +159,7 @@ class MapView extends PureComponent {
             />
           );
         })}
+
       </GoogleMapReact>
     );
   }

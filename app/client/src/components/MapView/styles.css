@@ -44,13 +44,13 @@
 
 .cluster-marker-container {
   position: absolute;
-  top: -3rem;
-  left: -3rem;
+  top: -21px;
+  left: -21px;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 3rem;
-  height: 3rem;
+  width: 42px;
+  height: 42px;
   cursor: pointer;
   /* background-color: darksalmon; */
   border-radius: 50px;

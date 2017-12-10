@@ -1,13 +1,14 @@
 import React, { PureComponent } from 'react';
 import { Label, List, Popup, Header, Icon, Image, Button, Accordion } from 'semantic-ui-react';
 import shortid from 'shortid';
-import upperFirst from 'lodash/upperFirst';
 import { Tooltip } from 'react-tippy';
 import Reactions from './Reactions';
+import { Motion, spring } from 'react-motion';
 import MarkerAccordion from './MarkerAccordion';
-import { fetchRelatedArticles } from '../../modules/mapArticles';
 import './styles.css';
 
+const config = { stiffness: 140, damping: 14 };
+const toCSS = (translateX) => ({ transform: `translateX: ${translateX}px` });
 
 class SimpleMarker extends PureComponent {
   render() {
@@ -22,87 +23,43 @@ class SimpleMarker extends PureComponent {
       <Tooltip
         position="right-start"
         className="this-tooltip"
-        distance={15}
         html={
           <div>
             <a href={url} target="_blank">{title}</a>
             <p>{new Date(publishDate).toLocaleDateString()}</p>
           </div>
         }
+        open={$hover}
         arrow
         sticky
-        interactive
       >
-        <Icon
-          color="red"
-          name="marker"
-          size={$hover ? 'huge' : 'big'}
-          className={`marker ${$hover ? 'hovered' : ''}`}
-        />
+        <Motion
+          defaultStyle={{
+            top: 220,
+            x: 0,
+          }}
+          style={{
+            top: spring(0, config),
+            x: spring(10, config),
+          }}
+        >
+          {(v) => {
+            console.log(v);
+            return (
+              <div>
+                {v.x}
+                <Icon
+                  color="red"
+                  name="marker"
+                  size={$hover ? 'huge' : 'big'}
+                  className={`marker ${$hover ? 'hovered' : ''}`}
+                  style={toCSS(v.translateX)}
+                />
+              </div>
+            );
+          }}
+        </Motion>
       </Tooltip>
-    // <Popup
-    //   position="bottom left"
-    //   className="popup-container"
-    //   trigger={
-    //     <Tooltip
-    //       position="left-start"
-    //       distance={15}
-    //       html={
-    //         <div onMouseEnter={this.openPopup} onMouseLeave={this.closePopup}>
-    //           {showFullInfo ? (
-    //             'awe'
-    //           ) : (
-    //             'hi'
-    //           )}
-    //         </div>
-    //     }
-    //       open={$hover || showFullInfo}
-    //       arrow
-    //       sticky
-    //     >
-    //       <Icon
-    //         color="red"
-    //         name="marker"
-    //         size={$hover || showFullInfo ? 'huge' : 'big'}
-    //         className={`marker ${$hover || showFullInfo ? 'hovered' : ''}`}
-    //       />
-    //     </Tooltip>
-    //   }
-    //   onOpen={() => {
-    //   // this.fetchRelated();
-    // }}
-    //   open={showFullInfo}
-    // >
-    //   <Label as="a" href={`http://${sourceUrl}`} ribbon color={colors[Math.floor(Math.random() * colors.length)]} target="_blank" className="news-label news-marker-tooltip">{source}</Label>
-    //   <div className="image-container">
-    //     <Image
-    //       src={topImageUrl}
-    //       shape="rounded"
-    //       className="simple-marker-image"
-    //     />
-    //     <Button color="blue" content="Read More" className="read-more-button" circular href={url} target="_blank" />
-    //   </div>
-
-    //   <Header as="a" href={url} target="_blank" color="blue">{title}</Header>
-
-    //   <div className="author-date-container">
-    //     <div className="author-name">
-    //       {authors.join(', ')} | {new Date(publishDate).toDateString()}
-    //     </div>
-    //   </div>
-
-    //   <MarkerAccordion
-    //     summary={shortSummary}
-    //     categories={categories}
-    //     keywords={keywords}
-    //     sentiment={sentiment}
-    //     organizations={organizations}
-    //     people={people}
-    //   />
-
-    //   <Reactions />
-
-    // </Popup>
     );
   }
 }

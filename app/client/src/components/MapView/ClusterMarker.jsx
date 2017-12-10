@@ -12,10 +12,9 @@ class ClusterMarker extends Component {
     return (
       <Tooltip
         position="right-start"
-        distance={15}
         html={
           <List divided relaxed className="cluster-list-container">
-            {articles.map((article) => (
+            {articles.slice(0, 5).map((article) => (
               <List.Item key={shortid.generate()} className="cluster-article-container">
                 <div className="article-title-container">
                   <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
@@ -25,8 +24,10 @@ class ClusterMarker extends Component {
             ))}
           </List>
         }
-        interactive
-        arrow
+        open={$hover}
+        // hmmm di maibaba ung position ng arrow eto na muna
+        // arrow
+        animateFill={false}
         sticky
       >
         <div className="cluster-marker-container" >

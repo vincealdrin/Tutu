@@ -44,7 +44,7 @@ class SimpleMarker extends PureComponent {
           }}
         >
           {(v) => {
-            console.log(v);
+            console.log();
             return (
               <div>
                 {v.x}

@@ -157,15 +157,6 @@
   left: -2rem;
 }
 
-.news-source-summary {
-  width: 60%;
-}
-
-.news-source-summary,
-.news-source-tags {
-  padding: 1rem;
-}
-
 .sentiment-list {
   display: inline;
   list-style: none;
@@ -216,4 +207,9 @@
   position: absolute;
   right: 3%;
   bottom: 4%;
+}
+
+.extras {
+  display: flex;
+  justify-content: space-between;
 }

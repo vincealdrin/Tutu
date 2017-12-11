@@ -3,6 +3,8 @@ import { Header, Grid, Image, Icon, Label } from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
 import './styles.css';
 
+const config = { stiffness: 140, damping: 14 };
+const toCSS = (translateX) => ({ transform: `translateX: ${translateX}px` });
 
 class SimpleMarker extends PureComponent {
   render() {
@@ -36,16 +38,36 @@ class SimpleMarker extends PureComponent {
             <Label className="see-more-button simple-marker-see-more" attached="bottom">Click marker to view more details</Label>
           </div>
         }
+        open={$hover}
         arrow
         sticky
-        interactive
       >
-        <Icon
-          color="red"
-          name="marker"
-          size={$hover ? 'huge' : 'big'}
-          className={`marker ${$hover ? 'hovered' : ''}`}
-        />
+        <Motion
+          defaultStyle={{
+            top: 220,
+            x: 0,
+          }}
+          style={{
+            top: spring(0, config),
+            x: spring(10, config),
+          }}
+        >
+          {(v) => {
+            console.log();
+            return (
+              <div>
+                {v.x}
+                <Icon
+                  color="red"
+                  name="marker"
+                  size={$hover ? 'huge' : 'big'}
+                  className={`marker ${$hover ? 'hovered' : ''}`}
+                  style={toCSS(v.translateX)}
+                />
+              </div>
+            );
+          }}
+        </Motion>
       </Tooltip>
     );
   }

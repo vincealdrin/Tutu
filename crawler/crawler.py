@@ -7,7 +7,6 @@ import time
 import re
 import langdetect
 from random import randrange
-import rethinkdb as r
 from urllib.parse import urldefrag, urlparse
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv

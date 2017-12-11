@@ -19,6 +19,11 @@ classes = [
     'Calamity', 'Nation', 'Education', 'Food'
 ]
 
+def article_extraction(url):
+    return text_client3.Extract({
+        'url': url
+    })['article']
+
 def categorize(url):
     categories = []
     category1 = text_client.UnsupervisedClassify({ 'url': url, 'class': classes[:5] })

@@ -18,7 +18,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchRecentArticles,
 }, dispatch);
 
-const socket = io.connect('http://localhost:5000/client');
+const socket = io.connect('http://localhost:3000/client');
 
 class TestComponent extends Component {
   componentDidMount() {

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { updateCrudStatus, crudStatus, errPayload } from '../utils';
+import { updateCrudStatus, crudStatus } from '../utils';
 
 export const FETCH_ARTICLES = 'articles/FETCH_ARTICLES';
 export const CREATE_ARTICLE = 'articles/CREATE_ARTICLE';
@@ -66,7 +66,12 @@ export const fetchArticles = () => async (dispatch) => {
       articles,
     });
   } catch (e) {
-    dispatch(errPayload(FETCH_ARTICLES, e));
+    dispatch({
+      statusText: 'error',
+      status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
+      type: FETCH_ARTICLES,
+    });
   }
 };
 
@@ -82,7 +87,12 @@ export const createArticle = (article) => async (dispatch) => {
       newArticle: { ...article, id },
     });
   } catch (e) {
-    dispatch(errPayload(CREATE_ARTICLE, e));
+    dispatch({
+      statusText: 'error',
+      status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
+      type: CREATE_ARTICLE,
+    });
   }
 };
 
@@ -100,7 +110,12 @@ export const updateArticle = (articleId, article, isIdChanged = false) => async 
       updatedArticle,
     });
   } catch (e) {
-    dispatch(errPayload(UPDATE_ARTICLE, e));
+    dispatch({
+      statusText: 'error',
+      status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
+      type: UPDATE_ARTICLE,
+    });
   }
 };
 
@@ -116,6 +131,11 @@ export const deleteArticles = (ids) => async (dispatch) => {
       deletedIds: ids,
     });
   } catch (e) {
-    dispatch(errPayload(DELETE_ARTICLES, e));
+    dispatch({
+      statusText: 'error',
+      status: e.response ? e.response.status : 500,
+      errorMsg: e.response.data.msg,
+      type: DELETE_ARTICLES,
+    });
   }
 };

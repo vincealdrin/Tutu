@@ -2,7 +2,7 @@ import axios from 'axios';
 import supercluster from 'points-cluster';
 import flattenDeep from 'lodash/flattenDeep';
 import { crudStatus, updateCrudStatus, httpThunk } from '../utils';
-import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM } from '../constants';
+import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM, DEFAULT_CENTER } from '../constants';
 
 export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
 export const FETCH_FOCUSED_INFO = 'mapArticles/FETCH_FOCUSED_INFO';
@@ -30,10 +30,7 @@ const initialState = {
   },
   mapState: {
     zoom: DEFAULT_ZOOM,
-    center: {
-      lat: 12.238496434320027,
-      lng: 122.11708496093752,
-    },
+    center: DEFAULT_CENTER,
   },
 };
 let source;
@@ -192,7 +189,7 @@ export const fetchArticles = (center, zoom, bounds) =>
       const cluster = supercluster(coords, {
         minZoom: MIN_ZOOM,
         maxZoom: MAX_ZOOM,
-        radius: 40,
+        radius: 42,
       });
       const clusters = cluster({ center, zoom, bounds });
 

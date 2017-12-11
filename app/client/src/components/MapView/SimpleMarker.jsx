@@ -1,18 +1,15 @@
 import React, { PureComponent } from 'react';
-import { Label, List, Popup, Header, Icon, Image, Button, Accordion } from 'semantic-ui-react';
-import shortid from 'shortid';
-import upperFirst from 'lodash/upperFirst';
+import { Header, Grid, Image, Icon, Label } from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
-import Reactions from './Reactions';
-import MarkerAccordion from './MarkerAccordion';
-import { fetchRelatedArticles } from '../../modules/mapArticles';
 import './styles.css';
 
 
 class SimpleMarker extends PureComponent {
   render() {
     const {
+      topImageUrl,
       title,
+      source,
       url,
       publishDate,
       $hover,
@@ -21,12 +18,22 @@ class SimpleMarker extends PureComponent {
     return (
       <Tooltip
         position="right-start"
-        className="this-tooltip"
         distance={15}
         html={
-          <div>
-            <a href={url} target="_blank">{title}</a>
-            <p>{new Date(publishDate).toLocaleDateString()}</p>
+          <div className="simple-marker">
+            <Grid>
+              <Grid.Row columns={2}>
+                <Grid.Column width={7}>
+                  <Image src={topImageUrl} />
+                </Grid.Column>
+                <Grid.Column width={9} className="marker-title-column">
+                  <Header as="a" color="blue" href={url} target="_blank" className="simple-marker-title">{title}</Header>
+                  <p className="article-date">{new Date(publishDate).toDateString()}</p>
+                  <Label as="a" circular className="source-label">{source}</Label>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+            <Label className="see-more-button simple-marker-see-more" attached="bottom">Click marker to view more details</Label>
           </div>
         }
         arrow
@@ -40,69 +47,6 @@ class SimpleMarker extends PureComponent {
           className={`marker ${$hover ? 'hovered' : ''}`}
         />
       </Tooltip>
-    // <Popup
-    //   position="bottom left"
-    //   className="popup-container"
-    //   trigger={
-    //     <Tooltip
-    //       position="left-start"
-    //       distance={15}
-    //       html={
-    //         <div onMouseEnter={this.openPopup} onMouseLeave={this.closePopup}>
-    //           {showFullInfo ? (
-    //             'awe'
-    //           ) : (
-    //             'hi'
-    //           )}
-    //         </div>
-    //     }
-    //       open={$hover || showFullInfo}
-    //       arrow
-    //       sticky
-    //     >
-    //       <Icon
-    //         color="red"
-    //         name="marker"
-    //         size={$hover || showFullInfo ? 'huge' : 'big'}
-    //         className={`marker ${$hover || showFullInfo ? 'hovered' : ''}`}
-    //       />
-    //     </Tooltip>
-    //   }
-    //   onOpen={() => {
-    //   // this.fetchRelated();
-    // }}
-    //   open={showFullInfo}
-    // >
-    //   <Label as="a" href={`http://${sourceUrl}`} ribbon color={colors[Math.floor(Math.random() * colors.length)]} target="_blank" className="news-label news-marker-tooltip">{source}</Label>
-    //   <div className="image-container">
-    //     <Image
-    //       src={topImageUrl}
-    //       shape="rounded"
-    //       className="simple-marker-image"
-    //     />
-    //     <Button color="blue" content="Read More" className="read-more-button" circular href={url} target="_blank" />
-    //   </div>
-
-    //   <Header as="a" href={url} target="_blank" color="blue">{title}</Header>
-
-    //   <div className="author-date-container">
-    //     <div className="author-name">
-    //       {authors.join(', ')} | {new Date(publishDate).toDateString()}
-    //     </div>
-    //   </div>
-
-    //   <MarkerAccordion
-    //     summary={shortSummary}
-    //     categories={categories}
-    //     keywords={keywords}
-    //     sentiment={sentiment}
-    //     organizations={organizations}
-    //     people={people}
-    //   />
-
-    //   <Reactions />
-
-    // </Popup>
     );
   }
 }

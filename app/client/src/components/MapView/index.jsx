@@ -144,6 +144,7 @@ class MapView extends PureComponent {
                 publishDate={article.publishDate}
                 source={article.source}
                 sourceUrl={article.sourceUrl}
+                topImageUrl={article.topImageUrl}
                 url={article.url}
                 lng={lng}
                 lat={lat}

@@ -47,33 +47,34 @@ module.exports = (conn, io) => {
   router.post('/', async (req, res, next) => {
     const sources = req.body;
     const timestamp = new Date();
-    const sourcesInfo = await Promise.all(sources.map(async (source) => {
-      const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
-      const htmlDoc = await rp(url);
-      const { domain } = parseDomain(url);
-      const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, url);
-      const faviconUrl = getFaviconUrl(htmlDoc);
-      const infoPromise = await getSourceInfo(source, responseGroups);
-      const info = await infoPromise;
-      const { title } = info.contentData.siteData;
-
-      const brand = getSourceBrand(url, title) || _.capitalize(domain);
-
-      delete info.contactInfo;
-
-      return {
-        ...info,
-        faviconUrl,
-        aboutUsUrl,
-        contactUsUrl,
-        timestamp,
-        brand,
-        id: await r.uuid(url).run(conn),
-      };
-    }));
 
     try {
-      await r.table(tbl).insert(sourcesInfo).run(conn);
+      const sourcesInfo = await Promise.all(sources.map(async (source) => {
+        const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
+        const htmlDoc = await rp(url);
+        const { domain } = parseDomain(url);
+        const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, url);
+        const faviconUrl = getFaviconUrl(htmlDoc);
+        const infoPromise = await getSourceInfo(source, responseGroups);
+        const info = await infoPromise;
+        const { title } = info.contentData.siteData;
+
+        const brand = getSourceBrand(url, title) || _.capitalize(domain);
+
+        delete info.contactInfo;
+
+        return {
+          ...info,
+          faviconUrl,
+          aboutUsUrl,
+          contactUsUrl,
+          timestamp,
+          brand,
+          id: await r.uuid(url).run(conn),
+        };
+      }));
+
+      await r.table('fakeSources').insert(sourcesInfo).run(conn);
       return res.json(sourcesInfo);
     } catch (e) {
       next(e);

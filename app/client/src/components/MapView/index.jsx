@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GoogleMapReact from 'google-map-react';
@@ -31,6 +31,7 @@ const mapStateToProps = ({
     infoStatus,
     focusedInfo,
     focusedClusterInfo,
+    filterMapState,
     focusedOn,
   },
   map,
@@ -43,6 +44,7 @@ const mapStateToProps = ({
   relatedArticles,
   infoStatus,
   clusterStatus,
+  filterMapState,
   focusedInfo,
   focusedClusterInfo,
   focusedOn,
@@ -67,7 +69,7 @@ const mapOption = {
   gestureHandling: 'greedy',
 };
 
-class MapView extends PureComponent {
+class MapView extends Component {
   componentWillMount() {
     navigator.geolocation.getCurrentPosition(({ coords }) => {
       this.props.updateMapState({

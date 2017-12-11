@@ -15,5 +15,5 @@ with open('../fake-news-detector/fake-news-sources/fake-news-sources.json') as f
 # headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
 # for s in sources:
 #   for url in s['urls']:
-#     requests.post('http://localhost:5000/api/sources', data=json.dumps([url]), headers=headers)
+#     requests.post('http://localhost:3001/api/sources', data=json.dumps([url]), headers=headers)
 #     time.sleep(1)

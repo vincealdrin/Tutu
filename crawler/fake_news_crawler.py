@@ -12,7 +12,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
 from db import get_locations, get_news_sources, get_provinces, get_article, insert_article, get_uuid
 from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_popularity
-from aylien import categorize
+from aylien import article_extraction
 from nlp import get_entities, summarize
 from nlp.keywords import parse_topics
 from fake_useragent import UserAgent
@@ -53,7 +53,6 @@ for news_source in news_sources:
         start_time = time.clock()
 
         defragged_url = urldefrag(article.url).url
-        print(defragged_url)
         qs_idx = defragged_url.find('?')
         clean_url = defragged_url[:qs_idx if qs_idx != -1 else None].replace('www.', '')
         url_uuid = get_uuid(clean_url)
@@ -70,7 +69,8 @@ for news_source in news_sources:
             article.parse()
 
             pattern = re.compile(source.brand+'|\r|\n', re.IGNORECASE)
-            body = pattern.sub('', article.text)
+            pattern2 = re.compile('ADVERTISEMENT')
+            body = pattern2.sub('', pattern.sub('', article.text))
 
             try:
                 if langdetect.detect(body) != 'en':
@@ -82,6 +82,10 @@ for news_source in news_sources:
 
             if not body:
                 print('\n(NO TEXT) Skipped: ' + str(article.url) + '\n')
+                continue
+
+            if  len(body.split()) < 50:
+                print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
                 continue
 
             publishDate = search_publish_date(article.publish_date, article.html)

@@ -17,7 +17,7 @@ import Counter from '../Counter';
 import GridLayout from '../GridView';
 import './styles.css';
 
-axios.defaults.baseURL = 'http://localhost:5000/exposed';
+axios.defaults.baseURL = 'http://localhost:3000/api';
 
 const App = () => (
   <div>

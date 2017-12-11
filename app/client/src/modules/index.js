@@ -8,7 +8,7 @@ import popularArticles from './popularArticles';
 import filters from './filters';
 import mapThemes from './mapThemes';
 
-const socket = io.connect('http://localhost:5000/client');
+const socket = io.connect('http://localhost:3000/client');
 export default combineReducers({
   router: routerReducer,
   socket: () => socket,

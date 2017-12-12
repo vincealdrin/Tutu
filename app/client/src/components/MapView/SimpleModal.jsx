@@ -12,17 +12,17 @@ import angryReact from './reactions/0.svg';
 import './styles.css';
 
 class SimpleModal extends Component {
-  state = { activeIndex: 0 };
-  handleClick = (_, titleProps) => {
-    const { index } = titleProps;
-    const { activeIndex } = this.state;
-    const newIndex = activeIndex === index ? -1 : index;
-
-    this.setState({ activeIndex: newIndex });
-  }
+  state = {
+    activeIndex: 0,
+    visible: false,
+  };
+  toggleVisibility = () => this.setState({ visible: !this.state.visible })
 
   render() {
-    const { activeIndex } = this.state;
+    const {
+      activeIndex,
+      visible,
+    } = this.state;
     const {
       open,
       article: {
@@ -102,9 +102,14 @@ class SimpleModal extends Component {
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Keywords</Label>
-                    {keywords.map((keyword) => (
-                      <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
+                    {visible ?
+                      keywords.map((keyword) => (
+                        <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
+                      )) :
+                      keywords.slice(0, 2).map((keyword) => (
+                        <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
                     ))}
+                    <span color="blue" className="article-tags see-more" onClick={this.toggleVisibility}>{`${visible ? 'See Less' : 'See More...'}`}</span>
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Sentiment</Label>
@@ -112,7 +117,7 @@ class SimpleModal extends Component {
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Organizations</Label>
-                    {organizations.map((org) => (
+                    {organizations.slice(0, 2).map((org) => (
                       <span key={shortid.generate()} className="article-tags">{`${org}, `}</span>
                     ))}
                   </List.Item>
@@ -132,11 +137,11 @@ class SimpleModal extends Component {
           </p>
           <p> {summary && summary[0]} </p>
           <Accordion style={{ margin: '1rem 0' }}>
-            <Accordion.Title active={activeIndex === 0} index={0} onClick={this.handleClick}>
+            <Accordion.Title active={activeIndex === 0} index={0}>
               <Icon name="dropdown" />
               Related Stories
             </Accordion.Title>
-            <Accordion.Content active={activeIndex === 0}>
+            <Accordion.Content active={activeIndex === 0} index={0}>
               {relatedArticles.map((related) => (
                 <p>{related}</p>
               ))}

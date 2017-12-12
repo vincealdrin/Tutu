@@ -136,6 +136,14 @@
   text-align: center;
 }
 
+/* see more button sa tags */
+.see-more {
+  color: #2185d0;
+}
+.see-more:hover {
+  text-decoration: underline;
+}
+
 /* MODAL ARTICLE CONTAINER */
 .modal-container {
   padding: 0.5rem;

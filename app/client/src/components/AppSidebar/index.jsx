@@ -5,7 +5,7 @@ import './style.css';
 
 class AppSidebar extends Component {
   state = {
-    visible: true,
+    visible: false,
     isWide: false,
   };
 
@@ -61,10 +61,6 @@ class AppSidebar extends Component {
             <Link to="/about" onClick={this.beVisible}>
               <Icon name="browser" color="grey" />
               <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>About</span>
-            </Link>
-            <Link to="/submit" onClick={this.beVisible}>
-              <Icon name="send outline" color="grey" />
-              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Submit News</span>
             </Link>
             <Link to="/themes" onClick={this.beVisible}>
               <Icon name="globe" color="grey" />

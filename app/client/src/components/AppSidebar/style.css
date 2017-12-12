@@ -130,3 +130,7 @@
 .label {
   transition: all 0.2s ease-in-out;
 }
+
+i.grey.icon {
+  padding: 0;
+}

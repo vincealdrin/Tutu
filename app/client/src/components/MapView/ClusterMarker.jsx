@@ -16,12 +16,23 @@ class ClusterMarker extends Component {
           <List divided relaxed className="cluster-list-container">
             {articles.slice(0, 5).map((article) => (
               <List.Item key={shortid.generate()} className="cluster-article-container">
-                <div className="article-title-container">
-                  <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
-                  <List.Description className="article-date">{new Date(article.publishDate).toDateString()}</List.Description>
-                </div>
+                <Grid>
+                  <Grid.Row columns={2}>
+                    <Grid.Column width={7}>
+                      <Image src={article.topImageUrl} />
+                    </Grid.Column>
+                    <Grid.Column width={9} className="marker-title-column">
+                      <div>
+                        <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
+                        <List.Description className="article-date">{new Date(article.publishDate).toDateString()}</List.Description>
+                        <Label as="a" circular className="source-label">{article.source}</Label>
+                      </div>
+                    </Grid.Column>
+                  </Grid.Row>
+                </Grid>
               </List.Item>
             ))}
+            <Label className="see-more-button" attached="bottom">Click marker to view more stories...</Label>
           </List>
         }
         open={$hover}

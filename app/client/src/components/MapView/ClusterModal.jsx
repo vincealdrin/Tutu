@@ -1,10 +1,20 @@
 import React, { Component } from 'react';
-import { Popup, List, Image, Label, Modal, Segment, Grid, Header, Button } from 'semantic-ui-react';
+import { List, Image, Label, Modal, Segment, Grid, Header, Button, Accordion, Icon } from 'semantic-ui-react';
 import shortid from 'shortid';
 import './styles.css';
 
 class ClusterModal extends Component {
+  state = { activeIndex: 0 };
+  handleClick = (_, titleProps) => {
+    const { index } = titleProps;
+    const { activeIndex } = this.state;
+    const newIndex = activeIndex === index ? -1 : index;
+
+    this.setState({ activeIndex: newIndex });
+  }
+
   render() {
+    const { activeIndex } = this.state;
     const {
       articles,
       open,
@@ -28,59 +38,80 @@ class ClusterModal extends Component {
         dimmer
       >
         <Modal.Content scrolling>
-          {articles.map((article) => (
-            <Segment key={shortid.generate()} raised className="modal-article-container">
-              <Grid>
-                <Grid.Row columns={3}>
-                  <Grid.Column width={4}>
-                    <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{article.source}</Label>
-                    <Image src={article.topImageUrl} style={{ marginTop: '3rem' }} />
-                  </Grid.Column>
-                  <Grid.Column width={7} style={{ marginTop: '3rem' }}>
-                    <Header as="h3" href={article.sourceUrl} color="blue">{article.title}</Header>
-                    <div className="author-date-container">
-                      {article.authors.map((author) => (
-                        <span key={shortid.generate()}>
-                          {author},
-                        </span>
-                        ))}
-                      <br />
-                      {new Date(article.publishDate).toDateString()}
-                    </div>
-                    <div>
-                      <Label as="a" tag style={{ textTransform: 'capitalize' }}>Hello</Label>
-                    </div>
-                  </Grid.Column>
-                  <Grid.Column width={5}>
-                    <Label.Group size="tiny" className="label-group">
-                      <div className="label-master">
-                        <Label basic color="pink">Category</Label>
+          {articles.map((article) =>
+              (
+                <Segment key={shortid.generate()} raised className="modal-article-container">
+                  <Grid columns={2}>
+                    <Grid.Column width={11}>
+                      <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{article.source}</Label>
+                      <div className="image-tag-title-container">
+                        <div className="top-image">
+                          <Image src={article.topImageUrl} />
+                          <Header as="a" href={article.url} color="blue" className="news-title" target="_blank">{article.title}</Header>
+                          <p className="article-date">
+                            {new Date(article.publishDate).toDateString()} | {article.authors.map((author) => (
+                                                                                `${author}, `
+                                                                              ))}
+                          </p>
+                        </div>
+                        <div className="tags">
+                          <List divided relaxed>
+                            <List.Item>
+                              <Label as="a" className="tag-label">Categories</Label>
+                              {article.categories.map((category) => (
+                                <span key={shortid.generate()} className="article-tags">{`${category}, `}</span>
+                              ))}
+                            </List.Item>
+                            <List.Item>
+                              <Label as="a" className="tag-label">Keywords</Label>
+                              {article.keywords.map((keyword) => (
+                                <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
+                              ))}
+                            </List.Item>
+                            <List.Item>
+                              <Label as="a" className="tag-label">Sentiment</Label>
+                              <span className="article-tags">{article.sentiment}</span>
+                            </List.Item>
+                            <List.Item>
+                              <Label as="a" className="tag-label">Organizations</Label>
+                              {article.organizations.map((org) => (
+                                <span key={shortid.generate()} className="article-tags">{`${org}, `}</span>
+                              ))}
+                            </List.Item>
+                            <List.Item>
+                              <Label as="a" className="tag-label">People</Label>
+                              {article.people.map((pips) => (
+                                <span key={shortid.generate()} className="article-tags">{`${pips}, `}</span>
+                              ))}
+                            </List.Item>
+                          </List>
+                        </div>
                       </div>
-                      <div>
-                        {article.categories.map((category) => (<Label as="a" tag style={{ marginBottom: '0.3rem' }} key={shortid.generate()}>{category}</Label>))}
+                    </Grid.Column>
+                    <Grid.Column width={5}>
+                      <div className="news-summary">
+                        <p>
+                          {article.summary[0]}
+                        </p>
                       </div>
-                    </Label.Group>
-                    <Label.Group size="tiny" className="label-group">
-                      <div className="label-master">
-                        <Label basic color="teal">Keywords</Label>
+                      <div className="related-stories">
+                        <Accordion style={{ margin: '1rem 0' }}>
+                          <Accordion.Title active={activeIndex === 0} index={0} onClick={this.handleClick}>
+                            <Icon name="dropdown" />
+                            Related Stories
+                          </Accordion.Title>
+                          <Accordion.Content active={activeIndex === 0}>
+                            {article.relatedArticles.map((related) => (
+                              <p>{related}</p>
+                            ))}
+                          </Accordion.Content>
+                        </Accordion>
+
+                        <Button as="a" href={article.url} circular color="blue" target="_blank" className="article-read-more">Read More</Button>
                       </div>
-                      <div>
-                        {article.keywords.map((keyword) => (<Label as="a" tag style={{ marginBottom: '0.3rem' }} key={shortid.generate()}>{keyword}</Label>))}
-                      </div>
-                    </Label.Group>
-                    <Label.Group size="tiny" className="label-group cluster-modal-sentiment">
-                      <div className="label-master">
-                        <Label basic color="orange">Sentiment</Label>
-                      </div>
-                      <div>
-                        {/* <Label as="a" tag style={{ textTransform: 'capitalize' }}>{sentimentValue > 100 ? '100%' : `${sentimentValue}%`} {article.sentiment.result}</Label> */}
-                      </div>
-                    </Label.Group>
-                    <Button color="blue" circular style={{ float: 'right' }} href={article.url} target="_blank">Read More</Button>
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </Segment>
+                    </Grid.Column>
+                  </Grid>
+                </Segment>
             ))}
         </Modal.Content>
       </Modal>

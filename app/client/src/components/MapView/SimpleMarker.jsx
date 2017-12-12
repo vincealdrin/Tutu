@@ -1,10 +1,6 @@
 import React, { PureComponent } from 'react';
-import { Label, List, Popup, Header, Icon, Image, Button, Accordion } from 'semantic-ui-react';
-import shortid from 'shortid';
+import { Header, Grid, Image, Icon, Label } from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
-import Reactions from './Reactions';
-import { Motion, spring } from 'react-motion';
-import MarkerAccordion from './MarkerAccordion';
 import './styles.css';
 
 const config = { stiffness: 140, damping: 14 };
@@ -13,7 +9,9 @@ const toCSS = (translateX) => ({ transform: `translateX: ${translateX}px` });
 class SimpleMarker extends PureComponent {
   render() {
     const {
+      topImageUrl,
       title,
+      source,
       url,
       publishDate,
       $hover,
@@ -22,11 +20,22 @@ class SimpleMarker extends PureComponent {
     return (
       <Tooltip
         position="right-start"
-        className="this-tooltip"
+        distance={15}
         html={
-          <div>
-            <a href={url} target="_blank">{title}</a>
-            <p>{new Date(publishDate).toLocaleDateString()}</p>
+          <div className="simple-marker">
+            <Grid>
+              <Grid.Row columns={2}>
+                <Grid.Column width={7}>
+                  <Image src={topImageUrl} />
+                </Grid.Column>
+                <Grid.Column width={9} className="marker-title-column">
+                  <Header as="a" color="blue" href={url} target="_blank" className="simple-marker-title">{title}</Header>
+                  <p className="article-date">{new Date(publishDate).toDateString()}</p>
+                  <Label as="a" circular className="source-label">{source}</Label>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+            <Label className="see-more-button simple-marker-see-more" attached="bottom">Click marker to view more details</Label>
           </div>
         }
         open={$hover}

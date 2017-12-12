@@ -143,6 +143,7 @@ class MapView extends Component {
                 publishDate={article.publishDate}
                 source={article.source}
                 sourceUrl={article.sourceUrl}
+                topImageUrl={article.topImageUrl}
                 url={article.url}
                 lng={lng}
                 lat={lat}

@@ -6,7 +6,7 @@ import './style.css';
 class About extends Component {
   render() {
     return (
-      <div className="about-section-container">
+      <div>
         <Segment>
           <Label as="a" color="red" ribbon style={{ marginBottom: '1rem' }}>About</Label>
           <div className="scrollable-section about-section-info">

@@ -17,14 +17,24 @@ class AppSidebar extends Component {
   render() {
     const { isWide } = this.state;
     const { visible } = this.state;
+    let isVisible;
+    let isIconVisible;
+
+    if (window.location.pathname === '/') {
+      isVisible = `${visible ? 'hidden' : 'full'}`;
+      isIconVisible = `${visible ? 'left' : 'right'}`;
+    } else {
+      isVisible = `${visible ? 'full' : 'hidden'}`;
+      isIconVisible = `${visible ? 'right' : 'left'}`;
+    }
 
     return (
       <div className="container">
         <div className="item-container">
           <div className="article-display-button" onClick={this.toggleVisibility}>
-            <Icon name={`angle ${visible ? 'right' : 'left'}`} size="large" />
+            <Icon name={`angle ${isIconVisible}`} size="large" />
           </div>
-          <div className={`menu-item-container ${visible ? 'full' : 'hidden'}`}>
+          <div className={`menu-item-container ${isVisible}`}>
             {this.props.children}
           </div>
         </div>
@@ -61,10 +71,6 @@ class AppSidebar extends Component {
             <Link to="/about" onClick={this.beVisible}>
               <Icon name="browser" color="grey" />
               <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>About</span>
-            </Link>
-            <Link to="/submit" onClick={this.beVisible}>
-              <Icon name="send outline" color="grey" />
-              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Submit News</span>
             </Link>
             <Link to="/themes" onClick={this.beVisible}>
               <Icon name="globe" color="grey" />

@@ -5,7 +5,7 @@ import './style.css';
 
 class AppSidebar extends Component {
   state = {
-    visible: false,
+    visible: true,
     isWide: false,
   };
 
@@ -17,14 +17,24 @@ class AppSidebar extends Component {
   render() {
     const { isWide } = this.state;
     const { visible } = this.state;
+    let isVisible;
+    let isIconVisible;
+
+    if (window.location.pathname === '/') {
+      isVisible = `${visible ? 'hidden' : 'full'}`;
+      isIconVisible = `${visible ? 'left' : 'right'}`;
+    } else {
+      isVisible = `${visible ? 'full' : 'hidden'}`;
+      isIconVisible = `${visible ? 'right' : 'left'}`;
+    }
 
     return (
       <div className="container">
         <div className="item-container">
           <div className="article-display-button" onClick={this.toggleVisibility}>
-            <Icon name={`angle ${visible ? 'right' : 'left'}`} size="large" />
+            <Icon name={`angle ${isIconVisible}`} size="large" />
           </div>
-          <div className={`menu-item-container ${visible ? 'full' : 'hidden'}`}>
+          <div className={`menu-item-container ${isVisible}`}>
             {this.props.children}
           </div>
         </div>

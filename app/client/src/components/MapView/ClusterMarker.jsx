@@ -7,14 +7,13 @@ import './styles.css';
 class ClusterMarker extends Component {
   render() {
     const { count, articles, $hover } = this.props;
-    const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
 
     return (
       <Tooltip
         position="right-start"
         html={
           <List divided relaxed className="cluster-list-container">
-            {articles.slice(0, 5).map((article) => (
+            {articles.slice(0, 4).map((article) => (
               <List.Item key={shortid.generate()} className="cluster-article-container">
                 <Grid>
                   <Grid.Row columns={2}>
@@ -35,9 +34,10 @@ class ClusterMarker extends Component {
             <Label className="see-more-button" attached="bottom">Click marker to view more stories...</Label>
           </List>
         }
-        open={$hover}
+        // open={$hover}
         // hmmm di maibaba ung position ng arrow eto na muna
         // arrow
+        interactive
         animateFill={false}
         sticky
       >

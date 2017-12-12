@@ -106,8 +106,7 @@
 
 .cluster-list-container {
   max-height: 365px;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .cluster-list-container:last-child {

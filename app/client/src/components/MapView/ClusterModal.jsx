@@ -38,50 +38,74 @@ class ClusterModal extends Component {
         dimmer
       >
         <Modal.Content scrolling>
-          {articles.map((article) =>
-              (
+          {articles.map(({
+            sentiment,
+            summary,
+            title,
+            publishDate,
+            source,
+            sourceUrl,
+            url,
+            topImageUrl,
+            authors = [],
+            categories = [],
+            keywords = [],
+            organizations = [],
+            people = [],
+            reactions = [],
+            relatedArticles = [],
+          }) => {
+            const [
+              afraid = { reduction: 0 },
+              amused = { reduction: 0 },
+              angry = { reduction: 0 },
+              happy = { reduction: 0 },
+              inspired = { reduction: 0 },
+              sad = { reduction: 0 },
+            ] = reactions;
+
+              return (
                 <Segment key={shortid.generate()} raised className="modal-article-container">
                   <Grid columns={2}>
                     <Grid.Column width={11}>
-                      <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{article.source}</Label>
+                      <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
                       <div className="image-tag-title-container">
                         <div className="top-image">
-                          <Image src={article.topImageUrl} />
-                          <Header as="a" href={article.url} color="blue" className="news-title" target="_blank">{article.title}</Header>
+                          <Image src={topImageUrl} />
+                          <Header as="a" href={url} color="blue" className="news-title" target="_blank">{title}</Header>
                           <p className="article-date">
-                            {new Date(article.publishDate).toDateString()} | {article.authors.map((author) => (
-                                                                                `${author}, `
-                                                                              ))}
+                            {new Date(publishDate).toDateString()} | &nbsp;
+                            {authors.map((author) => (`${author}, `))}
                           </p>
                         </div>
                         <div className="tags">
                           <List divided relaxed>
                             <List.Item>
                               <Label as="a" className="tag-label">Categories</Label>
-                              {article.categories.map((category) => (
+                              {categories.map((category) => (
                                 <span key={shortid.generate()} className="article-tags">{`${category}, `}</span>
                               ))}
                             </List.Item>
                             <List.Item>
                               <Label as="a" className="tag-label">Keywords</Label>
-                              {article.keywords.map((keyword) => (
+                              {keywords.map((keyword) => (
                                 <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
                               ))}
                             </List.Item>
                             <List.Item>
                               <Label as="a" className="tag-label">Sentiment</Label>
-                              <span className="article-tags">{article.sentiment}</span>
+                              <span className="article-tags">{sentiment}</span>
                             </List.Item>
                             <List.Item>
                               <Label as="a" className="tag-label">Organizations</Label>
-                              {article.organizations.map((org) => (
+                              {organizations.map((org) => (
                                 <span key={shortid.generate()} className="article-tags">{`${org}, `}</span>
                               ))}
                             </List.Item>
                             <List.Item>
                               <Label as="a" className="tag-label">People</Label>
-                              {article.people.map((pips) => (
-                                <span key={shortid.generate()} className="article-tags">{`${pips}, `}</span>
+                              {people.map((person) => (
+                                <span key={shortid.generate()} className="article-tags">{`${person}, `}</span>
                               ))}
                             </List.Item>
                           </List>
@@ -90,9 +114,7 @@ class ClusterModal extends Component {
                     </Grid.Column>
                     <Grid.Column width={5}>
                       <div className="news-summary">
-                        <p>
-                          {article.summary[0]}
-                        </p>
+                        <p> {summary && summary[0]} </p>
                       </div>
                       <div className="related-stories">
                         <Accordion style={{ margin: '1rem 0' }}>
@@ -101,18 +123,16 @@ class ClusterModal extends Component {
                             Related Stories
                           </Accordion.Title>
                           <Accordion.Content active={activeIndex === 0}>
-                            {article.relatedArticles.map((related) => (
-                              <p>{related}</p>
-                            ))}
+                            {relatedArticles.map((related) => <p>{related.title}</p>)}
                           </Accordion.Content>
                         </Accordion>
-
-                        <Button as="a" href={article.url} circular color="blue" target="_blank" className="article-read-more">Read More</Button>
+                        <Button as="a" href={url} circular color="blue" target="_blank" className="article-read-more">Read More</Button>
                       </div>
                     </Grid.Column>
                   </Grid>
                 </Segment>
-            ))}
+            );
+          })}
         </Modal.Content>
       </Modal>
     );

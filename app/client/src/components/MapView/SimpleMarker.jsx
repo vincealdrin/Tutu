@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Header, Grid, Image, Icon, Label } from 'semantic-ui-react';
+import { Motion, spring } from 'react-motion';
 import { Tooltip } from 'react-tippy';
 import './styles.css';
 

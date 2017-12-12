@@ -11,7 +11,6 @@ load_dotenv(find_dotenv(), override=True)
 with open('../fake-news-detector/fake-news-sources/fake-news-sources.json') as f:
   sources = json.load(f)
 
-
 # headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
 # for s in sources:
 #   for url in s['urls']:

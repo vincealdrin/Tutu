@@ -18,6 +18,7 @@
     "natural": "^0.5.4",
     "parse-domain": "^2.0.0",
     "passport": "^0.4.0",
+    "pmx": "^1.5.5",
     "request": "^2.83.0",
     "request-ip": "^2.0.2",
     "request-promise": "^4.2.2",

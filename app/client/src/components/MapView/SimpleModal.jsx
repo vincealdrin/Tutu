@@ -26,21 +26,21 @@ class SimpleModal extends Component {
     const {
       open,
       article: {
-        authors,
-        categories,
-        keywords,
-        organizations,
-        people,
-        reactions = [],
         sentiment,
         summary,
-        topImageUrl,
-        relatedArticles,
         title,
         publishDate,
         source,
         sourceUrl,
         url,
+        topImageUrl,
+        authors = [],
+        categories = [],
+        keywords = [],
+        organizations = [],
+        people = [],
+        reactions = [],
+        relatedArticles = [],
       },
       removeFocused,
       updateReaction,
@@ -130,9 +130,7 @@ class SimpleModal extends Component {
           <p className="article-date">
             {new Date(publishDate).toDateString()} | {authors.map((author) => (`${author}, `))}
           </p>
-          <p>
-            {summary[0]}
-          </p>
+          <p> {summary && summary[0]} </p>
           <Accordion style={{ margin: '1rem 0' }}>
             <Accordion.Title active={activeIndex === 0} index={0} onClick={this.handleClick}>
               <Icon name="dropdown" />

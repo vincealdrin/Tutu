@@ -3,6 +3,7 @@ import { List, Image, Label, Modal, Accordion, Icon, Grid, Header, Button } from
 import { Tooltip } from 'react-tippy';
 import shortid from 'shortid';
 // import the reaction images
+import Tags from './Tags';
 import happyReact from './reactions/5.svg';
 import amusedReact from './reactions/4.svg';
 import inspiredReact from './reactions/3.svg';
@@ -12,17 +13,10 @@ import angryReact from './reactions/0.svg';
 import './styles.css';
 
 class SimpleModal extends Component {
-  state = {
-    activeIndex: 0,
-    visible: false,
-  };
-  toggleVisibility = () => this.setState({ visible: !this.state.visible })
+  state = { activeIndex: 0 };
 
   render() {
-    const {
-      activeIndex,
-      visible,
-    } = this.state;
+    const { activeIndex } = this.state;
     const {
       open,
       article: {
@@ -102,14 +96,7 @@ class SimpleModal extends Component {
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Keywords</Label>
-                    {visible ?
-                      keywords.map((keyword) => (
-                        <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
-                      )) :
-                      keywords.slice(0, 2).map((keyword) => (
-                        <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
-                    ))}
-                    <span color="blue" className="article-tags see-more" onClick={this.toggleVisibility}>{`${visible ? 'See Less' : 'See More...'}`}</span>
+                    <Tags content={keywords} />
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Sentiment</Label>
@@ -117,15 +104,11 @@ class SimpleModal extends Component {
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Organizations</Label>
-                    {organizations.slice(0, 2).map((org) => (
-                      <span key={shortid.generate()} className="article-tags">{`${org}, `}</span>
-                    ))}
+                    <Tags content={organizations} />
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">People</Label>
-                    {people.map((pips) => (
-                      <span key={shortid.generate()} className="article-tags">{`${pips}, `}</span>
-                    ))}
+                    <Tags content={people} />
                   </List.Item>
                 </List>
               </div>

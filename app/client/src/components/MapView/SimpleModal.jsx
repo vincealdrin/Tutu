@@ -128,7 +128,7 @@ class SimpleModal extends Component {
           </Grid>
           <Header as="a" color="blue" href={url} target="_blank">{title}</Header>
           <p className="article-date">
-            {new Date(publishDate).toDateString()} | {authors.map((author) => (`${author}, `))}
+            {new Date(publishDate).toDateString()} | {authors.join(', ')}
           </p>
           <p> {summary && summary[0]} </p>
           <Accordion style={{ margin: '1rem 0' }}>

@@ -75,7 +75,7 @@ class ClusterModal extends Component {
                           <Header as="a" href={url} color="blue" className="news-title" target="_blank">{title}</Header>
                           <p className="article-date">
                             {new Date(publishDate).toDateString()} | &nbsp;
-                            {authors.map((author) => (`${author}, `))}
+                            {authors.join(', ')}
                           </p>
                         </div>
                         <div className="tags">

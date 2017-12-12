@@ -10,14 +10,13 @@ import RecentArticles from '../RecentArticles';
 import PopularArticles from '../PopularArticles';
 import Filter from '../Filter';
 import About from '../About';
-import TestComponent from '../TestComponent';
 import Categories from '../Categories';
 import MapThemes from '../MapThemes';
 import Counter from '../Counter';
 import GridLayout from '../GridView';
 import './styles.css';
 
-axios.defaults.baseURL = 'http://localhost:3000/api';
+axios.defaults.baseURL = '/api/exposed';
 
 const App = () => (
   <div>

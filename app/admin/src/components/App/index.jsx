@@ -9,7 +9,7 @@ import Crawler from '../Crawler';
 import Sidebar from '../Sidebar';
 import './styles.css';
 
-axios.defaults.baseURL = 'http://localhost:3001/api';
+axios.defaults.baseURL = '/api/admin';
 
 const App = () => (
   <div>

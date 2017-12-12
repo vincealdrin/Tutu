@@ -7,7 +7,7 @@ import sources from './sources';
 import articles from './articles';
 import crawler from './crawler';
 
-const socket = io.connect('http://localhost:3000');
+const socket = io.connect('/');
 export default combineReducers({
   router: routerReducer,
   socket: () => socket,

@@ -3,6 +3,7 @@ import { List, Image, Label, Modal, Accordion, Icon, Grid, Header, Button } from
 import { Tooltip } from 'react-tippy';
 import shortid from 'shortid';
 // import the reaction images
+import Tags from './Tags';
 import happyReact from './reactions/5.svg';
 import amusedReact from './reactions/4.svg';
 import inspiredReact from './reactions/3.svg';
@@ -12,20 +13,10 @@ import angryReact from './reactions/0.svg';
 import './styles.css';
 
 class SimpleModal extends Component {
-  state = {
-    activeIndex: 0,
-    keywordsAreVisible: false,
-    orgsAreVisible: false,
-  };
-  toggleKeywordVisibility = () => this.setState({ keywordsAreVisible: !this.state.keywordsAreVisible });
-  toggleOrgVisibility = () => this.setState({ orgsAreVisible: !this.state.orgsAreVisible });
+  state = { activeIndex: 0 };
 
   render() {
-    const {
-      activeIndex,
-      keywordsAreVisible,
-      orgsAreVisible,
-    } = this.state;
+    const { activeIndex } = this.state;
     const {
       open,
       article: {
@@ -105,14 +96,7 @@ class SimpleModal extends Component {
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Keywords</Label>
-                    {keywordsAreVisible ?
-                      keywords.map((keyword) => (
-                        <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
-                      )) :
-                      keywords.slice(0, 2).map((keyword) => (
-                        <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
-                    ))}
-                    <span className="article-tags see-more" onClick={this.toggleKeywordVisibility}>{`${keywordsAreVisible ? 'See Less' : 'See More...'}`}</span>
+                    <Tags content={keywords} />
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Sentiment</Label>
@@ -120,20 +104,11 @@ class SimpleModal extends Component {
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Organizations</Label>
-                    {orgsAreVisible ?
-                      organizations.map((org) => (
-                        <span key={shortid.generate()} className="article-tags">{`${org}, `}</span>
-                      )) :
-                      organizations.slice(0, 2).map((org) => (
-                        <span key={shortid.generate()} className="article-tags">{`${org}, `}</span>
-                      ))}
-                    <span className="article-tags see-more" onClick={this.toggleOrgVisibility}>{`${orgsAreVisible ? 'See Less' : 'See More...'}`}</span>
+                    <Tags content={organizations} />
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">People</Label>
-                    {people.map((pips) => (
-                      <span key={shortid.generate()} className="article-tags">{`${pips}, `}</span>
-                    ))}
+                    <Tags content={people} />
                   </List.Item>
                 </List>
               </div>

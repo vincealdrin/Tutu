@@ -31,6 +31,7 @@ const App = () => (
 
     <AppSidebar>
       <Switch>
+        <Route path="/" exact component={PopularArticles} />
         <Route path="(.*)/popular" exact component={PopularArticles} />
         <Route path="(.*)/recent" exact component={RecentArticles} />
         <Route path="(.*)/filter" exact component={Filter} />

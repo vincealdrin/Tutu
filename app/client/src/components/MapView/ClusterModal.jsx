@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { List, Image, Label, Modal, Segment, Grid, Header, Button, Accordion, Icon } from 'semantic-ui-react';
+import Tags from './Tags';
 import shortid from 'shortid';
 import './styles.css';
 
@@ -88,9 +89,7 @@ class ClusterModal extends Component {
                             </List.Item>
                             <List.Item>
                               <Label as="a" className="tag-label">Keywords</Label>
-                              {keywords.map((keyword) => (
-                                <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
-                              ))}
+                              <Tags content={keywords} />
                             </List.Item>
                             <List.Item>
                               <Label as="a" className="tag-label">Sentiment</Label>
@@ -98,15 +97,11 @@ class ClusterModal extends Component {
                             </List.Item>
                             <List.Item>
                               <Label as="a" className="tag-label">Organizations</Label>
-                              {organizations.map((org) => (
-                                <span key={shortid.generate()} className="article-tags">{`${org}, `}</span>
-                              ))}
+                              <Tags content={organizations} />
                             </List.Item>
                             <List.Item>
                               <Label as="a" className="tag-label">People</Label>
-                              {people.map((person) => (
-                                <span key={shortid.generate()} className="article-tags">{`${person}, `}</span>
-                              ))}
+                              <Tags content={people} />
                             </List.Item>
                           </List>
                         </div>

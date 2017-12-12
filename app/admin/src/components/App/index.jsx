@@ -6,6 +6,7 @@ import Home from '../Home';
 import Users from '../Users';
 import Counter from '../Counter';
 import Crawler from '../Crawler';
+import NewsSources from '../NewsSources';
 import Sidebar from '../Sidebar';
 import './styles.css';
 
@@ -19,6 +20,7 @@ const App = () => (
         <Route exact path="/users" component={Users} />
         <Route exact path="/counter" component={Counter} />
         <Route exact path="/crawler" component={Crawler} />
+        <Route exact path="/sources" component={NewsSources} />
       </main>
     </Sidebar>
   </div>

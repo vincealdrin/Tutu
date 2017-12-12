@@ -74,7 +74,7 @@ module.exports = (conn, io) => {
         };
       }));
 
-      await r.table('fakeSources').insert(sourcesInfo).run(conn);
+      await r.table(tbl).insert(sourcesInfo).run(conn);
       return res.json(sourcesInfo);
     } catch (e) {
       next(e);
@@ -103,7 +103,10 @@ module.exports = (conn, io) => {
     const { ids = [] } = req.body;
 
     try {
-      await r.table(tbl).getAll(r.args(ids)).delete().run(conn);
+      await r.table(tbl)
+        .getAll(r.args(ids))
+        .delete()
+        .run(conn);
 
       res.status(204).end();
     } catch (e) {

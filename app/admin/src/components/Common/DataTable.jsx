@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   Icon,
   Button,
@@ -7,6 +7,7 @@ import {
   Checkbox,
   Input,
   Dropdown,
+  Modal,
 } from 'semantic-ui-react';
 import shortid from 'shortid';
 
@@ -18,21 +19,33 @@ const rowsPerPageOptions = [
   { key: '30', text: '30', value: 30 },
   { key: '50', text: '50', value: 50 },
 ];
-class DataTable extends Component {
+class DataTable extends PureComponent {
   state = {
     isDeleting: false,
     isAdding: false,
     isEditing: false,
+    deletionList: [],
     searchText: '',
     searchFilter: '',
     page: 0,
     perPage: 20,
   }
 
-  setsearchFilter = (searchFilter) => this.setState({ searchFilter })
-  setsearchText = (searchText) => this.setState({ searchText })
+  setSearchFilter = (searchFilter) => this.setState({ searchFilter })
+  setSearchText = (searchText) => this.setState({ searchText })
   selectPerPage = (perPage) => this.setState({ perPage })
-  toggleDelete = () => this.setState({ isDeleting: !this.state.isDeleting })
+  enableAdd = () => this.setState({ isAdding: true })
+  cancelAdd = () => this.setState({ isAdding: false })
+  enableDelete = () => this.setState({ isDeleting: true })
+  cancelDelete = () => this.setState({ isDeleting: false })
+
+  clearDeletionList = () => this.setState({ deletionList: [] })
+  appendDeletion = (selectedId) => {
+    this.setState({ deletionList: [...this.state.deletionList, selectedId] });
+  }
+  removeDeletion = (selectedId) => {
+    this.setState({ deletionList: this.state.deletionList.filter((id) => id !== selectedId) });
+  }
 
   render() {
     const {
@@ -40,7 +53,14 @@ class DataTable extends Component {
       columns = [],
       data = [],
       totalCount,
+      label,
+      addModalContent,
+      addModalActions,
+      onDeleteSelected,
     } = this.props;
+    const {
+      isEditing, isAdding, isDeleting, deletionList,
+    } = this.state;
 
     const totalPages = Math.ceil((totalCount || this.state.perPage) / this.state.perPage);
     return (
@@ -51,21 +71,59 @@ class DataTable extends Component {
               <Button
                 labelPosition="left"
                 size="small"
-                onClick={this.toggleDelete}
-                icon
+                icon={isDeleting ? 'cancel' : 'trash'}
+                content={isDeleting ? 'Cancel ' : `Delete ${label}`}
+                onClick={() => {
+                  if (isDeleting) {
+                      this.cancelDelete();
+                      this.clearDeletionList();
+                  } else {
+                    this.enableDelete();
+                  }
+                }}
+                disabled={isAdding}
                 secondary
-              >
-                <Icon name="remove user" /> Remove Users
-              </Button>
-              <Button
-                labelPosition="left"
-                size="small"
-                disabled={this.state.isDeleting}
-                icon
-                primary
-              >
-                <Icon name="add user" /> Add User
-              </Button>
+              />
+              {!isDeleting
+                ? (
+                  <Modal
+                    trigger={
+                      <Button
+                        labelPosition="left"
+                        size="small"
+                        onClick={this.enableAdd}
+                        icon="add"
+                        content={`Add ${label}`}
+                        primary
+                      />
+                    }
+                    open={isAdding}
+                  >
+                    <Modal.Header>Add {label}</Modal.Header>
+                    <Modal.Content scrolling>
+                      <Modal.Description>
+                        {addModalContent}
+                      </Modal.Description>
+                    </Modal.Content>
+                    <Modal.Actions>
+                      {addModalActions(this.cancelAdd)}
+                    </Modal.Actions>
+                  </Modal>
+                )
+                : (
+                  <Button
+                    labelPosition="left"
+                    size="small"
+                    icon="trash"
+                    content="Delete Selected"
+                    color="red"
+                    onClick={async () => {
+                      await onDeleteSelected(deletionList, this.cancelDelete);
+                      this.cancelDelete();
+                      this.clearDeletionList();
+                    }}
+                  />
+                )}
               <div style={searchContainerStyle}>
                 <Input
                   icon="search"
@@ -74,8 +132,8 @@ class DataTable extends Component {
                   label={(
                     <Dropdown
                       defaultValue={defaultSearchFilter}
-                      options={columns.map((column) => ({ ...column, value: column.key }))}
-                      onChange={(__, { value }) => this.setsearchFilter(value)}
+                      options={columns.map((column) => ({ text: column.text, value: column.key }))}
+                      onChange={(__, { value }) => this.setSearchFilter(value)}
                     />
                   )}
                 />
@@ -84,28 +142,48 @@ class DataTable extends Component {
           </Table.Row>
           <Table.Row>
             {this.state.isDeleting ? <Table.HeaderCell /> : null}
-            {columns.map(({ text }) => <Table.HeaderCell key={shortid.generate()}>{text}</Table.HeaderCell>)}
+            {columns.map(({ text }) => (
+              <Table.HeaderCell key={shortid.generate()}>
+                {text}
+              </Table.HeaderCell>
+            ))}
           </Table.Row>
         </Table.Header>
 
         <Table.Body>
-          {data.map((datum) => (
-            <Table.Row key={shortid.generate()}>
-              {this.state.isDeleting ? (
-                <Table.Cell collapsing>
-                  <Checkbox slider />
-                </Table.Cell>
-              ) : null}
-              {columns.map(({ key }) => <Table.Cell key={shortid.generate()}>{datum[key]}</Table.Cell>)}
-            </Table.Row>
-          ))}
+          {data.map((datum) => {
+            const isChecked = deletionList.includes(datum.id);
+            return (
+              <Table.Row key={shortid.generate()}>
+                {this.state.isDeleting ? (
+                  <Table.Cell collapsing>
+                    <Checkbox
+                      onClick={() => (isChecked
+                        ? this.removeDeletion(datum.id)
+                        : this.appendDeletion(datum.id))}
+                      checked={isChecked}
+                      slider
+                    />
+                  </Table.Cell>
+                ) : null}
+                {columns.map(({ key, dkey, wrappers = {} }) => {
+                  const val = dkey ? dkey(datum) : datum[key];
+                  return (
+                    <Table.Cell key={shortid.generate()}>
+                      {wrappers[key] ? wrappers[key](val) : val}
+                    </Table.Cell>
+                  );
+                })}
+              </Table.Row>
+            );
+          })}
         </Table.Body>
 
         <Table.Footer>
           <Table.Row>
             <Table.HeaderCell colSpan="5">
               <Button.Group>
-                <Button disabled>Rows per page</Button>
+                <Button disabled>Rows</Button>
                 <Dropdown
                   options={rowsPerPageOptions}
                   onChange={(__, { value }) => this.selectPerPage(value)}

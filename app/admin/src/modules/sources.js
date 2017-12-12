@@ -1,15 +1,15 @@
 import axios from 'axios';
-import { updateCrudStatus, crudStatus } from '../utils';
+import { updateCrudStatus, crudStatus, httpThunk } from '../utils';
 
 export const FETCH_SOURCES = 'sources/FETCH_SOURCES';
-export const CREATE_SOURCE = 'sources/CREATE_SOURCE';
+export const ADD_SOURCES = 'sources/ADD_SOURCES';
 export const UPDATE_SOURCE = 'sources/UPDATE_SOURCE';
 export const DELETE_SOURCES = 'sources/DELETE_SOURCE';
 
 const initialState = {
   sources: [],
   fetchStatus: crudStatus,
-  createStatus: crudStatus,
+  addStatus: crudStatus,
   updateStatus: crudStatus,
   deleteStatus: crudStatus,
 };
@@ -22,14 +22,14 @@ export default (state = initialState, action) => {
         sources: action.sources || state.sources,
         fetchStatus: updateCrudStatus(action),
       };
-    case CREATE_SOURCE:
+    case ADD_SOURCES:
       return {
         ...state,
-        sources: [
-          ...action.sources,
-          action.newSource,
-        ],
-        createStatus: updateCrudStatus(action),
+        sources: action.newSources ? [
+          ...state.sources,
+          ...action.newSources,
+        ] : state.sources,
+        addStatus: updateCrudStatus(action),
       };
     case UPDATE_SOURCE:
       return {
@@ -45,7 +45,9 @@ export default (state = initialState, action) => {
     case DELETE_SOURCES:
       return {
         ...state,
-        sources: state.sources.filter((source) => action.deletedIds.includes(source.id)),
+        sources: action.deletedIds
+          ? state.sources.filter((source) => action.deletedIds.includes(source.id))
+          : state.sources,
         updateStatus: updateCrudStatus(action),
       };
     default:
@@ -53,47 +55,33 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchSources = () => async (dispatch) => {
-  dispatch({ type: FETCH_SOURCES, statusText: 'pending' });
-
+export const fetchSources = () => httpThunk(FETCH_SOURCES, async () => {
   try {
-    const sources = await axios.get('a');
+    const { data: sources, status } = await axios.get('/sources');
 
-    dispatch({
-      type: FETCH_SOURCES,
-      statusText: 'success',
+    return {
       sources,
-    });
+      status,
+    };
   } catch (e) {
-    dispatch({
-      type: FETCH_SOURCES,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
-    });
+    return e;
   }
-};
+});
 
-export const createSource = (source) => async (dispatch) => {
-  dispatch({ type: CREATE_SOURCE, statusText: 'pending' });
 
+export const addSources = (sources, cb) => httpThunk(ADD_SOURCES, async () => {
   try {
-    const id = await axios.post('a', source);
+    const { data: newSources, status } = await axios.post('/sources', sources);
+    if (cb) cb();
 
-    dispatch({
-      type: CREATE_SOURCE,
-      statusText: 'success',
-      newSource: { ...source, id },
-    });
+    return {
+      newSources,
+      status,
+    };
   } catch (e) {
-    dispatch({
-      type: CREATE_SOURCE,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
-    });
+    return e;
   }
-};
+});
 
 export const updateSource = (sourceId, source, isIdChanged = false) => async (dispatch) => {
   dispatch({ type: UPDATE_SOURCE, statusText: 'pending' });
@@ -118,23 +106,16 @@ export const updateSource = (sourceId, source, isIdChanged = false) => async (di
   }
 };
 
-export const deleteSources = (ids) => async (dispatch) => {
-  dispatch({ type: DELETE_SOURCES, statusText: 'pending' });
-
+export const deleteSources = (ids) => httpThunk(DELETE_SOURCES, async () => {
   try {
-    await axios.put('/sources/', ids);
+    await axios.delete('/sources', ids);
 
-    dispatch({
+    return {
       type: DELETE_SOURCES,
       statusText: 'success',
       deletedIds: ids,
-    });
+    };
   } catch (e) {
-    dispatch({
-      type: DELETE_SOURCES,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
-    });
+    return e;
   }
-};
+});

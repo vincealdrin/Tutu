@@ -14,7 +14,8 @@ class Tags extends PureComponent {
     return (
       <div>
         <span className="article-tags">{tags.join(', ')}</span>
-        <span color="blue" className="article-tags see-more" onClick={this.toggleExpand}>
+        &nbsp;
+        <span className="article-tags see-more" onClick={this.toggleExpand}>
           {`${isExpanded ? 'See Less' : 'See More...'}`}
         </span>
       </div>

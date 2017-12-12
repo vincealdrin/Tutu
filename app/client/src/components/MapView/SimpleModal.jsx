@@ -14,14 +14,17 @@ import './styles.css';
 class SimpleModal extends Component {
   state = {
     activeIndex: 0,
-    visible: false,
+    keywordsAreVisible: false,
+    orgsAreVisible: false,
   };
-  toggleVisibility = () => this.setState({ visible: !this.state.visible })
+  toggleKeywordVisibility = () => this.setState({ keywordsAreVisible: !this.state.keywordsAreVisible });
+  toggleOrgVisibility = () => this.setState({ orgsAreVisible: !this.state.orgsAreVisible });
 
   render() {
     const {
       activeIndex,
-      visible,
+      keywordsAreVisible,
+      orgsAreVisible,
     } = this.state;
     const {
       open,
@@ -102,14 +105,14 @@ class SimpleModal extends Component {
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Keywords</Label>
-                    {visible ?
+                    {keywordsAreVisible ?
                       keywords.map((keyword) => (
                         <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
                       )) :
                       keywords.slice(0, 2).map((keyword) => (
                         <span key={shortid.generate()} className="article-tags">{`${keyword}, `}</span>
                     ))}
-                    <span color="blue" className="article-tags see-more" onClick={this.toggleVisibility}>{`${visible ? 'See Less' : 'See More...'}`}</span>
+                    <span className="article-tags see-more" onClick={this.toggleKeywordVisibility}>{`${keywordsAreVisible ? 'See Less' : 'See More...'}`}</span>
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Sentiment</Label>
@@ -117,9 +120,14 @@ class SimpleModal extends Component {
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Organizations</Label>
-                    {organizations.slice(0, 2).map((org) => (
-                      <span key={shortid.generate()} className="article-tags">{`${org}, `}</span>
-                    ))}
+                    {orgsAreVisible ?
+                      organizations.map((org) => (
+                        <span key={shortid.generate()} className="article-tags">{`${org}, `}</span>
+                      )) :
+                      organizations.slice(0, 2).map((org) => (
+                        <span key={shortid.generate()} className="article-tags">{`${org}, `}</span>
+                      ))}
+                    <span className="article-tags see-more" onClick={this.toggleOrgVisibility}>{`${orgsAreVisible ? 'See Less' : 'See More...'}`}</span>
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">People</Label>

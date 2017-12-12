@@ -139,6 +139,7 @@
 /* see more button sa tags */
 .see-more {
   color: #2185d0;
+  cursor: pointer;
 }
 .see-more:hover {
   text-decoration: underline;

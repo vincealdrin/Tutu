@@ -106,8 +106,7 @@
 
 .cluster-list-container {
   max-height: 365px;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .cluster-list-container:last-child {
@@ -139,6 +138,7 @@
 /* see more button sa tags */
 .see-more {
   color: #2185d0;
+  cursor: pointer;
 }
 .see-more:hover {
   text-decoration: underline;

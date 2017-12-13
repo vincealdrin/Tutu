@@ -6,13 +6,6 @@ import './styles.css';
 
 class ClusterModal extends Component {
   state = { activeIndex: 0 };
-  handleClick = (_, titleProps) => {
-    const { index } = titleProps;
-    const { activeIndex } = this.state;
-    const newIndex = activeIndex === index ? -1 : index;
-
-    this.setState({ activeIndex: newIndex });
-  }
 
   render() {
     const { activeIndex } = this.state;
@@ -113,7 +106,7 @@ class ClusterModal extends Component {
                       </div>
                       <div className="related-stories">
                         <Accordion style={{ margin: '1rem 0' }}>
-                          <Accordion.Title active={activeIndex === 0} index={0} onClick={this.handleClick}>
+                          <Accordion.Title active={activeIndex === 0} index={0}>
                             <Icon name="dropdown" />
                             Related Stories
                           </Accordion.Title>

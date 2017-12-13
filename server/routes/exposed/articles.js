@@ -3,7 +3,12 @@ const r = require('rethinkdb');
 const natural = require('natural');
 const requestIp = require('request-ip');
 const {
-  mapArticle, mapArticleInfo, PH_TIMEZONE, mapSideArticle, mapClusterInfo,
+  mapArticle,
+  mapArticleInfo,
+  PH_TIMEZONE,
+  WEEK_IN_SEC,
+  mapSideArticle,
+  mapClusterInfo,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -180,40 +185,42 @@ module.exports = (conn, io) => {
         catsFilterLength,
       } = req.query;
       const uuid = await r.uuid(url).run(conn);
-      const article = await r.table(tbl)
+      const articleInfo = await r.table(tbl)
         .get(uuid)
         .merge(mapArticleInfo(catsFilterLength))
+        .merge((article) => ({
+          relatedArticles: r.table('articles').filter((doc) =>
+            article('publishDate').date()
+              .during(
+                r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).sub(WEEK_IN_SEC),
+                r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).add(WEEK_IN_SEC),
+                { rightBound: 'closed' }
+              )
+              .and(doc('categories')
+                .orderBy(r.desc((category) => category('score')))
+                .slice(0, 2)
+                .getField('label')
+                .eq(article('categories'))
+                .and(doc('topics')('common').contains((topic) => article('keywords').contains(topic)))
+                .and(doc('people').contains((person) => article('people').contains(person))
+                  .or(doc('organizations').contains((org) => article('organizations').contains(org))))))
+            .orderBy(r.desc('timestamp'))
+            .slice(0, 20)
+            .pluck('title', 'url'),
+        }))
         .without(
           'timestamp', 'body', 'id',
-          'summary2', 'url', 'title',
+          'summary2', 'url', // 'title',
           'publishDate', 'sourceId', 'locations',
           'popularity', 'topics'
         )
         .run(conn);
 
-      const cursor = await r.table('articles').filter((doc) =>
-        doc('timestamp')
-          .during(doc('timestamp').date(), r.time(doc('timestamp').year(), doc('timestamp').month(), doc('timestamp').day(), PH_TIMEZONE))
-          .and(doc('categories')
-            .orderBy(r.desc((category) => category('score')))
-            .slice(0, 2)
-            .concatMap((c) => [c('label')])
-            .eq(article.categories.slice(0, 2))
-            .and(doc('topics')('common').contains((topic) => topic.match(`(?i)${article.keywords.join('|')}`)))
-            .and(doc('people').contains((person) => person.match(`(?i)${article.people.join('|')}`))
-              .or(doc('organizations').contains((org) => org.match(`(?i)${article.organizations.join('|')}`))))))
-        .orderBy(r.desc('timestamp'))
-        .slice(0, 20)
-        .pluck('title', 'url')
-        .run(conn);
-      const relatedArticles = await cursor.toArray();
-      const filteredRelArticles = relatedArticles
-        .filter(({ title }) => natural.DiceCoefficient(article.title, title) > 0.40)
+      articleInfo.relatedArticles = articleInfo.relatedArticles
+        .filter(({ title }) => natural.DiceCoefficient(articleInfo.title, title) > 0.40)
         .slice(0, 5);
 
-      article.relatedArticles = filteredRelArticles;
-
-      res.json(article);
+      res.json(articleInfo);
     } catch (e) {
       next(e);
     }
@@ -231,29 +238,30 @@ module.exports = (conn, io) => {
         .map(mapClusterInfo(catsFilterLength))
         .merge((article) => ({
           relatedArticles: r.table('articles').filter((doc) =>
-            doc('timestamp')
-              .during(doc('timestamp').date(), r.time(doc('timestamp').year(), doc('timestamp').month(), doc('timestamp').day(), PH_TIMEZONE))
+            article('publishDate').date()
+              .during(
+                r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).sub(WEEK_IN_SEC),
+                r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).add(WEEK_IN_SEC),
+                { rightBound: 'closed' }
+              )
               .and(doc('categories')
                 .orderBy(r.desc((category) => category('score')))
                 .slice(0, 2)
-                .concatMap((c) => [c('label')])
-                .eq(article('categories')
-                  .orderBy(r.desc((category) => category('score')))
-                  .slice(0, 2)
-                  .concatMap((c) => [c('label')]))
-                .and(doc('topics')('common').contains((topic) => article('topics')('common').contains(topic)))
+                .getField('label')
+                .eq(article('categories'))
+                .and(doc('topics')('common').contains((topic) => article('keywords').contains(topic)))
                 .and(doc('people').contains((person) => article('people').contains(person))
                   .or(doc('organizations').contains((org) => article('organizations').contains(org))))))
-            .orderBy(r.desc('timestamp'))
+            .orderBy(r.desc('publishDate'))
             .slice(0, 20)
             .pluck('title', 'url'),
         }))
-        .without(
-          'timestamp', 'body', 'id',
-          'summary2', 'url', 'title',
-          'publishDate', 'sourceId', 'locations',
-          'popularity', 'topics'
-        )
+        // .without(
+        //   'timestamp', 'body', 'id',
+        //   'summary2', 'url', 'title',
+        //   'publishDate', 'sourceId', 'locations',
+        //   'popularity', 'topics'
+        // )
         .run(conn);
       const articles = await cursor.toArray();
 
@@ -328,8 +336,12 @@ module.exports = (conn, io) => {
       } = req.query;
       const catsArr = categories.split(',');
       const cursor = await r.table('articles').filter((article) =>
-        article('timestamp')
-          .during(article('timestamp').date(), r.time(article('timestamp').year(), article('timestamp').month(), article('timestamp').day(), PH_TIMEZONE))
+        article('publishDate').date()
+          .during(
+            r.time(article('publishDate').year(), article('publishDate').month(), article('publishDate').day().sub(7), PH_TIMEZONE),
+            r.time(article('publishDate').year(), article('publishDate').month(), article('publishDate').day().add(7), PH_TIMEZONE),
+            { rightBound: 'closed' }
+          )
           .and(article('categories')
             .orderBy(r.desc((category) => category('score')))
             .slice(0, catsArr.length)

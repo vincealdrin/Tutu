@@ -26,8 +26,8 @@ export default (state = initialState, action) => {
       return {
         ...state,
         sources: action.newSources ? [
-          ...state.sources,
           ...action.newSources,
+          ...state.sources,
         ] : state.sources,
         addStatus: updateCrudStatus(action),
       };

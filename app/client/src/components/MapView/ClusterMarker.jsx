@@ -37,7 +37,7 @@ class ClusterMarker extends Component {
         // open={$hover}
         // hmmm di maibaba ung position ng arrow eto na muna
         // arrow
-        interactive
+        interactive={false}
         animateFill={false}
         sticky
       >

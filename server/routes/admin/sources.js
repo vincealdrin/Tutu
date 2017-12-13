@@ -55,14 +55,14 @@ module.exports = (conn, io) => {
         const { domain } = parseDomain(url);
         const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, url);
         const faviconUrl = getFaviconUrl(htmlDoc);
-        const infoPromise = await getSourceInfo(source, responseGroups);
+        const infoPromise = await getSourceInfo(url, responseGroups);
         const info = await infoPromise;
         const { title } = info.contentData.siteData;
 
         const brand = getSourceBrand(url, title) || _.capitalize(domain);
 
         delete info.contactInfo;
-        console.log(info);
+
         return {
           ...info,
           faviconUrl,
@@ -77,7 +77,6 @@ module.exports = (conn, io) => {
       await r.table(tbl).insert(sourcesInfo).run(conn);
       return res.json(sourcesInfo);
     } catch (e) {
-      console.log(e);
       next(e);
     }
   });

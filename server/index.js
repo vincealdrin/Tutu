@@ -30,7 +30,6 @@ app.use(compression({
 }));
 
 app.use(cors({ exposedHeaders: 'X-Total-Count' }));
-
 // app.use(express.static(path.resolve(__dirname, '..', 'app', 'client', 'build')));
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -91,7 +90,7 @@ initDb((conn) => {
   app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.json({
-      msg: err.msg,
+      msg: err.msg || err.message,
     });
   });
 

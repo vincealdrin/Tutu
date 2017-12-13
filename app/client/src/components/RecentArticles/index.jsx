@@ -57,7 +57,7 @@ class RecentArticles extends Component {
                     <Grid.Column width={10} className="article-info">
                       <Header color="blue" as="a" href={article.url} className="article-title" target="_blank">{article.title}</Header>
                       <br />
-                      <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a>
+                      <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a> | <span>{new Date(article.publishDate).toLocaleDateString()}</span>
                       <p> {article.summary[0]} </p>
                       <Button onClick={() => this.props.fetchFocusedInfo(article)} content="focus" />
                     </Grid.Column>

@@ -110,7 +110,7 @@ class SimpleModal extends Component {
             </Accordion.Title>
             <Accordion.Content active={activeIndex === 0} index={0}>
               {relatedArticles.map((related) => (
-                <p>{related}</p>
+                <p>{related.title}</p>
               ))}
             </Accordion.Content>
           </Accordion>

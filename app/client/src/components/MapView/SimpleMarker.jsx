@@ -39,8 +39,7 @@ class SimpleMarker extends PureComponent {
             <Label className="see-more-button simple-marker-see-more" attached="bottom">Click marker to view more details</Label>
           </div>
         }
-        // open={$hover}
-        interactive
+        open={$hover}
         arrow
         sticky
       >
@@ -58,7 +57,6 @@ class SimpleMarker extends PureComponent {
             console.log();
             return (
               <div>
-                {v.x}
                 <Icon
                   color="red"
                   name="marker"

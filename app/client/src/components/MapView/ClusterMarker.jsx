@@ -34,10 +34,9 @@ class ClusterMarker extends Component {
             <Label className="see-more-button" attached="bottom">Click marker to view more stories...</Label>
           </List>
         }
-        // open={$hover}
+        open={$hover}
         // hmmm di maibaba ung position ng arrow eto na muna
         // arrow
-        interactive={false}
         animateFill={false}
         sticky
       >

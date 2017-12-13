@@ -2,14 +2,7 @@ import React, { Component } from 'react';
 import { List, Image, Label, Modal, Accordion, Icon, Grid, Header, Button } from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
 import shortid from 'shortid';
-// import the reaction images
 import Tags from './Tags';
-import happyReact from './reactions/5.svg';
-import amusedReact from './reactions/4.svg';
-import inspiredReact from './reactions/3.svg';
-import afraidReact from './reactions/2.svg';
-import sadReact from './reactions/1.svg';
-import angryReact from './reactions/0.svg';
 import './styles.css';
 
 class SimpleModal extends Component {
@@ -45,15 +38,6 @@ class SimpleModal extends Component {
       console.log('pending');
       return 'pending';
     }
-
-    const reactionsImages = [
-      { image: happyReact, name: 'happy' },
-      { image: amusedReact, name: 'amused' },
-      { image: inspiredReact, name: 'inspired' },
-      { image: afraidReact, name: 'afraid' },
-      { image: sadReact, name: 'sad' },
-      { image: angryReact, name: 'angry' },
-    ];
 
     const [
       afraid = { reduction: 0 },
@@ -131,20 +115,7 @@ class SimpleModal extends Component {
             </Accordion.Content>
           </Accordion>
           <div className="extras">
-            <List horizontal>
-              {reactionsImages.map((reactionItem) => (
-                <List.Item className="reactions">
-                  <Tooltip
-                    html={
-                      <span style={{ textTransform: 'capitalize' }}>{reactionItem.name}</span>
-                    }
-                    distance={-4}
-                  >
-                    <Image src={reactionItem.image} onClick={() => updateReaction(url, reactionItem.name)} />
-                  </Tooltip>
-                </List.Item>
-              ))}
-            </List>
+
             <Button as="a" href={url} circular color="blue" target="_blank">Read More</Button>
           </div>
         </Modal.Content>

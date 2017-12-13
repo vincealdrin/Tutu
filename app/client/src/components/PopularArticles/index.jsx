@@ -42,7 +42,9 @@ class PopularArticles extends Component {
                     </Grid.Column>
 
                     <Grid.Column width={10} className="article-info">
-                      <Header as="h4">{article.title}</Header>
+                      <Header color="blue" as="a" href={article.url} className="article-title" target="_blank">{article.title}</Header>
+                      <br />
+                      <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a>
                       <p> {article.summary[0]} </p>
                       <Button onClick={() => this.props.fetchFocusedInfo(article)} content="focus" />
                     </Grid.Column>

@@ -69,10 +69,11 @@ export const fetchSources = () => httpThunk(FETCH_SOURCES, async () => {
 });
 
 
-export const addSources = (sources, cb) => httpThunk(ADD_SOURCES, async () => {
+export const addSources = () => httpThunk(ADD_SOURCES, async (getState) => {
   try {
-    const { data: newSources, status } = await axios.post('/sources', sources);
-    if (cb) cb();
+    const { form: { sources } } = getState();
+    const urls = Object.values(sources.values);
+    const { data: newSources, status } = await axios.post('/sources', urls);
 
     return {
       newSources,

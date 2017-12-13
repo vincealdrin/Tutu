@@ -41,7 +41,7 @@ for news_source in news_sources:
     # config.proxies = get_proxies()
 
     try:
-        source = newspaper.build('http://'+url, config=config,  memoize_articles=False)
+        source = newspaper.build('http://'+url, config=config,  memoize_articles=True)
     except Exception as e:
         print('(SOURCE ERROR) Source Skipped\n')
         print(e)

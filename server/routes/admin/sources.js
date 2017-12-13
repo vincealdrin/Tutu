@@ -62,7 +62,7 @@ module.exports = (conn, io) => {
         const brand = getSourceBrand(url, title) || _.capitalize(domain);
 
         delete info.contactInfo;
-
+        console.log(info);
         return {
           ...info,
           faviconUrl,
@@ -77,6 +77,7 @@ module.exports = (conn, io) => {
       await r.table(tbl).insert(sourcesInfo).run(conn);
       return res.json(sourcesInfo);
     } catch (e) {
+      console.log(e);
       next(e);
     }
   });

@@ -12,6 +12,8 @@ const PH_TIMEZONE = '+08:00';
 module.exports.PH_TIMEZONE = PH_TIMEZONE;
 
 module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, reject) => {
+  console.log(url);
+  console.log(responseGroups);
   awisClient({
     Action: 'UrlInfo',
     Url: url,

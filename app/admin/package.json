@@ -1,8 +1,16 @@
 {
-  "name": "client",
+  "name": "admin",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5000",
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:5000"
+    },
+    "/socket.io": {
+      "target": "ws://localhost:5000",
+      "ws": true
+    }
+  },
   "dependencies": {
     "axios": "^0.17.1",
     "chart.js": "^2.7.1",
@@ -15,7 +23,9 @@
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.8",
     "react-scripts": "1.0.17",
+    "react-semantic-redux-form": "^1.2.1",
     "redux": "^3.7.2",
+    "redux-form": "^7.2.0",
     "redux-thunk": "^2.2.0",
     "semantic-ui-css": "^2.2.12",
     "semantic-ui-react": "^0.76.0",

@@ -1,8 +1,16 @@
 {
   "name": "client",
   "version": "0.1.0",
-  "proxy": "http://localhost:5000",
   "private": true,
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:5000"
+    },
+    "/socket.io": {
+      "target": "ws://localhost:5000",
+      "ws": true
+    }
+  },
   "dependencies": {
     "axios": "^0.17.1",
     "google-map-react": "^0.25.0",

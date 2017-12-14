@@ -1,22 +1,21 @@
 import React, { PureComponent } from 'react';
 
+const THRESHOLD = 3;
 class Tags extends PureComponent {
-  state = { isExpanded: this.props.content.length <= 3 }
+  state = { isExpanded: this.props.content.length <= THRESHOLD }
 
   toggleExpand = () => this.setState({ isExpanded: !this.state.isExpanded })
 
   render() {
     const { content } = this.props;
     const { isExpanded } = this.state;
-    const max = isExpanded ? content.length : 3;
-    const tags = content.slice(0, max);
+    const tags = isExpanded ? content : content.slice(0, THRESHOLD);
 
     return (
       <div>
-        <span className="article-tags">{tags.join(', ')}</span>
-        &nbsp;
-        <span className="article-tags see-more" onClick={this.toggleExpand}>
-          {`${isExpanded ? 'See less' : 'See more...'}`}
+        <span className="article-tags">{tags.join(', ')}</span>&nbsp;
+        <span color="blue" className="article-tags see-more" onClick={this.toggleExpand}>
+          {content.length > THRESHOLD ? `${isExpanded ? '...less' : 'more...'}` : null}
         </span>
       </div>
     );

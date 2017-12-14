@@ -91,7 +91,6 @@ export const fetchLogs = () => async (dispatch) => {
       statusText: 'error',
       status: e.response ? e.response.status : 500,
       errorMsg: e.response.data.msg,
-      errorMsg: e.response.data.msg,
     });
   }
 };

@@ -1,7 +1,7 @@
 # start CoreNLP server
 # java -mx4g -cp "*" --add-modules java.xml.bind edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 500000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
 # for deployment
-# nohup java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 500000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
+# nohup java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 500000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly &
 
 import newspaper
 import json
@@ -41,7 +41,7 @@ for news_source in news_sources:
     # config.proxies = get_proxies()
 
     try:
-        source = newspaper.build('http://'+url, config=config,  memoize_articles=False)
+        source = newspaper.build('http://'+url, config=config,  memoize_articles=True)
     except Exception as e:
         print('(SOURCE ERROR) Source Skipped\n')
         print(e)
@@ -69,7 +69,8 @@ for news_source in news_sources:
 
         defragged_url = urldefrag(article.url).url
         qs_idx = defragged_url.find('?')
-        clean_url = defragged_url[:qs_idx if qs_idx != -1 else None].replace('www.', '')
+        clean_url = defragged_url[:qs_idx if qs_idx != -1 else None]
+        clean_url = clean_url.replace('https', 'http').replace('www.', '')
         url_uuid = get_uuid(clean_url)
 
         insert_log(source_id, 'articleCrawl', 'pending', float(time.clock() - start_time), {

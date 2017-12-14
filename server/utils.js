@@ -9,7 +9,10 @@ const awisClient = awis({
 });
 
 const PH_TIMEZONE = '+08:00';
+const WEEK_IN_SEC = 604800;
+
 module.exports.PH_TIMEZONE = PH_TIMEZONE;
+module.exports.WEEK_IN_SEC = WEEK_IN_SEC;
 
 module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, reject) => {
   awisClient({
@@ -105,8 +108,9 @@ const getSentiment = (sentiment) => r.branch(
 
 module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
   const doc = {
+    title: article('title'),
     authors: article('authors'),
-    keywords: article('topics')('common').split(','),
+    keywords: article('topics')('common'),
     people: article('people'),
     organizations: article('organizations'),
     publishDate: article('publishDate'),
@@ -135,13 +139,13 @@ module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
       .slice(0, catsFilterLength)
-      .concatMap((c) => [c('label')]);
+      .getField('label');
   } else {
     doc.categories = article('categories')
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
       .slice(0, 2)
-      .concatMap((c) => [c('label')]);
+      .getField('label');
   }
 
   return doc;
@@ -149,8 +153,9 @@ module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
 
 module.exports.mapClusterInfo = (catsFilterLength) => (article) => {
   const doc = {
+    title: article('title'),
     authors: article('authors'),
-    keywords: article('topics')('common').split(','),
+    keywords: article('topics')('common'),
     people: article('people'),
     organizations: article('organizations'),
     publishDate: article('publishDate'),
@@ -164,13 +169,13 @@ module.exports.mapClusterInfo = (catsFilterLength) => (article) => {
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
       .slice(0, catsFilterLength)
-      .concatMap((c) => [c('label')]);
+      .getField('label');
   } else {
     doc.categories = article('categories')
       .filter((category) => category('score').gt(0))
       .orderBy(r.desc((category) => category('score')))
       .slice(0, 2)
-      .concatMap((c) => [c('label')]);
+      .getField('label');
   }
 
   return doc;
@@ -217,7 +222,7 @@ module.exports.mapFeedArticle = (join) => {
     url: join('left')('new_val')('url'),
     title: join('left')('new_val')('title'),
     // authors: join('left')('new_val')('authors'),
-    // keywords: join('left')('new_val')('topics')('common').split(','),
+    // keywords: join('left')('new_val')('topics')('common'),
     publishDate: join('left')('new_val')('publishDate'),
     // sentiment: getSentiment(join('left')('new_val')('sentiment')),
     summary: join('left')('new_val')('summary'),

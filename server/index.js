@@ -30,7 +30,6 @@ app.use(compression({
 }));
 
 app.use(cors({ exposedHeaders: 'X-Total-Count' }));
-
 // app.use(express.static(path.resolve(__dirname, '..', 'app', 'client', 'build')));
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -58,9 +57,6 @@ initDb((conn) => {
   //   res.sendFile(path.resolve(__dirname, '..', 'app', 'client', 'build', 'index.html'));
   // });
 
-  // adminApp.get('*', (req, res) => {
-  //   res.sendFile(path.resolve(__dirname, '..', 'app', 'admin', 'build', 'index.html'));
-  // });
 
   // catch 404 and forward to error handler
   app.use((req, res, next) => {
@@ -94,7 +90,7 @@ initDb((conn) => {
   app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.json({
-      msg: err.msg,
+      msg: err.msg || err.message,
     });
   });
 

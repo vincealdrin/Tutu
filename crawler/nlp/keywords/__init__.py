@@ -70,6 +70,7 @@ class TopicDetector(object):
         data = self.improve_data(words)
         top5 = [w for w, c in FreqDist(data).most_common(5)]
         topics = [e for e in top5 if e.split()[0] in freq]
+        topics = self.readable(topics)
         return topics
 
     def main_topics(self, words):
@@ -78,12 +79,17 @@ class TopicDetector(object):
                 if pos_tag([w])[0][1] in "NNP"]
         et = word_tokenize(self.extract_topics(words))
         main_topics = set([e for e in et if e.split()[0] in freq])
+        main_topics = self.readable(main_topics)
         return main_topics
+
+    def readable(self, words):
+        data = ','.join(words)
+        return data
 
 def parse_topics(text):
     td = TopicDetector()
 
     return {
-        'common': td.extract_topics(text),
-        'main': td.main_topics(text)
+        'common': td.extract_topics(text).split(','),
+        'main': td.main_topics(text).split(',')
     }

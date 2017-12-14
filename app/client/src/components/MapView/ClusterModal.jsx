@@ -2,10 +2,20 @@ import React, { Component } from 'react';
 import { List, Image, Label, Dimmer, Loader, Modal, Segment, Grid, Header, Button, Accordion, Icon } from 'semantic-ui-react';
 import Tags from './Tags';
 import shortid from 'shortid';
+import Tags from './Tags';
 import './styles.css';
 
 class ClusterModal extends Component {
   state = { activeIndex: 0 };
+
+  getSentimentColor = (sentiment) => {
+    if (sentiment === 'Positive') {
+      return 'green';
+    } else if (sentiment === 'Neutral') {
+      return 'grey';
+    }
+    return 'red';
+  }
 
   render() {
     const { activeIndex } = this.state;
@@ -63,7 +73,7 @@ class ClusterModal extends Component {
               inspired = { reduction: 0 },
               sad = { reduction: 0 },
             ] = reactions;
-
+            
             return (
               <Segment key={shortid.generate()} raised className="modal-article-container">
                 <Grid columns={2}>
@@ -76,7 +86,7 @@ class ClusterModal extends Component {
                         <p className="article-date">
                           {new Date(publishDate).toDateString()} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
                         </p>
-                      </div>
+                        </div>
                       <div className="tags">
                         <List divided relaxed>
                           <List.Item>

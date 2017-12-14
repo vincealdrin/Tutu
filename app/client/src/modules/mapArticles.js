@@ -211,7 +211,7 @@ export const fetchFocusedInfo = (article) => httpThunk(FETCH_FOCUSED_INFO, async
     const { filters: { categories } } = getState();
     const { data: focusedInfo, status } = await axios.get('/articles/info', {
       params: {
-        url: article.url,
+        id: article.id,
         catsFilter: categories.length,
       },
     });
@@ -234,7 +234,7 @@ export const fetchFocusedClusterInfo = (articles) =>
       const { filters: { categories } } = getState();
       const { data: focusedClusterInfo, status } = await axios.get('/articles/clusterInfo', {
         params: {
-          urls: articles.map((article) => article.url).join(),
+          ids: articles.map((article) => article.id).join(),
           catsFilter: categories.length,
         },
       });

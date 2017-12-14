@@ -181,12 +181,11 @@ module.exports = (conn, io) => {
   router.get('/info', async (req, res, next) => {
     try {
       const {
-        url,
+        id,
         catsFilterLength,
       } = req.query;
-      const uuid = await r.uuid(url).run(conn);
       const articleInfo = await r.table(tbl)
-        .get(uuid)
+        .get(id)
         .merge(mapArticleInfo(catsFilterLength))
         .merge((article) => ({
           relatedArticles: r.table('articles').filter((doc) =>
@@ -196,21 +195,23 @@ module.exports = (conn, io) => {
                 r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).add(WEEK_IN_SEC),
                 { rightBound: 'closed' }
               )
-              .and(doc('categories')
-                .orderBy(r.desc((category) => category('score')))
-                .slice(0, 2)
-                .getField('label')
-                .eq(article('categories'))
-                .and(doc('topics')('common').contains((topic) => article('keywords').contains(topic)))
-                .and(doc('people').contains((person) => article('people').contains(person))
-                  .or(doc('organizations').contains((org) => article('organizations').contains(org))))))
+              .and(article('categories')
+                .contains((label) => doc('categories')
+                  .orderBy(r.desc((category) => category('score')))
+                  .slice(0, 2)
+                  .getField('label')
+                  .contains(label))
+                .and(article('keywords').contains((keyword) => doc('topics')('common').coerceTo('string').match(keyword)))
+                .and(article('people').contains((person) => doc('people').coerceTo('string').match(person)))
+                .or(article('organizations').contains((org) => doc('organizations').coerceTo('string').match(org))))
+              .and(doc('id').ne(article('id'))))
             .orderBy(r.desc('timestamp'))
             .slice(0, 20)
             .pluck('title', 'url'),
         }))
         .without(
           'timestamp', 'body', 'id',
-          'summary2', 'url', // 'title',
+          'summary2', // 'url', // 'title',
           'publishDate', 'sourceId', 'locations',
           'popularity', 'topics'
         )
@@ -229,10 +230,10 @@ module.exports = (conn, io) => {
   router.get('/clusterInfo', async (req, res, next) => {
     try {
       const {
-        urls,
+        ids,
         catsFilterLength,
       } = req.query;
-      const uuids = await Promise.all(urls.split(',').map((url) => r.uuid(url).run(conn)));
+      const uuids = ids.split(',');
       const cursor = await r.table(tbl)
         .getAll(r.args(uuids))
         .map(mapClusterInfo(catsFilterLength))
@@ -244,14 +245,16 @@ module.exports = (conn, io) => {
                 r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).add(WEEK_IN_SEC),
                 { rightBound: 'closed' }
               )
-              .and(doc('categories')
-                .orderBy(r.desc((category) => category('score')))
-                .slice(0, 2)
-                .getField('label')
-                .eq(article('categories'))
-                .and(doc('topics')('common').contains((topic) => article('keywords').contains(topic)))
-                .and(doc('people').contains((person) => article('people').contains(person))
-                  .or(doc('organizations').contains((org) => article('organizations').contains(org))))))
+              .and(article('categories')
+                .contains((label) => doc('categories')
+                  .orderBy(r.desc((category) => category('score')))
+                  .slice(0, 2)
+                  .getField('label')
+                  .contains(label))
+                .and(article('keywords').contains((keyword) => doc('topics')('common').coerceTo('string').match(keyword)))
+                .and(article('people').contains((org) => doc('people').coerceTo('string').match(org)))
+                .or(article('organizations').contains((org) => doc('organizations').coerceTo('string').match(org))))
+              .and(doc('id').ne(article('id'))))
             .orderBy(r.desc('publishDate'))
             .slice(0, 20)
             .pluck('title', 'url'),
@@ -266,12 +269,17 @@ module.exports = (conn, io) => {
       const articles = await cursor.toArray();
 
       // console.log(articles);
-      const filteredArticles = articles.map((article) => ({
-        ...article,
-        relatedArticles: article.relatedArticles
-          .filter(({ title }) => natural.DiceCoefficient(article.title, title) > 0.40)
-          .slice(0, 5),
-      }));
+      const filteredArticles = uuids.map((id) => {
+        const article = articles.find((a) => a.id === id);
+        delete article.id;
+
+        return {
+          ...article,
+          relatedArticles: article.relatedArticles
+            .filter(({ title }) => natural.DiceCoefficient(article.title, title) > 0.40)
+            .slice(0, 5),
+        };
+      });
 
       res.json(filteredArticles);
     } catch (e) {

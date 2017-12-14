@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { List, Image, Dimmer, Loader, Label, Modal, Accordion, Icon, Grid, Header, Button } from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
-import shortid from 'shortid';
 // import the reaction images
 import Tags from './Tags';
 import happyReact from './reactions/5.svg';
@@ -17,6 +16,15 @@ class SimpleModal extends Component {
     activeIndex: 0,
     active: false,
   };
+
+  getSentimentColor = (sentiment) => {
+    if (sentiment === 'Positive') {
+      return 'green';
+    } else if (sentiment === 'Neutral') {
+      return 'grey';
+    }
+    return 'red';
+  }
 
   render() {
     const {
@@ -101,18 +109,22 @@ class SimpleModal extends Component {
                       <div>
                         <List divided relaxed>
                           <List.Item>
+                            <Label
+                              as="a"
+                              className="tag-label"
+                              color={this.getSentimentColor(sentiment)}
+                            >
+                              Sentiment
+                            </Label>
+                            <span className="article-tags">{sentiment}</span>
+                          </List.Item>
+                          <List.Item>
                             <Label as="a" className="tag-label">Categories</Label>
-                            {categories.map((category) => (
-                              <span key={shortid.generate()} className="article-tags">{`${category}, `}</span>
-                          ))}
+                            <Tags content={categories} />
                           </List.Item>
                           <List.Item>
                             <Label as="a" className="tag-label">Keywords</Label>
                             <Tags content={keywords} />
-                          </List.Item>
-                          <List.Item>
-                            <Label as="a" className="tag-label">Sentiment</Label>
-                            <span className="article-tags">{sentiment}</span>
                           </List.Item>
                           <List.Item>
                             <Label as="a" className="tag-label">Organizations</Label>

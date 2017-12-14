@@ -10,11 +10,12 @@ const toCSS = (translateX) => ({ transform: `translateX: ${translateX}px` });
 class SimpleMarker extends PureComponent {
   render() {
     const {
-      topImageUrl,
-      title,
-      source,
-      url,
-      publishDate,
+      article: {
+        topImageUrl,
+        title,
+        source,
+        publishDate,
+      },
       $hover,
     } = this.props;
 
@@ -27,16 +28,18 @@ class SimpleMarker extends PureComponent {
             <Grid>
               <Grid.Row columns={2}>
                 <Grid.Column width={7}>
-                  <Image src={topImageUrl} />
+                  {$hover ? <Image src={topImageUrl} /> : null}
                 </Grid.Column>
                 <Grid.Column width={9} className="marker-title-column">
-                  <Header as="a" color="blue" href={url} target="_blank" className="simple-marker-title">{title}</Header>
+                  <Header as="a" color="blue" target="_blank" className="simple-marker-title">{title}</Header>
                   <p className="article-date">{new Date(publishDate).toDateString()}</p>
                   <Label as="a" circular className="source-label">{source}</Label>
                 </Grid.Column>
               </Grid.Row>
             </Grid>
-            <Label className="see-more-button simple-marker-see-more" attached="bottom">Click marker to view more details</Label>
+            <Label className="see-more-button simple-marker-see-more" attached="bottom">
+              Click marker to view more details
+            </Label>
           </div>
         }
         open={$hover}

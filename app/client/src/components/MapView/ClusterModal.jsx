@@ -1,11 +1,20 @@
 import React, { Component } from 'react';
 import { List, Image, Label, Modal, Segment, Grid, Header, Button, Accordion, Icon } from 'semantic-ui-react';
-import Tags from './Tags';
 import shortid from 'shortid';
+import Tags from './Tags';
 import './styles.css';
 
 class ClusterModal extends Component {
   state = { activeIndex: 0 };
+
+  getSentimentColor = (sentiment) => {
+    if (sentiment === 'Positive') {
+      return 'green';
+    } else if (sentiment === 'Neutral') {
+      return 'grey';
+    }
+    return 'red';
+  }
 
   render() {
     const { activeIndex } = this.state;
@@ -75,18 +84,22 @@ class ClusterModal extends Component {
                         <div className="tags">
                           <List divided relaxed>
                             <List.Item>
+                              <Label
+                                as="a"
+                                className="tag-label"
+                                color={this.getSentimentColor(sentiment)}
+                              >
+                              Sentiment
+                              </Label>
+                              <span className="article-tags">{sentiment}</span>
+                            </List.Item>
+                            <List.Item>
                               <Label as="a" className="tag-label">Categories</Label>
-                              {categories.map((category) => (
-                                <span key={shortid.generate()} className="article-tags">{`${category}, `}</span>
-                              ))}
+                              <Tags content={categories} />
                             </List.Item>
                             <List.Item>
                               <Label as="a" className="tag-label">Keywords</Label>
                               <Tags content={keywords} />
-                            </List.Item>
-                            <List.Item>
-                              <Label as="a" className="tag-label">Sentiment</Label>
-                              <span className="article-tags">{sentiment}</span>
                             </List.Item>
                             <List.Item>
                               <Label as="a" className="tag-label">Organizations</Label>

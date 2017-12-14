@@ -18,13 +18,14 @@ from aylien import categorize
 from nlp import get_entities, summarize
 from nlp.keywords import parse_topics
 from fake_useragent import UserAgent
+from random import shuffle
 
 load_dotenv(find_dotenv(), override=True)
 
 locations = get_locations()
 provinces = get_provinces()
-news_sources = get_news_sources('timestamp', False)
-
+news_sources = get_news_sources('timestamp')
+shuffle(news_sources)
 if not news_sources:
     print('EMPTY NEWS SOURCES')
 
@@ -41,7 +42,7 @@ for news_source in news_sources:
     # config.proxies = get_proxies()
 
     try:
-        source = newspaper.build('http://'+url, config=config,  memoize_articles=True)
+        source = newspaper.build('http://'+url, config=config,  memoize_articles=False)
     except Exception as e:
         print('(SOURCE ERROR) Source Skipped\n')
         print(e)
@@ -58,7 +59,7 @@ for news_source in news_sources:
 
     if (not source.articles):
         print('(ZERO ARTICLES) Source Skipped\n')
-        insert_log(source_id, 'SOURCE ERROR', 'error', float(time.clock() - src_start_time))
+        insert_log(source_id, 'SOURCE ERROR', 'error', float(time.clock() - src_start_time), {})
         continue
 
     # 50 articles only for dev purposes

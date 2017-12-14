@@ -12,12 +12,12 @@ class Tags extends PureComponent {
     const tags = isExpanded ? content : content.slice(0, THRESHOLD);
 
     return (
-      <div>
+      <span>
         <span className="article-tags">{tags.join(', ')}</span>&nbsp;
         <span color="blue" className="article-tags see-more" onClick={this.toggleExpand}>
           {content.length > THRESHOLD ? `${isExpanded ? '...less' : 'more...'}` : null}
         </span>
-      </div>
+      </span>
     );
   }
 }

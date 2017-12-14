@@ -53,7 +53,7 @@ def get_provinces():
                 'location': doc['right'].without({ 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True})
             }).without({ 'right': True, 'left': True }).run(conn))
 
-def get_news_sources(order_by, desc, table='sources'):
+def get_news_sources(order_by, desc = False, table='sources'):
     if desc:
         return list(r.table(table).order_by(r.desc(order_by)).run(conn))
     return list(r.table(table).order_by(order_by).run(conn))

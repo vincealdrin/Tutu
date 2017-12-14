@@ -88,7 +88,7 @@ class MapView extends Component {
     if (childProps.articles) {
       this.props.fetchFocusedClusterInfo(childProps.articles);
     } else {
-      this.props.fetchFocusedInfo(childProps);
+      this.props.fetchFocusedInfo(childProps.article);
     }
   }
 
@@ -139,12 +139,7 @@ class MapView extends Component {
             return (
               <SimpleMarker
                 key={shortid.generate()}
-                title={article.title}
-                publishDate={article.publishDate}
-                source={article.source}
-                sourceUrl={article.sourceUrl}
-                topImageUrl={article.topImageUrl}
-                url={article.url}
+                article={article}
                 lng={lng}
                 lat={lat}
               />

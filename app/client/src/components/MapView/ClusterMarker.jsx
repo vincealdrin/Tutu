@@ -18,12 +18,14 @@ class ClusterMarker extends Component {
                 <Grid>
                   <Grid.Row columns={2}>
                     <Grid.Column width={7}>
-                      <Image src={article.topImageUrl} />
+                      {$hover ? <Image src={article.topImageUrl} /> : null}
                     </Grid.Column>
                     <Grid.Column width={9} className="marker-title-column">
                       <div>
                         <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
-                        <List.Description className="article-date">{new Date(article.publishDate).toDateString()}</List.Description>
+                        <List.Description className="article-date">
+                          {new Date(article.publishDate).toDateString()}
+                        </List.Description>
                         <Label as="a" circular className="source-label">{article.source}</Label>
                       </div>
                     </Grid.Column>

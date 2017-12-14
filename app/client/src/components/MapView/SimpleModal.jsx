@@ -76,107 +76,105 @@ class SimpleModal extends Component {
     const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
 
     return (
-      <div>
-        {
-          status.pending
-          ?
-            (
-              <Dimmer active>
-                <Loader indeterminate>Loading article...</Loader>
-              </Dimmer>
-            )
-          :
-            (
-              <Modal
-                className="modal-container"
-                size="tiny"
-                open={open}
-                onClose={removeFocused}
-                closeOnDimmerClick
-                dimmer
-              >
-                <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
-                <Modal.Content scrolling>
-                  <Grid columns={2} style={{ marginBottom: '1rem' }}>
-                    <Grid.Column width={7}>
-                      <div className="image-tag-title-container">
-                        <div className="top-image">
-                          <Image src={topImageUrl} />
-                        </div>
-                      </div>
-                    </Grid.Column>
-                    <Grid.Column width={9}>
-                      <div>
-                        <List divided relaxed>
-                          <List.Item>
-                            <Label
-                              as="a"
-                              className="tag-label"
-                              color={this.getSentimentColor(sentiment)}
-                            >
-                              Sentiment
-                            </Label>
-                            <span className="article-tags">{sentiment}</span>
-                          </List.Item>
-                          <List.Item>
-                            <Label as="a" className="tag-label">Categories</Label>
-                            <Tags content={categories} />
-                          </List.Item>
-                          <List.Item>
-                            <Label as="a" className="tag-label">Keywords</Label>
-                            <Tags content={keywords} />
-                          </List.Item>
-                          <List.Item>
-                            <Label as="a" className="tag-label">Organizations</Label>
-                            <Tags content={organizations} />
-                          </List.Item>
-                          <List.Item>
-                            <Label as="a" className="tag-label">People</Label>
-                            <Tags content={people} />
-                          </List.Item>
-                        </List>
-                      </div>
-                    </Grid.Column>
-                  </Grid>
-                  <Header as="a" color="blue" href={url} target="_blank">{title}</Header>
-                  <p className="article-date">
-                    {new Date(publishDate).toDateString()} | {authors.join(', ')}
-                  </p>
-                  <p> {summary && summary[0]} </p>
-                  <Accordion style={{ margin: '1rem 0' }}>
-                    <Accordion.Title active={activeIndex === 0} index={0}>
-                      <Icon name="dropdown" />
-                    Related Stories
-                    </Accordion.Title>
-                    <Accordion.Content active={activeIndex === 0} index={0}>
-                      {relatedArticles.map((related) => (
-                        <p>{related.title}</p>
-                    ))}
-                    </Accordion.Content>
-                  </Accordion>
-                  <div className="extras">
-                    <List horizontal>
-                      {reactionsImages.map((reactionItem) => (
-                        <List.Item className="reactions">
-                          <Tooltip
-                            html={<span style={{ textTransform: 'capitalize' }}>{reactionItem.name}</span>}
-                            distance={-4}
-                          >
-                            <Image
-                              src={reactionItem.image}
-                              onClick={() => updateReaction(url, reactionItem.name)}
-                            />
-                          </Tooltip>
-                        </List.Item>
-                    ))}
-                    </List>
-                    <Button as="a" href={url} circular color="blue" target="_blank">Read More</Button>
-                  </div>
-                </Modal.Content>
-              </Modal>
-            )
-        }
-      </div>
+      <Modal
+        className="modal-container"
+        size="tiny"
+        open={open}
+        onClose={removeFocused}
+        closeOnDimmerClick
+        dimmer
+      >
+        <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
+        <Modal.Content scrolling>
+          {status.pending ? (
+            <Dimmer active>
+              <Loader indeterminate>Loading article...</Loader>
+            </Dimmer>
+            ) : null }
+          <Grid columns={2} style={{ marginBottom: '1rem' }}>
+            <Grid.Column width={7}>
+              <div className="image-tag-title-container">
+                <div
+                  className="top-image"
+                  style={{
+                    width: 219.63,
+                    height: 294.84,
+                    backgroundImage: `url(${topImageUrl})`,
+                    backgroundPosition: 'center',
+                    backgroundSize: 'cover',
+                  }}
+                />
+              </div>
+            </Grid.Column>
+            <Grid.Column width={9}>
+              <div>
+                <List divided relaxed>
+                  <List.Item>
+                    <Label
+                      as="a"
+                      className="tag-label"
+                      color={this.getSentimentColor(sentiment)}
+                    >
+                      Sentiment
+                    </Label>
+                    <span className="article-tags">{sentiment}</span>
+                  </List.Item>
+                  <List.Item>
+                    <Label as="a" className="tag-label">Categories</Label>
+                    <Tags content={categories} />
+                  </List.Item>
+                  <List.Item>
+                    <Label as="a" className="tag-label">Keywords</Label>
+                    <Tags content={keywords} />
+                  </List.Item>
+                  <List.Item>
+                    <Label as="a" className="tag-label">Organizations</Label>
+                    <Tags content={organizations} />
+                  </List.Item>
+                  <List.Item>
+                    <Label as="a" className="tag-label">People</Label>
+                    <Tags content={people} />
+                  </List.Item>
+                </List>
+              </div>
+            </Grid.Column>
+          </Grid>
+          <Header as="a" color="blue" href={url} target="_blank">{title}</Header>
+          <p className="article-date">
+            {new Date(publishDate).toDateString()} | {authors.join(', ')}
+          </p>
+          <Label as="a" href={`http://${sourceUrl}`} target="_blank" circular style={{ marginBottom: '0.6rem' }}>{source}</Label>
+          <p> {summary && summary[0]} </p>
+          <Accordion style={{ margin: '1rem 0' }}>
+            <Accordion.Title active={activeIndex === 0} index={0}>
+              <Icon name="dropdown" />
+              Related Stories
+            </Accordion.Title>
+            <Accordion.Content active={activeIndex === 0} index={0}>
+              {relatedArticles.map((related) => (
+                <p>{related}</p>
+              ))}
+            </Accordion.Content>
+          </Accordion>
+          <div className="extras">
+            <List horizontal>
+              {reactionsImages.map((reactionItem) => (
+                <List.Item className="reactions">
+                  <Tooltip
+                    html={
+                      <span style={{ textTransform: 'capitalize' }}>{reactionItem.name}</span>
+                }
+                    distance={-4}
+                  >
+                    <Image src={reactionItem.image} onClick={() => updateReaction(url, reactionItem.name)} />
+                  </Tooltip>
+                </List.Item>
+          ))}
+            </List>
+            <Button as="a" href={url} circular color="blue" target="_blank">Read More</Button>
+          </div>
+        </Modal.Content>
+      </Modal>
     );
   }
 }

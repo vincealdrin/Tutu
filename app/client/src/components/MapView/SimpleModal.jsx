@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { List, Image, Dimmer, Loader, Label, Modal, Accordion, Icon, Grid, Header, Button } from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
-import shortid from 'shortid';
 // import the reaction images
 import Tags from './Tags';
 import happyReact from './reactions/5.svg';
@@ -17,6 +16,15 @@ class SimpleModal extends Component {
     activeIndex: 0,
     active: false,
   };
+
+  getSentimentColor = (sentiment) => {
+    if (sentiment === 'Positive') {
+      return 'green';
+    } else if (sentiment === 'Neutral') {
+      return 'grey';
+    }
+    return 'red';
+  }
 
   render() {
     const {
@@ -78,17 +86,11 @@ class SimpleModal extends Component {
       >
         <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
         <Modal.Content scrolling>
-          {
-            status.pending
-            ?
-              (
-                <Dimmer active>
-                  <Loader indeterminate>Loading article...</Loader>
-                </Dimmer>
-              )
-            :
-            ''
-          }
+          {status.pending ? (
+            <Dimmer active>
+              <Loader indeterminate>Loading article...</Loader>
+            </Dimmer>
+            ) : null }
           <Grid columns={2} style={{ marginBottom: '1rem' }}>
             <Grid.Column width={7}>
               <div className="image-tag-title-container">
@@ -108,18 +110,22 @@ class SimpleModal extends Component {
               <div>
                 <List divided relaxed>
                   <List.Item>
+                    <Label
+                      as="a"
+                      className="tag-label"
+                      color={this.getSentimentColor(sentiment)}
+                    >
+                      Sentiment
+                    </Label>
+                    <span className="article-tags">{sentiment}</span>
+                  </List.Item>
+                  <List.Item>
                     <Label as="a" className="tag-label">Categories</Label>
-                    {categories.map((category) => (
-                      <span key={shortid.generate()} className="article-tags">{`${category}, `}</span>
-                ))}
+                    <Tags content={categories} />
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Keywords</Label>
                     <Tags content={keywords} />
-                  </List.Item>
-                  <List.Item>
-                    <Label as="a" className="tag-label">Sentiment</Label>
-                    <span className="article-tags">{sentiment}</span>
                   </List.Item>
                   <List.Item>
                     <Label as="a" className="tag-label">Organizations</Label>
@@ -142,12 +148,12 @@ class SimpleModal extends Component {
           <Accordion style={{ margin: '1rem 0' }}>
             <Accordion.Title active={activeIndex === 0} index={0}>
               <Icon name="dropdown" />
-          Related Stories
+              Related Stories
             </Accordion.Title>
             <Accordion.Content active={activeIndex === 0} index={0}>
               {relatedArticles.map((related) => (
                 <p>{related}</p>
-          ))}
+              ))}
             </Accordion.Content>
           </Accordion>
           <div className="extras">

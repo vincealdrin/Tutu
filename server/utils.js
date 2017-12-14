@@ -108,6 +108,7 @@ const getSentiment = (sentiment) => r.branch(
 
 module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
   const doc = {
+    url: article('url'),
     title: article('title'),
     authors: article('authors'),
     keywords: article('topics')('common'),
@@ -153,6 +154,8 @@ module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
 
 module.exports.mapClusterInfo = (catsFilterLength) => (article) => {
   const doc = {
+    id: article('id'),
+    url: article('url'),
     title: article('title'),
     authors: article('authors'),
     keywords: article('topics')('common'),
@@ -184,7 +187,7 @@ module.exports.mapClusterInfo = (catsFilterLength) => (article) => {
 
 module.exports.mapArticle = (bounds) => (join) => {
   const article = {
-    url: join('left')('url'),
+    id: join('left')('id'),
     title: join('left')('title'),
     publishDate: join('left')('publishDate'),
     topImageUrl: join('left')('topImageUrl'),

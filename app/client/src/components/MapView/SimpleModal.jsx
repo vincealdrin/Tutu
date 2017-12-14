@@ -135,7 +135,7 @@ class SimpleModal extends Component {
           </Grid>
           <Header as="a" color="blue" href={url} target="_blank">{title}</Header>
           <p className="article-date">
-            {new Date(publishDate).toDateString()} | {authors.join(', ')}
+            {new Date(publishDate).toDateString()} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
           </p>
           <Label as="a" href={`http://${sourceUrl}`} target="_blank" circular style={{ marginBottom: '0.6rem' }}>{source}</Label>
           <p> {summary && summary[0]} </p>

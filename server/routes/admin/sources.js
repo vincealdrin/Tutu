@@ -55,7 +55,7 @@ module.exports = (conn, io) => {
         const { domain } = parseDomain(url);
         const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, url);
         const faviconUrl = getFaviconUrl(htmlDoc);
-        const infoPromise = await getSourceInfo(source, responseGroups);
+        const infoPromise = await getSourceInfo(url, responseGroups);
         const info = await infoPromise;
         const { title } = info.contentData.siteData;
 

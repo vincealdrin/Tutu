@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import times from 'lodash/times';
-import shortid from 'shortid';
-import { Input, Segment, Grid, Label, Button } from 'semantic-ui-react';
+import { Segment, Grid, Label, Button } from 'semantic-ui-react';
 import DataTable from '../Common/DataTable';
+import SourcesForm from './SourcesForm';
 import {
   fetchSources,
   addSources,
@@ -43,25 +42,12 @@ const columns = [
 ];
 
 class Sources extends Component {
-  state = {
-    inputCount: 1,
-    inputVals: [],
-  }
-
   componentDidMount() {
     this.props.fetchSources();
   }
 
-  resetInputVals = () => this.setState({ inputCount: 1, inputVals: [] })
-  addInput = () => this.setState({ inputCount: this.state.inputCount + 1 })
-  removeInput = () => this.setState({
-    inputCount: this.state.inputCount - 1,
-    inputVals: this.state.inputVals.slice(0, -1),
-  })
-
   render() {
     const { sources } = this.props;
-    const { inputCount, inputVals } = this.state;
 
     return (
       <div className="sources-container">
@@ -88,38 +74,7 @@ class Sources extends Component {
                   data={sources}
                   columns={columns}
                   onDeleteSelected={this.props.deleteSources}
-                  addModalContent={
-                    <div>
-                      {times(inputCount, (i) => (
-                        <Input
-                          key={shortid.generate()}
-                          icon="world"
-                          iconPosition="left"
-                          placeholder="Source URL"
-                          action={(i + 1) === (inputCount)
-                              ? {
-                                  color: 'teal',
-                                  icon: 'add',
-                                  content: 'Add Input',
-                                  onClick: this.addInput,
-                                }
-                              : {
-                                color: 'orange',
-                                icon: 'remove',
-                                content: 'Remove',
-                                onClick: this.removeInput,
-                              }
-                            }
-                          onChange={(_, { value }) => {
-                            const vals = inputVals;
-                            vals[i] = value;
-                            this.setState({ inputVals: vals });
-                          }}
-                          fluid
-                        />
-                        ))}
-                    </div>
-                  }
+                  addModalContent={<SourcesForm />}
                   addModalActions={(closeModal) => (
                     <div>
                       <Button
@@ -130,8 +85,8 @@ class Sources extends Component {
                       <Button
                         color="green"
                         onClick={async () => {
-                          await this.props.addSources(inputVals);
-                          this.resetInputVals();
+                          await this.props.addSources();
+                          // this.resetInputVals();
                           closeModal();
                         }}
                         content="Add All Sources"

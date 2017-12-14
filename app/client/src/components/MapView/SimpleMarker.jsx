@@ -57,7 +57,6 @@ class SimpleMarker extends PureComponent {
             console.log();
             return (
               <div>
-                {v.x}
                 <Icon
                   color="red"
                   name="marker"

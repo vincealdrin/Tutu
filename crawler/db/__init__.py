@@ -58,5 +58,8 @@ def get_news_sources(order_by, desc = False, table='sources'):
         return list(r.table(table).order_by(r.desc(order_by)).run(conn))
     return list(r.table(table).order_by(order_by).run(conn))
 
+def get_rand_news_source(count = 1, table='sources'):
+    return list(r.table('table').sample(count).run(conn))
+
 def insert_fake_source(source):
     r.table('fakeSources').insert(source).run(conn)

@@ -19,7 +19,7 @@ fake-useragent = "*"
 scikit-learn = "*"
 numpy = "*"
 scipy = "*"
-socketIO-client = "*"
+socketio-client = "*"
 rethinkdb = "*"
 sumy = "*"
 matplotlib = "*"
@@ -33,6 +33,8 @@ idna = "*"
 twython = "*"
 stop-words = "*"
 concepts = "*"
+proxybroker = "*"
+asyncio = "*"
 
 
 [dev-packages]

@@ -12,7 +12,7 @@ from random import randrange
 from urllib.parse import urldefrag, urlparse
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
-from db import get_locations, get_news_sources, get_provinces, get_article, insert_article, insert_log, get_uuid
+from db import get_locations, get_news_sources, get_provinces, get_article, insert_article, insert_log, get_uuid, get_rand_news_source
 from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_popularity
 from aylien import categorize
 from nlp import get_entities, summarize
@@ -24,14 +24,21 @@ load_dotenv(find_dotenv(), override=True)
 
 locations = get_locations()
 provinces = get_provinces()
-news_sources = get_news_sources('timestamp')
-shuffle(news_sources)
-if not news_sources:
-    print('EMPTY NEWS SOURCES')
+# news_sources = get_news_sources('timestamp')
+# shuffle(news_sources)
+# if not news_sources:
+#     print('EMPTY NEWS SOURCES')
 
 count = 0
 slp_time = 0
-for news_source in news_sources:
+
+while True:
+    news_source = get_rand_news_source()
+
+    if not news_source:
+        print('EMPTY NEWS SOURCES')
+        break
+
     src_start_time = time.clock()
     url = news_source['contentData']['dataUrl']
     config = newspaper.Config()
@@ -39,7 +46,7 @@ for news_source in news_sources:
     config.follow_meta_refresh = True
     src_art_count = 0
     source_id = news_source['id']
-    # config.proxies = get_proxies()
+    config.proxies = get_proxies()
 
     try:
         source = newspaper.build('http://'+url, config=config,  memoize_articles=False)

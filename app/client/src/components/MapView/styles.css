@@ -104,11 +104,6 @@
   width: 5% !important;
 }
 
-.cluster-list-container {
-  max-height: 365px;
-  overflow: hidden;
-}
-
 .cluster-list-container:last-child {
   margin-bottom: 2.8rem !important;
 }

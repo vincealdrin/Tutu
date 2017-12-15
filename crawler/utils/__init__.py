@@ -8,29 +8,38 @@ import htmldate
 import os
 from functools import reduce
 from fake_useragent import UserAgent
+import asyncio
+from proxybroker import Broker
+import random
 
 SHARED_COUNT_API_KEY = os.environ.get('SHARED_COUNT_API_KEY')
 PH_TIMEZONE = '+08:00'
-# get free proxies from us-proxy.org
-def get_proxies():
-    html_doc = get('https://www.us-proxy.org/').text
-    soup = BeautifulSoup(html_doc, 'html.parser')
-    rows = soup.find_all('tr')[1:-1]
 
-    http_rows = [row for row in rows if row.select('td[class=\'hx\']')[0].text == 'no']
-    http_rand_idx = randrange(0, len(http_rows))
-    http_ip = http_rows[http_rand_idx].find_all('td')[0].text
-    http_port = http_rows[http_rand_idx].find_all('td')[1].text
+def find_proxies(types=['HTTP'], limit=3):
+    ips = []
+    async def show(proxies):
+        while True:
+            proxy = await proxies.get()
+            if proxy is None: break
+            print('Found proxy: %s' % proxy)
+            # proto = 'https' if 'HTTPS' in proxy.types else 'http'
+            # row = '%s://%s:%d' % (proto, proxy.host, proxy.port)
+            row = '%s:%d' % (proxy.host, proxy.port)
+            ips.append(row)
 
-    https_rows = [row for row in rows if row.select('td[class=\'hx\']')[0].text == 'yes']
-    https_rand_idx = randrange(0, len(https_rows))
-    https_ip = https_rows[https_rand_idx].find_all('td')[0].text
-    https_port = https_rows[https_rand_idx].find_all('td')[1].text
-    proxies = { 'http': http_ip + ':' + http_port, 'https': https_ip + ':' + https_port }
-    print('\nProxies: ' + json.dumps(proxies, indent=2))
-    sleep()
+    proxies = asyncio.Queue()
+    broker = Broker(proxies)
+    tasks = asyncio.gather(
+        broker.find(types=types, limit=limit),
+        show(proxies))
 
-    return proxies
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(tasks)
+
+    return random.choice(ips)
+
+def get_proxies(http, https):
+    return { 'http': find_proxies(), 'https': find_proxies(['HTTPS']) }
 
 def sleep(slp_time):
     if slp_time:

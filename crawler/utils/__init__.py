@@ -8,29 +8,20 @@ import htmldate
 import os
 from functools import reduce
 from fake_useragent import UserAgent
+import asyncio
+from proxybroker import Broker
+import random
 
 SHARED_COUNT_API_KEY = os.environ.get('SHARED_COUNT_API_KEY')
+PROXY_IP = os.environ.get('PROXY_IP')
+PROXY_IP2 = os.environ.get('PROXY_IP2')
+PROXY_IP3 = os.environ.get('PROXY_IP3')
 PH_TIMEZONE = '+08:00'
-# get free proxies from us-proxy.org
-def get_proxies():
-    html_doc = get('https://www.us-proxy.org/').text
-    soup = BeautifulSoup(html_doc, 'html.parser')
-    rows = soup.find_all('tr')[1:-1]
 
-    http_rows = [row for row in rows if row.select('td[class=\'hx\']')[0].text == 'no']
-    http_rand_idx = randrange(0, len(http_rows))
-    http_ip = http_rows[http_rand_idx].find_all('td')[0].text
-    http_port = http_rows[http_rand_idx].find_all('td')[1].text
-
-    https_rows = [row for row in rows if row.select('td[class=\'hx\']')[0].text == 'yes']
-    https_rand_idx = randrange(0, len(https_rows))
-    https_ip = https_rows[https_rand_idx].find_all('td')[0].text
-    https_port = https_rows[https_rand_idx].find_all('td')[1].text
-    proxies = { 'http': http_ip + ':' + http_port, 'https': https_ip + ':' + https_port }
-    print('\nProxies: ' + json.dumps(proxies, indent=2))
-    sleep()
-
-    return proxies
+proxies = [PROXY_IP, PROXY_IP2, PROXY_IP3]
+def get_proxy():
+    choice = random.choice(proxies)
+    return { 'http': choice, 'https': choice }
 
 def sleep(slp_time):
     if slp_time:

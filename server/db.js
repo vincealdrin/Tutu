@@ -26,7 +26,7 @@ module.exports = async (cb) => {
 
     tables.forEach(async (name) => {
       try {
-        await r.db(db).tableCreate(name).run(conn);
+        await r.db(db).wait().tableCreate(name).run(conn);
         console.log(`${name} table created`);
       } catch (e) {
         console.log(`${name} table has already been created`);
@@ -34,7 +34,7 @@ module.exports = async (cb) => {
     });
 
     try {
-      await r.table('articles').indexCreate(
+      await r.table('articles').wait().indexCreate(
         'positions',
         r.row('locations')('location')('position'),
         { geo: true, multi: true }
@@ -52,7 +52,10 @@ module.exports = async (cb) => {
     // }
 
     try {
-      await r.table('crawlerLogs').indexCreate('status', (article) => article('timestamp').date()).run(conn);
+      await r.table('crawlerLogs')
+        .wait()
+        .indexCreate('status', (article) => article('timestamp').date())
+        .run(conn);
       console.log('status index created on crawlerLogs table');
     } catch (e) {
       console.log('status index already exists on crawlerLogs table');

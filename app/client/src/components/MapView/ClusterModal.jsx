@@ -73,19 +73,18 @@ class ClusterModal extends Component {
               sad = { reduction: 0 },
             ] = reactions;
 
-              return (
-                <Segment key={shortid.generate()} raised className="modal-article-container">
-                  <Grid columns={2}>
-                    <Grid.Column width={11}>
-                      <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
-                      <div className="image-tag-title-container">
-                        <div className="top-image">
-                          <Image src={topImageUrl} />
-                          <Header as="a" href={url} color="blue" className="news-title" target="_blank">{title}</Header>
-                          <p className="article-date">
-                            {new Date(publishDate).toDateString()} | &nbsp;
-                            {authors.join(', ')}
-                          </p>
+            return (
+              <Segment key={shortid.generate()} raised className="modal-article-container">
+                <Grid columns={2}>
+                  <Grid.Column width={11}>
+                    <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
+                    <div className="image-tag-title-container">
+                      <div className="top-image">
+                        <Image src={topImageUrl} />
+                        <Header as="a" href={url} color="blue" className="news-title" target="_blank">{title}</Header>
+                        <p className="article-date">
+                          {new Date(publishDate).toDateString()} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
+                        </p>
                         </div>
                         <div className="tags">
                           <List divided relaxed>

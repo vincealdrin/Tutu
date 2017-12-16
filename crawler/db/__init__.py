@@ -53,10 +53,23 @@ def get_provinces():
                 'location': doc['right'].without({ 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True})
             }).without({ 'right': True, 'left': True }).run(conn))
 
-def get_news_sources(order_by, desc = False, table='sources'):
+def get_sources_count(table='sources'):
+    return r.table(table).count().run(conn)
+
+def get_sources(order_by, desc = False, table='sources'):
     if desc:
         return list(r.table(table).order_by(r.desc(order_by)).run(conn))
     return list(r.table(table).order_by(order_by).run(conn))
+
+def get_rand_sources(not_sources=[], count = 1, table='sources'):
+    return list(
+        r.table(table)
+            .filter(
+                lambda source: (~r.expr(not_sources).contains(source['id']))
+            )
+            .sample(count)
+            .run(conn)
+        )
 
 def insert_fake_source(source):
     r.table('fakeSources').insert(source).run(conn)

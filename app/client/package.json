@@ -16,6 +16,7 @@
     "google-map-react": "^0.25.0",
     "history": "^4.7.2",
     "lodash": "^4.17.4",
+    "nuka-carousel": "^3.0.0",
     "points-cluster": "^0.1.4",
     "rc-slider": "^8.5.0",
     "react": "^16.1.0",

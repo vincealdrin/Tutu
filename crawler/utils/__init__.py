@@ -13,33 +13,15 @@ from proxybroker import Broker
 import random
 
 SHARED_COUNT_API_KEY = os.environ.get('SHARED_COUNT_API_KEY')
+PROXY_IP = os.environ.get('PROXY_IP')
+PROXY_IP2 = os.environ.get('PROXY_IP2')
+PROXY_IP3 = os.environ.get('PROXY_IP3')
 PH_TIMEZONE = '+08:00'
 
-def find_proxies(types=['HTTP'], limit=3):
-    ips = []
-    async def show(proxies):
-        while True:
-            proxy = await proxies.get()
-            if proxy is None: break
-            print('Found proxy: %s' % proxy)
-            # proto = 'https' if 'HTTPS' in proxy.types else 'http'
-            # row = '%s://%s:%d' % (proto, proxy.host, proxy.port)
-            row = '%s:%d' % (proxy.host, proxy.port)
-            ips.append(row)
-
-    proxies = asyncio.Queue()
-    broker = Broker(proxies)
-    tasks = asyncio.gather(
-        broker.find(types=types, limit=limit),
-        show(proxies))
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(tasks)
-
-    return random.choice(ips)
-
-def get_proxies(http, https):
-    return { 'http': find_proxies(), 'https': find_proxies(['HTTPS']) }
+proxies = [PROXY_IP, PROXY_IP2, PROXY_IP3]
+def get_proxy():
+    choice = random.choice(proxies)
+    return { 'http': choice, 'https': choice }
 
 def sleep(slp_time):
     if slp_time:

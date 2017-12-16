@@ -34,7 +34,7 @@ class AppSidebar extends Component {
           <div className="article-display-button" onClick={this.toggleVisibility}>
             <Icon name={`angle ${isIconVisible}`} size="large" />
           </div>
-          <div className={`menu-item-container ${isVisible}`}>
+          <div className={`side-menu-item-container ${isVisible}`}>
             {this.props.children}
           </div>
         </div>
@@ -50,7 +50,7 @@ class AppSidebar extends Component {
               <Header as="h2" className={`tutu-logo ${isWide ? 'show' : 'hide'}`}>TUTÛ</Header>
             </Link>
           </div>
-          <div className="menu">
+          <div className="side-menu">
             <span className={`label ${isWide ? 'show' : 'hide'}`}>MENU</span>
             <Link to="/popular" onClick={this.beVisible}>
               <Icon name="newspaper" color="grey" />

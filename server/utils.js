@@ -100,6 +100,28 @@ const mapLocation = (loc) => {
   };
 };
 
+module.exports.getRelatedArticles = (article) =>
+  r.table('articles').filter((doc) =>
+    article('publishDate').date()
+      .during(
+        r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).sub(WEEK_IN_SEC),
+        r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).add(WEEK_IN_SEC),
+        { rightBound: 'closed' }
+      )
+      .and(article('categories')
+        .contains((label) => doc('categories')
+          .orderBy(r.desc((category) => category('score')))
+          .slice(0, 2)
+          .getField('label')
+          .contains(label))
+        .and(article('keywords').contains((keyword) => doc('topics')('common').coerceTo('string').match(keyword))
+          .or(article('people').contains((person) => doc('people').coerceTo('string').match(person)))
+          .or(article('organizations').contains((org) => doc('organizations').coerceTo('string').match(org)))))
+      .and(doc('id').ne(article('id'))))
+    .orderBy(r.desc('timestamp'))
+    .slice(0, 20)
+    .pluck('title', 'url');
+
 const getSentiment = (sentiment) => r.branch(
   sentiment('compound').ge(0.5), 'Positive',
   sentiment('compound').le(-0.5), 'Negative',

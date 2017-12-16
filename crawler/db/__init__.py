@@ -1,4 +1,3 @@
-from dotenv import load_dotenv, find_dotenv
 import rethinkdb as r
 import os
 from datetime import datetime
@@ -73,3 +72,6 @@ def get_rand_sources(not_sources=[], count = 1, table='sources'):
 
 def insert_fake_source(source):
     r.table('fakeSources').insert(source).run(conn)
+
+def get_source(id, table='sources'):
+    return r.table(table).get(id).run(conn)

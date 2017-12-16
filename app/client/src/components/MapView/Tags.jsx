@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 
 const THRESHOLD = 3;
 class Tags extends PureComponent {
-  state = { isExpanded: this.props.content.length > THRESHOLD }
+  state = { isExpanded: !this.props.content.length > THRESHOLD }
 
   toggleExpand = () => this.setState({ isExpanded: !this.state.isExpanded })
 

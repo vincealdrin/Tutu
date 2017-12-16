@@ -2,10 +2,15 @@ import React, { Component } from 'react';
 import { List, Image, Label, Dimmer, Loader, Modal, Segment, Grid, Header, Button, Accordion, Icon } from 'semantic-ui-react';
 import shortid from 'shortid';
 import Tags from './Tags';
+import Pagination from './Pagination';
 import './styles.css';
 
 class ClusterModal extends Component {
-  state = { activeIndex: 0 };
+  state = {
+    activeIndex: 0,
+    currentPage: 1,
+    limit: 10,
+  };
 
   getSentimentColor = (sentiment) => {
     if (sentiment === 'Positive') {
@@ -17,13 +22,19 @@ class ClusterModal extends Component {
   }
 
   render() {
-    const { activeIndex } = this.state;
+    const {
+      activeIndex,
+      currentPage,
+      limit,
+    } = this.state;
     const {
       articles,
+      totalCount,
       open,
       removeFocused,
       updateReaction,
       status,
+      fetchArticles,
     } = this.props;
     const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
 
@@ -90,9 +101,7 @@ class ClusterModal extends Component {
                         <List divided relaxed>
                           <List.Item>
                             <Label as="a" className="tag-label">Categories</Label>
-                            {categories.map((category) => (
-                              <span key={shortid.generate()} className="article-tags">{`${category}, `}</span>
-                            ))}
+                            <Tags content={categories} />
                           </List.Item>
                           <List.Item>
                             <Label as="a" className="tag-label">Keywords</Label>
@@ -125,7 +134,7 @@ class ClusterModal extends Component {
                           Related Stories
                         </Accordion.Title>
                         <Accordion.Content active={activeIndex === 0}>
-                          {relatedArticles.map((related) => <p>{related.title}</p>)}
+                          {relatedArticles.map((related) => <a key={shortid.generate()} href={related.url}>{related.title}</a>)}
                         </Accordion.Content>
                       </Accordion>
                       <Button as="a" href={url} circular color="blue" target="_blank" className="article-read-more">Read More</Button>
@@ -136,6 +145,18 @@ class ClusterModal extends Component {
             );
           })}
         </Modal.Content>
+        <Modal.Actions>
+          {(open && status.success) || (totalCount > limit && articles.length) ? (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil((totalCount || limit) / limit)}
+              onChange={(page) => {
+              this.setState({ currentPage: page });
+              fetchArticles(null, page - 1, limit);
+            }}
+            />
+          ) : null}
+        </Modal.Actions>
       </Modal>
     );
   }

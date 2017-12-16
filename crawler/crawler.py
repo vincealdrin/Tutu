@@ -1,7 +1,7 @@
 # start CoreNLP server
 # java -mx4g -cp "*" --add-modules java.xml.bind edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 500000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
 # for deployment
-# nohup java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 500000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly &
+# nohup java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 10000000000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly &
 
 import newspaper
 import json
@@ -24,7 +24,6 @@ load_dotenv(find_dotenv(), override=True)
 
 locations = get_locations()
 provinces = get_provinces()
-has_news_sources = get_sources_count()
 
 # news_sources = get_news_sources('timestamp')
 # shuffle(news_sources)
@@ -82,6 +81,7 @@ while True:
             continue
 
         # 20 articles only for dev purposes
+        shuffle(source.articles)
         for article in source.articles[:20]:
             start_time = time.clock()
 
@@ -113,6 +113,8 @@ while True:
                 article.parse()
                 article.nlp()
 
+                title = article.title.split('|')[0].strip()
+
                 categories, body, rate_limits = categorize(article.url)
 
                 pattern = re.compile(source.brand, re.IGNORECASE)
@@ -123,7 +125,7 @@ while True:
                         print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
                         slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                             'articleUrl': article.url,
-                            'articleTitle': article.title,
+                            'articleTitle': title,
                             'errorMsg': 'NOT ENGLISH',
                         })
                         continue
@@ -131,7 +133,7 @@ while True:
                     print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
                     slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
-                        'articleTitle': article.title,
+                        'articleTitle': title,
                         'errorMsg': 'NOT ENGLISH',
                     })
                     continue
@@ -140,7 +142,7 @@ while True:
                     print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
                     slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
-                        'articleTitle': article.title,
+                        'articleTitle': title,
                         'errorMsg': 'SHORT CONTENT',
 
                     })
@@ -150,7 +152,7 @@ while True:
                     print('\n(SOURCE IS IN BODY) Skipped: ' + str(article.url) + '\n')
                     slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
-                        'articleTitle': article.title,
+                        'articleTitle': title,
                         'errorMsg': 'SOURCE IS IN BODY',
                     })
                     continue
@@ -159,12 +161,12 @@ while True:
                     print('\n(NO TEXT) Skipped: ' + str(article.url) + '\n')
                     slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
-                        'articleTitle': article.title,
+                        'articleTitle': title,
                         'errorMsg': 'NO TEXT',
                     })
                     continue
 
-                combined_body = body + ' ' + article.text + ' ' + article.title + ' ' + urlparse(article.url).path
+                combined_body = body + ' ' + article.text + ' ' + title + ' ' + urlparse(article.url).path
                 matched_locations = search_locations(combined_body, locations, provinces)
 
                 nation_terms = '\WPH|Philippines?|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos\W'
@@ -177,30 +179,39 @@ while True:
                         print('\n(HAS OTHER COUNTRY BUT NO PH) Skipped: ' + str(article.url) + '\n')
                         slp_time = insert_log(source_id, 'HAS OTHER COUNTRY BUT NO PH', 'error', float(time.clock() - start_time), {
                             'articleUrl': article.url,
-                            'articleTitle': article.title
+                            'articleTitle': title
                         })
                         continue
 
                 if not matched_locations:
                     if not nation_pattern.search(combined_body):
-                        print('\n(UNPARSEABLE LOCATION) Skipped: ' + str(article.url) + '\n')
-                        slp_time = insert_log(source_id, 'UNPARSEABLE LOCATION', 'error', float(time.clock() - start_time), {
+                        print('\n(CAN\'T FIND LOCATION) Skipped: ' + str(article.url) + '\n')
+                        slp_time = insert_log(source_id, 'CAN\'T FIND LOCATION', 'error', float(time.clock() - start_time), {
                             'articleUrl': article.url,
-                            'articleTitle': article.title
+                            'articleTitle': title
                         })
                         continue
 
                 publishDate = search_publish_date(article.publish_date, article.html)
 
                 if (not publishDate):
-                    print('\n(UNPARSEABLE PUBLISH DATE) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'UNPARSEABLE PUBLISH DATE', 'error', float(time.clock() - start_time), {
+                    print('\n(CAN\'T FIND PUBLISH DATE) Skipped: ' + str(article.url) + '\n')
+                    slp_time = insert_log(source_id, 'CAN\'T FIND PUBLISH DATE', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
-                        'articleTitle': article.title
+                        'articleTitle': title
                     })
                     continue
 
-                organizations, people = get_entities(body)
+                organizations, people, error = get_entities(body)
+
+                if error:
+                    print('\n(TEXT IS TOO LONG) Skipped: ' + str(article.url) + '\n')
+                    slp_time = insert_log(source_id, 'TEXT IS TOO LONG', 'error', float(time.clock() - start_time), {
+                        'articleUrl': article.url,
+                        'articleTitle': title
+                    })
+                    continue
+
                 summary_sentences = summarize(body)
                 sentiment = SentimentIntensityAnalyzer().polarity_scores(body)
                 topics = parse_topics(body)
@@ -215,7 +226,7 @@ while True:
                     'id': url_uuid,
                     'url': clean_url,
                     'sourceId': news_source['id'],
-                    'title': article.title.encode('ascii', 'ignore').decode('utf-8'),
+                    'title': title.encode('ascii', 'ignore').decode('utf-8'),
                     'authors': article.authors,
                     'body': body,
                     'publishDate': publishDate,
@@ -240,7 +251,7 @@ while True:
                 aylien_status = rate_limits[0]
                 aylien_status2 = rate_limits[1]
                 aylien_status3 = rate_limits[2]
-                print(str(count) + '.) ' + str(article.title) + ' | ' + str(article.url))
+                print(str(count) + '.) ' + str(title) + ' | ' + str(article.url))
                 print('Locations: ' + ' | '.join([ml['location']['formattedAddress'] for ml in matched_locations]))
                 print('AYLIEN REMAINING CALL: ['+str(aylien_status['remaining'])+', '+str(aylien_status2['remaining'])+', '+str(aylien_status3['remaining'])+'] -- ' + str('%.2f' % runtime + 's scraping runtime'))
 
@@ -252,7 +263,7 @@ while True:
                 print('\n(ARTICLE ERROR) Article Skipped\n')
                 slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                     'articleUrl': url,
-                    'articleTitle': article.title if article.title else '',
+                    'articleTitle': title if title else '',
                 })
                 continue
 

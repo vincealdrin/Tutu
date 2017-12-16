@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { List, Image, Dimmer, Loader, Label, Modal, Accordion, Icon, Grid, Header, Button } from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
+import shortid from 'shortid';
 // import the reaction images
 import Tags from './Tags';
 import happyReact from './reactions/5.svg';
@@ -152,7 +153,7 @@ class SimpleModal extends Component {
             </Accordion.Title>
             <Accordion.Content active={activeIndex === 0} index={0}>
               {relatedArticles.map((related) => (
-                <p>{related}</p>
+                <p key={shortid.generate()}>{related.title}</p>
               ))}
             </Accordion.Content>
           </Accordion>

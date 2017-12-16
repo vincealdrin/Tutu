@@ -9,6 +9,7 @@ const {
   WEEK_IN_SEC,
   mapSideArticle,
   mapClusterInfo,
+  getRelatedArticles,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -188,26 +189,7 @@ module.exports = (conn, io) => {
         .get(id)
         .merge(mapArticleInfo(catsFilterLength))
         .merge((article) => ({
-          relatedArticles: r.table('articles').filter((doc) =>
-            article('publishDate').date()
-              .during(
-                r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).sub(WEEK_IN_SEC),
-                r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).add(WEEK_IN_SEC),
-                { rightBound: 'closed' }
-              )
-              .and(article('categories')
-                .contains((label) => doc('categories')
-                  .orderBy(r.desc((category) => category('score')))
-                  .slice(0, 2)
-                  .getField('label')
-                  .contains(label))
-                .and(article('keywords').contains((keyword) => doc('topics')('common').coerceTo('string').match(keyword)))
-                .and(article('people').contains((person) => doc('people').coerceTo('string').match(person)))
-                .or(article('organizations').contains((org) => doc('organizations').coerceTo('string').match(org))))
-              .and(doc('id').ne(article('id'))))
-            .orderBy(r.desc('timestamp'))
-            .slice(0, 20)
-            .pluck('title', 'url'),
+          relatedArticles: getRelatedArticles(article),
         }))
         .without(
           'timestamp', 'body', 'id',
@@ -218,7 +200,7 @@ module.exports = (conn, io) => {
         .run(conn);
 
       articleInfo.relatedArticles = articleInfo.relatedArticles
-        .filter(({ title }) => natural.DiceCoefficient(articleInfo.title, title) > 0.40)
+        .filter(({ title }) => natural.DiceCoefficient(articleInfo.title, title) > 0.50)
         .slice(0, 5);
 
       res.json(articleInfo);
@@ -236,28 +218,9 @@ module.exports = (conn, io) => {
       const uuids = ids.split(',');
       const cursor = await r.table(tbl)
         .getAll(r.args(uuids))
-        .map(mapClusterInfo(catsFilterLength))
+        .map(mapClusterInfo(parseInt(catsFilterLength)))
         .merge((article) => ({
-          relatedArticles: r.table('articles').filter((doc) =>
-            article('publishDate').date()
-              .during(
-                r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).sub(WEEK_IN_SEC),
-                r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).add(WEEK_IN_SEC),
-                { rightBound: 'closed' }
-              )
-              .and(article('categories')
-                .contains((label) => doc('categories')
-                  .orderBy(r.desc((category) => category('score')))
-                  .slice(0, 2)
-                  .getField('label')
-                  .contains(label))
-                .and(article('keywords').contains((keyword) => doc('topics')('common').coerceTo('string').match(keyword)))
-                .and(article('people').contains((org) => doc('people').coerceTo('string').match(org)))
-                .or(article('organizations').contains((org) => doc('organizations').coerceTo('string').match(org))))
-              .and(doc('id').ne(article('id'))))
-            .orderBy(r.desc('publishDate'))
-            .slice(0, 20)
-            .pluck('title', 'url'),
+          relatedArticles: getRelatedArticles(article),
         }))
         // .without(
         //   'timestamp', 'body', 'id',
@@ -276,7 +239,7 @@ module.exports = (conn, io) => {
         return {
           ...article,
           relatedArticles: article.relatedArticles
-            .filter(({ title }) => natural.DiceCoefficient(article.title, title) > 0.40)
+            .filter(({ title }) => natural.DiceCoefficient(article.title, title) > 0.50)
             .slice(0, 5),
         };
       });

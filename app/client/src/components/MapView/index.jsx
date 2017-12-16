@@ -33,6 +33,7 @@ const mapStateToProps = ({
     focusedClusterInfo,
     filterMapState,
     focusedOn,
+    focusedClusterArticles,
   },
   map,
 }) => ({
@@ -47,6 +48,7 @@ const mapStateToProps = ({
   filterMapState,
   focusedInfo,
   focusedClusterInfo,
+  focusedClusterArticles,
   focusedOn,
 });
 
@@ -100,8 +102,10 @@ class MapView extends Component {
       infoStatus,
       clusterStatus,
       focusedClusterInfo,
+      fetchFocusedClusterInfo,
       focusedOn,
       focusedInfo,
+      focusedClusterArticles,
     } = this.props;
 
     return (
@@ -117,14 +121,16 @@ class MapView extends Component {
         onChildClick={this._onChildClick}
       >
         <ClusterModal
-          open={focusedOn === 'cluster'}
+          open={focusedOn === 'cluster' && !clusterStatus.cancelled}
           articles={focusedClusterInfo}
+          fetchArticles={fetchFocusedClusterInfo}
           removeFocused={this.props.removeFocused}
           updateReaction={this.props.updateReaction}
           status={clusterStatus}
+          totalCount={focusedClusterArticles.length}
         />
         <SimpleModal
-          open={focusedOn === 'simple'}
+          open={focusedOn === 'simple' && !infoStatus.cancelled}
           article={focusedInfo}
           removeFocused={this.props.removeFocused}
           updateReaction={this.props.updateReaction}

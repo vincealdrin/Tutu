@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { List, Image, Label, Dimmer, Loader, Modal, Segment, Grid, Header, Button, Accordion, Icon } from 'semantic-ui-react';
 import shortid from 'shortid';
+import RelatedArticles from './RelatedArticles';
 import Tags from './Tags';
 import './styles.css';
 
@@ -17,7 +18,6 @@ class ClusterModal extends Component {
   }
 
   render() {
-    const { activeIndex } = this.state;
     const {
       articles,
       open,
@@ -85,58 +85,50 @@ class ClusterModal extends Component {
                         <p className="article-date">
                           {new Date(publishDate).toDateString()} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
                         </p>
-                        </div>
-                        <div className="tags">
-                          <List divided relaxed>
-                            <List.Item>
-                              <Label
-                                as="a"
-                                className="tag-label"
-                                color={this.getSentimentColor(sentiment)}
-                              >
+                      </div>
+                      <div className="tags">
+                        <List divided relaxed>
+                          <List.Item>
+                            <Label
+                              as="a"
+                              className="tag-label"
+                              color={this.getSentimentColor(sentiment)}
+                            >
                               Sentiment
-                              </Label>
-                              <span className="article-tags">{sentiment}</span>
-                            </List.Item>
-                            <List.Item>
-                              <Label as="a" className="tag-label">Categories</Label>
-                              <Tags content={categories} />
-                            </List.Item>
-                            <List.Item>
-                              <Label as="a" className="tag-label">Keywords</Label>
-                              <Tags content={keywords} />
-                            </List.Item>
-                            <List.Item>
-                              <Label as="a" className="tag-label">Organizations</Label>
-                              <Tags content={organizations} />
-                            </List.Item>
-                            <List.Item>
-                              <Label as="a" className="tag-label">People</Label>
-                              <Tags content={people} />
-                            </List.Item>
-                          </List>
-                        </div>
+                            </Label>
+                            <span className="article-tags">{sentiment}</span>
+                          </List.Item>
+                          <List.Item>
+                            <Label as="a" className="tag-label">Categories</Label>
+                            <Tags content={categories} />
+                          </List.Item>
+                          <List.Item>
+                            <Label as="a" className="tag-label">Keywords</Label>
+                            <Tags content={keywords} />
+                          </List.Item>
+                          <List.Item>
+                            <Label as="a" className="tag-label">Organizations</Label>
+                            <Tags content={organizations} />
+                          </List.Item>
+                          <List.Item>
+                            <Label as="a" className="tag-label">People</Label>
+                            <Tags content={people} />
+                          </List.Item>
+                        </List>
                       </div>
-                    </Grid.Column>
-                    <Grid.Column width={5}>
-                      <div className="news-summary">
-                        <p> {summary && summary[0]} </p>
-                      </div>
-                      <div className="related-stories">
-                        <Accordion style={{ margin: '1rem 0' }}>
-                          <Accordion.Title active={activeIndex === 0} index={0}>
-                            <Icon name="dropdown" />
-                            Related Stories
-                          </Accordion.Title>
-                          <Accordion.Content active={activeIndex === 0}>
-                            {relatedArticles.map((related) => <p>{related.title}</p>)}
-                          </Accordion.Content>
-                        </Accordion>
-                        <Button as="a" href={url} circular color="blue" target="_blank" className="article-read-more">Read More</Button>
-                      </div>
-                    </Grid.Column>
-                  </Grid>
-                </Segment>
+                    </div>
+                  </Grid.Column>
+                  <Grid.Column width={5}>
+                    <div className="news-summary">
+                      <p> {summary && summary[0]} </p>
+                    </div>
+                    <div className="related-stories">
+                      <RelatedArticles content={relatedArticles} />
+                      <Button as="a" href={url} circular floated="right" color="blue" target="_blank" className="article-read-more">Read More</Button>
+                    </div>
+                  </Grid.Column>
+                </Grid>
+              </Segment>
             );
           })}
         </Modal.Content>

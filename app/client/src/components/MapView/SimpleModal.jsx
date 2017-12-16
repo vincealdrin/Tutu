@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { List, Image, Dimmer, Loader, Label, Modal, Accordion, Icon, Grid, Header, Button } from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
+import Carousel from 'nuka-carousel';
 // import the reaction images
 import Tags from './Tags';
 import happyReact from './reactions/5.svg';
@@ -14,7 +15,6 @@ import './styles.css';
 class SimpleModal extends Component {
   state = {
     activeIndex: 0,
-    active: false,
   };
 
   getSentimentColor = (sentiment) => {
@@ -26,10 +26,17 @@ class SimpleModal extends Component {
     return 'red';
   }
 
+  showRelatedArticles = (_, titleProps) => {
+    const { index } = titleProps;
+    const { activeIndex } = this.state;
+    const newIndex = activeIndex === index ? -1 : index;
+
+    this.setState({ activeIndex: newIndex });
+  }
+
   render() {
     const {
       activeIndex,
-      active,
     } = this.state;
     const {
       open,
@@ -144,16 +151,29 @@ class SimpleModal extends Component {
             {new Date(publishDate).toDateString()} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
           </p>
           <Label as="a" href={`http://${sourceUrl}`} target="_blank" circular style={{ marginBottom: '0.6rem' }}>{source}</Label>
-          <p> {summary && summary[0]} </p>
+          <Carousel style={{ padding: '18px 70px 60px', textAlign: 'center' }}>
+            {summary && summary.map((sum) => (
+              <p> {sum} </p>
+            ))}
+          </Carousel>
           <Accordion style={{ margin: '1rem 0' }}>
-            <Accordion.Title active={activeIndex === 0} index={0}>
+            <Accordion.Title active={activeIndex === 0} index={0} onClick={this.showRelatedArticles}>
               <Icon name="dropdown" />
               Related Stories
             </Accordion.Title>
             <Accordion.Content active={activeIndex === 0} index={0}>
-              {relatedArticles.map((related) => (
-                <p>{related}</p>
-              ))}
+              <List divided relaxed>
+                {relatedArticles.length > 0
+                ?
+                  relatedArticles.map((related) => (
+                    <List.Item>
+                      <List.Header as="a" color="blue" href={related.url} target="_blank">{related.title}</List.Header>
+                    </List.Item>
+                  ))
+                :
+                  <span className="no-info">No related articles found</span>
+                }
+              </List>
             </Accordion.Content>
           </Accordion>
           <div className="extras">

@@ -13,7 +13,7 @@
 }
 
 .simple-marker {
-  min-height: 185px;
+  min-height: 200px;
   text-align: left;
 }
 
@@ -168,6 +168,7 @@
   width: 3rem;
   padding: 0 !important;
   margin: 0 !important;
+  cursor: pointer;
 }
 
 .accordion-container {
@@ -206,13 +207,12 @@
   margin-right: 0.5rem !important;
 }
 
-.article-read-more {
-  position: absolute;
-  right: 3%;
-  bottom: 4%;
-}
-
 .extras {
   display: flex;
   justify-content: space-between;
+}
+
+.no-info {
+  font-size: 0.9rem;
+  color: #767676;
 }

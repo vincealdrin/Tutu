@@ -17,6 +17,8 @@ stop-words = "*"
 matplotlib = "*"
 htmldate = "*"
 requests = "*"
+python-dotenv = "*"
+
 
 [dev-packages]
 

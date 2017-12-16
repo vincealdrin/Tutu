@@ -3,10 +3,15 @@ import { List, Image, Label, Dimmer, Loader, Modal, Segment, Grid, Header, Butto
 import shortid from 'shortid';
 import RelatedArticles from './RelatedArticles';
 import Tags from './Tags';
+import Pagination from './Pagination';
 import './styles.css';
 
 class ClusterModal extends Component {
-  state = { activeIndex: 0 };
+  state = {
+    activeIndex: 0,
+    currentPage: 1,
+    limit: 10,
+  };
 
   getSentimentColor = (sentiment) => {
     if (sentiment === 'Positive') {
@@ -19,11 +24,17 @@ class ClusterModal extends Component {
 
   render() {
     const {
+      currentPage,
+      limit,
+    } = this.state;
+    const {
       articles,
+      totalCount,
       open,
       removeFocused,
       updateReaction,
       status,
+      fetchArticles,
     } = this.props;
     const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
 
@@ -132,6 +143,18 @@ class ClusterModal extends Component {
             );
           })}
         </Modal.Content>
+        <Modal.Actions>
+          {(open && status.success) || (totalCount > limit && articles.length) ? (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil((totalCount || limit) / limit)}
+              onChange={(page) => {
+              this.setState({ currentPage: page });
+              fetchArticles(null, page - 1, limit);
+            }}
+            />
+          ) : null}
+        </Modal.Actions>
       </Modal>
     );
   }

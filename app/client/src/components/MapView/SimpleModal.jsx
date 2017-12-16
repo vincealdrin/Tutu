@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { List, Image, Dimmer, Loader, Label, Modal, Accordion, Icon, Grid, Header, Button } from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
 import Carousel from 'nuka-carousel';
+import shortid from 'shortid';
 // import the reaction images
 import Tags from './Tags';
 import happyReact from './reactions/5.svg';

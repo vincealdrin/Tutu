@@ -65,8 +65,6 @@ lr_text = LogisticRegression(penalty='l1')
 lr_text.fit(X_text_tfidf_train, y_text_train)
 y_text_pred = lr_text.predict(X_text_tfidf_test)
 
-
-
 # print('\nLinear Regression:')
 # print('F1 score {:.4}%'.format( f1_score(y_text_test, y_text_pred, average='macro')*100 ))
 # print('Accuracy score {:.4}%'.format(accuracy_score(y_text_test, y_text_pred)*100))

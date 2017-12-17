@@ -22,6 +22,7 @@ const initialState = {
   reactionStatus: crudStatus,
   focusedInfo: {},
   focusedClusterInfo: [],
+  focusedClusterArticles: [],
   focusedOn: '',
   filterMapState: {
     zoom: DEFAULT_ZOOM,
@@ -34,6 +35,8 @@ const initialState = {
   },
 };
 let source;
+let focusedClusterSource;
+let focusedInfoSource;
 
 export default (state = initialState, action) => {
   switch (action.type) {
@@ -68,8 +71,8 @@ export default (state = initialState, action) => {
         focusedClusterInfo: action.focusedClusterInfo || state.focusedClusterInfo,
         focusedOn: 'cluster',
         clusterStatus: updateCrudStatus(action),
+        focusedClusterArticles: action.focusedClusterArticles || state.focusedClusterArticles,
         focusedInfo: {},
-        isFocused: true,
       };
     case REMOVE_FOCUSED:
       return {
@@ -77,6 +80,7 @@ export default (state = initialState, action) => {
         focusedOn: '',
         focusedInfo: {},
         focusedClusterInfo: [],
+        focusedClusterArticles: [],
         infoStatus: crudStatus,
         clusterStatus: crudStatus,
         reactionStatus: crudStatus,
@@ -121,9 +125,19 @@ export default (state = initialState, action) => {
   }
 };
 
-export const removeFocused = () => ({
-  type: REMOVE_FOCUSED,
-});
+export const removeFocused = () => {
+  if (focusedClusterSource) {
+    focusedClusterSource.cancel();
+  }
+
+  if (focusedInfoSource) {
+    focusedInfoSource.cancel();
+  }
+
+  return {
+    type: REMOVE_FOCUSED,
+  };
+};
 
 export const updateMapState = (center, zoom, bounds) => ({
   type: UPDATE_MAP_STATE,
@@ -208,12 +222,18 @@ export const fetchArticles = (center, zoom, bounds) =>
 
 export const fetchFocusedInfo = (article) => httpThunk(FETCH_FOCUSED_INFO, async (getState) => {
   try {
+    if (focusedInfoSource) {
+      focusedInfoSource.cancel();
+    }
+    focusedInfoSource = axios.CancelToken.source();
+
     const { filters: { categories } } = getState();
     const { data: focusedInfo, status } = await axios.get('/articles/info', {
       params: {
         id: article.id,
         catsFilter: categories.length,
       },
+      cancelToken: focusedInfoSource.token,
     });
 
     return {
@@ -228,24 +248,43 @@ export const fetchFocusedInfo = (article) => httpThunk(FETCH_FOCUSED_INFO, async
   }
 });
 
-export const fetchFocusedClusterInfo = (articles) =>
+export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
   httpThunk(FETCH_CLUSTER_INFO, async (getState) => {
     try {
-      const { filters: { categories } } = getState();
+      if (focusedClusterSource) {
+        focusedClusterSource.cancel();
+      }
+      focusedClusterSource = axios.CancelToken.source();
+
+      const {
+        filters: { categories },
+        mapArticles: { focusedClusterArticles },
+      } = getState();
+      const sliceArticles = (focusedClusterArticles.length ? focusedClusterArticles : articles)
+        .slice(page * limit, (page + 1) * limit);
+
+
       const { data: focusedClusterInfo, status } = await axios.get('/articles/clusterInfo', {
         params: {
-          ids: articles.map((article) => article.id).join(),
-          catsFilter: categories.length,
+          catsFilterLength: categories.length,
+          ids: sliceArticles.map((article) => article.id).join(),
         },
+        cancelToken: focusedClusterSource.token,
       });
 
-      return {
-        focusedClusterInfo: articles.map((article, i) => ({
+      const payload = {
+        focusedClusterInfo: sliceArticles.map((article, i) => ({
           ...article,
           ...focusedClusterInfo[i],
         })),
         status,
       };
+
+      if (!focusedClusterArticles.length) {
+        payload.focusedClusterArticles = articles;
+      }
+
+      return payload;
     } catch (e) {
       return e;
     }

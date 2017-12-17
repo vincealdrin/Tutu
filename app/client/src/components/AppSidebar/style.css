@@ -1,4 +1,4 @@
-.menu-item-container {
+.side-menu-item-container {
   position: relative;
   width: 50vw;
   height: 100vh;
@@ -76,25 +76,25 @@
   margin-top: 0 !important;
 }
 
-.menu {
+.side-menu {
   display: flex;
   flex-direction: column;
   width: 100%;
   padding: 14px 26px;
 }
 
-.menu i {
+.side-menu i {
   font-size: 1.35rem;
 }
 
-.menu a {
+.side-menu a {
   display: flex;
   align-items: center;
   width: 200px;
   color: #1b272b;
 }
 
-.menu a:not(:last-child) {
+.side-menu a:not(:last-child) {
   margin-bottom: 1.4rem;
 }
 

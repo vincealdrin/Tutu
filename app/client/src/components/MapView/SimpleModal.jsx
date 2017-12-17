@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { List, Image, Dimmer, Loader, Label, Modal, Accordion, Icon, Grid, Header, Button } from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
-import Carousel from 'nuka-carousel';
-// import the reaction images
 import Tags from './Tags';
+import Carousel from './Carousel';
+// import the reaction images
 import happyReact from './reactions/5.svg';
 import amusedReact from './reactions/4.svg';
 import inspiredReact from './reactions/3.svg';
@@ -151,11 +151,9 @@ class SimpleModal extends Component {
             {new Date(publishDate).toDateString()} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
           </p>
           <Label as="a" href={`http://${sourceUrl}`} target="_blank" circular style={{ marginBottom: '0.6rem' }}>{source}</Label>
-          <Carousel style={{ padding: '18px 70px 60px', textAlign: 'center' }}>
-            {summary && summary.map((sum) => (
-              <p> {sum} </p>
-            ))}
-          </Carousel>
+          <div className="carousel-container">
+            <Carousel content={summary} />
+          </div>
           <Accordion style={{ margin: '1rem 0' }}>
             <Accordion.Title active={activeIndex === 0} index={0} onClick={this.showRelatedArticles}>
               <Icon name="dropdown" />

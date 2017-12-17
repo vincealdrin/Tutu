@@ -216,3 +216,43 @@
   font-size: 0.9rem;
   color: #767676;
 }
+
+/* CAROUSEL STYLING */
+.carousel-slides {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+/* JUMPING ARROWS FIX */
+.carousel-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 180px;
+}
+
+.carousel {
+  position: relative;
+}
+
+.carousel-slide {
+  display: none;
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  list-style: none;
+}
+
+.carousel-slide-active {
+  display: block;
+}
+
+.carousel-slide-content {
+  margin-bottom: 1.4rem !important;
+}
+
+.carousel-arrows {
+  display: flex;
+  justify-content: space-between;
+}

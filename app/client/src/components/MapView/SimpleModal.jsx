@@ -149,7 +149,8 @@ class SimpleModal extends Component {
           </Grid>
           <Header as="a" color="blue" href={url} target="_blank">{title}</Header>
           <p className="article-date">
-            {new Date(publishDate).toDateString()} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
+            {new Date(publishDate).toDateString()}
+            &nbsp;{status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
           </p>
           <Label as="a" href={`http://${sourceUrl}`} target="_blank" circular style={{ marginBottom: '0.6rem' }}>{source}</Label>
           <Carousel style={{ padding: '18px 70px 60px', textAlign: 'center' }}>
@@ -165,14 +166,19 @@ class SimpleModal extends Component {
             <Accordion.Content active={activeIndex === 0} index={0}>
               <List divided relaxed>
                 {relatedArticles.length > 0
-                ?
-                  relatedArticles.map((related) => (
+                  ? relatedArticles.map((related) => (
                     <List.Item>
-                      <List.Header as="a" color="blue" href={related.url} target="_blank">{related.title}</List.Header>
+                      <List.Header
+                        as="a"
+                        color="blue"
+                        href={related.url}
+                        target="_blank"
+                      >
+                        {related.title}
+                      </List.Header>
                     </List.Item>
                   ))
-                :
-                  <span className="no-info">No related articles found</span>
+                  : <span className="no-info">No related articles found</span>
                 }
               </List>
             </Accordion.Content>
@@ -184,13 +190,16 @@ class SimpleModal extends Component {
                   <Tooltip
                     html={
                       <span style={{ textTransform: 'capitalize' }}>{reactionItem.name}</span>
-                }
+                    }
                     distance={-4}
                   >
-                    <Image src={reactionItem.image} onClick={() => updateReaction(url, reactionItem.name)} />
+                    <Image
+                      src={reactionItem.image}
+                      onClick={() => updateReaction(url, reactionItem.name)}
+                    />
                   </Tooltip>
                 </List.Item>
-          ))}
+            ))}
             </List>
             <Button as="a" href={url} circular color="blue" target="_blank">Read More</Button>
           </div>

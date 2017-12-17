@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import shortid from 'shortid';
-import { Input } from 'semantic-ui-react';
 import { Field, reduxForm } from 'redux-form';
 import { InputField } from 'react-semantic-redux-form';
 
-class SourcesURL extends Component {
+class SourcesForm extends Component {
   state = { inputs: [] }
 
   reset = () => this.setState({ inputs: [] })
@@ -93,4 +92,4 @@ class SourcesURL extends Component {
 
 export default reduxForm({
   form: 'sources',
-})(SourcesURL);
+})(SourcesForm);

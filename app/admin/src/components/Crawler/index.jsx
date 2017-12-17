@@ -50,7 +50,6 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   addLog,
 }, dispatch);
 
-
 class Crawler extends Component {
   componentDidMount() {
     const { socket } = this.props;

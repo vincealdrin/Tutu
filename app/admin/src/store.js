@@ -3,10 +3,20 @@ import { routerMiddleware } from 'react-router-redux';
 import thunk from 'redux-thunk';
 import createHistory from 'history/createBrowserHistory';
 import rootReducer from './modules';
+import { crudStatus } from './utils';
 
 export const history = createHistory();
 
-const initialState = {};
+const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+const initialState = {
+  user: {
+    info: userInfo.info || {},
+    token: userInfo.token || '',
+    isLogin: !!userInfo.token,
+    loginStatus: crudStatus,
+  },
+};
+
 const enhancers = [];
 const middleware = [
   thunk,
@@ -31,7 +41,6 @@ const store = createStore(
   initialState,
   composedEnhancers,
 );
-
 
 if (process.env.NODE_ENV === 'development') {
   if (module.hot) {

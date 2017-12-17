@@ -4,11 +4,6 @@ const passport = require('passport');
 const r = require('rethinkdb');
 const bcrypt = require('bcrypt-nodejs');
 
-const jwtSignOption = {
-  expiresIn: '7 days',
-  issuer: 'TUTU',
-};
-const { JWT_SECRET } = process.env;
 const extractUserInfo = ({
   id,
   username,
@@ -20,9 +15,30 @@ const extractUserInfo = ({
   name,
   role,
 });
-const generateToken = (user) => jwt.sign(extractUserInfo(user), JWT_SECRET, jwtSignOption);
+const { JWT_SECRET } = process.env;
+const generateToken = (user) => jwt.sign(extractUserInfo(user), JWT_SECRET, {
+  expiresIn: '3 days',
+  issuer: 'TUTU',
+});
 
 module.exports = (conn) => {
+  router.post('/login', (req, res, next) => {
+    passport.authenticate('local', { session: false }, (err, user, info) => {
+      if (err) next(err);
+
+      if (!user) {
+        return res.status(400).json({
+          message: info.message,
+        });
+      }
+
+      res.json({
+        token: `JWT ${generateToken(user)}`,
+        user: extractUserInfo(user),
+      });
+    })(req, res, next);
+  });
+
   router.post('/register', (req, res, next) => {
     const {
       username,
@@ -50,21 +66,5 @@ module.exports = (conn) => {
     });
   });
 
-  router.post('/login', (req, res, next) => {
-    passport.authenticate('local', { session: false }, (err, user, info) => {
-      if (err) next(err);
-
-      if (!user) {
-        return res.status(400).json({
-          message: info.message,
-        });
-      }
-
-      res.json({
-        token: `JWT ${generateToken(user)}`,
-        user: extractUserInfo(user),
-      });
-    })(req, res, next);
-  });
   return router;
 };

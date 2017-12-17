@@ -9,7 +9,7 @@ import './styles.css';
 class ClusterModal extends Component {
   state = {
     activeIndex: 0,
-    currentPage: 0,
+    currentPage: 1,
     limit: 10,
   };
 
@@ -146,7 +146,7 @@ class ClusterModal extends Component {
         <Modal.Actions>
           {((open && status.success) || articles.length) && totalCount > limit ? (
             <Pagination
-              currentPage={currentPage + 1}
+              currentPage={currentPage}
               totalPages={Math.ceil((totalCount || limit) / limit)}
               onChange={(page) => {
               this.setState({ currentPage: page });

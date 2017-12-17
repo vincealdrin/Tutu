@@ -8,6 +8,7 @@ export const DELETE_SOURCES = 'sources/DELETE_SOURCE';
 
 const initialState = {
   sources: [],
+  totalCount: 0,
   fetchStatus: crudStatus,
   addStatus: crudStatus,
   updateStatus: crudStatus,
@@ -21,6 +22,7 @@ export default (state = initialState, action) => {
         ...state,
         sources: action.sources || state.sources,
         fetchStatus: updateCrudStatus(action),
+        totalCount: action.totalCount || state.totalCount,
       };
     case ADD_SOURCES:
       return {
@@ -46,7 +48,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         sources: action.deletedIds
-          ? state.sources.filter((source) => action.deletedIds.includes(source.id))
+          ? state.sources.filter((source) => !action.deletedIds.includes(source.id))
           : state.sources,
         updateStatus: updateCrudStatus(action),
       };
@@ -55,11 +57,19 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchSources = () => httpThunk(FETCH_SOURCES, async () => {
+export const fetchSources = (page = 0, limit = 15, filterKey = '', searchText = '') => httpThunk(FETCH_SOURCES, async () => {
   try {
-    const { data: sources, status } = await axios.get('/sources');
+    const { data: sources, status, headers } = await axios.get('/sources', {
+      params: {
+        filterKey,
+        page,
+        limit,
+        searchText,
+      },
+    });
 
     return {
+      totalCount: parseInt(headers['x-total-count'], 10),
       sources,
       status,
     };
@@ -109,7 +119,11 @@ export const updateSource = (sourceId, source, isIdChanged = false) => async (di
 
 export const deleteSources = (ids) => httpThunk(DELETE_SOURCES, async () => {
   try {
-    await axios.delete('/sources', ids);
+    await axios.delete('/sources', {
+      data: {
+        ids: ids.join(),
+      },
+    });
 
     return {
       type: DELETE_SOURCES,

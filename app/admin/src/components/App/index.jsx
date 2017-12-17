@@ -14,6 +14,7 @@ axios.defaults.baseURL = '/api/admin';
 const mapStateToProps = ({
   user: {
     isLogin,
+    token,
   },
 }) => ({
   isLogin,

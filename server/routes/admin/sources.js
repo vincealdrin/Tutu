@@ -15,13 +15,26 @@ module.exports = (conn, io) => {
   const tbl = 'sources';
 
   router.get('/', async (req, res, next) => {
-    const { page = 0, limit = 15 } = req.query;
+    const {
+      page = 0,
+      limit = 15,
+      filterKey = '',
+      searchText = '',
+    } = req.query;
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
 
     try {
       const totalCount = await r.table(tbl).count().run(conn);
-      const cursor = await r.table(tbl)
-        .skip(page * limit)
-        .limit(limit)
+      let query = r.table(tbl);
+
+      if (filterKey && searchText) {
+        query = query.filter((source) => source.pluck(JSON.parse(filterKey)).match(`(?i)${searchText}`));
+      }
+
+      const cursor = await query
+        .skip(parsedPage * parsedLimit)
+        .limit(parsedLimit)
         .run(conn);
       const sources = await cursor.toArray();
 
@@ -59,12 +72,46 @@ module.exports = (conn, io) => {
         const info = await infoPromise;
         const { title } = info.contentData.siteData;
 
-        const brand = getSourceBrand(url, title) || _.capitalize(domain);
+        const brand = _.trim(getSourceBrand(url, title) || _.capitalize(domain));
 
         delete info.contactInfo;
 
         return {
-          ...info,
+          url: _.get(info, 'contentData.dataUrl', ''),
+          title: _.get(info, 'contentData.siteData.title', ''),
+          description: _.get(info, 'contentData.siteData.description', ''),
+          rank: parseInt(_.get(info, 'trafficData.rank') || '0'),
+          linksInCount: parseInt(_.get(info, 'contentData.linksInCount') || '0'),
+          categories: {
+            path: _.get(info, 'related.categories.categoryData.absolutePath', ''),
+            title: _.get(info, 'related.categories.categoryData.title', ''),
+          },
+          relatedLinks: _.get(info, 'related.relatedLinks.relatedLink', []).map((related) => ({
+            ...related,
+            url: related.dataUrl,
+          })),
+          speed: {
+            medianLoadTime: parseInt(_.get(info, 'contentData.speed.medianLoadTime') || '0'),
+            percentile: parseInt(_.get(info, 'contentData.speed.percentile') || '0'),
+          },
+          rankByCountry: _.get(info, 'trafficData.rankByCountry.country', []).map((country) => ({
+            code: country.code,
+            contribution: {
+              pageViews: parseFloat(_.get(country, 'contribution.pageViews', '0.0').replace('%', '')),
+              users: parseFloat(_.get(country, 'contribution.users', '0.0').replace('%', '')),
+            },
+            rank: parseInt(_.get(country, 'rank') || '0'),
+          })),
+          contributingSubdomains: _.get(info, 'trafficData.contributingSubdomains.contributingSubdomain', [])
+            .map((subdomain) => ({
+              url: subdomain.dataUrl,
+              pageViews: {
+                perUser: parseFloat(_.get(subdomain, 'pageViews.perUser', '0.0')),
+                percentage: parseFloat(_.get(subdomain, 'pageViews.percentage', '0.0').replace('%', '')),
+              },
+              reach: parseFloat(_.get(subdomain, 'reach.percentage', '0.0').replace('%', '')),
+              timeRange: parseInt(_.get(subdomain, 'timeRange.months') || '0'),
+            })),
           faviconUrl,
           aboutUsUrl,
           contactUsUrl,
@@ -100,11 +147,11 @@ module.exports = (conn, io) => {
   });
 
   router.delete('/', async (req, res, next) => {
-    const { ids = [] } = req.body;
+    const { ids = '' } = req.body;
 
     try {
       await r.table(tbl)
-        .getAll(r.args(ids))
+        .getAll(r.args(ids.split(',')))
         .delete()
         .run(conn);
 

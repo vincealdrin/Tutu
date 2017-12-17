@@ -10,6 +10,8 @@ import {
   Modal,
 } from 'semantic-ui-react';
 import shortid from 'shortid';
+import debounce from 'lodash/debounce';
+import Pagination from './Pagination';
 
 const searchContainerStyle = { float: 'right' };
 const rowsPerPageOptions = [
@@ -26,14 +28,11 @@ class DataTable extends PureComponent {
     isEditing: false,
     deletionList: [],
     searchText: '',
-    searchFilter: '',
-    page: 0,
-    perPage: 20,
+    searchFilter: this.props.defaultSearchFilter,
+    currentPage: 0,
+    limit: 20,
   }
 
-  setSearchFilter = (searchFilter) => this.setState({ searchFilter })
-  setSearchText = (searchText) => this.setState({ searchText })
-  selectPerPage = (perPage) => this.setState({ perPage })
   enableAdd = () => this.setState({ isAdding: true })
   cancelAdd = () => this.setState({ isAdding: false })
   enableDelete = () => this.setState({ isDeleting: true })
@@ -47,6 +46,8 @@ class DataTable extends PureComponent {
     this.setState({ deletionList: this.state.deletionList.filter((id) => id !== selectedId) });
   }
 
+  debouncedOnPaginate = debounce(this.props.onPaginate, 300)
+
   render() {
     const {
       defaultSearchFilter,
@@ -57,12 +58,19 @@ class DataTable extends PureComponent {
       addModalContent,
       addModalActions,
       onDeleteSelected,
+      onPaginate,
     } = this.props;
     const {
-      isEditing, isAdding, isDeleting, deletionList,
+      isEditing,
+      isAdding,
+      isDeleting,
+      deletionList,
+      currentPage,
+      limit,
+      searchFilter,
+      searchText,
     } = this.state;
 
-    const totalPages = Math.ceil((totalCount || this.state.perPage) / this.state.perPage);
     return (
       <Table celled>
         <Table.Header fullWidth>
@@ -118,7 +126,7 @@ class DataTable extends PureComponent {
                     content="Delete Selected"
                     color="red"
                     onClick={async () => {
-                      await onDeleteSelected(deletionList, this.cancelDelete);
+                      await onDeleteSelected(deletionList);
                       this.cancelDelete();
                       this.clearDeletionList();
                     }}
@@ -128,12 +136,16 @@ class DataTable extends PureComponent {
                 <Input
                   icon="search"
                   placeholder="Search..."
-                  onChange={(__, { value }) => this.setSearchText(value)}
+                  onChange={(__, { value }) => {
+                    this.setState({ searchText: value }, () => {
+                      this.debouncedOnPaginate(currentPage - 1, limit, searchFilter, value);
+                    });
+                  }}
                   label={(
                     <Dropdown
                       defaultValue={defaultSearchFilter}
                       options={columns.map((column) => ({ text: column.text, value: column.key }))}
-                      onChange={(__, { value }) => this.setSearchFilter(value)}
+                      onChange={(__, { value }) => this.setState({ searchFilter: value })}
                     />
                   )}
                 />
@@ -186,24 +198,30 @@ class DataTable extends PureComponent {
                 <Button disabled>Rows</Button>
                 <Dropdown
                   options={rowsPerPageOptions}
-                  onChange={(__, { value }) => this.selectPerPage(value)}
-                  value={this.state.perPage}
+                  onChange={(__, { value }) => {
+                    this.setState({
+                      limit: value,
+                      currentPage: 1,
+                    }, () => {
+                      onPaginate(0, value, searchFilter, searchText);
+                    });
+                  }}
+                  value={this.state.limit}
                   floating
                   button
                 />
               </Button.Group>
-              <Menu floated="right" pagination>
-                <Menu.Item as="a" icon>
-                  <Icon name="left chevron" />
-                </Menu.Item>
-                <Menu.Item as="a">1</Menu.Item>
-                <Menu.Item as="a" disabled>...</Menu.Item>
-                <Menu.Item as="a">3</Menu.Item>
-                <Menu.Item as="a">4</Menu.Item>
-                <Menu.Item as="a" icon>
-                  <Icon name="right chevron" />
-                </Menu.Item>
-              </Menu>
+              {limit < totalCount ? (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={Math.ceil((totalCount || limit) / limit)}
+                  onChange={(page) => {
+                  this.setState({ currentPage: page }, () => {
+                    this.debouncedOnPaginate(page - 1, limit, searchFilter, searchText);
+                  });
+                }}
+                />
+              ) : null}
             </Table.HeaderCell>
           </Table.Row>
         </Table.Footer>

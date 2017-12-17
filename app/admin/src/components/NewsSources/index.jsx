@@ -14,10 +14,12 @@ import './styles.css';
 const mapStateToProps = ({
   sources: {
     sources,
+    totalCount,
   },
   socket,
 }) => ({
   sources,
+  totalCount,
   socket,
 });
 
@@ -47,7 +49,7 @@ class Sources extends Component {
   }
 
   render() {
-    const { sources } = this.props;
+    const { sources, totalCount } = this.props;
 
     return (
       <div className="sources-container">
@@ -70,10 +72,11 @@ class Sources extends Component {
                 <DataTable
                   defaultSearchFilter="brand"
                   label="Sources"
-                  totalCount={5}
+                  totalCount={totalCount}
                   data={sources}
                   columns={columns}
                   onDeleteSelected={this.props.deleteSources}
+                  onPaginate={this.props.fetchSources}
                   addModalContent={<SourcesForm />}
                   addModalActions={(closeModal) => (
                     <div>

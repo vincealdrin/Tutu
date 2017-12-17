@@ -40,6 +40,8 @@ export const login = () => httpThunk(LOGIN, async (getState) => {
       },
     });
 
+    axios.defaults.headers.common.Authorization = user.token;
+
     localStorage.setItem('userInfo', JSON.stringify({
       info: user.user,
       token: user.token,
@@ -57,6 +59,7 @@ export const login = () => httpThunk(LOGIN, async (getState) => {
 
 export const logout = () => {
   localStorage.removeItem('userInfo');
+  axios.defaults.headers.common.Authorization = '';
 
   return {
     type: LOGOUT,

@@ -1,6 +1,7 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import { routerMiddleware } from 'react-router-redux';
 import thunk from 'redux-thunk';
+import axios from 'axios';
 import createHistory from 'history/createBrowserHistory';
 import rootReducer from './modules';
 import { crudStatus } from './utils';
@@ -16,6 +17,7 @@ const initialState = {
     loginStatus: crudStatus,
   },
 };
+axios.defaults.headers.common.Authorization = initialState.user.token;
 
 const enhancers = [];
 const middleware = [

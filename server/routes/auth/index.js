@@ -9,7 +9,13 @@ const jwtSignOption = {
   issuer: 'TUTU',
 };
 const { JWT_SECRET } = process.env;
-const extractUserInfo = ({ username, name, role }) => ({
+const extractUserInfo = ({
+  id,
+  username,
+  name,
+  role,
+}) => ({
+  id,
   username,
   name,
   role,

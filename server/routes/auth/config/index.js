@@ -4,13 +4,6 @@ const LocalStrategy = require('passport-local');
 const r = require('rethinkdb');
 const bcrypt = require('bcrypt-nodejs');
 
-const jwtOption = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'),
-  secretOrKey: process.env.JWT_SECRET,
-  issuer: 'TUTU',
-  audience: 'TUTU Admin',
-};
-
 module.exports = (conn) => {
   const tbl = 'users';
 
@@ -37,11 +30,17 @@ module.exports = (conn) => {
     }
   });
 
-  const jwtAuth = new JWTStrategy(jwtOption, async ({ username }, done) => {
-    const matchedUser = await r.table(tbl).get(username).run(conn);
+  const jwtOption = {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt'),
+    secretOrKey: process.env.JWT_SECRET,
+    issuer: 'TUTU',
+  };
+
+  const jwtAuth = new JWTStrategy(jwtOption, async ({ id }, done) => {
+    const matchedUser = await r.table(tbl).get(id).run(conn);
 
     if (!matchedUser) {
-      return done(null, false, { message: 'Invalid token' });
+      return done(null, false);
     }
 
     done(null, matchedUser);

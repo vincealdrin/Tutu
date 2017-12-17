@@ -3,50 +3,45 @@ import { Button, Icon } from 'semantic-ui-react';
 import shortid from 'shortid';
 import './styles.css';
 
-class CarouselLeftArrow extends Component {
-  render() {
-    return (
-      <Button
-        className="carousel-arrow carousel-arrow-left"
-        onClick={this.props.onClick}
-      >
-        <Icon name="chevron left" />
-      </Button>
-    );
-  }
-}
+const CarouselLeftArrow = (arrow) => (
+  <Button
+    color="grey"
+    className="carousel-arrow carousel-arrow-left"
+    onClick={arrow.onClick}
+  >
+    <Icon name="chevron left" />
+  </Button>
+);
 
-class CarouselRightArrow extends Component {
-  render() {
-    return (
-      <Button
-        className="carousel-arrow carousel-arrow-right"
-        onClick={this.props.onClick}
-      >
-        <Icon name="chevron right" />
-      </Button>
-    );
-  }
-}
+const CarouselRightArrow = (arrow) => (
+  <Button
+    color="grey"
+    className="carousel-arrow carousel-arrow-right"
+    onClick={arrow.onClick}
+  >
+    <Icon name="chevron right" />
+  </Button>
+);
 
-class CarouselSlide extends Component {
-  render() {
-    const { slide } = this.props;
-    return (
-      <li
-        className={
-          this.props.index === this.props.activeIndex
-          ? 'carousel-slide carousel-slide-active'
-          : 'carousel-slide'
-        }
-      >
-        <p className="carousel-slide-content">
-          {slide}
-        </p>
-      </li>
-    );
-  }
-}
+const CarouselSlide = ({
+  slide,
+  index,
+  activeIndex,
+}) => (
+  <li
+    className={
+      index === activeIndex
+      ?
+        'carousel-slide carousel-slide-active'
+      :
+        'carousel-slide'
+    }
+  >
+    <p className="carousel-slide-content">
+      {slide}
+    </p>
+  </li>
+);
 
 class Carousel extends Component {
   state = {
@@ -54,36 +49,22 @@ class Carousel extends Component {
   };
 
   goToPreviousSlide = () => {
-    const { activeIndex } = this.state;
-    const { content } = this.props;
+    let { activeIndex } = this.state;
+    const { content = [] } = this.props;
     const summaryLength = content.length;
-    let index = activeIndex;
-
-    if (index < 1) {
-      index = summaryLength;
-    }
-
-    --index;
 
     this.setState({
-      activeIndex: index,
+      activeIndex: activeIndex < 1 ? activeIndex = summaryLength - 1 : activeIndex - 1,
     });
   }
 
   goToNextSlide = () => {
-    const { activeIndex } = this.state;
+    let { activeIndex } = this.state;
     const { content } = this.props;
     const summaryLength = content.length - 1;
-    let index = activeIndex;
-
-    if (index === summaryLength) {
-      index = -1;
-    }
-
-    ++index;
 
     this.setState({
-      activeIndex: index,
+      activeIndex: activeIndex === summaryLength ? activeIndex = 0 : activeIndex + 1,
     });
   }
 
@@ -94,7 +75,7 @@ class Carousel extends Component {
     return (
       <div className="carousel">
         <ul className="carousel-slides">
-          {content && content.map((sum, index) => (
+          {content.map((sum, index) => (
             <CarouselSlide
               key={shortid.generate()}
               index={index}

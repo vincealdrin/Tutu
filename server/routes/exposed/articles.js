@@ -339,7 +339,7 @@ module.exports = (conn, io) => {
       const { url, reaction } = req.body;
 
       if (!/happy|sad|angry|amused|afraid|inspired/.test(reaction)) {
-        next({ msg: 'Invalid reaction', status: 400 });
+        next({ message: 'Invalid reaction', status: 400 });
       }
 
       const uuid = await r.uuid(url).run(conn);
@@ -352,7 +352,7 @@ module.exports = (conn, io) => {
 
       if (existingReact) {
         return next({
-          msg: `You already reacted "${existingReact.reaction}"`,
+          message: `You already reacted "${existingReact.reaction}"`,
           status: 400,
         });
       }
@@ -367,7 +367,7 @@ module.exports = (conn, io) => {
       res.status(204).end();
     } catch (e) {
       next({
-        msg: 'URL not found',
+        message: 'URL not found',
         status: 404,
         ...e,
       });

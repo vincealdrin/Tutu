@@ -9,7 +9,6 @@ const compression = require('compression');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const http = require('http');
-const path = require('path');
 const errorhandler = require('errorhandler');
 const cors = require('cors');
 const initDb = require('./db');
@@ -28,6 +27,8 @@ app.use(compression({
   level: 9,
   memLevel: 9,
 }));
+app.use(passport.initialize());
+
 
 app.use(cors({ exposedHeaders: 'X-Total-Count' }));
 // app.use(express.static(path.resolve(__dirname, '..', 'app', 'client', 'build')));
@@ -37,7 +38,6 @@ const isProduction = process.env.NODE_ENV === 'production';
 if (isProduction) {
   app.use(errorhandler());
 }
-
 initDb((conn) => {
   io.sockets.on('connection', (socket) => {
     console.log(`${socket.id} has connected`);
@@ -76,7 +76,7 @@ initDb((conn) => {
       res.status(err.status || 500);
 
       res.json({
-        msg: err.msg,
+        message: err.message,
         error: {
           message: err.message,
           error: err,
@@ -90,7 +90,7 @@ initDb((conn) => {
   app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.json({
-      msg: err.msg || err.message,
+      message: err.message || err.message,
     });
   });
 

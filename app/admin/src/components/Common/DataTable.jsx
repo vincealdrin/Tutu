@@ -1,8 +1,6 @@
 import React, { PureComponent } from 'react';
 import {
-  Icon,
   Button,
-  Menu,
   Table,
   Checkbox,
   Input,
@@ -29,7 +27,7 @@ class DataTable extends PureComponent {
     deletionList: [],
     searchText: '',
     searchFilter: this.props.defaultSearchFilter,
-    currentPage: 0,
+    currentPage: 1,
     limit: 20,
   }
 
@@ -178,14 +176,11 @@ class DataTable extends PureComponent {
                     />
                   </Table.Cell>
                 ) : null}
-                {columns.map(({ key, dkey, wrappers = {} }) => {
-                  const val = dkey ? dkey(datum) : datum[key];
-                  return (
-                    <Table.Cell key={shortid.generate()}>
-                      {wrappers[key] ? wrappers[key](val) : val}
-                    </Table.Cell>
-                  );
-                })}
+                {columns.map(({ key, wrappers = {} }) => (
+                  <Table.Cell key={shortid.generate()}>
+                    {wrappers[key] ? wrappers[key](datum[key]) : datum[key]}
+                  </Table.Cell>
+                  ))}
               </Table.Row>
             );
           })}

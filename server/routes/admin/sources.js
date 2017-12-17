@@ -2,9 +2,12 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 const _ = require('lodash');
 const rp = require('request-promise');
-const parseDomain = require('parse-domain');
 const {
-  getAboutContactUrl, getFaviconUrl, getSourceInfo, getSourceBrand,
+  getAboutContactUrl,
+  getFaviconUrl,
+  getSourceInfo,
+  getSourceBrand,
+  getTitle,
 } = require('../../utils');
 
 const responseGroups = ['RelatedLinks', 'Categories', 'Rank', 'ContactInfo', 'RankByCountry',
@@ -29,7 +32,7 @@ module.exports = (conn, io) => {
       let query = r.table(tbl);
 
       if (filterKey && searchText) {
-        query = query.filter((source) => source.pluck(JSON.parse(filterKey)).match(`(?i)${searchText}`));
+        query = query.filter((source) => source(filterKey).match(`(?i)${searchText}`));
       }
 
       const cursor = await query
@@ -65,16 +68,34 @@ module.exports = (conn, io) => {
       const sourcesInfo = await Promise.all(sources.map(async (source) => {
         const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
         const htmlDoc = await rp(url);
-        const { domain } = parseDomain(url);
         const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, url);
         const faviconUrl = getFaviconUrl(htmlDoc);
         const infoPromise = await getSourceInfo(url, responseGroups);
         const info = await infoPromise;
-        const { title } = info.contentData.siteData;
-
-        const brand = _.trim(getSourceBrand(url, title) || _.capitalize(domain));
+        const title = getTitle(htmlDoc);
+        const brand = _.trim(getSourceBrand(url, title));
 
         delete info.contactInfo;
+        const subdomains = _.get(info, 'trafficData.contributingSubdomains.contributingSubdomain') || [];
+        const mappedSubdomains = Array.isArray(subdomains)
+          ? subdomains.map((subdomain) => ({
+            url: subdomain.dataUrl,
+            pageViews: {
+              perUser: parseFloat((_.get(subdomain, 'pageViews.perUser') || '0.0')),
+              percentage: parseFloat((_.get(subdomain, 'pageViews.percentage') || '0.0').replace('%', '')),
+            },
+            reach: parseFloat((_.get(subdomain, 'reach.percentage') || '0.0').replace('%', '')),
+            timeRange: parseInt(_.get(subdomain, 'timeRange.months') || '0'),
+          }))
+          : {
+            url: subdomains.dataUrl,
+            pageViews: {
+              perUser: parseFloat((_.get(subdomains, 'pageViews.perUser') || '0.0')),
+              percentage: parseFloat((_.get(subdomains, 'pageViews.percentage') || '0.0').replace('%', '')),
+            },
+            reach: parseFloat((_.get(subdomains, 'reach.percentage') || '0.0').replace('%', '')),
+            timeRange: parseInt(_.get(subdomains, 'timeRange.months') || '0'),
+          };
 
         return {
           url: _.get(info, 'contentData.dataUrl', ''),
@@ -86,7 +107,7 @@ module.exports = (conn, io) => {
             path: _.get(info, 'related.categories.categoryData.absolutePath', ''),
             title: _.get(info, 'related.categories.categoryData.title', ''),
           },
-          relatedLinks: _.get(info, 'related.relatedLinks.relatedLink', []).map((related) => ({
+          relatedLinks: (_.get(info, 'related.relatedLinks.relatedLink') || []).map((related) => ({
             ...related,
             url: related.dataUrl,
           })),
@@ -94,24 +115,15 @@ module.exports = (conn, io) => {
             medianLoadTime: parseInt(_.get(info, 'contentData.speed.medianLoadTime') || '0'),
             percentile: parseInt(_.get(info, 'contentData.speed.percentile') || '0'),
           },
-          rankByCountry: _.get(info, 'trafficData.rankByCountry.country', []).map((country) => ({
+          rankByCountry: (_.get(info, 'trafficData.rankByCountry.country') || []).map((country) => ({
             code: country.code,
             contribution: {
-              pageViews: parseFloat(_.get(country, 'contribution.pageViews', '0.0').replace('%', '')),
-              users: parseFloat(_.get(country, 'contribution.users', '0.0').replace('%', '')),
+              pageViews: parseFloat((_.get(country, 'contribution.pageViews') || '0.0').replace('%', '')),
+              users: parseFloat((_.get(country, 'contribution.users') || '0.0').replace('%', '')),
             },
             rank: parseInt(_.get(country, 'rank') || '0'),
           })),
-          contributingSubdomains: _.get(info, 'trafficData.contributingSubdomains.contributingSubdomain', [])
-            .map((subdomain) => ({
-              url: subdomain.dataUrl,
-              pageViews: {
-                perUser: parseFloat(_.get(subdomain, 'pageViews.perUser', '0.0')),
-                percentage: parseFloat(_.get(subdomain, 'pageViews.percentage', '0.0').replace('%', '')),
-              },
-              reach: parseFloat(_.get(subdomain, 'reach.percentage', '0.0').replace('%', '')),
-              timeRange: parseInt(_.get(subdomain, 'timeRange.months') || '0'),
-            })),
+          subdomains: mappedSubdomains,
           faviconUrl,
           aboutUsUrl,
           contactUsUrl,

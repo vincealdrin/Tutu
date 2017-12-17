@@ -61,9 +61,9 @@ export const fetchSources = (page = 0, limit = 15, filterKey = '', searchText = 
   try {
     const { data: sources, status, headers } = await axios.get('/sources', {
       params: {
-        filterKey,
         page,
         limit,
+        filterKey,
         searchText,
       },
     });

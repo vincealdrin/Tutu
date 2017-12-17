@@ -31,10 +31,9 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 
 const columns = [
   {
-    key: 'dataUrl',
-    dkey: (source) => source.contentData.dataUrl,
+    key: 'url',
     wrappers: {
-      dataUrl: (val) => (
+      url: (val) => (
         <a href={`http://${val}`} target="__blank">{val}</a>
       ),
     },

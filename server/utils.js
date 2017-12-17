@@ -14,6 +14,12 @@ const WEEK_IN_SEC = 604800;
 module.exports.PH_TIMEZONE = PH_TIMEZONE;
 module.exports.WEEK_IN_SEC = WEEK_IN_SEC;
 
+module.exports.getTitle = (htmlDoc) => {
+  const $ = cheerio.load(htmlDoc);
+
+  return $('title').text();
+};
+
 module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, reject) => {
   awisClient({
     Action: 'UrlInfo',
@@ -27,7 +33,12 @@ module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, re
 
 module.exports.getSourceBrand = (url, title) => {
   const titleArr = title.split(/-|\|/);
-  return titleArr.find((word) => new RegExp(_.trim(word), 'i').test(url));
+  const foundTitle = titleArr.find((word) => new RegExp(_.trim(word), 'i').test(url));
+
+  if (foundTitle) {
+    return foundTitle;
+  }
+  return title;
 };
 
 const cleanUrl = (dirtyUrl = '', baseUrl) => {
@@ -87,7 +98,6 @@ module.exports.getAboutContactUrl = (htmlDoc, baseUrl) => {
 
     return { aboutUsUrl, contactUsUrl };
   } catch (e) {
-    console.error(e);
     return { error: 'Source Error' };
   }
 };
@@ -140,21 +150,6 @@ module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
     sentiment: getSentiment(article('sentiment')),
     summary: article('summary'),
     reactions: article('reactions').group('reaction').count().ungroup(),
-    // topImageUrl: article('topImageUrl'),
-    // source: r.table('sources').get(article('sourceId'))
-    //   .pluck({
-    //     faviconUrl: true,
-    //     contentData: {
-    //       siteData: { title: true },
-    //       dataUrl: true,
-    //     },
-    //   })
-    //   .merge((source) => ({
-    //     title: source('contentData')('siteData')('title'),
-    //     url: source('contentData')('dataUrl'),
-    //     favicon: source('faviconUrl'),
-    //   }))
-    //   .without('contentData', 'faviconUrl'),
   };
 
   if (catsFilterLength) {
@@ -214,7 +209,7 @@ module.exports.mapArticle = (bounds) => (join) => {
     publishDate: join('left')('publishDate'),
     topImageUrl: join('left')('topImageUrl'),
     source: join('right')('brand'),
-    sourceUrl: join('right')('contentData')('dataUrl'),
+    sourceUrl: join('right')('url'),
   };
 
   if (bounds) {
@@ -235,8 +230,8 @@ module.exports.mapSideArticle = (join) => {
     publishDate: join('left')('publishDate'),
     summary: join('left')('summary'),
     topImageUrl: join('left')('topImageUrl'),
-    source: join('right')('contentData')('siteData')('title'),
-    sourceUrl: join('right')('contentData')('dataUrl'),
+    source: join('right')('title'),
+    sourceUrl: join('right')('url'),
   };
 
   return article;
@@ -246,21 +241,11 @@ module.exports.mapFeedArticle = (join) => {
   const article = {
     url: join('left')('new_val')('url'),
     title: join('left')('new_val')('title'),
-    // authors: join('left')('new_val')('authors'),
-    // keywords: join('left')('new_val')('topics')('common'),
     publishDate: join('left')('new_val')('publishDate'),
-    // sentiment: getSentiment(join('left')('new_val')('sentiment')),
     summary: join('left')('new_val')('summary'),
     topImageUrl: join('left')('new_val')('topImageUrl'),
-    // categories: join('left')('new_val')('categories')
-    //   .filter((category) => category('score').gt(0))
-    //   .orderBy(r.desc((category) => category('score')))
-    //   .slice(0, 2)
-    //   .concatMap((c) => [c('label')]),
-    // locations: join('left')('new_val')('locations').map(mapLocation),
-    source: join('right')('contentData')('siteData')('title'),
-    sourceUrl: join('right')('contentData')('dataUrl'),
-    // sourceFaviconUrl: join('right')('faviconUrl'),
+    source: join('right')('title'),
+    sourceUrl: join('right')('url'),
   };
 
   return {
@@ -281,8 +266,8 @@ module.exports.mapFeedLog = (join) => ({
     articlesCount: join('left')('new_val')('articlesCount').default(0),
     articlesCrawledCount: join('left')('new_val')('articlesCrawledCount').default(0),
     error: join('left')('error').default(''),
-    sourceUrl: join('right')('contentData')('dataUrl'),
-    sourceTitle: join('right')('contentData')('siteData')('title'),
+    sourceUrl: join('right')('url'),
+    sourceTitle: join('right')('title'),
     article: r.table('articles')
       .get(join('left')('new_val')('articleId'))
       .pluck('authors', 'title', 'summary', 'url', 'publishDate')
@@ -301,8 +286,8 @@ module.exports.mapLog = (join) => ({
   articlesCount: join('left')('articlesCount').default(0),
   articlesCrawledCount: join('left')('articlesCrawledCount').default(0),
   error: join('left')('error').default(''),
-  sourceUrl: join('right')('contentData')('dataUrl'),
-  sourceTitle: join('right')('contentData')('siteData')('title'),
+  sourceUrl: join('right')('url'),
+  sourceTitle: join('right')('title'),
   article: r.table('articles')
     .get(join('left')('articleId'))
     .pluck('authors', 'title', 'summary', 'url', 'publishDate')

@@ -3,23 +3,13 @@ import { Button, Icon } from 'semantic-ui-react';
 import shortid from 'shortid';
 import './styles.css';
 
-const CarouselLeftArrow = (arrow) => (
+const CarouselArrow = (arrow) => (
   <Button
     color="grey"
-    className="carousel-arrow carousel-arrow-left"
+    className="carousel-arrow"
     onClick={arrow.onClick}
   >
-    <Icon name="chevron left" />
-  </Button>
-);
-
-const CarouselRightArrow = (arrow) => (
-  <Button
-    color="grey"
-    className="carousel-arrow carousel-arrow-right"
-    onClick={arrow.onClick}
-  >
-    <Icon name="chevron right" />
+    <Icon name={`chevron ${arrow.direction}`} />
   </Button>
 );
 
@@ -39,6 +29,25 @@ const CarouselSlide = ({
   >
     <p className="carousel-slide-content">
       {slide}
+    </p>
+  </li>
+);
+
+const CarouselSummaryNumber = ({
+  index,
+  activeIndex,
+}) => (
+  <li
+    className={
+      index === activeIndex
+      ?
+        'carousel-slide carousel-slide-active'
+      :
+        'carousel-slide'
+    }
+  >
+    <p className="carousel-slide-content article-tags">
+      Summary {index + 1}
     </p>
   </li>
 );
@@ -69,7 +78,7 @@ class Carousel extends Component {
   }
 
   render() {
-    const { content } = this.props;
+    const { content = [] } = this.props;
     const { activeIndex } = this.state;
 
     return (
@@ -86,8 +95,17 @@ class Carousel extends Component {
         </ul>
 
         <div className="carousel-arrows">
-          <CarouselLeftArrow onClick={this.goToPreviousSlide} />
-          <CarouselRightArrow onClick={this.goToNextSlide} />
+          <CarouselArrow onClick={this.goToPreviousSlide} direction="left" />
+          <ul className="carousel-slides">
+            {content.map((sum, index) => (
+              <CarouselSummaryNumber
+                key={shortid.generate()}
+                index={index}
+                activeIndex={activeIndex}
+              />
+            ))}
+          </ul>
+          <CarouselArrow onClick={this.goToNextSlide} direction="right" />
         </div>
       </div>
     );

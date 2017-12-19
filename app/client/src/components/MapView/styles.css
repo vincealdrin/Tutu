@@ -225,27 +225,27 @@
 }
 
 /* JUMPING ARROWS FIX */
-.carousel-container {
+.carousel {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-height: 180px;
-}
-
-.carousel {
-  position: relative;
 }
 
 .carousel-slide {
   display: none;
   max-width: 400px;
-  margin: 0 auto;
+  margin: auto;
   text-align: center;
   list-style: none;
 }
 
 .carousel-slide-active {
   display: block;
+}
+
+.carousel-summary:nth-child(1) {
+  height: 120px;
+  margin-top: 1rem;
+  overflow-y: auto;
 }
 
 .carousel-slide-content {

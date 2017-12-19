@@ -71,7 +71,7 @@ while True:
             if PY_ENV == 'development':
                 print('(SOURCE ERROR) Source Skipped\n')
             insert_log(source_id, 'sourceCrawl', 'error', float(time.clock() - src_start_time), {
-                'errorMsg': 'SOURCE ERROR'
+                'errorMessage': 'SOURCE ERROR'
             })
             continue
 
@@ -119,7 +119,7 @@ while True:
                     print(' -- ' + existing_article['id'] + '\n')
                 insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                     'articleUrl': article.url,
-                    'errorMsg': 'EXISTING URL'
+                    'errorMessage': 'EXISTING URL'
                 })
                 slp_time = 0
                 continue
@@ -143,7 +143,7 @@ while True:
                         slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                             'articleUrl': article.url,
                             'articleTitle': title,
-                            'errorMsg': 'NOT ENGLISH',
+                            'errorMessage': 'NOT ENGLISH',
                         })
                         continue
                 except:
@@ -152,7 +152,7 @@ while True:
                     slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
                         'articleTitle': title,
-                        'errorMsg': 'NOT ENGLISH',
+                        'errorMessage': 'NOT ENGLISH',
                     })
                     continue
 
@@ -162,7 +162,7 @@ while True:
                     slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
                         'articleTitle': title,
-                        'errorMsg': 'SHORT CONTENT',
+                        'errorMessage': 'SHORT CONTENT',
 
                     })
                     continue
@@ -173,7 +173,7 @@ while True:
                     slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
                         'articleTitle': title,
-                        'errorMsg': 'SOURCE IS IN BODY',
+                        'errorMessage': 'SOURCE IS IN BODY',
                     })
                     continue
 
@@ -183,7 +183,7 @@ while True:
                     slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
                         'articleTitle': title,
-                        'errorMsg': 'NO TEXT',
+                        'errorMessage': 'NO TEXT',
                     })
                     continue
 

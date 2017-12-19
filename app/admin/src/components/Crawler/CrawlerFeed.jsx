@@ -9,22 +9,22 @@ class CrawlerFeed extends Component {
       switch (status) {
         case 'pending':
           return {
-            actionMsg: 'Crawling has started',
+            actionMessage: 'Crawling has started',
             icon: 'bug',
           };
         case 'success':
           return {
-            actionMsg: 'Crawling was successful',
+            actionMessage: 'Crawling was successful',
             icon: 'thumbs up',
           };
         case 'error':
           return {
-            actionMsg: 'Crawling has stopped for some reason',
+            actionMessage: 'Crawling has stopped for some reason',
             icon: 'warning sign',
           };
         default:
           return {
-            actionMsg: 'Something went wrong...',
+            actionMessage: 'Something went wrong...',
             icon: 'warning sign',
           };
       }
@@ -33,22 +33,22 @@ class CrawlerFeed extends Component {
     switch (status) {
       case 'pending':
         return {
-          actionMsg: 'Building the news source',
+          actionMessage: 'Building the news source',
           icon: 'cogs',
         };
       case 'success':
         return {
-          actionMsg: 'Succesfully crawled the news source',
+          actionMessage: 'Succesfully crawled the news source',
           icon: 'thumbs up',
         };
       case 'error':
         return {
-          actionMsg: 'Building the news source has failed',
+          actionMessage: 'Building the news source has failed',
           icon: 'warning sign',
         };
       default:
         return {
-          actionMsg: 'Something went wrong...',
+          actionMessage: 'Something went wrong...',
           icon: 'warning sign',
         };
     }
@@ -62,7 +62,7 @@ class CrawlerFeed extends Component {
         {logs.map((log) => {
           const {
             icon,
-            actionMsg,
+            actionMessage,
           } = this.getLogAction(log.type, log.status);
 
           return (
@@ -70,7 +70,7 @@ class CrawlerFeed extends Component {
               <Feed.Label icon={icon} />
               <Feed.Content>
                 <Feed.Summary>
-                  {actionMsg}
+                  {actionMessage}
                   <Feed.Date>{timeago().format(log.timestamp)}</Feed.Date>
                 </Feed.Summary>
                 <Feed.Extra>

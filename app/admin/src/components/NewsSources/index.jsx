@@ -11,6 +11,20 @@ import {
 } from '../../modules/sources';
 import './styles.css';
 
+const columns = [
+  { key: 'brand', text: 'Brand' },
+  {
+    key: 'url',
+    wrappers: {
+      url: (val) => (
+        <a href={`http://${val}`} target="__blank">{val}</a>
+      ),
+    },
+    text: 'URL',
+  },
+];
+
+
 const mapStateToProps = ({
   sources: {
     sources,
@@ -28,19 +42,6 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   addSources,
   deleteSources,
 }, dispatch);
-
-const columns = [
-  {
-    key: 'url',
-    wrappers: {
-      url: (val) => (
-        <a href={`http://${val}`} target="__blank">{val}</a>
-      ),
-    },
-    text: 'URL',
-  },
-  { key: 'brand', text: 'Brand' },
-];
 
 class Sources extends Component {
   componentDidMount() {

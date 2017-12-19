@@ -25,7 +25,7 @@ class DataTable extends PureComponent {
     isAdding: false,
     isEditing: false,
     deletionList: [],
-    searchText: '',
+    search: '',
     searchFilter: this.props.defaultSearchFilter,
     currentPage: 1,
     limit: 20,
@@ -66,7 +66,7 @@ class DataTable extends PureComponent {
       currentPage,
       limit,
       searchFilter,
-      searchText,
+      search,
     } = this.state;
 
     return (
@@ -135,7 +135,7 @@ class DataTable extends PureComponent {
                   icon="search"
                   placeholder="Search..."
                   onChange={(__, { value }) => {
-                    this.setState({ searchText: value }, () => {
+                    this.setState({ search: value }, () => {
                       this.debouncedOnPaginate(currentPage - 1, limit, searchFilter, value);
                     });
                   }}
@@ -198,7 +198,7 @@ class DataTable extends PureComponent {
                       limit: value,
                       currentPage: 1,
                     }, () => {
-                      onPaginate(0, value, searchFilter, searchText);
+                      onPaginate(0, value, searchFilter, search);
                     });
                   }}
                   value={this.state.limit}
@@ -212,7 +212,7 @@ class DataTable extends PureComponent {
                   totalPages={Math.ceil((totalCount || limit) / limit)}
                   onChange={(page) => {
                   this.setState({ currentPage: page }, () => {
-                    this.debouncedOnPaginate(page - 1, limit, searchFilter, searchText);
+                    this.debouncedOnPaginate(page - 1, limit, searchFilter, search);
                   });
                 }}
                 />

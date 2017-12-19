@@ -13,10 +13,12 @@ text_client2 = textapi.Client(AYLIEN_APP_ID2, AYLIEN_APP_KEY2)
 text_client3 = textapi.Client(AYLIEN_APP_ID3, AYLIEN_APP_KEY3)
 
 classes = [
-    'Business', 'Economy & Finance', 'Lifestyle', 'Accident',
-    'Entertainment', 'Sports', 'Government & Politics',
-    'Health', 'Science & Technology', 'Crime', 'Weather',
-    'Calamity', 'Nation', 'Education', 'Food'
+    'Economy', 'Business & Finance', 'Lifestyle',
+    'Disaster & Accident', 'Entertainment & Arts',
+    'Sports', 'Law & Government', 'Politics',
+    'Health', 'Science & Technology',
+    'Crime', 'Weather', 'Culture',
+    'Nation', 'Education'
 ]
 
 def article_extraction(url):

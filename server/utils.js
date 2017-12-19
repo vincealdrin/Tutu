@@ -110,6 +110,12 @@ const mapLocation = (loc) => {
   };
 };
 
+const getCategoriesField = (article, max = 2) => article('categories')
+  .filter((category) => category('score').gt(0))
+  .orderBy(r.desc((category) => category('score')))
+  .slice(0, max === 0 ? 2 : max)
+  .getField('label');
+
 module.exports.getRelatedArticles = (article) =>
   r.table('articles').filter((doc) =>
     article('publishDate').date()
@@ -138,69 +144,20 @@ const getSentiment = (sentiment) => r.branch(
   'Neutral',
 );
 
-module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
-  const doc = {
-    url: article('url'),
-    title: article('title'),
-    authors: article('authors'),
-    keywords: article('topics')('common'),
-    people: article('people'),
-    organizations: article('organizations'),
-    publishDate: article('publishDate'),
-    sentiment: getSentiment(article('sentiment')),
-    summary: article('summary'),
-    reactions: article('reactions').group('reaction').count().ungroup(),
-  };
-
-  if (catsFilterLength) {
-    doc.categories = article('categories')
-      .filter((category) => category('score').gt(0))
-      .orderBy(r.desc((category) => category('score')))
-      .slice(0, catsFilterLength)
-      .getField('label');
-  } else {
-    doc.categories = article('categories')
-      .filter((category) => category('score').gt(0))
-      .orderBy(r.desc((category) => category('score')))
-      .slice(0, 2)
-      .getField('label');
-  }
-
-  return doc;
-};
-
-module.exports.mapClusterInfo = (catsFilterLength) => (article) => {
-  const doc = {
-    id: article('id'),
-    url: article('url'),
-    title: article('title'),
-    authors: article('authors'),
-    keywords: article('topics')('common'),
-    people: article('people'),
-    organizations: article('organizations'),
-    publishDate: article('publishDate'),
-    sentiment: getSentiment(article('sentiment')),
-    summary: article('summary'),
-    reactions: article('reactions').group('reaction').count().ungroup(),
-  };
-
-  if (catsFilterLength) {
-    doc.categories = article('categories')
-      .filter((category) => category('score').gt(0))
-      .orderBy(r.desc((category) => category('score')))
-      .slice(0, catsFilterLength)
-      .getField('label');
-  } else {
-    doc.categories = article('categories')
-      .filter((category) => category('score').gt(0))
-      .orderBy(r.desc((category) => category('score')))
-      .slice(0, 2)
-      .getField('label');
-  }
-
-  return doc;
-};
-
+module.exports.mapArticleInfo = (catsFilterLength) => (article) => ({
+  id: article('id'),
+  url: article('url'),
+  title: article('title'),
+  authors: article('authors'),
+  keywords: article('topics')('common'),
+  people: article('people'),
+  organizations: article('organizations'),
+  publishDate: article('publishDate'),
+  sentiment: getSentiment(article('sentiment')),
+  summary: article('summary'),
+  categories: getCategoriesField(article, catsFilterLength),
+  reactions: article('reactions').group('reaction').count().ungroup(),
+});
 
 module.exports.mapArticle = (bounds) => (join) => {
   const article = {

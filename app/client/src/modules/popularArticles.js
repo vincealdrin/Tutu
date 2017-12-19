@@ -52,7 +52,7 @@ export const fetchPopularArticles = (limit) => async (dispatch) => {
       type: FETCH_POPULAR_ARTICLES,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
+      errorMessage: e.response.data.message,
     });
   }
 };

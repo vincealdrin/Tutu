@@ -90,7 +90,7 @@ export const fetchLogs = () => async (dispatch) => {
       type: FETCH_LOGS,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
+      errorMessage: e.response.data.message,
     });
   }
 };
@@ -113,7 +113,7 @@ export const fetchStats = (cb) => async (dispatch) => {
       type: FETCH_STATS,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
+      errorMessage: e.response.data.message,
     });
   }
 

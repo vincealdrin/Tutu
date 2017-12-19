@@ -1,9 +1,11 @@
+import { Cancel } from 'axios';
+
 export const updateCrudStatus = (action) => ({
   pending: action.statusText === 'pending',
   success: action.statusText === 'success',
   error: action.statusText === 'error',
   status: action.status,
-  errorMsg: action.errorMsg,
+  errorMessage: action.errorMessage,
 });
 
 export const crudStatus = {
@@ -11,30 +13,33 @@ export const crudStatus = {
   success: false,
   error: false,
   status: null,
-  errorMsg: '',
+  errorMessage: '',
 };
 
 export const httpThunk = (type, cb) => async (dispatch, getState) => {
   dispatch({ statusText: 'pending', type });
-  const payload = await cb(getState);
+  const payload = await cb(getState, dispatch);
 
   if (payload instanceof Error) {
     const {
       response = {
-        data: { msg: '' },
+        data: { message: '' },
         status: 500,
       },
     } = payload;
     dispatch({
       statusText: 'error',
-      status: response ? response.status : 500,
-      errorMsg: response.data.msg,
+      errorMessage: response.data.message,
+      status: response.status,
+      type,
+    });
+  } else if (payload instanceof Cancel) {
+    dispatch({ statusText: 'cancelled', type });
+  } else {
+    dispatch({
+      ...payload,
+      statusText: 'success',
       type,
     });
   }
-  dispatch({
-    ...payload,
-    statusText: 'success',
-    type,
-  });
 };

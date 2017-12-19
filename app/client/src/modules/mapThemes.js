@@ -39,7 +39,7 @@ export const fetchMapStyle = () => async (dispatch) => {
       type: FETCH_MAP_STYLES,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
+      errorMessage: e.response.data.message,
     });
   }
 };

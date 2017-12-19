@@ -27,9 +27,11 @@ const CarouselSlide = ({
         'carousel-slide'
     }
   >
-    <p className="carousel-slide-content">
-      {slide}
-    </p>
+    <div className="carousel-summary">
+      <p className="carousel-slide-content">
+        {slide}
+      </p>
+    </div>
   </li>
 );
 

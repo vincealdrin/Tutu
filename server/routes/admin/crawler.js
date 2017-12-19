@@ -13,8 +13,8 @@ module.exports = (conn, io) => {
 
       const cursor = await r.table(tbl)
         .filter(r.row('timestamp').ge(date))
-        .orderBy(r.desc('timestamp'))
         .eqJoin(r.row('sourceId'), r.table('sources'))
+        .orderBy(r.desc(r.row('left')('timestamp')))
         .map(mapLog)
         .limit(30)
         .run(conn);

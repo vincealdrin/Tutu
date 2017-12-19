@@ -256,9 +256,10 @@ module.exports = (conn, io) => {
       const lastWk = new Date();
       lastWk.setDate(lastWk.getDate() - 7);
 
-      const query = await r.table(tbl).filter((article) => article('popularity')('totalCount').gt(0))
-        .orderBy(r.desc(r.row('popularity')('totalCount')))
+      const query = await r.table(tbl).filter((article) => article('publishDate').date().ge(lastWk)
+        .and(article('popularity')('totalCount').gt(0)))
         .eqJoin(r.row('sourceId'), r.table('sources'))
+        .orderBy(r.desc(r.row('right')('popularity')('totalCount')))
         .map(mapSideArticle)
         .slice(0, limit);
       const totalCount = query.count().run(conn);
@@ -281,9 +282,9 @@ module.exports = (conn, io) => {
       const query = r.table(tbl).filter(r.row('timestamp').date().ge(lastWk));
       const totalCount = await query.count().run(conn);
       const cursor = await query
+        .orderBy(r.desc('timestamp'))
         .eqJoin('sourceId', r.table('sources'))
         .map(mapSideArticle)
-        .orderBy(r.desc('timestamp'))
         .limit(parseInt(limit))
         .run(conn);
       const articles = await cursor.toArray();

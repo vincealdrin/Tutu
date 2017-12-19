@@ -19,9 +19,12 @@ PROXY_IP3 = os.environ.get('PROXY_IP3')
 PH_TIMEZONE = '+08:00'
 
 proxies = [PROXY_IP, PROXY_IP2, PROXY_IP3]
-def get_proxy():
+def get_proxy(last = ''):
     choice = random.choice(proxies)
-    return { 'http': choice, 'https': choice }
+
+    if choice == last:
+        return get_proxy(choice)
+    return { 'http': choice }
 
 def sleep(slp_time):
     if slp_time:

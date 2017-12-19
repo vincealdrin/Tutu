@@ -34,7 +34,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         logs: state.logs.length >= 30
-          ? [action.newLog, ...state.logs.slice(1)]
+          ? [action.newLog, ...state.logs.slice(0, state.logs.length - 1)]
           : [action.newLog, ...state.logs],
       };
     case INCREMENT_SUCCESS_COUNT:

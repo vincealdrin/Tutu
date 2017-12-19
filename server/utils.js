@@ -225,12 +225,13 @@ module.exports.mapArticle = (bounds) => (join) => {
 
 module.exports.mapSideArticle = (join) => {
   const article = {
+    id: join('left')('id'),
     url: join('left')('url'),
     title: join('left')('title'),
     publishDate: join('left')('publishDate'),
     summary: join('left')('summary'),
     topImageUrl: join('left')('topImageUrl'),
-    source: join('right')('title'),
+    source: join('right')('brand'),
     sourceUrl: join('right')('url'),
   };
 
@@ -239,12 +240,13 @@ module.exports.mapSideArticle = (join) => {
 
 module.exports.mapFeedArticle = (join) => {
   const article = {
+    id: join('left')('new_val')('id'),
     url: join('left')('new_val')('url'),
     title: join('left')('new_val')('title'),
     publishDate: join('left')('new_val')('publishDate'),
     summary: join('left')('new_val')('summary'),
     topImageUrl: join('left')('new_val')('topImageUrl'),
-    source: join('right')('title'),
+    source: join('right')('brand'),
     sourceUrl: join('right')('url'),
   };
 

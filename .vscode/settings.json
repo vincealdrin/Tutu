@@ -5,7 +5,7 @@
   ],
   // change this depending on ur venv path
   "python.pythonPath":
-  "C:\\Users\\vncea\\.virtualenvs\\spider-EyAUVvSq",
+  "C:\\Users\\vncea\\.virtualenvs\\crawler-XEqVwfD2",
   "files.exclude": {
       "**/.git": true,
       "**/.svn": true,

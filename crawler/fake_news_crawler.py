@@ -35,7 +35,7 @@ while True:
             continue
 
         src_start_time = time.clock()
-        url = news_source['contentData']['dataUrl']
+        url = news_source['url']
         config = newspaper.Config()
         # config.browser_user_agent = UserAgent().random
         config.follow_meta_refresh = True

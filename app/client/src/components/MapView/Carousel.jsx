@@ -8,6 +8,7 @@ const CarouselArrow = (arrow) => (
     color="grey"
     className="carousel-arrow"
     onClick={arrow.onClick}
+    size="mini"
   >
     <Icon name={`chevron ${arrow.direction}`} />
   </Button>

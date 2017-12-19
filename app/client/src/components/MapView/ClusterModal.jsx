@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { List, Image, Label, Dimmer, Loader, Modal, Segment, Grid, Header, Button, Accordion, Icon } from 'semantic-ui-react';
 import shortid from 'shortid';
 import RelatedArticles from './RelatedArticles';
+import Carousel from './Carousel';
 import Tags from './Tags';
 import Pagination from './Pagination';
 import './styles.css';
@@ -131,7 +132,7 @@ class ClusterModal extends Component {
                   </Grid.Column>
                   <Grid.Column width={5}>
                     <div className="news-summary">
-                      <p> {summary && summary[0]} </p>
+                      <Carousel content={summary} />
                     </div>
                     <div className="related-stories">
                       <RelatedArticles content={relatedArticles} />

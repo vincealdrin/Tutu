@@ -53,6 +53,10 @@
   width: 75px;
 }
 
+.thin-component {
+  width: 25vw;
+}
+
 .wide {
   width: 225px;
 }

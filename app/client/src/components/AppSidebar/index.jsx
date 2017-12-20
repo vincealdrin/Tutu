@@ -23,6 +23,9 @@ class AppSidebar extends Component {
     if (window.location.pathname === '/') {
       isVisible = `${visible ? 'hidden' : 'full'}`;
       isIconVisible = `${visible ? 'left' : 'right'}`;
+    } if (window.location.pathname === '/submit' || window.location.pathname === '/about') {
+      isVisible = `${visible ? 'full thin-component' : 'hidden'}`;
+      isIconVisible = `${visible ? 'right' : 'left'}`;
     } else {
       isVisible = `${visible ? 'full' : 'hidden'}`;
       isIconVisible = `${visible ? 'right' : 'left'}`;
@@ -71,6 +74,10 @@ class AppSidebar extends Component {
             <Link to="/about" onClick={this.beVisible}>
               <Icon name="browser" color="grey" />
               <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>About</span>
+            </Link>
+            <Link to="/submit" onClick={this.beVisible}>
+              <Icon name="send outline" color="grey" />
+              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Submit</span>
             </Link>
             <Link to="/themes" onClick={this.beVisible}>
               <Icon name="globe" color="grey" />

@@ -1,19 +1,11 @@
 import React, { Component } from 'react';
-import { Popup, List, Image, Label, Modal, Segment, Grid, Header, Button } from 'semantic-ui-react';
+import { List, Image, Label, Grid } from 'semantic-ui-react';
 import shortid from 'shortid';
 import { Tooltip } from 'react-tippy';
 import './styles.css';
 
 class ClusterMarker extends Component {
-  state = {
-    hovered: false,
-  };
-  hoverMarker = () => {
-    this.setState({ hovered: !this.state.hovered });
-  };
-
   render() {
-    const { hovered } = this.state;
     const { count, articles, $hover } = this.props;
 
     return (

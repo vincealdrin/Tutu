@@ -1,0 +1,20 @@
+.submit-field {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.submit-field > input {
+  border-radius: 100px !important;
+}
+
+.ui.message {
+  margin: 4rem 0;
+}
+
+.doThis {
+  background-color: red !important;
+}
+
+.dontDoThis {
+  background-color: blue !important;
+}

@@ -1,15 +1,49 @@
 .cluster-marker-container {
+  position: relative;
+  z-index: 100;
   display: flex;
-  width: 3rem;
-  height: 3rem;
+  width: 3.6rem !important;
+  height: 3.6rem !important;
   background: #fff;
   border: 5px solid #f25100;
   border-radius: 100%;
+  box-shadow: 0 3px 24px #1b272b;
+  transform-origin: center;
+  transition: all 0.2s cubic-bezier(0.56, 0.21, 0.38, 1.55);
 }
 
 .cluster-marker-container > p {
   margin: auto;
   font-size: 1.7rem;
+}
+
+.cluster-marker-container-hovered {
+  animation: pulse 2s infinite;
+}
+
+.cluster-marker-container-radiant {
+  position: absolute;
+  top: -0.38rem;
+  left: -0.37rem;
+  z-index: -20000;
+  width: 3.6rem;
+  height: 3.6rem;
+  background: #fff;
+  border: 5px solid #f25100;
+  border-radius: 100%;
+  transform-origin: center;
+}
+
+/* radar pulse animation for cluster marker */
+@keyframes pulse {
+  1% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
 }
 
 .simple-marker {
@@ -39,12 +73,12 @@
   position: absolute;
   bottom: 1px;
   left: -13.5px;
-  transition: all 0.1s ease-in-out;
+  transition: all 0.141592654s ease-in-out;
 }
 
 .tippy-tooltip {
-  top: -2rem;
-  left: 0.5rem;
+  top: -5rem;
+  left: 2.4rem;
   background: #fff;
   box-shadow: 0 0 3px #94989b;
 }
@@ -98,10 +132,6 @@
   position: absolute;
   right: 7px;
   bottom: 7px;
-}
-
-.favicon-container {
-  width: 5% !important;
 }
 
 .cluster-list-container:last-child {
@@ -243,13 +273,15 @@
 }
 
 .carousel-summary:nth-child(1) {
+  display: flex;
   height: 150px;
   margin: 1rem 0;
   overflow-y: auto;
 }
 
 .carousel-slide-content {
-  margin-bottom: 1.6rem !important;
+  /* margin-bottom: 1.6rem !important; */
+  margin: auto;
 }
 
 .carousel-arrows {

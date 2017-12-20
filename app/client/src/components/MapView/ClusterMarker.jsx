@@ -5,7 +5,15 @@ import { Tooltip } from 'react-tippy';
 import './styles.css';
 
 class ClusterMarker extends Component {
+  state = {
+    hovered: false,
+  };
+  hoverMarker = () => {
+    this.setState({ hovered: !this.state.hovered });
+  };
+
   render() {
+    const { hovered } = this.state;
     const { count, articles, $hover } = this.props;
 
     return (
@@ -37,12 +45,13 @@ class ClusterMarker extends Component {
           </List>
         }
         open={$hover}
-        // hmmm di maibaba ung position ng arrow eto na muna
-        // arrow
         animateFill={false}
         sticky
       >
-        <div className="cluster-marker-container" >
+        <div
+          className="cluster-marker-container"
+        >
+          <div className={`cluster-marker-container-radiant ${$hover ? 'cluster-marker-container-hovered' : ''}`} />
           <p>{count}</p>
         </div>
       </Tooltip>

@@ -19,13 +19,13 @@ def insert_article(article, table='articles'):
         'timestamp': r.expr(datetime.now(r.make_timezone(PH_TIMEZONE))),
     }).run(conn)
 
-def insert_log(sourceId, type, status, runtime, info):
+def insert_log(sourceId, type, status, runTime, info):
     r.table('crawlerLogs').insert({
         **info,
         'sourceId': sourceId,
         'status': status,
         'type': type,
-        'runtime': runtime,
+        'runTime': runTime,
         'timestamp': r.expr(datetime.now(r.make_timezone(PH_TIMEZONE)))
     }).run(conn)
 

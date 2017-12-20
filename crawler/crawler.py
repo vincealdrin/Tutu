@@ -93,10 +93,9 @@ while True:
         if (not source.articles):
             if PY_ENV == 'development':
                 print('(ZERO ARTICLES) Source Skipped\n')
-            insert_log(source_id, 'SOURCE ERROR', 'error', float(time.clock() - src_start_time), {})
+            insert_log(source_id, 'SOURCE ERROR', 'error', float(time.clock() - src_start_time))
             continue
 
-        # 20 articles only for dev purposes
         for article in source.articles:
             start_time = time.clock()
 
@@ -108,7 +107,7 @@ while True:
             clean_url = clean_url.replace('https', 'http').replace('www.', '')
             url_uuid = get_uuid(clean_url)
 
-            insert_log(source_id, 'articleCrawl', 'pending', float(time.clock() - start_time), {
+            insert_log(source_id, 'articleCrawl', 'pending', float(slp_time), {
                 'articleUrl': article.url
             })
 
@@ -156,14 +155,13 @@ while True:
                     })
                     continue
 
-                if  len(body.split()) < 100:
+                if len(body.split()) < 100:
                     if PY_ENV == 'development':
                         print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
                     slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
                         'articleTitle': title,
                         'errorMessage': 'SHORT CONTENT',
-
                     })
                     continue
 
@@ -199,9 +197,10 @@ while True:
                     if country in combined_body and not nation_pattern.search(combined_body):
                         if PY_ENV == 'development':
                             print('\n(HAS OTHER COUNTRY BUT NO PH) Skipped: ' + str(article.url) + '\n')
-                        slp_time = insert_log(source_id, 'HAS OTHER COUNTRY BUT NO PH', 'error', float(time.clock() - start_time), {
+                        slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                             'articleUrl': article.url,
-                            'articleTitle': title
+                            'articleTitle': title,
+                            'errorMessage': 'HAS OTHER COUNTRY BUT NO PH'
                         })
                         continue
 
@@ -209,9 +208,10 @@ while True:
                     if not nation_pattern.search(combined_body):
                         if PY_ENV == 'development':
                             print('\n(CAN\'T FIND LOCATION) Skipped: ' + str(article.url) + '\n')
-                        slp_time = insert_log(source_id, 'CAN\'T FIND LOCATION', 'error', float(time.clock() - start_time), {
+                        slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                             'articleUrl': article.url,
-                            'articleTitle': title
+                            'articleTitle': title,
+                            'errorMessage': 'CAN\'T FIND LOCATION'
                         })
                         continue
 
@@ -220,9 +220,10 @@ while True:
                 if (not publishDate):
                     if PY_ENV == 'development':
                         print('\n(CAN\'T FIND PUBLISH DATE) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'CAN\'T FIND PUBLISH DATE', 'error', float(time.clock() - start_time), {
+                    slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
-                        'articleTitle': title
+                        'articleTitle': title,
+                        'errorMessage': 'CAN\'T FIND PUBLISH DATE'
                     })
                     continue
 
@@ -231,9 +232,10 @@ while True:
                 if error:
                     if PY_ENV == 'development':
                         print('\n(TEXT IS TOO LONG) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'TEXT IS TOO LONG', 'error', float(time.clock() - start_time), {
+                    slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
                         'articleUrl': article.url,
-                        'articleTitle': title
+                        'articleTitle': title,
+                        'errorMessage': 'TEXT IS TOO LONG'
                     })
                     continue
 
@@ -303,3 +305,5 @@ while True:
 
         if PY_ENV == 'development':
             print('\n' + source.domain + ' done!')
+
+        sleep(3)

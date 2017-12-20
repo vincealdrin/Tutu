@@ -69,7 +69,7 @@ export const fetchArticles = () => async (dispatch) => {
     dispatch({
       statusText: 'error',
       status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
+      errorMessage: e.response.data.message,
       type: FETCH_ARTICLES,
     });
   }
@@ -90,7 +90,7 @@ export const createArticle = (article) => async (dispatch) => {
     dispatch({
       statusText: 'error',
       status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
+      errorMessage: e.response.data.message,
       type: CREATE_ARTICLE,
     });
   }
@@ -113,7 +113,7 @@ export const updateArticle = (articleId, article, isIdChanged = false) => async 
     dispatch({
       statusText: 'error',
       status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
+      errorMessage: e.response.data.message,
       type: UPDATE_ARTICLE,
     });
   }
@@ -134,7 +134,7 @@ export const deleteArticles = (ids) => async (dispatch) => {
     dispatch({
       statusText: 'error',
       status: e.response ? e.response.status : 500,
-      errorMsg: e.response.data.msg,
+      errorMessage: e.response.data.message,
       type: DELETE_ARTICLES,
     });
   }

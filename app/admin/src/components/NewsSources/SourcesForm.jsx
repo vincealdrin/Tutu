@@ -33,7 +33,6 @@ class SourcesForm extends Component {
   }
 
   removeInput = (id) => {
-    console.log(id);
     this.setState({
       inputs: this.state.inputs.filter((_, i) => (i + 1) !== id),
     });

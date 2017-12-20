@@ -3,7 +3,7 @@ const r = require('rethinkdb');
 const bcrypt = require('bcrypt-nodejs');
 
 module.exports = (conn, io) => {
-  const tblName = 'users';
+  const tbl = 'users';
 
   router.get('/', async (req, res, next) => {
     const {
@@ -12,18 +12,20 @@ module.exports = (conn, io) => {
       filter,
       search,
     } = req.query;
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
 
     try {
-      const table = r.table(tblName);
-      const totalCount = await table.count().run(conn);
+      const totalCount = await r.table(tbl).count().run(conn);
+      let query = r.table(tbl).filter(r.row('role').ne('superadmin'));
 
       if (filter && search) {
-        table.filter({ [filter]: search });
+        query = query.filter((user) => user(filter).match(`(?i)${search}`));
       }
 
-      const cursor = await table
-        .skip(page * limit)
-        .limit(limit)
+      const cursor = await query
+        .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
+        .without('password')
         .run(conn);
       const users = await cursor.toArray();
 
@@ -38,7 +40,7 @@ module.exports = (conn, io) => {
     const { userId } = req.params;
 
     try {
-      const user = await r.table(tblName).get(userId).run(conn);
+      const user = await r.table(tbl).get(userId).run(conn);
 
       res.json(user);
     } catch (e) {
@@ -50,6 +52,13 @@ module.exports = (conn, io) => {
     const user = req.body;
     const id = await r.uuid(user.username).run(conn);
 
+    if (user.role === 'superadmin') {
+      return next({
+        message: 'Can\'t create user with superadmin role',
+        status: 400,
+      });
+    }
+
     bcrypt.hash(user.password, null, null, async (err, hash) => {
       if (err) throw err;
 
@@ -57,7 +66,7 @@ module.exports = (conn, io) => {
       user.password = hash;
 
       try {
-        await r.table(tblName).insert(user).run(conn);
+        await r.table(tbl).insert(user).run(conn);
 
         res.json(user);
       } catch (e) {
@@ -76,7 +85,7 @@ module.exports = (conn, io) => {
     }
 
     try {
-      await r.table(tblName).get(userId).update(user).run(conn);
+      await r.table(tbl).get(userId).update(user).run(conn);
 
       res.json(user);
     } catch (e) {
@@ -88,7 +97,11 @@ module.exports = (conn, io) => {
     const { ids = [] } = req.body;
 
     try {
-      await r.table(tblName).getAll(r.args(ids)).delete().run(conn);
+      await r.table(tbl)
+        .getAll(r.args(ids.split(',')))
+        .filter(r.row('role').ne('superadmin'))
+        .delete()
+        .run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -100,7 +113,7 @@ module.exports = (conn, io) => {
     const { userId = '' } = req.params;
 
     try {
-      await r.table(tblName).getAll(userId).delete().run(conn);
+      await r.table(tbl).getAll(userId).delete().run(conn);
 
       res.status(204).end();
     } catch (e) {

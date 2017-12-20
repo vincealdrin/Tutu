@@ -231,7 +231,7 @@ export const fetchFocusedInfo = (article) => httpThunk(FETCH_FOCUSED_INFO, async
     const { data: focusedInfo, status } = await axios.get('/articles/info', {
       params: {
         id: article.id,
-        catsFilter: categories.length,
+        catsFilterLength: categories.length,
       },
       cancelToken: focusedInfoSource.token,
     });

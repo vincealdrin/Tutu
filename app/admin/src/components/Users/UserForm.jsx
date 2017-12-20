@@ -1,36 +1,40 @@
 import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
-import { Button } from 'semantic-ui-react';
 import { InputField } from 'react-semantic-redux-form';
 
-class LoginForm extends Component {
-  _onSubmit = (e) => {
-    e.preventDefault();
-    this.props.login();
-  }
-
+class UserForm extends Component {
   render() {
-    const { login } = this.props;
     return (
-      <form onSubmit={this._onSubmit}>
+      <div>
         <Field
           component={InputField}
           name="username"
-          placeholder="username"
+          placeholder="Username"
           fluid
         />
         <Field
           component={InputField}
           name="password"
-          placeholder="password"
+          placeholder="Password"
           fluid
         />
-        <Button content="login" onClick={login} />
-      </form>
+        <Field
+          component={InputField}
+          name="name"
+          placeholder="Name"
+          fluid
+        />
+        <Field
+          component={InputField}
+          name="role"
+          placeholder="Role"
+          fluid
+        />
+      </div>
     );
   }
 }
 
 export default reduxForm({
-  form: 'login',
-})(LoginForm);
+  form: 'user',
+})(UserForm);

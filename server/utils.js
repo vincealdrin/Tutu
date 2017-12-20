@@ -110,6 +110,14 @@ const mapLocation = (loc) => {
   };
 };
 
+const getCategoriesField = (article, max = 2) => article('categories')
+  .filter((category) => category('score').gt(0))
+  .orderBy(r.desc((category) => category('score')))
+  .slice(0, max === 0 ? 2 : max)
+  .getField('label');
+
+module.exports.getCategoriesField = getCategoriesField;
+
 module.exports.getRelatedArticles = (article) =>
   r.table('articles').filter((doc) =>
     article('publishDate').date()
@@ -138,69 +146,20 @@ const getSentiment = (sentiment) => r.branch(
   'Neutral',
 );
 
-module.exports.mapArticleInfo = (catsFilterLength) => (article) => {
-  const doc = {
-    url: article('url'),
-    title: article('title'),
-    authors: article('authors'),
-    keywords: article('topics')('common'),
-    people: article('people'),
-    organizations: article('organizations'),
-    publishDate: article('publishDate'),
-    sentiment: getSentiment(article('sentiment')),
-    summary: article('summary'),
-    reactions: article('reactions').group('reaction').count().ungroup(),
-  };
-
-  if (catsFilterLength) {
-    doc.categories = article('categories')
-      .filter((category) => category('score').gt(0))
-      .orderBy(r.desc((category) => category('score')))
-      .slice(0, catsFilterLength)
-      .getField('label');
-  } else {
-    doc.categories = article('categories')
-      .filter((category) => category('score').gt(0))
-      .orderBy(r.desc((category) => category('score')))
-      .slice(0, 2)
-      .getField('label');
-  }
-
-  return doc;
-};
-
-module.exports.mapClusterInfo = (catsFilterLength) => (article) => {
-  const doc = {
-    id: article('id'),
-    url: article('url'),
-    title: article('title'),
-    authors: article('authors'),
-    keywords: article('topics')('common'),
-    people: article('people'),
-    organizations: article('organizations'),
-    publishDate: article('publishDate'),
-    sentiment: getSentiment(article('sentiment')),
-    summary: article('summary'),
-    reactions: article('reactions').group('reaction').count().ungroup(),
-  };
-
-  if (catsFilterLength) {
-    doc.categories = article('categories')
-      .filter((category) => category('score').gt(0))
-      .orderBy(r.desc((category) => category('score')))
-      .slice(0, catsFilterLength)
-      .getField('label');
-  } else {
-    doc.categories = article('categories')
-      .filter((category) => category('score').gt(0))
-      .orderBy(r.desc((category) => category('score')))
-      .slice(0, 2)
-      .getField('label');
-  }
-
-  return doc;
-};
-
+module.exports.mapArticleInfo = (catsFilterLength) => (article) => ({
+  id: article('id'),
+  url: article('url'),
+  title: article('title'),
+  authors: article('authors'),
+  keywords: article('topics')('common'),
+  people: article('people'),
+  organizations: article('organizations'),
+  publishDate: article('publishDate'),
+  sentiment: getSentiment(article('sentiment')),
+  summary: article('summary'),
+  categories: getCategoriesField(article, catsFilterLength),
+  reactions: article('reactions').group('reaction').count().ungroup(),
+});
 
 module.exports.mapArticle = (bounds) => (join) => {
   const article = {
@@ -261,15 +220,16 @@ module.exports.mapFeedLog = (join) => ({
   log: {
     status: join('left')('new_val')('status'),
     type: join('left')('new_val')('type'),
-    runtime: join('left')('new_val')('runtime').default(0),
+    runTime: join('left')('new_val')('runTime').default(0),
     articleUrl: join('left')('new_val')('articleUrl').default(''),
-    sleepTime: join('left')('new_val')('sleepTime').default(0),
     timestamp: join('left')('new_val')('timestamp'),
     articlesCount: join('left')('new_val')('articlesCount').default(0),
     articlesCrawledCount: join('left')('new_val')('articlesCrawledCount').default(0),
-    error: join('left')('error').default(''),
+    proxy: join('left')('new_val')('proxy').default(''),
+    userAgent: join('left')('new_val')('userAgent').default(''),
+    errorMessage: join('left')('new_val')('errorMessage').default(''),
     sourceUrl: join('right')('url'),
-    sourceTitle: join('right')('title'),
+    sourceBrand: join('right')('brand'),
     article: r.table('articles')
       .get(join('left')('new_val')('articleId'))
       .pluck('authors', 'title', 'summary', 'url', 'publishDate')
@@ -281,15 +241,16 @@ module.exports.mapFeedLog = (join) => ({
 module.exports.mapLog = (join) => ({
   status: join('left')('status'),
   type: join('left')('type'),
-  runtime: join('left')('runtime').default(0),
+  runTime: join('left')('runTime').default(0),
   articleUrl: join('left')('articleUrl').default(''),
-  sleepTime: join('left')('sleepTime').default(0),
   timestamp: join('left')('timestamp'),
   articlesCount: join('left')('articlesCount').default(0),
   articlesCrawledCount: join('left')('articlesCrawledCount').default(0),
-  error: join('left')('error').default(''),
+  proxy: join('left')('proxy').default(''),
+  userAgent: join('left')('userAgent').default(''),
+  errorMessage: join('left')('errorMessage').default(''),
   sourceUrl: join('right')('url'),
-  sourceTitle: join('right')('title'),
+  sourceBrand: join('right')('brand'),
   article: r.table('articles')
     .get(join('left')('articleId'))
     .pluck('authors', 'title', 'summary', 'url', 'publishDate')

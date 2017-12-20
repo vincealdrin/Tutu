@@ -21,8 +21,8 @@ module.exports = (conn, io) => {
     const {
       page = 0,
       limit = 15,
-      filterKey = '',
-      searchText = '',
+      filter = '',
+      search = '',
     } = req.query;
     const parsedPage = parseInt(page);
     const parsedLimit = parseInt(limit);
@@ -31,13 +31,12 @@ module.exports = (conn, io) => {
       const totalCount = await r.table(tbl).count().run(conn);
       let query = r.table(tbl);
 
-      if (filterKey && searchText) {
-        query = query.filter((source) => source(filterKey).match(`(?i)${searchText}`));
+      if (filter && search) {
+        query = query.filter((source) => source(filter).match(`(?i)${search}`));
       }
 
       const cursor = await query
-        .skip(parsedPage * parsedLimit)
-        .limit(parsedLimit)
+        .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
         .run(conn);
       const sources = await cursor.toArray();
 

@@ -42,19 +42,20 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 }, dispatch);
 
 const categoriesOptions = [
-  { key: 'Government & Politics', text: 'Government & Politics', value: 'Government & Politics' },
-  { key: 'Nation', text: 'Nation', value: 'Nation' },
-  { key: 'Weather', text: 'Weather', value: 'Weather' },
-  { key: 'Business', text: 'Business', value: 'Business' },
-  { key: 'Entertainment', text: 'Entertainment', value: 'Entertainment' },
-  { key: 'Economy & Finance', text: 'Economy & Finance', value: 'Economy & Finance' },
-  { key: 'Lifestyle', text: 'Lifestyle', value: 'Lifestyle' },
-  { key: 'Science & Technology', text: 'Science & Technology', value: 'Science & Technology' },
-  { key: 'Health', text: 'Health', value: 'Health' },
-  { key: 'Sports', text: 'Sports', value: 'Sports' },
-  { key: 'Accident', text: 'Accident', value: 'Accident' },
+  { key: 'Arts & Entertainment', text: 'Arts & Entertainment', value: 'Arts & Entertainment' },
+  { key: 'Business & Finance', text: 'Business & Finance', value: 'Business & Finance' },
   { key: 'Crime', text: 'Crime', value: 'Crime' },
-  { key: 'Calamity', text: 'Calamity', value: 'Calamity' },
+  { key: 'Disaster & Accident', text: 'Disaster & Accident', value: 'Disaster & Accident' },
+  { key: 'Economy', text: 'Economy', value: 'Economy' },
+  { key: 'Education', text: 'Education', value: 'Education' },
+  { key: 'Health', text: 'Health', value: 'Health' },
+  { key: 'Law & Government', text: 'Law & Government', value: 'Law & Government' },
+  { key: 'Lifestyle', text: 'Lifestyle', value: 'Lifestyle' },
+  { key: 'Nation', text: 'Nation', value: 'Nation' },
+  { key: 'Politics', text: 'Politics', value: 'Politics' },
+  { key: 'Science & Technology', text: 'Science & Technology', value: 'Science & Technology' },
+  { key: 'Sports', text: 'Sports', value: 'Sports' },
+  { key: 'Weather', text: 'Weather', value: 'Weather' },
 ];
 
 const sentimentsOptions = [

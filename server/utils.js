@@ -116,6 +116,8 @@ const getCategoriesField = (article, max = 2) => article('categories')
   .slice(0, max === 0 ? 2 : max)
   .getField('label');
 
+module.exports.getCategoriesField = getCategoriesField;
+
 module.exports.getRelatedArticles = (article) =>
   r.table('articles').filter((doc) =>
     article('publishDate').date()
@@ -223,7 +225,9 @@ module.exports.mapFeedLog = (join) => ({
     timestamp: join('left')('new_val')('timestamp'),
     articlesCount: join('left')('new_val')('articlesCount').default(0),
     articlesCrawledCount: join('left')('new_val')('articlesCrawledCount').default(0),
-    errorMessage: join('left')('errorMessage').default(''),
+    proxy: join('left')('new_val')('proxy').default(''),
+    userAgent: join('left')('new_val')('userAgent').default(''),
+    errorMessage: join('left')('new_val')('errorMessage').default(''),
     sourceUrl: join('right')('url'),
     sourceBrand: join('right')('brand'),
     article: r.table('articles')
@@ -242,6 +246,8 @@ module.exports.mapLog = (join) => ({
   timestamp: join('left')('timestamp'),
   articlesCount: join('left')('articlesCount').default(0),
   articlesCrawledCount: join('left')('articlesCrawledCount').default(0),
+  proxy: join('left')('proxy').default(''),
+  userAgent: join('left')('userAgent').default(''),
   errorMessage: join('left')('errorMessage').default(''),
   sourceUrl: join('right')('url'),
   sourceBrand: join('right')('brand'),

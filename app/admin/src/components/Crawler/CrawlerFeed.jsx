@@ -29,7 +29,10 @@ class CrawlerFeed extends Component {
         default:
           return {
             feedHtml: (
-              <p>{`-- ${log.errorMessage}`}</p>
+              <span>
+                <a href={log.articleUrl} target="__blank">{log.articleUrl}</a>
+                <p>{`-- ${log.errorMessage}`}</p>
+              </span>
             ),
             actionMessage: 'Crawling has stopped for some reason',
             icon: 'warning sign',
@@ -44,6 +47,10 @@ class CrawlerFeed extends Component {
             <p>
               <a href={log.sourceUrl} target="__blank">{log.sourceBrand}</a>
               {` has ${log.articlesCount} article${log.articlesCount > 1 ? 's' : ''}`}
+              <br />
+              <span>Proxy: {log.proxy}</span>
+              <br />
+              <span>User-Agent: {log.userAgent}</span>
             </p>
           ),
           actionMessage: 'Building the news source',

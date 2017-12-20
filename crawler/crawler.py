@@ -58,12 +58,13 @@ while True:
         config.follow_meta_refresh = True
         config.memoize_articles = True
 
-        if PY_ENV == 'production':
-            config.browser_user_agent = UserAgent().random
-            config.proxies = proxy
 
         proxy = get_proxy(last_proxy)
         last_proxy = proxy['http']
+
+        if PY_ENV == 'production':
+            config.browser_user_agent = UserAgent().random
+            config.proxies = proxy
 
         try:
             source = newspaper.build('http://'+url, config=config)
@@ -75,13 +76,9 @@ while True:
             })
             continue
 
-        if PY_ENV == 'production':
-            if PY_ENV == 'development':
-                print('Proxy: ' + proxy['http'])
-            if PY_ENV == 'development':
-                print('User-Agent: ' + config.browser_user_agent)
-
         if PY_ENV == 'development':
+            print('Proxy: ' + proxy['http'])
+            print('User-Agent: ' + config.browser_user_agent)
             print('\n' + source.domain + ' has ' + str(len(source.articles)) + ' articles\n')
 
         insert_log(source_id, 'sourceCrawl', 'pending', float(time.clock() - src_start_time), {
@@ -93,7 +90,9 @@ while True:
         if (not source.articles):
             if PY_ENV == 'development':
                 print('(ZERO ARTICLES) Source Skipped\n')
-            insert_log(source_id, 'SOURCE ERROR', 'error', float(time.clock() - src_start_time))
+            insert_log(source_id, 'sourceCrawl', 'error', float(time.clock() - src_start_time), {
+                'errorMessage': 'ZERO ARTICLES'
+            })
             continue
 
         for article in source.articles:

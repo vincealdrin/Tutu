@@ -1,6 +1,6 @@
 import rethinkdb as r
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from utils import PH_TIMEZONE
 from random import randrange
 
@@ -28,6 +28,33 @@ def insert_log(sourceId, type, status, runTime, info):
         'runTime': runTime,
         'timestamp': r.expr(datetime.now(r.make_timezone(PH_TIMEZONE)))
     }).run(conn)
+
+    MB = 1024
+    THRESHOLD = 10
+    logs_mb_size = r.db('rethinkdb').table('stats').filter({
+        'db': 'tutu',
+        'table': 'crawlerLogs'
+    }).map(r.row['storage_engine']['disk']['space_usage']['data_bytes'].default(0)
+    ).sum().div(MB).div(MB).run(conn)
+
+    if logs_mb_size > THRESHOLD:
+        r.table('crawlerLogs').delete().run(conn)
+
+    # DAYS = 1
+    # HOURS = 1
+    # last_days = datetime.now(r.make_timezone(PH_TIMEZONE)) - timedelta(days=DAYS)
+    # last_hours = datetime.now(r.make_timezone(PH_TIMEZONE)) - timedelta(hours=HOURS)
+
+    # r.table('crawlerLogs').filter(
+    #     r.row['timestamp'].le(last_days).or(
+    #         r.row['type'].eq('sourceCrawl').and(
+    #             r.row['status'].eq('error').and(
+    #                 r.row['errorMessage'].eq('ZERO ARTICLES')
+    #             )
+    #         ).and(
+    #             r.row['timestamp'].le(last_hours)
+    #         )
+    #     )).delete().run(conn)
 
     return randrange(2, 6)
 

@@ -48,9 +48,7 @@ class ClusterMarker extends Component {
         animateFill={false}
         sticky
       >
-        <div
-          className="cluster-marker-container"
-        >
+        <div className="cluster-marker-container">
           <div className={`cluster-marker-container-radiant ${$hover ? 'cluster-marker-container-hovered' : ''}`} />
           <p>{count}</p>
         </div>

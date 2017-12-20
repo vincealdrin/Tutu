@@ -50,6 +50,7 @@ class ClusterMarker extends Component {
       >
         <div
           className="cluster-marker-container"
+          style={$hover ? { zIndex: 9999 } : {}}
         >
           <div className={`cluster-marker-container-radiant ${$hover ? 'cluster-marker-container-hovered' : ''}`} />
           <p>{count}</p>

@@ -2,8 +2,8 @@
   position: relative;
   z-index: 100;
   display: flex;
-  width: 3.6rem !important;
-  height: 3.6rem !important;
+  width: 3.2rem !important;
+  height: 3.2rem !important;
   background: #fff;
   border: 5px solid #f25100;
   border-radius: 100%;
@@ -14,7 +14,7 @@
 
 .cluster-marker-container > p {
   margin: auto;
-  font-size: 1.7rem;
+  font-size: 1.1rem;
 }
 
 .cluster-marker-container-hovered {
@@ -26,8 +26,8 @@
   top: -0.38rem;
   left: -0.37rem;
   z-index: -20000;
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 3.2rem;
+  height: 3.2rem;
   background: #fff;
   border: 5px solid #f25100;
   border-radius: 100%;

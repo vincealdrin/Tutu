@@ -2,8 +2,8 @@
   position: relative;
   z-index: 100;
   display: flex;
-  width: 3.6rem !important;
-  height: 3.6rem !important;
+  width: 3.2rem !important;
+  height: 3.2rem !important;
   background: #fff;
   border: 5px solid #f25100;
   border-radius: 100%;
@@ -14,7 +14,7 @@
 
 .cluster-marker-container > p {
   margin: auto;
-  font-size: 1.7rem;
+  font-size: 1.1rem;
 }
 
 .cluster-marker-container-hovered {
@@ -23,11 +23,11 @@
 
 .cluster-marker-container-radiant {
   position: absolute;
-  top: -0.38rem;
-  left: -0.37rem;
+  top: -0.37rem;
+  left: -0.3046rem;
   z-index: -20000;
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 3.2rem;
+  height: 3.2rem;
   background: #fff;
   border: 5px solid #f25100;
   border-radius: 100%;
@@ -91,6 +91,7 @@
   position: absolute;
   top: -21px;
   left: -21px;
+  z-index: -100;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -40,7 +40,7 @@ class ClusterMarker extends Component {
         animateFill={false}
         sticky
       >
-        <div className="cluster-marker-container">
+        <div className="cluster-marker-container" style={$hover ? { zIndex: 10000 } : {}}>
           <div className={`cluster-marker-container-radiant ${$hover ? 'cluster-marker-container-hovered' : ''}`} />
           <p>{count}</p>
         </div>

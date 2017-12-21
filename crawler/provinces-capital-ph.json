@@ -1,1149 +1,1232 @@
-[{
-    "ISO": "PH-ABR",
-    "name": "Abra",
-    "capital": "Bangued",
-    "area": "7009416525000000000 km^2",
-    "division": "Luzon",
-    "region": "CAR",
-    "townCount": 27,
-    "brgyCount": 303,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 17.5881847,
-        "longitude": 120.6314948
-    }
-}, {
-    "ISO": "PH-AGN",
-    "name": "Agusan del Norte",
-    "capital": "Cabadbaran",
-    "area": "7009354686000000000 km^2",
-    "division": "Mindanao",
-    "region": "XIII",
-    "townCount": 10,
-    "brgyCount": 252,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 9.122192499999999,
-        "longitude": 125.537603
-    }
-}, {
-    "ISO": "PH-AGS",
-    "name": "Agusan del Sur",
-    "capital": "Prosperidad",
-    "area": "7009998952000000000 km^2",
-    "division": "Mindanao",
-    "region": "XIII",
-    "townCount": 13,
-    "brgyCount": 314,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 8.6023686,
-        "longitude": 125.8716137
-    }
-}, {
-    "ISO": "PH-AKL",
-    "name": "Aklan",
-    "capital": "Kalibo",
-    "area": "7009182142000000000 km^2",
-    "division": "Visayas",
-    "region": "VI",
-    "townCount": 17,
-    "brgyCount": 327,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 11.6892241,
-        "longitude": 122.367428
-    }
-}, {
-    "ISO": "PH-ALB",
-    "name": "Albay",
-    "capital": "Legazpi",
-    "area": "7009257577000000000 km^2",
-    "division": "Luzon",
-    "region": "V",
-    "townCount": 15,
-    "brgyCount": 720,
-    "cityCount": 3,
-    "capital_coords": {
-        "latitude": 13.1390621,
-        "longitude": 123.7437995
-    }
-}, {
-    "ISO": "PH-ANT",
-    "name": "Antique",
-    "capital": "San Jose de Buenavista",
-    "area": "7009272917000000000 km^2",
-    "division": "Visayas",
-    "region": "VI",
-    "townCount": 18,
-    "brgyCount": 590,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 10.7489069,
-        "longitude": 121.9412608
-    }
-}, {
-    "ISO": "PH-APA",
-    "name": "Apayao",
-    "capital": "Kabugao",
-    "area": "7009441335000000000 km^2",
-    "division": "Luzon",
-    "region": "CAR",
-    "townCount": 7,
-    "brgyCount": 133,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 18.0171576,
-        "longitude": 121.1841573
-    }
-}, {
-    "ISO": "PH-AUR",
-    "name": "Aurora",
-    "capital": "Baler",
-    "area": "7009314732000000000 km^2",
-    "division": "Luzon",
-    "region": "III",
-    "townCount": 8,
-    "brgyCount": 151,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 15.733607,
-        "longitude": 121.57125
-    }
-}, {
-    "ISO": "PH-BAS",
-    "name": "Basilan",
-    "capital": "Lamitan",
-    "area": "7009132723000000000 km^2",
-    "division": "Mindanao",
-    "region": "ARMM",
-    "townCount": 11,
-    "brgyCount": 255,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 6.661518999999999,
-        "longitude": 122.1064668
-    }
-}, {
-    "ISO": "PH-BAN",
-    "name": "Bataan",
-    "capital": "Balanga",
-    "area": "7009137298000000000 km^2",
-    "division": "Luzon",
-    "region": "III",
-    "townCount": 11,
-    "brgyCount": 237,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 14.6741293,
-        "longitude": 120.5112907
-    }
-}, {
-    "ISO": "PH-BTN",
-    "name": "Batanes",
-    "capital": "Basco",
-    "area": "7008219010000000000 km^2",
-    "division": "Luzon",
-    "region": "II",
-    "townCount": 6,
-    "brgyCount": 29,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 20.4634375,
-        "longitude": 122.004179
-    }
-}, {
-    "ISO": "PH-BTG",
-    "name": "Batangas",
-    "capital": "Batangas City",
-    "area": "7009311972000000000 km^2",
-    "division": "Luzon",
-    "region": "IV-A",
-    "townCount": 31,
-    "brgyCount": 1,
-    "cityCount": 3,
-    "capital_coords": {
-        "latitude": 13.7564651,
-        "longitude": 121.0583076
-    }
-}, {
-    "ISO": "PH-BEN",
-    "name": "Benguet",
-    "capital": "La Trinidad",
-    "area": "7009282659000000000 km^2",
-    "division": "Luzon",
-    "region": "CAR",
-    "townCount": 13,
-    "brgyCount": 269,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 16.4774284,
-        "longitude": 120.5854674
-    }
-}, {
-    "ISO": "PH-BIL",
-    "name": "Biliran",
-    "capital": "Naval",
-    "area": "7008536010000000000 km^2",
-    "division": "Visayas",
-    "region": "VIII",
-    "townCount": 8,
-    "brgyCount": 132,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 11.5628579,
-        "longitude": 124.3965285
-    }
-}, {
-    "ISO": "PH-BOH",
-    "name": "Bohol",
-    "capital": "Tagbilaran",
-    "area": "7009482095000000000 km^2",
-    "division": "Visayas",
-    "region": "VII",
-    "townCount": 47,
-    "brgyCount": 1,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 9.672948,
-        "longitude": 123.8730022
-    }
-}, {
-    "ISO": "PH-BUK",
-    "name": "Bukidnon",
-    "capital": "Malaybalay",
-    "area": "7010104985900000000 km^2",
-    "division": "Mindanao",
-    "region": "X",
-    "townCount": 20,
-    "brgyCount": 464,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 8.1306038,
-        "longitude": 125.1276536
-    }
-}, {
-    "ISO": "PH-BUL",
-    "name": "Bulacan",
-    "capital": "Malolos",
-    "area": "7009279610000000000 km^2",
-    "division": "Luzon",
-    "region": "III",
-    "townCount": 21,
-    "brgyCount": 569,
-    "cityCount": 3,
-    "capital_coords": {
-        "latitude": 14.8527393,
-        "longitude": 120.8160376
-    }
-}, {
-    "ISO": "PH-CAG",
-    "name": "Cagayan",
-    "capital": "Tuguegarao",
-    "area": "7009929575000000000 km^2",
-    "division": "Luzon",
-    "region": "II",
-    "townCount": 28,
-    "brgyCount": 820,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 17.6131813,
-        "longitude": 121.7270206
-    }
-}, {
-    "ISO": "PH-CAN",
-    "name": "Camarines Norte",
-    "capital": "Daet",
-    "area": "7009232007000000000 km^2",
-    "division": "Luzon",
-    "region": "V",
-    "townCount": 12,
-    "brgyCount": 282,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 14.099578,
-        "longitude": 122.9550349
-    }
-}, {
-    "ISO": "PH-CAS",
-    "name": "Camarines Sur",
-    "capital": "Pili",
-    "area": "7009549703000000000 km^2",
-    "division": "Luzon",
-    "region": "V",
-    "townCount": 35,
-    "brgyCount": 1,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 13.595469,
-        "longitude": 123.2812562
-    }
-}, {
-    "ISO": "PH-CAM",
-    "name": "Camiguin",
-    "capital": "Mambajao",
-    "area": "7008237950000000000 km^2",
-    "division": "Mindanao",
-    "region": "X",
-    "townCount": 5,
-    "brgyCount": 58,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 9.2321675,
-        "longitude": 124.7077665
-    }
-}, {
-    "ISO": "PH-CAP",
-    "name": "Capiz",
-    "capital": "Roxas",
-    "area": "7009259464000000000 km^2",
-    "division": "Visayas",
-    "region": "VI",
-    "townCount": 16,
-    "brgyCount": 473,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 11.5528816,
-        "longitude": 122.740723
-    }
-}, {
-    "ISO": "PH-CAT",
-    "name": "Catanduanes",
-    "capital": "Virac",
-    "area": "7009149216000000000 km^2",
-    "division": "Luzon",
-    "region": "V",
-    "townCount": 11,
-    "brgyCount": 315,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 13.5848627,
-        "longitude": 124.2065844
-    }
-}, {
-    "ISO": "PH-CAV",
-    "name": "Cavite",
-    "capital": "Imus",
-    "area": "7009157417000000000 km^2",
-    "division": "Luzon",
-    "region": "IV-A",
-    "townCount": 17,
-    "brgyCount": 829,
-    "cityCount": 6,
-    "capital_coords": {
-        "latitude": 14.4064221,
-        "longitude": 120.9405057
-    }
-}, {
-    "ISO": "PH-CEB",
-    "name": "Cebu",
-    "capital": "Cebu City",
-    "area": "7009534200000000000 km^2",
-    "division": "Visayas",
-    "region": "VII",
-    "townCount": 44,
-    "brgyCount": 1,
-    "cityCount": 9,
-    "capital_coords": {
-        "latitude": 10.3156992,
-        "longitude": 123.8854366
-    }
-}, {
-    "ISO": "PH-COM",
-    "name": "Compostela Valley",
-    "capital": "Nabunturan",
-    "area": "7009447977000000000 km^2",
-    "division": "Mindanao",
-    "region": "XI",
-    "townCount": 11,
-    "brgyCount": 237,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 7.5853685,
-        "longitude": 125.9805528
-    }
-}, {
-    "ISO": "PH-NCO",
-    "name": "Cotabato",
-    "capital": "Kidapawan",
-    "area": "7009900890000000000 km^2",
-    "division": "Mindanao",
-    "region": "XII",
-    "townCount": 17,
-    "brgyCount": 543,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 7.010606999999999,
-        "longitude": 125.0911341
-    }
-}, {
-    "ISO": "PH-DAV",
-    "name": "Davao del Norte",
-    "capital": "Tagum",
-    "area": "7009342697000000000 km^2",
-    "division": "Mindanao",
-    "region": "XI",
-    "townCount": 8,
-    "brgyCount": 223,
-    "cityCount": 3,
-    "capital_coords": {
-        "latitude": 7.448212,
-        "longitude": 125.8094242
-    }
-}, {
-    "ISO": "PH-DAS",
-    "name": "Davao del Sur",
-    "capital": "Digos",
-    "area": "7009460759000000000 km^2",
-    "division": "Mindanao",
-    "region": "XI",
-    "townCount": 9,
-    "brgyCount": 414,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 6.7575087,
-        "longitude": 125.352398
-    }
-}, {
-    "ISO": "PH-DVO",
-    "name": "Davao Occidental",
-    "capital": "Malita",
-    "area": "7009216345000000000 km^2",
-    "division": "Mindanao",
-    "region": "XI",
-    "townCount": 5,
-    "brgyCount": 105,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 5.8340662,
-        "longitude": 125.5438967
-    }
-}, {
-    "ISO": "PH-DAO",
-    "name": "Davao Oriental",
-    "capital": "Mati",
-    "area": "7009567964000000000 km^2",
-    "division": "Mindanao",
-    "region": "XI",
-    "townCount": 10,
-    "brgyCount": 183,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 6.9437633,
-        "longitude": 126.2467484
-    }
-}, {
-    "ISO": "PH-DIN",
-    "name": "Dinagat Islands",
-    "capital": "San Jose",
-    "area": "7009103633999999999 km^2",
-    "division": "Mindanao",
-    "region": "XIII",
-    "townCount": 7,
-    "brgyCount": 100,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 10.0254969,
-        "longitude": 125.5986093
-    }
-}, {
-    "ISO": "PH-EAS",
-    "name": "Eastern Samar",
-    "capital": "Borongan",
-    "area": "7009466047000000000 km^2",
-    "division": "Visayas",
-    "region": "VIII",
-    "townCount": 22,
-    "brgyCount": 597,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 11.6079912,
-        "longitude": 125.4328501
-    }
-}, {
-    "ISO": "PH-GUI",
-    "name": "Guimaras",
-    "capital": "Jordan",
-    "area": "7008604570000000000 km^2",
-    "division": "Visayas",
-    "region": "VI",
-    "townCount": 5,
-    "brgyCount": 98,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 10.5959757,
-        "longitude": 122.5877782
-    }
-}, {
-    "ISO": "PH-IFU",
-    "name": "Ifugao",
-    "capital": "Lagawe",
-    "area": "7009262821000000000 km^2",
-    "division": "Luzon",
-    "region": "CAR",
-    "townCount": 11,
-    "brgyCount": 175,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 16.8082549,
-        "longitude": 121.193945
-    }
-}, {
-    "ISO": "PH-ILN",
-    "name": "Ilocos Norte",
-    "capital": "Laoag",
-    "area": "7009346789000000000 km^2",
-    "division": "Luzon",
-    "region": "I",
-    "townCount": 21,
-    "brgyCount": 557,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 18.1960128,
-        "longitude": 120.5926679
-    }
-}, {
-    "ISO": "PH-ILS",
-    "name": "Ilocos Sur",
-    "capital": "Vigan",
-    "area": "7009259600000000000 km^2",
-    "division": "Luzon",
-    "region": "I",
-    "townCount": 32,
-    "brgyCount": 768,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 17.5704898,
-        "longitude": 120.3873299
-    }
-}, {
-    "ISO": "PH-ILI",
-    "name": "Iloilo",
-    "capital": "Iloilo City",
-    "area": "7009507917000000000 km^2",
-    "division": "Visayas",
-    "region": "VI",
-    "townCount": 42,
-    "brgyCount": 1,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 10.7201501,
-        "longitude": 122.5621063
-    }
-}, {
-    "ISO": "PH-ISA",
-    "name": "Isabela",
-    "capital": "Ilagan",
-    "area": "7010124149300000000 km^2",
-    "division": "Luzon",
-    "region": "II",
-    "townCount": 34,
-    "brgyCount": 1,
-    "cityCount": 3,
-    "capital_coords": {
-        "latitude": 17.1263233,
-        "longitude": 122.0101024
-    }
-}, {
-    "ISO": "PH-KAL",
-    "name": "Kalinga",
-    "capital": "Tabuk",
-    "area": "7009323125000000000 km^2",
-    "division": "Luzon",
-    "region": "CAR",
-    "townCount": 7,
-    "brgyCount": 152,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 17.4117354,
-        "longitude": 121.4384498
-    }
-}, {
-    "ISO": "PH-LUN",
-    "name": "La Union",
-    "capital": "San Fernando",
-    "area": "7009149770000000000 km^2",
-    "division": "Luzon",
-    "region": "I",
-    "townCount": 19,
-    "brgyCount": 576,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 16.6073769,
-        "longitude": 120.3666099
-    }
-}, {
-    "ISO": "PH-LAG",
-    "name": "Laguna",
-    "capital": "Santa Cruz",
-    "area": "7009191785000000000 km^2",
-    "division": "Luzon",
-    "region": "IV-A",
-    "townCount": 24,
-    "brgyCount": 674,
-    "cityCount": 6,
-    "capital_coords": {
-        "latitude": 14.2691095,
-        "longitude": 121.4113308
-    }
-}, {
-    "ISO": "PH-LAN",
-    "name": "Lanao del Norte",
-    "capital": "Tubod",
-    "area": "7009415993999999999 km^2",
-    "division": "Mindanao",
-    "region": "X",
-    "townCount": 22,
-    "brgyCount": 506,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 7.9942672,
-        "longitude": 123.8746152
-    }
-}, {
-    "ISO": "PH-LAS",
-    "name": "Lanao del Sur",
-    "capital": "Marawi",
-    "area": "7009387289000000000 km^2",
-    "division": "Mindanao",
-    "region": "ARMM",
-    "townCount": 39,
-    "brgyCount": 1,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 8.0106213,
-        "longitude": 124.297718
-    }
-}, {
-    "ISO": "PH-LEY",
-    "name": "Leyte",
-    "capital": "Tacloban",
-    "area": "7009651505000000000 km^2",
-    "division": "Visayas",
-    "region": "VIII",
-    "townCount": 40,
-    "brgyCount": 1,
-    "cityCount": 3,
-    "capital_coords": {
-        "latitude": 11.2543388,
-        "longitude": 124.9616867
-    }
-}, {
-    "ISO": "PH-MAG",
-    "name": "Maguindanao",
-    "capital": "Shariff Aguak",
-    "area": "7009614653000000000 km^2",
-    "division": "Mindanao",
-    "region": "ARMM",
-    "townCount": 36,
-    "brgyCount": 545,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 6.8530801,
-        "longitude": 124.3976356
-    }
-}, {
-    "ISO": "PH-MAD",
-    "name": "Marinduque",
-    "capital": "Boac",
-    "area": "7008952580000000000 km^2",
-    "division": "Luzon",
-    "region": "IV-B",
-    "townCount": 6,
-    "brgyCount": 218,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 13.3941301,
-        "longitude": 121.8790306
-    }
-}, {
-    "ISO": "PH-MAS",
-    "name": "Masbate",
-    "capital": "Masbate City",
-    "area": "7009415177999999999 km^2",
-    "division": "Luzon",
-    "region": "V",
-    "townCount": 20,
-    "brgyCount": 550,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 12.3574346,
-        "longitude": 123.5504076
-    }
-}, {
-    "ISO": "PH-MSC",
-    "name": "Misamis Occidental",
-    "capital": "Oroquieta",
-    "area": "7009205521999999999 km^2",
-    "division": "Mindanao",
-    "region": "X",
-    "townCount": 14,
-    "brgyCount": 490,
-    "cityCount": 3,
-    "capital_coords": {
-        "latitude": 8.459526799999999,
-        "longitude": 123.8006496
-    }
-}, {
-    "ISO": "PH-MSR",
-    "name": "Misamis Oriental",
-    "capital": "Cagayan de Oro",
-    "area": "7009354432000000000 km^2",
-    "division": "Mindanao",
-    "region": "X",
-    "townCount": 23,
-    "brgyCount": 504,
-    "cityCount": 3,
-    "capital_coords": {
-        "latitude": 8.4542363,
-        "longitude": 124.6318977
-    }
-}, {
-    "ISO": "PH-MOU",
-    "name": "Mountain name",
-    "capital": "Bontoc",
-    "area": "7009215738000000000 km^2",
-    "division": "Luzon",
-    "region": "CAR",
-    "townCount": 10,
-    "brgyCount": 144,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 17.091256,
-        "longitude": 121.0105733
-    }
-}, {
-    "ISO": "PH-NEC",
-    "name": "Negros Occidental",
-    "capital": "Bacolod",
-    "area": "7009796521000000000 km^2",
-    "division": "Visayas",
-    "region": "VI",
-    "townCount": 19,
-    "brgyCount": 662,
-    "cityCount": 13,
-    "capital_coords": {
-        "latitude": 10.6407389,
-        "longitude": 122.9689565
-    }
-}, {
-    "ISO": "PH-NER",
-    "name": "Negros Oriental",
-    "capital": "Dumaguete",
-    "area": "7009538553000000000 km^2",
-    "division": "Visayas",
-    "region": "VII",
-    "townCount": 20,
-    "brgyCount": 557,
-    "cityCount": 6,
-    "capital_coords": {
-        "latitude": 9.3068402,
-        "longitude": 123.3054467
-    }
-}, {
-    "ISO": "PH-NSA",
-    "name": "Northern Samar",
-    "capital": "Catarman",
-    "area": "7009369293000000000 km^2",
-    "division": "Visayas",
-    "region": "VIII",
-    "townCount": 24,
-    "brgyCount": 569,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 12.4198447,
-        "longitude": 124.6414028
-    }
-}, {
-    "ISO": "PH-NUE",
-    "name": "Nueva Ecija",
-    "capital": "Palayan",
-    "area": "7009575133000000000 km^2",
-    "division": "Luzon",
-    "region": "III",
-    "townCount": 27,
-    "brgyCount": 849,
-    "cityCount": 5,
-    "capital_coords": {
-        "latitude": 15.5782871,
-        "longitude": 121.1113286
-    }
-}, {
-    "ISO": "PH-NUV",
-    "name": "Nueva Vizcaya",
-    "capital": "Bayombong",
-    "area": "7009397567000000000 km^2",
-    "division": "Luzon",
-    "region": "II",
-    "townCount": 15,
-    "brgyCount": 275,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 16.4804228,
-        "longitude": 121.1481284
-    }
-}, {
-    "ISO": "PH-MDC",
-    "name": "Occidental Mindoro",
-    "capital": "Mamburao",
-    "area": "7009586571000000000 km^2",
-    "division": "Luzon",
-    "region": "IV-B",
-    "townCount": 11,
-    "brgyCount": 162,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 13.2681778,
-        "longitude": 120.6204892
-    }
-}, {
-    "ISO": "PH-MDR",
-    "name": "Oriental Mindoro",
-    "capital": "Calapan",
-    "area": "7009423838000000000 km^2",
-    "division": "Luzon",
-    "region": "IV-B",
-    "townCount": 14,
-    "brgyCount": 426,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 12.3443972,
-        "longitude": 121.3361897
-    }
-}, {
-    "ISO": "PH-PLW",
-    "name": "Palawan",
-    "capital": "Puerto Princesa",
-    "area": "7010170307500000000 km^2",
-    "division": "Luzon",
-    "region": "IV-B",
-    "townCount": 23,
-    "brgyCount": 433,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 9.967216299999999,
-        "longitude": 118.78551
-    }
-}, {
-    "ISO": "PH-PAM",
-    "name": "Pampanga",
-    "capital": "San Fernando",
-    "area": "7009206246999999999 km^2",
-    "division": "Luzon",
-    "region": "III",
-    "townCount": 19,
-    "brgyCount": 538,
-    "cityCount": 3,
-    "capital_coords": {
-        "latitude": 15.0593937,
-        "longitude": 120.6567054
-    }
-}, {
-    "ISO": "PH-PAN",
-    "name": "Pangasinan",
-    "capital": "Lingayen",
-    "area": "7009545101000000000 km^2",
-    "division": "Luzon",
-    "region": "I",
-    "townCount": 44,
-    "brgyCount": 1,
-    "cityCount": 4,
-    "capital_coords": {
-        "latitude": 16.0059867,
-        "longitude": 120.2397336
-    }
-}, {
-    "ISO": "PH-QUE",
-    "name": "Quezon",
-    "capital": "Lucena",
-    "area": "7009906960000000000 km^2",
-    "division": "Luzon",
-    "region": "IV-A",
-    "townCount": 39,
-    "brgyCount": 1,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 13.9413957,
-        "longitude": 121.6234471
-    }
-}, {
-    "ISO": "PH-QUI",
-    "name": "Quirino",
-    "capital": "Cabarroguis",
-    "area": "7009232347000000000 km^2",
-    "division": "Luzon",
-    "region": "II",
-    "townCount": 6,
-    "brgyCount": 132,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 16.4199058,
-        "longitude": 121.5141615
-    }
-}, {
-    "ISO": "PH-RIZ",
-    "name": "Rizal",
-    "capital": "Antipolo",
-    "area": "7009119194000000000 km^2",
-    "division": "Luzon",
-    "region": "IV-A",
-    "townCount": 13,
-    "brgyCount": 188,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 14.6254827,
-        "longitude": 121.1244847
-    }
-}, {
-    "ISO": "PH-ROM",
-    "name": "Romblon",
-    "capital": "Romblon, Romblon",
-    "area": "7009153345000000000 km^2",
-    "division": "Luzon",
-    "region": "IV-B",
-    "townCount": 17,
-    "brgyCount": 219,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 12.5778554,
-        "longitude": 122.269129
-    }
-}, {
-    "ISO": "PH-WSA",
-    "name": "Samar",
-    "capital": "Catbalogan",
-    "area": "7009604803000000000 km^2",
-    "division": "Visayas",
-    "region": "VIII",
-    "townCount": 24,
-    "brgyCount": 951,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 11.8240433,
-        "longitude": 124.8403408
-    }
-}, {
-    "ISO": "PH-SAR",
-    "name": "Sarangani",
-    "capital": "Alabel",
-    "area": "7009360125000000000 km^2",
-    "division": "Mindanao",
-    "region": "XII",
-    "townCount": 7,
-    "brgyCount": 141,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 6.185032500000001,
-        "longitude": 125.3466253
-    }
-}, {
-    "ISO": "PH-SIG",
-    "name": "Siquijor",
-    "capital": "Siquijor, Siquijor",
-    "area": "7008337490000000000 km^2",
-    "division": "Visayas",
-    "region": "VII",
-    "townCount": 6,
-    "brgyCount": 134,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 9.213263099999999,
-        "longitude": 123.5157032
-    }
-}, {
-    "ISO": "PH-SOR",
-    "name": "Sorsogon",
-    "capital": "Sorsogon City",
-    "area": "7009211901000000000 km^2",
-    "division": "Luzon",
-    "region": "V",
-    "townCount": 14,
-    "brgyCount": 541,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 12.9927095,
-        "longitude": 124.0147464
-    }
-}, {
-    "ISO": "PH-SCO",
-    "name": "South Cotabato",
-    "capital": "Koronadal",
-    "area": "7009442881000000000 km^2",
-    "division": "Mindanao",
-    "region": "XII",
-    "townCount": 10,
-    "brgyCount": 225,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 6.4973963,
-        "longitude": 124.8471625
-    }
-}, {
-    "ISO": "PH-SLE",
-    "name": "Southern Leyte",
-    "capital": "Maasin",
-    "area": "7009179861000000000 km^2",
-    "division": "Visayas",
-    "region": "VIII",
-    "townCount": 18,
-    "brgyCount": 500,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 10.1653546,
-        "longitude": 124.8403408
-    }
-}, {
-    "ISO": "PH-SUK",
-    "name": "Sultan Kudarat",
-    "capital": "Isulan",
-    "area": "7009529834000000000 km^2",
-    "division": "Mindanao",
-    "region": "XII",
-    "townCount": 11,
-    "brgyCount": 249,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 6.6322636,
-        "longitude": 124.5978144
-    }
-}, {
-    "ISO": "PH-SLU",
-    "name": "Sulu",
-    "capital": "Jolo",
-    "area": "7009160040000000000 km^2",
-    "division": "Mindanao",
-    "region": "ARMM",
-    "townCount": 19,
-    "brgyCount": 410,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 6.0473648,
-        "longitude": 121.0089611
-    }
-}, {
-    "ISO": "PH-SUN",
-    "name": "Surigao del Norte",
-    "capital": "Surigao",
-    "area": "7009197293000000000 km^2",
-    "division": "Mindanao",
-    "region": "XIII",
-    "townCount": 20,
-    "brgyCount": 335,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 9.7571312,
-        "longitude": 125.5137674
-    }
-}, {
-    "ISO": "PH-SUR",
-    "name": "Surigao del Sur",
-    "capital": "Tandag",
-    "area": "7009493270000000000 km^2",
-    "division": "Mindanao",
-    "region": "XIII",
-    "townCount": 17,
-    "brgyCount": 309,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 9.1011711,
-        "longitude": 126.1588771
-    }
-}, {
-    "ISO": "PH-TAR",
-    "name": "Tarlac",
-    "capital": "Tarlac City",
-    "area": "7009305360000000000 km^2",
-    "division": "Luzon",
-    "region": "III",
-    "townCount": 17,
-    "brgyCount": 511,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 15.4754786,
-        "longitude": 120.5963492
-    }
-}, {
-    "ISO": "PH-TAW",
-    "name": "Tawi-Tawi",
-    "capital": "Bongao",
-    "area": "7009108740000000000 km^2",
-    "division": "Mindanao",
-    "region": "ARMM",
-    "townCount": 11,
-    "brgyCount": 203,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 5.1041783,
-        "longitude": 119.8120795
-    }
-}, {
-    "ISO": "PH-ZMB",
-    "name": "Zambales",
-    "capital": "Iba",
-    "area": "7009383083000000000 km^2",
-    "division": "Luzon",
-    "region": "III",
-    "townCount": 13,
-    "brgyCount": 247,
-    "cityCount": 1,
-    "capital_coords": {
-        "latitude": 15.3329773,
-        "longitude": 119.975756
-    }
-}, {
-    "ISO": "PH-ZAN",
-    "name": "Zamboanga del Norte",
-    "capital": "Dipolog",
-    "area": "7009730100000000000 km^2",
-    "division": "Mindanao",
-    "region": "IX",
-    "townCount": 25,
-    "brgyCount": 691,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 8.5142736,
-        "longitude": 123.3373916
-    }
-}, {
-    "ISO": "PH-ZAS",
-    "name": "Zamboanga del Sur",
-    "capital": "Pagadian",
-    "area": "7009591416000000000 km^2",
-    "division": "Mindanao",
-    "region": "IX",
-    "townCount": 26,
-    "brgyCount": 779,
-    "cityCount": 2,
-    "capital_coords": {
-        "latitude": 8.1041862,
-        "longitude": 123.4943968
-    }
-}, {
-    "ISO": "PH-ZSI",
-    "name": "Zamboanga Sibugay",
-    "capital": "Ipil",
-    "area": "7009360775000000000 km^2",
-    "division": "Mindanao",
-    "region": "IX",
-    "townCount": 16,
-    "brgyCount": 389,
-    "cityCount": 0,
-    "capital_coords": {
-        "latitude": 7.7858361,
-        "longitude": 122.588174
-    }
-}, {
-    "ISO": "PH-00",
-    "name": "Manila",
-    "capital": "Manila",
-    "area": "7008638550000000000 km^2",
-    "division": "Luzon",
-    "region": "NCR",
-    "townCount": 1,
-    "brgyCount": 1,
-    "cityCount": 16,
-    "capital_coords": {
-        "latitude": 14.5995124,
-        "longitude": 120.9842195
-    }
-}]
+[
+    {
+        "ISO": "PH-ABR",
+        "name": "Abra",
+        "capital": "Bangued",
+        "area": "7009416525000000000 km^2",
+        "division": "Luzon",
+        "region": "CAR",
+        "townCount": 27,
+        "brgyCount": 303,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 17.5881847,
+            "longitude": 120.6314948
+        }
+    },
+    {
+        "ISO": "PH-AGN",
+        "name": "Agusan del Norte",
+        "capital": "Cabadbaran",
+        "area": "7009354686000000000 km^2",
+        "division": "Mindanao",
+        "region": "XIII",
+        "townCount": 10,
+        "brgyCount": 252,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 9.122192499999999,
+            "longitude": 125.537603
+        }
+    },
+    {
+        "ISO": "PH-AGS",
+        "name": "Agusan del Sur",
+        "capital": "Prosperidad",
+        "area": "7009998952000000000 km^2",
+        "division": "Mindanao",
+        "region": "XIII",
+        "townCount": 13,
+        "brgyCount": 314,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 8.6023686,
+            "longitude": 125.8716137
+        }
+    },
+    {
+        "ISO": "PH-AKL",
+        "name": "Aklan",
+        "capital": "Kalibo",
+        "area": "7009182142000000000 km^2",
+        "division": "Visayas",
+        "region": "VI",
+        "townCount": 17,
+        "brgyCount": 327,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 11.6892241,
+            "longitude": 122.367428
+        }
+    },
+    {
+        "ISO": "PH-ALB",
+        "name": "Albay",
+        "capital": "Legazpi",
+        "area": "7009257577000000000 km^2",
+        "division": "Luzon",
+        "region": "V",
+        "townCount": 15,
+        "brgyCount": 720,
+        "cityCount": 3,
+        "capital_coords": {
+            "latitude": 13.1390621,
+            "longitude": 123.7437995
+        }
+    },
+    {
+        "ISO": "PH-ANT",
+        "name": "Antique",
+        "capital": "San Jose de Buenavista",
+        "area": "7009272917000000000 km^2",
+        "division": "Visayas",
+        "region": "VI",
+        "townCount": 18,
+        "brgyCount": 590,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 10.7489069,
+            "longitude": 121.9412608
+        }
+    },
+    {
+        "ISO": "PH-APA",
+        "name": "Apayao",
+        "capital": "Kabugao",
+        "area": "7009441335000000000 km^2",
+        "division": "Luzon",
+        "region": "CAR",
+        "townCount": 7,
+        "brgyCount": 133,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 18.0171576,
+            "longitude": 121.1841573
+        }
+    },
+    {
+        "ISO": "PH-AUR",
+        "name": "Aurora",
+        "capital": "Baler",
+        "area": "7009314732000000000 km^2",
+        "division": "Luzon",
+        "region": "III",
+        "townCount": 8,
+        "brgyCount": 151,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 15.733607,
+            "longitude": 121.57125
+        }
+    },
+    {
+        "ISO": "PH-BAS",
+        "name": "Basilan",
+        "capital": "Lamitan",
+        "area": "7009132723000000000 km^2",
+        "division": "Mindanao",
+        "region": "ARMM",
+        "townCount": 11,
+        "brgyCount": 255,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 6.661518999999999,
+            "longitude": 122.1064668
+        }
+    },
+    {
+        "ISO": "PH-BAN",
+        "name": "Bataan",
+        "capital": "Balanga",
+        "area": "7009137298000000000 km^2",
+        "division": "Luzon",
+        "region": "III",
+        "townCount": 11,
+        "brgyCount": 237,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 14.6741293,
+            "longitude": 120.5112907
+        }
+    },
+    {
+        "ISO": "PH-BTN",
+        "name": "Batanes",
+        "capital": "Basco",
+        "area": "7008219010000000000 km^2",
+        "division": "Luzon",
+        "region": "II",
+        "townCount": 6,
+        "brgyCount": 29,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 20.4634375,
+            "longitude": 122.004179
+        }
+    },
+    {
+        "ISO": "PH-BTG",
+        "name": "Batangas",
+        "capital": "Batangas City",
+        "area": "7009311972000000000 km^2",
+        "division": "Luzon",
+        "region": "IV-A",
+        "townCount": 31,
+        "brgyCount": 1,
+        "cityCount": 3,
+        "capital_coords": {
+            "latitude": 13.7564651,
+            "longitude": 121.0583076
+        }
+    },
+    {
+        "ISO": "PH-BEN",
+        "name": "Benguet",
+        "capital": "La Trinidad",
+        "area": "7009282659000000000 km^2",
+        "division": "Luzon",
+        "region": "CAR",
+        "townCount": 13,
+        "brgyCount": 269,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 16.4774284,
+            "longitude": 120.5854674
+        }
+    },
+    {
+        "ISO": "PH-BIL",
+        "name": "Biliran",
+        "capital": "Naval",
+        "area": "7008536010000000000 km^2",
+        "division": "Visayas",
+        "region": "VIII",
+        "townCount": 8,
+        "brgyCount": 132,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 11.5628579,
+            "longitude": 124.3965285
+        }
+    },
+    {
+        "ISO": "PH-BOH",
+        "name": "Bohol",
+        "capital": "Tagbilaran",
+        "area": "7009482095000000000 km^2",
+        "division": "Visayas",
+        "region": "VII",
+        "townCount": 47,
+        "brgyCount": 1,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 9.672948,
+            "longitude": 123.8730022
+        }
+    },
+    {
+        "ISO": "PH-BUK",
+        "name": "Bukidnon",
+        "capital": "Malaybalay",
+        "area": "7010104985900000000 km^2",
+        "division": "Mindanao",
+        "region": "X",
+        "townCount": 20,
+        "brgyCount": 464,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 8.1306038,
+            "longitude": 125.1276536
+        }
+    },
+    {
+        "ISO": "PH-BUL",
+        "name": "Bulacan",
+        "capital": "Malolos",
+        "area": "7009279610000000000 km^2",
+        "division": "Luzon",
+        "region": "III",
+        "townCount": 21,
+        "brgyCount": 569,
+        "cityCount": 3,
+        "capital_coords": {
+            "latitude": 14.8527393,
+            "longitude": 120.8160376
+        }
+    },
+    {
+        "ISO": "PH-CAG",
+        "name": "Cagayan",
+        "capital": "Tuguegarao",
+        "area": "7009929575000000000 km^2",
+        "division": "Luzon",
+        "region": "II",
+        "townCount": 28,
+        "brgyCount": 820,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 17.6131813,
+            "longitude": 121.7270206
+        }
+    },
+    {
+        "ISO": "PH-CAN",
+        "name": "Camarines Norte",
+        "capital": "Daet",
+        "area": "7009232007000000000 km^2",
+        "division": "Luzon",
+        "region": "V",
+        "townCount": 12,
+        "brgyCount": 282,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 14.099578,
+            "longitude": 122.9550349
+        }
+    },
+    {
+        "ISO": "PH-CAS",
+        "name": "Camarines Sur",
+        "capital": "Pili",
+        "area": "7009549703000000000 km^2",
+        "division": "Luzon",
+        "region": "V",
+        "townCount": 35,
+        "brgyCount": 1,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 13.595469,
+            "longitude": 123.2812562
+        }
+    },
+    {
+        "ISO": "PH-CAM",
+        "name": "Camiguin",
+        "capital": "Mambajao",
+        "area": "7008237950000000000 km^2",
+        "division": "Mindanao",
+        "region": "X",
+        "townCount": 5,
+        "brgyCount": 58,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 9.2321675,
+            "longitude": 124.7077665
+        }
+    },
+    {
+        "ISO": "PH-CAP",
+        "name": "Capiz",
+        "capital": "Roxas",
+        "area": "7009259464000000000 km^2",
+        "division": "Visayas",
+        "region": "VI",
+        "townCount": 16,
+        "brgyCount": 473,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 11.5528816,
+            "longitude": 122.740723
+        }
+    },
+    {
+        "ISO": "PH-CAT",
+        "name": "Catanduanes",
+        "capital": "Virac",
+        "area": "7009149216000000000 km^2",
+        "division": "Luzon",
+        "region": "V",
+        "townCount": 11,
+        "brgyCount": 315,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 13.5848627,
+            "longitude": 124.2065844
+        }
+    },
+    {
+        "ISO": "PH-CAV",
+        "name": "Cavite",
+        "capital": "Imus",
+        "area": "7009157417000000000 km^2",
+        "division": "Luzon",
+        "region": "IV-A",
+        "townCount": 17,
+        "brgyCount": 829,
+        "cityCount": 6,
+        "capital_coords": {
+            "latitude": 14.4064221,
+            "longitude": 120.9405057
+        }
+    },
+    {
+        "ISO": "PH-CEB",
+        "name": "Cebu",
+        "capital": "Cebu City",
+        "area": "7009534200000000000 km^2",
+        "division": "Visayas",
+        "region": "VII",
+        "townCount": 44,
+        "brgyCount": 1,
+        "cityCount": 9,
+        "capital_coords": {
+            "latitude": 10.3156992,
+            "longitude": 123.8854366
+        }
+    },
+    {
+        "ISO": "PH-COM",
+        "name": "Compostela Valley",
+        "capital": "Nabunturan",
+        "area": "7009447977000000000 km^2",
+        "division": "Mindanao",
+        "region": "XI",
+        "townCount": 11,
+        "brgyCount": 237,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 7.5853685,
+            "longitude": 125.9805528
+        }
+    },
+    {
+        "ISO": "PH-NCO",
+        "name": "Cotabato",
+        "capital": "Kidapawan",
+        "area": "7009900890000000000 km^2",
+        "division": "Mindanao",
+        "region": "XII",
+        "townCount": 17,
+        "brgyCount": 543,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 7.010606999999999,
+            "longitude": 125.0911341
+        }
+    },
+    {
+        "ISO": "PH-DAV",
+        "name": "Davao del Norte",
+        "capital": "Tagum",
+        "area": "7009342697000000000 km^2",
+        "division": "Mindanao",
+        "region": "XI",
+        "townCount": 8,
+        "brgyCount": 223,
+        "cityCount": 3,
+        "capital_coords": {
+            "latitude": 7.448212,
+            "longitude": 125.8094242
+        }
+    },
+    {
+        "ISO": "PH-DAS",
+        "name": "Davao del Sur",
+        "capital": "Digos",
+        "area": "7009460759000000000 km^2",
+        "division": "Mindanao",
+        "region": "XI",
+        "townCount": 9,
+        "brgyCount": 414,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 6.7575087,
+            "longitude": 125.352398
+        }
+    },
+    {
+        "ISO": "PH-DVO",
+        "name": "Davao Occidental",
+        "capital": "Malita",
+        "area": "7009216345000000000 km^2",
+        "division": "Mindanao",
+        "region": "XI",
+        "townCount": 5,
+        "brgyCount": 105,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 5.8340662,
+            "longitude": 125.5438967
+        }
+    },
+    {
+        "ISO": "PH-DAO",
+        "name": "Davao Oriental",
+        "capital": "Mati",
+        "area": "7009567964000000000 km^2",
+        "division": "Mindanao",
+        "region": "XI",
+        "townCount": 10,
+        "brgyCount": 183,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 6.9437633,
+            "longitude": 126.2467484
+        }
+    },
+    {
+        "ISO": "PH-DIN",
+        "name": "Dinagat Islands",
+        "capital": "San Jose",
+        "area": "7009103633999999999 km^2",
+        "division": "Mindanao",
+        "region": "XIII",
+        "townCount": 7,
+        "brgyCount": 100,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 10.0254969,
+            "longitude": 125.5986093
+        }
+    },
+    {
+        "ISO": "PH-EAS",
+        "name": "Eastern Samar",
+        "capital": "Borongan",
+        "area": "7009466047000000000 km^2",
+        "division": "Visayas",
+        "region": "VIII",
+        "townCount": 22,
+        "brgyCount": 597,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 11.6079912,
+            "longitude": 125.4328501
+        }
+    },
+    {
+        "ISO": "PH-GUI",
+        "name": "Guimaras",
+        "capital": "Jordan",
+        "area": "7008604570000000000 km^2",
+        "division": "Visayas",
+        "region": "VI",
+        "townCount": 5,
+        "brgyCount": 98,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 10.5959757,
+            "longitude": 122.5877782
+        }
+    },
+    {
+        "ISO": "PH-IFU",
+        "name": "Ifugao",
+        "capital": "Lagawe",
+        "area": "7009262821000000000 km^2",
+        "division": "Luzon",
+        "region": "CAR",
+        "townCount": 11,
+        "brgyCount": 175,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 16.8082549,
+            "longitude": 121.193945
+        }
+    },
+    {
+        "ISO": "PH-ILN",
+        "name": "Ilocos Norte",
+        "capital": "Laoag",
+        "area": "7009346789000000000 km^2",
+        "division": "Luzon",
+        "region": "I",
+        "townCount": 21,
+        "brgyCount": 557,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 18.1960128,
+            "longitude": 120.5926679
+        }
+    },
+    {
+        "ISO": "PH-ILS",
+        "name": "Ilocos Sur",
+        "capital": "Vigan",
+        "area": "7009259600000000000 km^2",
+        "division": "Luzon",
+        "region": "I",
+        "townCount": 32,
+        "brgyCount": 768,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 17.5704898,
+            "longitude": 120.3873299
+        }
+    },
+    {
+        "ISO": "PH-ILI",
+        "name": "Iloilo",
+        "capital": "Iloilo City",
+        "area": "7009507917000000000 km^2",
+        "division": "Visayas",
+        "region": "VI",
+        "townCount": 42,
+        "brgyCount": 1,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 10.7201501,
+            "longitude": 122.5621063
+        }
+    },
+    {
+        "ISO": "PH-ISA",
+        "name": "Isabela",
+        "capital": "Ilagan",
+        "area": "7010124149300000000 km^2",
+        "division": "Luzon",
+        "region": "II",
+        "townCount": 34,
+        "brgyCount": 1,
+        "cityCount": 3,
+        "capital_coords": {
+            "latitude": 17.1263233,
+            "longitude": 122.0101024
+        }
+    },
+    {
+        "ISO": "PH-KAL",
+        "name": "Kalinga",
+        "capital": "Tabuk",
+        "area": "7009323125000000000 km^2",
+        "division": "Luzon",
+        "region": "CAR",
+        "townCount": 7,
+        "brgyCount": 152,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 17.4117354,
+            "longitude": 121.4384498
+        }
+    },
+    {
+        "ISO": "PH-LUN",
+        "name": "La Union",
+        "capital": "San Fernando",
+        "area": "7009149770000000000 km^2",
+        "division": "Luzon",
+        "region": "I",
+        "townCount": 19,
+        "brgyCount": 576,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 16.6073769,
+            "longitude": 120.3666099
+        }
+    },
+    {
+        "ISO": "PH-LAG",
+        "name": "Laguna",
+        "capital": "Santa Cruz",
+        "area": "7009191785000000000 km^2",
+        "division": "Luzon",
+        "region": "IV-A",
+        "townCount": 24,
+        "brgyCount": 674,
+        "cityCount": 6,
+        "capital_coords": {
+            "latitude": 14.2691095,
+            "longitude": 121.4113308
+        }
+    },
+    {
+        "ISO": "PH-LAN",
+        "name": "Lanao del Norte",
+        "capital": "Tubod",
+        "area": "7009415993999999999 km^2",
+        "division": "Mindanao",
+        "region": "X",
+        "townCount": 22,
+        "brgyCount": 506,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 7.9942672,
+            "longitude": 123.8746152
+        }
+    },
+    {
+        "ISO": "PH-LAS",
+        "name": "Lanao del Sur",
+        "capital": "Marawi",
+        "area": "7009387289000000000 km^2",
+        "division": "Mindanao",
+        "region": "ARMM",
+        "townCount": 39,
+        "brgyCount": 1,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 8.0106213,
+            "longitude": 124.297718
+        }
+    },
+    {
+        "ISO": "PH-LEY",
+        "name": "Leyte",
+        "capital": "Tacloban",
+        "area": "7009651505000000000 km^2",
+        "division": "Visayas",
+        "region": "VIII",
+        "townCount": 40,
+        "brgyCount": 1,
+        "cityCount": 3,
+        "capital_coords": {
+            "latitude": 11.2543388,
+            "longitude": 124.9616867
+        }
+    },
+    {
+        "ISO": "PH-MAG",
+        "name": "Maguindanao",
+        "capital": "Shariff Aguak",
+        "area": "7009614653000000000 km^2",
+        "division": "Mindanao",
+        "region": "ARMM",
+        "townCount": 36,
+        "brgyCount": 545,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 6.8530801,
+            "longitude": 124.3976356
+        }
+    },
+    {
+        "ISO": "PH-MAD",
+        "name": "Marinduque",
+        "capital": "Boac",
+        "area": "7008952580000000000 km^2",
+        "division": "Luzon",
+        "region": "IV-B",
+        "townCount": 6,
+        "brgyCount": 218,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 13.3941301,
+            "longitude": 121.8790306
+        }
+    },
+    {
+        "ISO": "PH-MAS",
+        "name": "Masbate",
+        "capital": "Masbate City",
+        "area": "7009415177999999999 km^2",
+        "division": "Luzon",
+        "region": "V",
+        "townCount": 20,
+        "brgyCount": 550,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 12.3574346,
+            "longitude": 123.5504076
+        }
+    },
+    {
+        "ISO": "PH-MSC",
+        "name": "Misamis Occidental",
+        "capital": "Oroquieta",
+        "area": "7009205521999999999 km^2",
+        "division": "Mindanao",
+        "region": "X",
+        "townCount": 14,
+        "brgyCount": 490,
+        "cityCount": 3,
+        "capital_coords": {
+            "latitude": 8.459526799999999,
+            "longitude": 123.8006496
+        }
+    },
+    {
+        "ISO": "PH-MSR",
+        "name": "Misamis Oriental",
+        "capital": "Cagayan de Oro",
+        "area": "7009354432000000000 km^2",
+        "division": "Mindanao",
+        "region": "X",
+        "townCount": 23,
+        "brgyCount": 504,
+        "cityCount": 3,
+        "capital_coords": {
+            "latitude": 8.4542363,
+            "longitude": 124.6318977
+        }
+    },
+    {
+        "ISO": "PH-MOU",
+        "name": "Mountain Province",
+        "capital": "Bontoc",
+        "area": "7009215738000000000 km^2",
+        "division": "Luzon",
+        "region": "CAR",
+        "townCount": 10,
+        "brgyCount": 144,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 17.091256,
+            "longitude": 121.0105733
+        }
+    },
+    {
+        "ISO": "PH-NEC",
+        "name": "Negros Occidental",
+        "capital": "Bacolod",
+        "area": "7009796521000000000 km^2",
+        "division": "Visayas",
+        "region": "VI",
+        "townCount": 19,
+        "brgyCount": 662,
+        "cityCount": 13,
+        "capital_coords": {
+            "latitude": 10.6407389,
+            "longitude": 122.9689565
+        }
+    },
+    {
+        "ISO": "PH-NER",
+        "name": "Negros Oriental",
+        "capital": "Dumaguete",
+        "area": "7009538553000000000 km^2",
+        "division": "Visayas",
+        "region": "VII",
+        "townCount": 20,
+        "brgyCount": 557,
+        "cityCount": 6,
+        "capital_coords": {
+            "latitude": 9.3068402,
+            "longitude": 123.3054467
+        }
+    },
+    {
+        "ISO": "PH-NSA",
+        "name": "Northern Samar",
+        "capital": "Catarman",
+        "area": "7009369293000000000 km^2",
+        "division": "Visayas",
+        "region": "VIII",
+        "townCount": 24,
+        "brgyCount": 569,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 12.4198447,
+            "longitude": 124.6414028
+        }
+    },
+    {
+        "ISO": "PH-NUE",
+        "name": "Nueva Ecija",
+        "capital": "Palayan",
+        "area": "7009575133000000000 km^2",
+        "division": "Luzon",
+        "region": "III",
+        "townCount": 27,
+        "brgyCount": 849,
+        "cityCount": 5,
+        "capital_coords": {
+            "latitude": 15.5782871,
+            "longitude": 121.1113286
+        }
+    },
+    {
+        "ISO": "PH-NUV",
+        "name": "Nueva Vizcaya",
+        "capital": "Bayombong",
+        "area": "7009397567000000000 km^2",
+        "division": "Luzon",
+        "region": "II",
+        "townCount": 15,
+        "brgyCount": 275,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 16.4804228,
+            "longitude": 121.1481284
+        }
+    },
+    {
+        "ISO": "PH-MDC",
+        "name": "Occidental Mindoro",
+        "capital": "Mamburao",
+        "area": "7009586571000000000 km^2",
+        "division": "Luzon",
+        "region": "IV-B",
+        "townCount": 11,
+        "brgyCount": 162,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 13.2681778,
+            "longitude": 120.6204892
+        }
+    },
+    {
+        "ISO": "PH-MDR",
+        "name": "Oriental Mindoro",
+        "capital": "Calapan",
+        "area": "7009423838000000000 km^2",
+        "division": "Luzon",
+        "region": "IV-B",
+        "townCount": 14,
+        "brgyCount": 426,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 12.3443972,
+            "longitude": 121.3361897
+        }
+    },
+    {
+        "ISO": "PH-PLW",
+        "name": "Palawan",
+        "capital": "Puerto Princesa",
+        "area": "7010170307500000000 km^2",
+        "division": "Luzon",
+        "region": "IV-B",
+        "townCount": 23,
+        "brgyCount": 433,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 9.967216299999999,
+            "longitude": 118.78551
+        }
+    },
+    {
+        "ISO": "PH-PAM",
+        "name": "Pampanga",
+        "capital": "San Fernando",
+        "area": "7009206246999999999 km^2",
+        "division": "Luzon",
+        "region": "III",
+        "townCount": 19,
+        "brgyCount": 538,
+        "cityCount": 3,
+        "capital_coords": {
+            "latitude": 15.0593937,
+            "longitude": 120.6567054
+        }
+    },
+    {
+        "ISO": "PH-PAN",
+        "name": "Pangasinan",
+        "capital": "Lingayen",
+        "area": "7009545101000000000 km^2",
+        "division": "Luzon",
+        "region": "I",
+        "townCount": 44,
+        "brgyCount": 1,
+        "cityCount": 4,
+        "capital_coords": {
+            "latitude": 16.0059867,
+            "longitude": 120.2397336
+        }
+    },
+    {
+        "ISO": "PH-QUE",
+        "name": "Quezon",
+        "capital": "Lucena",
+        "area": "7009906960000000000 km^2",
+        "division": "Luzon",
+        "region": "IV-A",
+        "townCount": 39,
+        "brgyCount": 1,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 13.9413957,
+            "longitude": 121.6234471
+        }
+    },
+    {
+        "ISO": "PH-QUI",
+        "name": "Quirino",
+        "capital": "Cabarroguis",
+        "area": "7009232347000000000 km^2",
+        "division": "Luzon",
+        "region": "II",
+        "townCount": 6,
+        "brgyCount": 132,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 16.4199058,
+            "longitude": 121.5141615
+        }
+    },
+    {
+        "ISO": "PH-RIZ",
+        "name": "Rizal",
+        "capital": "Antipolo",
+        "area": "7009119194000000000 km^2",
+        "division": "Luzon",
+        "region": "IV-A",
+        "townCount": 13,
+        "brgyCount": 188,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 14.6254827,
+            "longitude": 121.1244847
+        }
+    },
+    {
+        "ISO": "PH-ROM",
+        "name": "Romblon",
+        "capital": "Romblon, Romblon",
+        "area": "7009153345000000000 km^2",
+        "division": "Luzon",
+        "region": "IV-B",
+        "townCount": 17,
+        "brgyCount": 219,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 12.5778554,
+            "longitude": 122.269129
+        }
+    },
+    {
+        "ISO": "PH-WSA",
+        "name": "Samar",
+        "capital": "Catbalogan",
+        "area": "7009604803000000000 km^2",
+        "division": "Visayas",
+        "region": "VIII",
+        "townCount": 24,
+        "brgyCount": 951,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 11.8240433,
+            "longitude": 124.8403408
+        }
+    },
+    {
+        "ISO": "PH-SAR",
+        "name": "Sarangani",
+        "capital": "Alabel",
+        "area": "7009360125000000000 km^2",
+        "division": "Mindanao",
+        "region": "XII",
+        "townCount": 7,
+        "brgyCount": 141,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 6.185032500000001,
+            "longitude": 125.3466253
+        }
+    },
+    {
+        "ISO": "PH-SIG",
+        "name": "Siquijor",
+        "capital": "Siquijor, Siquijor",
+        "area": "7008337490000000000 km^2",
+        "division": "Visayas",
+        "region": "VII",
+        "townCount": 6,
+        "brgyCount": 134,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 9.213263099999999,
+            "longitude": 123.5157032
+        }
+    },
+    {
+        "ISO": "PH-SOR",
+        "name": "Sorsogon",
+        "capital": "Sorsogon City",
+        "area": "7009211901000000000 km^2",
+        "division": "Luzon",
+        "region": "V",
+        "townCount": 14,
+        "brgyCount": 541,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 12.9927095,
+            "longitude": 124.0147464
+        }
+    },
+    {
+        "ISO": "PH-SCO",
+        "name": "South Cotabato",
+        "capital": "Koronadal",
+        "area": "7009442881000000000 km^2",
+        "division": "Mindanao",
+        "region": "XII",
+        "townCount": 10,
+        "brgyCount": 225,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 6.4973963,
+            "longitude": 124.8471625
+        }
+    },
+    {
+        "ISO": "PH-SLE",
+        "name": "Southern Leyte",
+        "capital": "Maasin",
+        "area": "7009179861000000000 km^2",
+        "division": "Visayas",
+        "region": "VIII",
+        "townCount": 18,
+        "brgyCount": 500,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 10.1653546,
+            "longitude": 124.8403408
+        }
+    },
+    {
+        "ISO": "PH-SUK",
+        "name": "Sultan Kudarat",
+        "capital": "Isulan",
+        "area": "7009529834000000000 km^2",
+        "division": "Mindanao",
+        "region": "XII",
+        "townCount": 11,
+        "brgyCount": 249,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 6.6322636,
+            "longitude": 124.5978144
+        }
+    },
+    {
+        "ISO": "PH-SLU",
+        "name": "Sulu",
+        "capital": "Jolo",
+        "area": "7009160040000000000 km^2",
+        "division": "Mindanao",
+        "region": "ARMM",
+        "townCount": 19,
+        "brgyCount": 410,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 6.0473648,
+            "longitude": 121.0089611
+        }
+    },
+    {
+        "ISO": "PH-SUN",
+        "name": "Surigao del Norte",
+        "capital": "Surigao",
+        "area": "7009197293000000000 km^2",
+        "division": "Mindanao",
+        "region": "XIII",
+        "townCount": 20,
+        "brgyCount": 335,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 9.7571312,
+            "longitude": 125.5137674
+        }
+    },
+    {
+        "ISO": "PH-SUR",
+        "name": "Surigao del Sur",
+        "capital": "Tandag",
+        "area": "7009493270000000000 km^2",
+        "division": "Mindanao",
+        "region": "XIII",
+        "townCount": 17,
+        "brgyCount": 309,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 9.1011711,
+            "longitude": 126.1588771
+        }
+    },
+    {
+        "ISO": "PH-TAR",
+        "name": "Tarlac",
+        "capital": "Tarlac City",
+        "area": "7009305360000000000 km^2",
+        "division": "Luzon",
+        "region": "III",
+        "townCount": 17,
+        "brgyCount": 511,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 15.4754786,
+            "longitude": 120.5963492
+        }
+    },
+    {
+        "ISO": "PH-TAW",
+        "name": "Tawi-Tawi",
+        "capital": "Bongao",
+        "area": "7009108740000000000 km^2",
+        "division": "Mindanao",
+        "region": "ARMM",
+        "townCount": 11,
+        "brgyCount": 203,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 5.1041783,
+            "longitude": 119.8120795
+        }
+    },
+    {
+        "ISO": "PH-ZMB",
+        "name": "Zambales",
+        "capital": "Iba",
+        "area": "7009383083000000000 km^2",
+        "division": "Luzon",
+        "region": "III",
+        "townCount": 13,
+        "brgyCount": 247,
+        "cityCount": 1,
+        "capital_coords": {
+            "latitude": 15.3329773,
+            "longitude": 119.975756
+        }
+    },
+    {
+        "ISO": "PH-ZAN",
+        "name": "Zamboanga del Norte",
+        "capital": "Dipolog",
+        "area": "7009730100000000000 km^2",
+        "division": "Mindanao",
+        "region": "IX",
+        "townCount": 25,
+        "brgyCount": 691,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 8.5142736,
+            "longitude": 123.3373916
+        }
+    },
+    {
+        "ISO": "PH-ZAS",
+        "name": "Zamboanga del Sur",
+        "capital": "Pagadian",
+        "area": "7009591416000000000 km^2",
+        "division": "Mindanao",
+        "region": "IX",
+        "townCount": 26,
+        "brgyCount": 779,
+        "cityCount": 2,
+        "capital_coords": {
+            "latitude": 8.1041862,
+            "longitude": 123.4943968
+        }
+    },
+    {
+        "ISO": "PH-ZSI",
+        "name": "Zamboanga Sibugay",
+        "capital": "Ipil",
+        "area": "7009360775000000000 km^2",
+        "division": "Mindanao",
+        "region": "IX",
+        "townCount": 16,
+        "brgyCount": 389,
+        "cityCount": 0,
+        "capital_coords": {
+            "latitude": 7.7858361,
+            "longitude": 122.588174
+        }
+    },
+    {
+        "ISO": "PH-00",
+        "name": "Manila",
+        "capital": "Manila",
+        "area": "7008638550000000000 km^2",
+        "division": "Luzon",
+        "region": "NCR",
+        "townCount": 1,
+        "brgyCount": 1,
+        "cityCount": 16,
+        "capital_coords": {
+            "latitude": 14.5995124,
+            "longitude": 120.9842195
+        }
+    }
+]

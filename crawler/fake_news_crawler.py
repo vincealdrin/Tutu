@@ -86,15 +86,15 @@ while True:
                 pattern2 = re.compile('ADVERTISEMENT')
                 body = pattern2.sub('', pattern.sub('', article.text))
 
-                try:
-                    if langdetect.detect(body) != 'en':
-                        print('\n(NOT ENGLISH) Skipped: ' + str(article.url) +
-                              '\n')
-                        continue
-                except:
-                    print(
-                        '\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
-                    continue
+                # try:
+                #     if langdetect.detect(body) != 'en':
+                #         print('\n(NOT ENGLISH) Skipped: ' + str(article.url) +
+                #               '\n')
+                #         continue
+                # except:
+                #     print(
+                #         '\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
+                #     continue
 
                 if not body:
                     print('\n(NO TEXT) Skipped: ' + str(article.url) + '\n')

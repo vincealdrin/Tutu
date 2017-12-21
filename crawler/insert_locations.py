@@ -1,7 +1,7 @@
 import rethinkdb as r
-from dotenv import load_dotenv, find_dotenv
 import os
 import json
+from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv(), override=True)
 
@@ -18,26 +18,40 @@ with open('./provinces-capital-ph.json') as provinces_data:
     provinces = json.load(provinces_data)
 
 for location in locations:
-  prov = location['province']
-  del location['province']
-  loc_id = r.uuid(location['formattedAddress']).run(conn)
+    prov = location['province']
+    loc_id = r.uuid(location['formattedAddress']).run(conn)
+    r.table('locations').insert({
+        'id':
+        loc_id,
+        "name":
+        location['name'],
+        "type":
+        location['type'],
+        "brgyCount":
+        int(location['brgyCount']),
+        "area":
+        location['area'],
+        "psgc":
+        location['psgc'],
+        "formattedAddress":
+        location['formattedAddress'],
+        "position":
+        r.point(location['coordinates']['longitude'],
+                location['coordinates']['latitude']),
+        "province":
+        location['province'],
+        "region":
+        location['region'],
+    }).run(conn)
 
-  a = r.table('locations').insert({
-    "name": location['name'],
-    "type": location['type'],
-    "brgyCount": int(location['brgyCount']),
-    "area": location['area'],
-    "psgc": location['psgc'],
-    "formattedAddress": location['formattedAddress'],
-    "position": r.point(location['coordinates']['longitude'], location['coordinates']['latitude']),
-    "region": location['region'],
-    'id': loc_id
-  }).run(conn)
+for province in provinces:
+    p_id = r.uuid(province['ISO']).run(conn)
 
-  for province in provinces:
-    if (prov == province['name'] and location['name'] == province['capital']):
-      p_id = r.uuid(province['ISO']).run(conn)
-      b = r.table('provinces').insert({
+    capital = r.table('locations').filter(r.row['name'].eq(
+        province['capital']).and_(r.row['province'].eq(
+            province['name']))).nth(0).run(conn)
+
+    r.table('provinces').insert({
         "ISO": province['ISO'],
         "name": province['name'],
         "capital": province['capital'],
@@ -47,9 +61,12 @@ for location in locations:
         "townCount": province['townCount'],
         "brgyCount": int(province['brgyCount']),
         "cityCount": province['cityCount'],
-        "capitalId": loc_id,
+        "capitalId": capital['id'],
         'id': p_id
-      }).run(conn)
+    }).run(conn)
 
-  r.table('locations').get(loc_id).update({ 'provinceId': p_id }).run(conn)
-
+    r.table('locations').get(capital['id']).update({
+        'provinceId': p_id
+    }).run(conn)
+    r.table('locations').get(capital['id']).replace(
+        r.row.without('province')).run(conn)

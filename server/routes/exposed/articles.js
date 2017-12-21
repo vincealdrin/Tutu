@@ -98,7 +98,7 @@ module.exports = (conn, io) => {
         const topCount = parseInt(top);
 
         if (socials[0] === 'all') {
-          query = query.filter((article) => article('left')('popularity')('totalCount').gt(0));
+          query = query.filter((article) => article('left')('popularity')('totalScore').gt(0));
         } else {
           switch (socials.length) {
           case 2:
@@ -128,7 +128,7 @@ module.exports = (conn, io) => {
           }
 
           if (socials[0] === 'all') {
-            query = query.orderBy(r.desc(r.row('left')('popularity')('totalCount')));
+            query = query.orderBy(r.desc(r.row('left')('popularity')('totalScore')));
           } else {
             query = query.orderBy(r.desc(r.row('left')('popularity')(socials[0])));
           }
@@ -181,8 +181,8 @@ module.exports = (conn, io) => {
       } = req.query;
       const articleInfo = await r.table(tbl)
         .get(id)
+        .merge((article) => mapArticleInfo(parseInt(catsFilterLength))(article))
         .merge((article) => ({
-          ...mapArticleInfo(parseInt(catsFilterLength))(article),
           relatedArticles: getRelatedArticles(article),
         }))
         .without(
@@ -194,9 +194,10 @@ module.exports = (conn, io) => {
         .run(conn);
 
       articleInfo.relatedArticles = articleInfo.relatedArticles
-        .filter(({
-          title,
-        }) => natural.DiceCoefficient(articleInfo.title, title) > 0.50)
+        .filter(({ title }) => {
+          console.log(natural.DiceCoefficient(articleInfo.title, title));
+          return natural.DiceCoefficient(articleInfo.title, title) > 0.30;
+        })
         .slice(0, 5);
 
       res.json(articleInfo);
@@ -237,7 +238,7 @@ module.exports = (conn, io) => {
           relatedArticles: article.relatedArticles
             .filter(({
               title,
-            }) => natural.DiceCoefficient(article.title, title) > 0.50)
+            }) => natural.DiceCoefficient(article.title, title) > 0.30)
             .slice(0, 5),
         };
       });
@@ -257,9 +258,9 @@ module.exports = (conn, io) => {
       lastWk.setDate(lastWk.getDate() - 7);
 
       const query = await r.table(tbl).filter((article) => article('publishDate').date().ge(lastWk)
-        .and(article('popularity')('totalCount').gt(0)))
+        .and(article('popularity')('totalScore').gt(0)))
         .eqJoin(r.row('sourceId'), r.table('sources'))
-        .orderBy(r.desc(r.row('left')('popularity')('totalCount')))
+        .orderBy(r.desc(r.row('left')('popularity')('totalScore')))
         .map(mapSideArticle)
         .slice(0, limit);
       const totalCount = query.count().run(conn);

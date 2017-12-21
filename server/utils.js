@@ -111,7 +111,6 @@ const mapLocation = (loc) => {
 };
 
 const getCategoriesField = (article, max = 2) => article('categories')
-  .filter((category) => category('score').gt(0))
   .orderBy(r.desc((category) => category('score')))
   .slice(0, max === 0 ? 2 : max)
   .getField('label');
@@ -126,15 +125,10 @@ module.exports.getRelatedArticles = (article) =>
         r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).add(WEEK_IN_SEC),
         { rightBound: 'closed' }
       )
-      .and(article('categories')
-        .contains((label) => doc('categories')
-          .orderBy(r.desc((category) => category('score')))
-          .slice(0, 2)
-          .getField('label')
-          .contains(label))
-        .and(article('keywords').contains((keyword) => doc('topics')('common').coerceTo('string').match(keyword))
-          .or(article('people').contains((person) => doc('people').coerceTo('string').match(person)))
-          .or(article('organizations').contains((org) => doc('organizations').coerceTo('string').match(org)))))
+      .and(article('categories').contains((label) => getCategoriesField(doc).contains(label)))
+      .or(doc('keywords').contains((keyword) => article('topics')('common').coerceTo('string').match(keyword)))
+      .or(doc('people').contains((person) => article('people').coerceTo('string').match(person)))
+      .or(doc('organizations').contains((org) => article('organizations').coerceTo('string').match(org)))
       .and(doc('id').ne(article('id'))))
     .orderBy(r.desc('timestamp'))
     .slice(0, 20)

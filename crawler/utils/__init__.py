@@ -124,10 +124,10 @@ def search_locations(text, locations, provinces):
     for location in locations:
         if location['location']['name'] in text:
             province_pattern = re.compile(
-                '\W(' + location['province']['name'] + ' Province|' +
+                r'\W(' + location['province']['name'] + ' Province|' +
                 location['province']['name'] + '|Metro ' +
                 location['province']['name'] + '|' +
-                location['province']['name'] + ')+,? ?(Philippines|PH)?\W',
+                location['province']['name'] + r')+,? ?(Philippines|PH)?\W',
                 re.IGNORECASE)
 
             if province_pattern.search(text):
@@ -136,10 +136,10 @@ def search_locations(text, locations, provinces):
     if not matched_locations:
         for province in provinces:
             province_pattern = re.compile(
-                '\W(' + province['province']['name'] + ' Province|' +
+                r'\W(' + province['province']['name'] + ' Province|' +
                 province['province']['name'] + '|Metro ' +
                 province['province']['name'] + '|' +
-                province['province']['name'] + ')+,? ?(Philippines|PH)?\W',
+                province['province']['name'] + r')+,? ?(Philippines|PH)?\W',
                 re.IGNORECASE)
             matched = province_pattern.search(text)
 

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "51288da83f820d344a5ff9b6b9e3d817ba3fb94a561174534c71c7b68ef58c07"
+            "sha256": "26230efa67e28d4fdce4e69e831eda00cc92daf3d785ea6ba02f3195c2dcd4ab"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -11,7 +11,7 @@
             "platform_python_implementation": "CPython",
             "platform_release": "10",
             "platform_system": "Windows",
-            "platform_version": "10.0.15063",
+            "platform_version": "10.0.16299",
             "python_full_version": "3.6.3",
             "python_version": "3.6",
             "sys_platform": "win32"
@@ -743,5 +743,12 @@
             "version": "==0.16.0"
         }
     },
-    "develop": {}
+    "develop": {
+        "rope": {
+            "hashes": [
+                "sha256:a09edfd2034fd50099a67822f9bd851fbd0f4e98d3b87519f6267b60e50d80d1"
+            ],
+            "version": "==0.10.7"
+        }
+    }
 }

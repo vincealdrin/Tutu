@@ -2,7 +2,12 @@
 # java -mx4g -cp "*" --add-modules java.xml.bind edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 20000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
 # for deployment
 # nohup java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 20000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly &
-
+# hack method to backup db on server
+# rethinkdb dump -c localhost:32769
+# tar zxvf ./rethinkdb_dump_2017-01-24T21:42:08.tar.gz
+# rm rethinkdb_dump_2017-01-24T21:21:47.tar.gz
+# mv rethinkdb_dump_2017-01-24T21:42:08 rethinkdb_dump_2017-01-24
+# tar -czvf rethinkdb_dump_2017-01-24.tar.gz rethinkdb_dump_2017-01-24
 import newspaper
 import json
 import time
@@ -30,7 +35,7 @@ provinces = get_provinces()
 # shuffle(news_sources)
 # if not news_sources:
 # if PY_ENV == 'development':
-    # print('EMPTY NEWS SOURCES')
+# print('EMPTY NEWS SOURCES')
 
 PY_ENV = os.environ.get('PY_ENV')
 count = 0
@@ -58,7 +63,6 @@ while True:
         config.follow_meta_refresh = True
         config.memoize_articles = True
 
-
         proxy = get_proxy(last_proxy)
         last_proxy = proxy['http']
 
@@ -67,32 +71,38 @@ while True:
             config.proxies = proxy
 
         try:
-            source = newspaper.build('http://'+url, config=config)
+            source = newspaper.build('http://' + url, config=config)
         except Exception as e:
             if PY_ENV == 'development':
                 print('(SOURCE ERROR) Source Skipped\n')
-            insert_log(source_id, 'sourceCrawl', 'error', float(time.clock() - src_start_time), {
-                'errorMessage': 'SOURCE ERROR'
-            })
+            insert_log(source_id, 'sourceCrawl', 'error',
+                       float(time.clock() - src_start_time), {
+                           'errorMessage': 'SOURCE ERROR'
+                       })
             continue
 
         if PY_ENV == 'development':
             print('Proxy: ' + proxy['http'])
             print('User-Agent: ' + config.browser_user_agent)
-            print('\n' + source.domain + ' has ' + str(len(source.articles)) + ' articles\n')
+            print('\n' + source.domain + ' has ' + str(len(source.articles)) +
+                  ' articles\n')
 
-        insert_log(source_id, 'sourceCrawl', 'pending', float(time.clock() - src_start_time), {
-            'proxy': proxy['http'],
-            'userAgent': config.browser_user_agent,
-            'articlesCount': len(source.articles)
-        })
+        insert_log(
+            source_id, 'sourceCrawl', 'pending',
+            float(time.clock() - src_start_time), {
+                'proxy': proxy['http'],
+                'userAgent': config.browser_user_agent,
+                'articlesCount': len(source.articles)
+            })
 
-        if (not source.articles):
+        if not source.articles:
             if PY_ENV == 'development':
                 print('(ZERO ARTICLES) Source Skipped\n')
-            insert_log(source_id, 'sourceCrawl', 'error', float(time.clock() - src_start_time), {
-                'errorMessage': 'ZERO ARTICLES'
-            })
+            slp_time = insert_log(source_id, 'sourceCrawl', 'error',
+                                  float(time.clock() - src_start_time), {
+                                      'errorMessage': 'ZERO ARTICLES'
+                                  })
+            sleep(slp_time)
             continue
 
         for article in source.articles:
@@ -115,10 +125,11 @@ while True:
                 if PY_ENV == 'development':
                     print('\n(EXISTING URL) Skipped: ' + str(article.url))
                     print(' -- ' + existing_article['id'] + '\n')
-                insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
-                    'articleUrl': article.url,
-                    'errorMessage': 'EXISTING URL'
-                })
+                insert_log(source_id, 'articleCrawl', 'error',
+                           float(time.clock() - start_time), {
+                               'articleUrl': article.url,
+                               'errorMessage': 'EXISTING URL'
+                           })
                 slp_time = 0
                 continue
 
@@ -128,114 +139,145 @@ while True:
                 article.nlp()
 
                 title = article.title.split('|')[0].strip()
-
                 categories, body, rate_limits = categorize(article.url)
-
                 pattern = re.compile(source.brand, re.IGNORECASE)
                 body = pattern.sub('', body)
 
                 try:
                     if langdetect.detect(body) != 'en':
                         if PY_ENV == 'development':
-                            print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
-                        slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
+                            print('\n(NOT ENGLISH) Skipped: ' +
+                                  str(article.url) + '\n')
+                        slp_time = insert_log(
+                            source_id, 'articleCrawl', 'error',
+                            float(time.clock() - start_time), {
+                                'articleUrl': article.url,
+                                'articleTitle': title,
+                                'errorMessage': 'NOT ENGLISH',
+                            })
+                        continue
+                except Exception:
+                    if PY_ENV == 'development':
+                        print('\n(NOT ENGLISH) Skipped: ' + str(article.url) +
+                              '\n')
+                    slp_time = insert_log(
+                        source_id, 'articleCrawl', 'error',
+                        float(time.clock() - start_time), {
                             'articleUrl': article.url,
                             'articleTitle': title,
                             'errorMessage': 'NOT ENGLISH',
                         })
-                        continue
-                except:
-                    if PY_ENV == 'development':
-                        print('\n(NOT ENGLISH) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
-                        'articleUrl': article.url,
-                        'articleTitle': title,
-                        'errorMessage': 'NOT ENGLISH',
-                    })
                     continue
 
                 if len(body.split()) < 100:
                     if PY_ENV == 'development':
-                        print('\n(SHORT CONTENT) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
-                        'articleUrl': article.url,
-                        'articleTitle': title,
-                        'errorMessage': 'SHORT CONTENT',
-                    })
+                        print('\n(SHORT CONTENT) Skipped: ' +
+                              str(article.url) + '\n')
+                    slp_time = insert_log(
+                        source_id, 'articleCrawl', 'error',
+                        float(time.clock() - start_time), {
+                            'articleUrl': article.url,
+                            'articleTitle': title,
+                            'errorMessage': 'SHORT CONTENT',
+                        })
                     continue
 
                 if source.brand in body:
                     if PY_ENV == 'development':
-                        print('\n(SOURCE IS IN BODY) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
-                        'articleUrl': article.url,
-                        'articleTitle': title,
-                        'errorMessage': 'SOURCE IS IN BODY',
-                    })
+                        print('\n(SOURCE IS IN BODY) Skipped: ' +
+                              str(article.url) + '\n')
+                    slp_time = insert_log(
+                        source_id, 'articleCrawl', 'error',
+                        float(time.clock() - start_time), {
+                            'articleUrl': article.url,
+                            'articleTitle': title,
+                            'errorMessage': 'SOURCE IS IN BODY',
+                        })
                     continue
 
                 if not body:
                     if PY_ENV == 'development':
-                        print('\n(NO TEXT) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
-                        'articleUrl': article.url,
-                        'articleTitle': title,
-                        'errorMessage': 'NO TEXT',
-                    })
+                        print(
+                            '\n(NO TEXT) Skipped: ' + str(article.url) + '\n')
+                    slp_time = insert_log(
+                        source_id, 'articleCrawl', 'error',
+                        float(time.clock() - start_time), {
+                            'articleUrl': article.url,
+                            'articleTitle': title,
+                            'errorMessage': 'NO TEXT',
+                        })
                     continue
 
-                combined_body = body + ' ' + article.text + ' ' + title + ' ' + urlparse(article.url).path
-                matched_locations = search_locations(combined_body, locations, provinces)
+                combined_body = body + ' ' + article.text + ' ' + title + ' ' + urlparse(
+                    article.url).path
+                matched_locations = search_locations(combined_body, locations,
+                                                     provinces)
 
-                nation_terms = '\WPH|Philippines?|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos\W'
-                nation_pattern = re.compile('(\W('+nation_terms+')$|^('+nation_terms+')\W|\W('+nation_terms+')\W)', re.IGNORECASE)
+                nation_terms = r'\WPH|Philippines?|Pilipinas|Filipino|Pilipino|Pinoy|Filipinos\W'
+                nation_pattern = re.compile(
+                    r'(\W(' + nation_terms + ')$|^(' + nation_terms +
+                    r')\W|\W(' + nation_terms + r')\W)', re.IGNORECASE)
 
                 with open('./world-countries.json') as countries_file:
                     countries = json.load(countries_file)
                 for country in countries:
-                    if country in combined_body and not nation_pattern.search(combined_body):
+                    if country in combined_body and not nation_pattern.search(
+                            combined_body):
                         if PY_ENV == 'development':
-                            print('\n(HAS OTHER COUNTRY BUT NO PH) Skipped: ' + str(article.url) + '\n')
-                        slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
-                            'articleUrl': article.url,
-                            'articleTitle': title,
-                            'errorMessage': 'HAS OTHER COUNTRY BUT NO PH'
-                        })
+                            print('\n(HAS OTHER COUNTRY BUT NO PH) Skipped: ' +
+                                  str(article.url) + '\n')
+                        slp_time = insert_log(
+                            source_id, 'articleCrawl', 'error',
+                            float(time.clock() - start_time), {
+                                'articleUrl': article.url,
+                                'articleTitle': title,
+                                'errorMessage': 'HAS OTHER COUNTRY BUT NO PH'
+                            })
                         continue
 
                 if not matched_locations:
                     if not nation_pattern.search(combined_body):
                         if PY_ENV == 'development':
-                            print('\n(CAN\'T FIND LOCATION) Skipped: ' + str(article.url) + '\n')
-                        slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
-                            'articleUrl': article.url,
-                            'articleTitle': title,
-                            'errorMessage': 'CAN\'T FIND LOCATION'
-                        })
+                            print('\n(CAN\'T FIND LOCATION) Skipped: ' +
+                                  str(article.url) + '\n')
+                        slp_time = insert_log(
+                            source_id, 'articleCrawl', 'error',
+                            float(time.clock() - start_time), {
+                                'articleUrl': article.url,
+                                'articleTitle': title,
+                                'errorMessage': 'CAN\'T FIND LOCATION'
+                            })
                         continue
 
-                publishDate = search_publish_date(article.publish_date, article.html)
+                publishDate = search_publish_date(article.publish_date,
+                                                  article.html)
 
                 if (not publishDate):
                     if PY_ENV == 'development':
-                        print('\n(CAN\'T FIND PUBLISH DATE) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
-                        'articleUrl': article.url,
-                        'articleTitle': title,
-                        'errorMessage': 'CAN\'T FIND PUBLISH DATE'
-                    })
+                        print('\n(CAN\'T FIND PUBLISH DATE) Skipped: ' +
+                              str(article.url) + '\n')
+                    slp_time = insert_log(
+                        source_id, 'articleCrawl', 'error',
+                        float(time.clock() - start_time), {
+                            'articleUrl': article.url,
+                            'articleTitle': title,
+                            'errorMessage': 'CAN\'T FIND PUBLISH DATE'
+                        })
                     continue
 
                 organizations, people, error = get_entities(body)
 
                 if error:
                     if PY_ENV == 'development':
-                        print('\n(TEXT IS TOO LONG) Skipped: ' + str(article.url) + '\n')
-                    slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
-                        'articleUrl': article.url,
-                        'articleTitle': title,
-                        'errorMessage': 'TEXT IS TOO LONG'
-                    })
+                        print('\n(TEXT IS TOO LONG) Skipped: ' +
+                              str(article.url) + '\n')
+                    slp_time = insert_log(
+                        source_id, 'articleCrawl', 'error',
+                        float(time.clock() - start_time), {
+                            'articleUrl': article.url,
+                            'articleTitle': title,
+                            'errorMessage': 'TEXT IS TOO LONG'
+                        })
                     continue
 
                 summary_sentences = summarize(body)
@@ -278,31 +320,42 @@ while True:
                 aylien_status2 = rate_limits[1]
                 aylien_status3 = rate_limits[2]
                 if PY_ENV == 'development':
-                    print(str(count) + '.) ' + str(title) + ' | ' + str(article.url))
+                    print(
+                        str(count) + '.) ' + str(title) + ' | ' +
+                        str(article.url))
                 if PY_ENV == 'development':
-                    print('Locations: ' + ' | '.join([ml['location']['formattedAddress'] for ml in matched_locations]))
+                    print('Locations: ' + ' | '.join([
+                        ml['location']['formattedAddress']
+                        for ml in matched_locations
+                    ]))
                 if PY_ENV == 'development':
-                    print('AYLIEN REMAINING CALL: ['+str(aylien_status['remaining'])+', '+str(aylien_status2['remaining'])+', '+str(aylien_status3['remaining'])+'] -- ' + str('%.2f' % runtime + 's scraping runtime'))
+                    print('AYLIEN REMAINING CALL: [' +
+                          str(aylien_status['remaining']) + ', ' +
+                          str(aylien_status2['remaining']) + ', ' + str(
+                              aylien_status3['remaining']) + '] -- ' + str(
+                                  '%.2f' % runtime + 's scraping runtime'))
 
-                slp_time = insert_log(source_id, 'articleCrawl', 'success', float(time.clock() - start_time), {
-                    'articleId': url_uuid
-                })
+                slp_time = insert_log(source_id, 'articleCrawl', 'success',
+                                      float(time.clock() - start_time), {
+                                          'articleId': url_uuid
+                                      })
 
             except newspaper.ArticleException as e:
                 if PY_ENV == 'development':
                     print('\n(ARTICLE ERROR) Article Skipped\n')
-                slp_time = insert_log(source_id, 'articleCrawl', 'error', float(time.clock() - start_time), {
-                    'articleUrl': url
-                })
+                slp_time = insert_log(source_id, 'articleCrawl', 'error',
+                                      float(time.clock() - start_time), {
+                                          'articleUrl': url
+                                      })
                 continue
 
-        insert_log(source_id, 'sourceCrawl', 'success', float(time.clock() - src_start_time), {
-            'articlesCrawledCount': src_art_count,
-        })
+        insert_log(source_id, 'sourceCrawl', 'success',
+                   float(time.clock() - src_start_time), {
+                       'articlesCrawledCount': src_art_count,
+                   })
 
         crawled_sources.append(source_id)
 
         if PY_ENV == 'development':
             print('\n' + source.domain + ' done!')
-
-        sleep(3)
+        sleep(randrange(2, 6))

@@ -3,6 +3,7 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import axios from 'axios';
 import 'react-tippy/dist/tippy.css';
 import 'semantic-ui-css/semantic.min.css';
+import 'react-datepicker/dist/react-datepicker.css';
 import 'rc-slider/assets/index.css';
 import MapView from '../MapView';
 import AppSidebar from '../AppSidebar';
@@ -14,7 +15,7 @@ import Categories from '../Categories';
 import Submit from '../Submit';
 import MapThemes from '../MapThemes';
 import Counter from '../Counter';
-import GridLayout from '../GridView';
+// import GridLayout from '../GridView';
 import './styles.css';
 
 axios.defaults.baseURL = '/api/exposed';
@@ -25,7 +26,7 @@ const App = () => (
       <Switch>
         <Route exact path="/(popular|recent|filter|about|categories|submit|themes)?" component={MapView} />
         <Route path="/counter" component={Counter} />
-        <Route path="/grid" component={GridLayout} />
+        {/* <Route path="/grid" component={GridLayout} /> */}
         <Redirect to="/" />
       </Switch>
     </main>

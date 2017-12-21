@@ -1,15 +1,19 @@
+import moment from 'moment';
+
 export const CHANGE_KEYWORDS = 'filters/CHANGE_KEYWORDS';
 export const CHANGE_CATEGORIES = 'filters/CHANGE_CATEGORIES';
 export const CHANGE_SOURCES = 'filters/CHANGE_SOURCES';
-export const CHANGE_TIMEWINDOW = 'filters/CHANGE_TIMEWINDOW';
+export const CHANGE_TIME_WINDOW = 'filters/CHANGE_TIME_WINDOW';
+export const CHANGE_DATE = 'filters/CHANGE_DATE';
 export const CHANGE_LIMIT = 'filters/CHANGE_LIMIT';
 export const CHANGE_ORGANIZATIONS = 'filters/CHANGE_ORGANIZATIONS';
 export const CHANGE_PEOPLE = 'filters/CHANGE_PEOPLE';
 export const CHANGE_SENTIMENT = 'filters/CHANGE_SENTIMENT';
 export const CHANGE_POPULAR = 'filters/CHANGE_POPULAR';
 export const UPDATE_MAP_STATE = 'filters/UPDATE_MAP_STATE';
+export const CLEAR_FILTERS = 'filters/CLEAR_FILTERS';
 
-const initialState = {
+export const filtersInitialState = {
   keywords: [],
   categories: [],
   organizations: [],
@@ -21,10 +25,11 @@ const initialState = {
     top: 100,
   },
   timeWindow: [24, 31],
+  date: moment(),
   limit: 1500,
 };
 
-export default (state = initialState, action) => {
+export default (state = filtersInitialState, action) => {
   switch (action.type) {
     case CHANGE_KEYWORDS:
       return {
@@ -41,10 +46,15 @@ export default (state = initialState, action) => {
         ...state,
         sources: action.sources,
       };
-    case CHANGE_TIMEWINDOW:
+    case CHANGE_TIME_WINDOW:
       return {
         ...state,
         timeWindow: action.timeWindow,
+      };
+    case CHANGE_DATE:
+      return {
+        ...state,
+        date: action.date,
       };
     case CHANGE_LIMIT:
       return {
@@ -74,6 +84,8 @@ export default (state = initialState, action) => {
         ...state,
         sentiment: action.sentiment,
       };
+    case CLEAR_FILTERS:
+      return filtersInitialState;
     default:
       return state;
   }
@@ -94,9 +106,14 @@ export const changeSourcesFilter = (sources) => ({
   sources,
 });
 
-export const changTimeWindowFilter = (timeWindow) => ({
-  type: CHANGE_TIMEWINDOW,
+export const changeTimeWindowFilter = (timeWindow) => ({
+  type: CHANGE_TIME_WINDOW,
   timeWindow,
+});
+
+export const changeDateFilter = (date) => ({
+  type: CHANGE_DATE,
+  date,
 });
 
 export const changeOrganizationsFilter = (organizations) => ({
@@ -127,4 +144,7 @@ export const changePopularSocialsFilter = (socials) => ({
 export const changePopularTopFilter = (top) => ({
   type: CHANGE_POPULAR,
   top,
+});
+export const clearFilters = () => ({
+  type: CLEAR_FILTERS,
 });

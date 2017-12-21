@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Label, Segment, Dropdown, Divider } from 'semantic-ui-react';
+import { Label, Segment, Dropdown, Divider, Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { fetchArticles } from '../../modules/mapArticles';
 import Slider from 'rc-slider';
+import DatePicker from 'react-datepicker';
+import { fetchArticles } from '../../modules/mapArticles';
 import {
   changeCategoriesFilter,
   changeKeywordsFilter,
@@ -14,7 +15,9 @@ import {
   changePopularTopFilter,
   changeSentimentFilter,
   changeSourcesFilter,
-  changTimeWindowFilter,
+  changeTimeWindowFilter,
+  changeDateFilter,
+  clearFilters,
 } from '../../modules/filters';
 import { mapOptions } from '../../utils';
 import './styles.css';
@@ -31,7 +34,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   changeKeywordsFilter,
   changeCategoriesFilter,
   changeSourcesFilter,
-  changTimeWindowFilter,
+  changeTimeWindowFilter,
   changeLimitFilter,
   changeOrganizationsFilter,
   changePeopleFilter,
@@ -39,6 +42,8 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   changePopularTopFilter,
   changeSentimentFilter,
   fetchArticles,
+  changeDateFilter,
+  clearFilters,
 }, dispatch);
 
 const categoriesOptions = [
@@ -98,6 +103,8 @@ class Filter extends Component {
       organizations,
       timeWindow,
       limit,
+      categories,
+      date,
     } = filters;
     const startRange = 31 - timeWindow[0];
     const endRange = 31 - timeWindow[1];
@@ -105,6 +112,21 @@ class Filter extends Component {
     return (
       <Segment>
         <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
+        <Button
+          content="save filter"
+          onClick={() => {
+            localStorage.setItem('filterSettings', JSON.stringify(filters));
+          }}
+        />
+        <Button
+          content="clear filter"
+          onClick={() => {
+            this.props.clearFilters();
+            this.props.fetchArticles(center, zoom, bounds);
+            // localStorage.removeItem('filterSettings');
+          }}
+        />
+        <Button content="get insights" />
         <div className="scrollable-section filter-scrollable">
           <span className="input-label">SEARCH KEYWORDS</span>
           <Dropdown
@@ -126,13 +148,14 @@ class Filter extends Component {
           <span className="input-label">CATEGORIES</span>
           <Dropdown
             text="Select Category"
-              // icon="globe"
-              // className="icon half-width"
+            // icon="globe"
+            // className="icon half-width"
             options={categoriesOptions}
             onChange={(_, { value }) => {
-                this.props.changeCategoriesFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
+              this.props.changeCategoriesFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            value={categories}
             search
             selection
             fluid
@@ -142,8 +165,8 @@ class Filter extends Component {
           <span className="input-label">SOURCE</span>
           <Dropdown
             text="Source"
-              // icon="browser"
-              // className="icon half-width"
+            // icon="browser"
+            // className="icon half-width"
             options={sources.map(mapOptions)}
             value={sources}
             onChange={(_, { value }) => {
@@ -157,6 +180,14 @@ class Filter extends Component {
             allowAdditions
           />
           <Divider />
+          <span className="input-label">DATE</span>
+          <DatePicker
+            selected={date}
+            onChange={(newDate) => {
+              this.props.changeDateFilter(newDate);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+          />
           <span className="input-label">TIME WINDOW</span>
           <Slider.Range
             min={0}
@@ -164,7 +195,7 @@ class Filter extends Component {
             allowCross={false}
             value={timeWindow}
             onChange={(value) => {
-              this.props.changTimeWindowFilter(value);
+              this.props.changeTimeWindowFilter(value);
               this.props.fetchArticles(center, zoom, bounds);
             }}
           />
@@ -179,9 +210,9 @@ class Filter extends Component {
             options={organizations.map(mapOptions)}
             value={organizations}
             onChange={(_, { value }) => {
-                this.props.changeOrganizationsFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
+              this.props.changeOrganizationsFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
             search
             selection
             fluid
@@ -195,9 +226,9 @@ class Filter extends Component {
             options={people.map(mapOptions)}
             value={people}
             onChange={(_, { value }) => {
-                this.props.changePeopleFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
+              this.props.changePeopleFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
             search
             selection
             fluid
@@ -207,9 +238,9 @@ class Filter extends Component {
           <Divider />
           <span className="input-label">SENTIMENT</span>
           <Dropdown
-              // text="Sentiment"
-              // icon="smile"
-              // className="icon little-width"
+            // text="Sentiment"
+            // icon="smile"
+            // className="icon little-width"
             defaultValue="none"
             options={sentimentsOptions}
             onChange={(_, { value }) => {
@@ -225,8 +256,8 @@ class Filter extends Component {
           <span className="input-label">POPULAR IN</span>
           <Dropdown
             text="Popular in..."
-                  // icon="internet explorer"
-                  // className="icon"
+            // icon="internet explorer"
+            // className="icon"
             options={this.state.popularSocialOptions}
             onChange={(_, { value }) => {
               if (value[0] === 'all') {

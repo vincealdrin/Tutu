@@ -1,32 +1,20 @@
 {
-  "python.autoComplete.extraPaths": [
-    "${env.SPARK_HOME}\\python",
-    "${env.SPARK_HOME}\\python\\pyspark"
-  ],
-  // change this depending on ur venv path
-  "python.pythonPath":
-  "C:\\Users\\vncea\\.virtualenvs\\crawler-XEqVwfD2",
+  "python.pythonPath": "C:\\Users\\vncea\\.virtualenvs\\crawler-XEqVwfD2\\Scripts\\python",
   "files.exclude": {
-      "**/.git": true,
-      "**/.svn": true,
-      "**/.hg": true,
-      "**/.DS_Store": true,
-      "**/node_modules": true
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true
   },
   "javascript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": false,
   "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
   "eslint.autoFixOnSave": true,
   "typescript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": false,
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "editor.formatOnPaste": false,
   "editor.formatOnType": false,
   // Python specific
-  "python.linting.pylintEnabled": false,
-  "python.linting.flake8Enabled": true,
-  "python.formatting.provider": "yapf",
-  "python.unitTest.unittestEnabled": false,
-  "python.unitTest.pyTestEnabled": false,
-  "python.unitTest.nosetestsEnabled": false,
   "emmet.showExpandedAbbreviation": "inMarkupAndStylesheetFilesOnly",
   "emmet.showAbbreviationSuggestions": true,
   "git.enableSmartCommit": true,

@@ -30,15 +30,11 @@ module.exports = (conn, io) => {
       people = '',
       sources = '',
       timeWindow = '7,0',
+      date = new Date().toLocaleString(),
       popular = '',
       sentiment = '',
     } = req.query;
-    const bounds = r.polygon(
-      [parseFloat(swLng), parseFloat(swLat)],
-      [parseFloat(seLng), parseFloat(seLat)],
-      [parseFloat(neLng), parseFloat(neLat)],
-      [parseFloat(nwLng), parseFloat(nwLat)],
-    );
+    const bounds = r.polygon([parseFloat(swLng), parseFloat(swLat)], [parseFloat(seLng), parseFloat(seLat)], [parseFloat(neLng), parseFloat(neLat)], [parseFloat(nwLng), parseFloat(nwLat)],);
     const catsArr = categories.split(',');
 
     try {
@@ -50,16 +46,18 @@ module.exports = (conn, io) => {
 
       if (timeWindow) {
         const [start, end] = timeWindow.split(',');
-        const now = new Date();
-        const startDate = new Date();
-        startDate.setDate(now.getDate() - parseInt(start));
-        const endDate = new Date();
-        endDate.setDate(now.getDate() - parseInt(end));
+        const selectedDate = new Date(JSON.parse(date));
+
+        const startDate = new Date(selectedDate.getTime());
+        startDate.setDate(selectedDate.getDate() - parseInt(start));
+        const endDate = new Date(selectedDate.getTime());
+        endDate.setDate(selectedDate.getDate() - parseInt(end));
 
         query = query.filter((article) => article('publishDate').date().during(
           r.time(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate(), PH_TIMEZONE),
-          r.time(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate(), PH_TIMEZONE),
-          { rightBound: 'closed' }
+          r.time(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate(), PH_TIMEZONE), {
+            rightBound: 'closed',
+          }
         ));
       }
 
@@ -196,7 +194,9 @@ module.exports = (conn, io) => {
         .run(conn);
 
       articleInfo.relatedArticles = articleInfo.relatedArticles
-        .filter(({ title }) => natural.DiceCoefficient(articleInfo.title, title) > 0.50)
+        .filter(({
+          title,
+        }) => natural.DiceCoefficient(articleInfo.title, title) > 0.50)
         .slice(0, 5);
 
       res.json(articleInfo);
@@ -235,7 +235,9 @@ module.exports = (conn, io) => {
         return {
           ...article,
           relatedArticles: article.relatedArticles
-            .filter(({ title }) => natural.DiceCoefficient(article.title, title) > 0.50)
+            .filter(({
+              title,
+            }) => natural.DiceCoefficient(article.title, title) > 0.50)
             .slice(0, 5),
         };
       });
@@ -248,7 +250,9 @@ module.exports = (conn, io) => {
 
   router.get('/popular', async (req, res, next) => {
     try {
-      const { limit = 15 } = req.query;
+      const {
+        limit = 15,
+      } = req.query;
       const lastWk = new Date();
       lastWk.setDate(lastWk.getDate() - 7);
 
@@ -271,7 +275,9 @@ module.exports = (conn, io) => {
 
   router.get('/recent', async (req, res, next) => {
     try {
-      const { limit = 15 } = req.query;
+      const {
+        limit = 15,
+      } = req.query;
       const lastWk = new Date();
       lastWk.setDate(lastWk.getDate() - 7);
 
@@ -307,8 +313,9 @@ module.exports = (conn, io) => {
         article('publishDate').date()
           .during(
             r.time(article('publishDate').year(), article('publishDate').month(), article('publishDate').day().sub(7), PH_TIMEZONE),
-            r.time(article('publishDate').year(), article('publishDate').month(), article('publishDate').day().add(7), PH_TIMEZONE),
-            { rightBound: 'closed' }
+            r.time(article('publishDate').year(), article('publishDate').month(), article('publishDate').day().add(7), PH_TIMEZONE), {
+              rightBound: 'closed',
+            }
           )
           .and(article('categories')
             .orderBy(r.desc((category) => category('score')))
@@ -333,10 +340,16 @@ module.exports = (conn, io) => {
 
   router.put('/reactions', async (req, res, next) => {
     try {
-      const { url, reaction } = req.body;
+      const {
+        url,
+        reaction,
+      } = req.body;
 
       if (!/happy|sad|angry|amused|afraid|inspired/.test(reaction)) {
-        next({ message: 'Invalid reaction', status: 400 });
+        next({
+          message: 'Invalid reaction',
+          status: 400,
+        });
       }
 
       const uuid = await r.uuid(url).run(conn);

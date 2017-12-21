@@ -45,8 +45,8 @@ class CrawlerFeed extends Component {
         return {
           feedHtml: (
             <p>
-              <a href={log.sourceUrl} target="__blank">{log.sourceBrand}</a>
-              {` has ${log.articlesCount} article${log.articlesCount > 1 ? 's' : ''}`}
+              <a href={`http://${log.sourceUrl}`} target="__blank">{log.sourceBrand}</a>
+              {` has ${log.articlesCount} article${log.articlesCount === 1 ? '' : 's'}`}
               <br />
               <span>Proxy: {log.proxy}</span>
               <br />

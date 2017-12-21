@@ -1,8 +1,17 @@
 import axios from 'axios';
 import supercluster from 'points-cluster';
 import flattenDeep from 'lodash/flattenDeep';
-import { crudStatus, updateCrudStatus, httpThunk } from '../utils';
-import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM, DEFAULT_CENTER } from '../constants';
+import {
+  crudStatus,
+  updateCrudStatus,
+  httpThunk,
+} from '../utils';
+import {
+  DEFAULT_ZOOM,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  DEFAULT_CENTER,
+} from '../constants';
 
 export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
 export const FETCH_FOCUSED_INFO = 'mapArticles/FETCH_FOCUSED_INFO';
@@ -165,13 +174,21 @@ export const fetchArticles = (center, zoom, bounds) =>
     source = axios.CancelToken.source();
 
     try {
-      const { filters } = getState();
+      const {
+        filters,
+      } = getState();
 
       const {
-        ne, nw,
-        se, sw,
+        ne,
+        nw,
+        se,
+        sw,
       } = bounds;
-      const { data: articles, headers, status } = await axios.get('/articles', {
+      const {
+        data: articles,
+        headers,
+        status,
+      } = await axios.get('/articles', {
         params: {
           neLng: ne.lng,
           neLat: ne.lat,
@@ -188,14 +205,20 @@ export const fetchArticles = (center, zoom, bounds) =>
           orgs: filters.organizations.join(),
           sentiment: filters.sentiment !== 'none' ? filters.sentiment : '',
           popular: filters.popular.socials.length ? `${filters.popular.socials.join()}|${filters.popular.top}` : '',
+          date: filters.date,
           timeWindow: `${31 - filters.timeWindow[0]},${31 - filters.timeWindow[1]}`,
           limit: filters.limit,
         },
         cancelToken: source.token,
       });
 
-      const coords = flattenDeep(articles.map(({ locations }, index) =>
-        locations.map(({ lng, lat }) => ({
+      const coords = flattenDeep(articles.map(({
+        locations,
+      }, index) =>
+        locations.map(({
+          lng,
+          lat,
+        }) => ({
           id: index,
           lng,
           lat,
@@ -205,7 +228,11 @@ export const fetchArticles = (center, zoom, bounds) =>
         maxZoom: MAX_ZOOM,
         radius: 42,
       });
-      const clusters = cluster({ center, zoom, bounds });
+      const clusters = cluster({
+        center,
+        zoom,
+        bounds,
+      });
 
       // dispatch(updateMapState(center, zoom, bounds));
 
@@ -227,8 +254,15 @@ export const fetchFocusedInfo = (article) => httpThunk(FETCH_FOCUSED_INFO, async
     }
     focusedInfoSource = axios.CancelToken.source();
 
-    const { filters: { categories } } = getState();
-    const { data: focusedInfo, status } = await axios.get('/articles/info', {
+    const {
+      filters: {
+        categories,
+      },
+    } = getState();
+    const {
+      data: focusedInfo,
+      status,
+    } = await axios.get('/articles/info', {
       params: {
         id: article.id,
         catsFilterLength: categories.length,
@@ -257,14 +291,21 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
       focusedClusterSource = axios.CancelToken.source();
 
       const {
-        filters: { categories },
-        mapArticles: { focusedClusterArticles },
+        filters: {
+          categories,
+        },
+        mapArticles: {
+          focusedClusterArticles,
+        },
       } = getState();
       const sliceArticles = (focusedClusterArticles.length ? focusedClusterArticles : articles)
         .slice(page * limit, (page + 1) * limit);
 
 
-      const { data: focusedClusterInfo, status } = await axios.get('/articles/clusterInfo', {
+      const {
+        data: focusedClusterInfo,
+        status,
+      } = await axios.get('/articles/clusterInfo', {
         params: {
           catsFilterLength: categories.length,
           ids: sliceArticles.map((article) => article.id).join(),
@@ -292,7 +333,9 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
 
 export const updateReaction = (url, reaction) => httpThunk(UPDATE_REACTION, async () => {
   try {
-    const { status } = await axios.put('/articles/reactions', {
+    const {
+      status,
+    } = await axios.put('/articles/reactions', {
       url,
       reaction,
     });

@@ -56,9 +56,9 @@ class SimpleMarker extends PureComponent {
             x: spring(10, config),
           }}
         >
-          {(v) => {
-            console.log();
-            return (
+          {(v) =>
+            // console.log();
+            (
               <div>
                 <Icon
                   color="red"
@@ -68,8 +68,8 @@ class SimpleMarker extends PureComponent {
                   style={toCSS(v.translateX)}
                 />
               </div>
-            );
-          }}
+            )
+          }
         </Motion>
       </Tooltip>
     );

@@ -188,7 +188,7 @@ module.exports = (conn, io) => {
         .run(conn);
 
       articleInfo.relatedArticles = articleInfo.relatedArticles
-        .filter(({ title }) => natural.DiceCoefficient(articleInfo.title, title) > 0.30)
+        .filter(({ title }) => natural.DiceCoefficient(articleInfo.title, title) > 0.40)
         .slice(0, 5);
 
       res.json(articleInfo);
@@ -229,7 +229,7 @@ module.exports = (conn, io) => {
           relatedArticles: article.relatedArticles
             .filter(({
               title,
-            }) => natural.DiceCoefficient(article.title, title) > 0.30)
+            }) => natural.DiceCoefficient(article.title, title) > 0.40)
             .slice(0, 5),
         };
       });

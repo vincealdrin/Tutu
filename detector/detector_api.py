@@ -44,8 +44,10 @@ other_df = df.drop(
         'hasTopImage',
         'reliable',
         'sentiment',
-        # 'socialScore',
-        # 'sourceCountryRank',
+        'socialScore',
+        # 'sourceHasContactPage',
+        # 'sourceHasAboutPage'
+        'sourceCountryRank',
         # 'sourceWorldRank',
     ],
     axis=1)
@@ -147,8 +149,8 @@ def predict():
     print({
         'sourceHasAboutPage': info['sourceHasAboutPage'],
         'sourceHasContactPage': info['sourceHasContactPage'],
-        'sentiment': sent_val,
-        'socialScore': get_popularity(info['url']),
+        # 'sentiment': sent_val,
+        # 'socialScore': get_popularity(info['url']),
         'sourceCountryRank': country_rank,
         'sourceWorldRank': world_rank,
     })
@@ -159,8 +161,8 @@ def predict():
             'sourceHasAboutPage': info['sourceHasAboutPage'],
             'sourceHasContactPage': info['sourceHasContactPage'],
             # 'sentiment': sent_val,
-            'socialScore': get_popularity(info['url']),
-            'sourceCountryRank': country_rank,
+            # 'socialScore': get_popularity(info['url']),
+            # 'sourceCountryRank': country_rank,
             'sourceWorldRank': world_rank,
         },
         index=[0])
@@ -174,7 +176,7 @@ def predict():
 
     test_df = hstack([X_title_test, X_body_test, test_other], format='csr')
 
-    prediction = lr_clf.predict(test_df)
+    prediction = clf.predict(test_df)
 
     print('nb')
     print(clf.predict(test_df))

@@ -20,6 +20,7 @@ import {
   clearFilters,
 } from '../../modules/filters';
 import { mapOptions } from '../../utils';
+import DatepickerButton from './DatepickerButton';
 import './styles.css';
 
 const mapStateToProps = ({
@@ -112,22 +113,33 @@ class Filter extends Component {
     return (
       <Segment>
         <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
-        <Button
-          content="save filter"
-          onClick={() => {
-            localStorage.setItem('filterSettings', JSON.stringify(filters));
-          }}
-        />
-        <Button
-          content="clear filter"
-          onClick={() => {
-            this.props.clearFilters();
-            this.props.fetchArticles(center, zoom, bounds);
-            // localStorage.removeItem('filterSettings');
-          }}
-        />
-        <Button content="get insights" />
         <div className="scrollable-section filter-scrollable">
+          <Button.Group basic>
+            <Button
+              icon="save"
+              labelPosition="left"
+              content="Save"
+              onClick={() => {
+                localStorage.setItem('filterSettings', JSON.stringify(filters));
+              }}
+            />
+            <Button
+              icon="delete"
+              labelPosition="left"
+              content="Clear"
+              onClick={() => {
+                this.props.clearFilters();
+                this.props.fetchArticles(center, zoom, bounds);
+                // localStorage.removeItem('filterSettings');
+              }}
+            />
+            <Button
+              icon="hand lizard"
+              labelPosition="left"
+              content="Insight"
+            />
+          </Button.Group>
+          <Divider />
           <span className="input-label">SEARCH KEYWORDS</span>
           <Dropdown
             placeholder="Keywords"
@@ -182,12 +194,14 @@ class Filter extends Component {
           <Divider />
           <span className="input-label">DATE</span>
           <DatePicker
+            customInput={<DatepickerButton />}
             selected={date}
             onChange={(newDate) => {
               this.props.changeDateFilter(newDate);
               this.props.fetchArticles(center, zoom, bounds);
             }}
           />
+          <Divider />
           <span className="input-label">TIME WINDOW</span>
           <Slider.Range
             min={0}

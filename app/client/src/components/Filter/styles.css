@@ -42,20 +42,6 @@
   min-width: 288.42px;
 }
 
-/* .filter-scrollable-section {
-  width: 300px;
-  height: 90vh;
-  overflow-y: auto;
-} */
-
-/* .ui.fluid.dropdown {
-  border-radius: 100px !important;
+.ui.icon.left.labeled.button {
+  padding-left: 3.94rem !important;
 }
-
-.ui.fluid.dropdown > .dropdown.icon {
-  display: none;
-}
-
-.ui.selection.dropdown > .search.icon {
-  top: 0.5rem;
-} */

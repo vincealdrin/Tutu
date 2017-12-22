@@ -23,7 +23,7 @@ class AppSidebar extends Component {
     if (window.location.pathname === '/') {
       isVisible = `${visible ? 'hidden' : 'full'}`;
       isIconVisible = `${visible ? 'left' : 'right'}`;
-    } if (window.location.pathname === '/submit' || window.location.pathname === '/about') {
+    } else if (window.location.pathname === '/submit' || window.location.pathname === '/about') {
       isVisible = `${visible ? 'full thin-component' : 'hidden'}`;
       isIconVisible = `${visible ? 'right' : 'left'}`;
     } else {

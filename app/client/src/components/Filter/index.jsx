@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Label, Segment, Dropdown, Divider, Button, Input } from 'semantic-ui-react';
+import { Label, Segment, Dropdown, Divider, Button, Icon } from 'semantic-ui-react';
+import { Tooltip } from 'react-tippy';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Slider from 'rc-slider';
@@ -86,6 +87,17 @@ const popularTopOptions = [
   { key: '1000', text: '1000', value: '1000' },
 ];
 
+const FilterAlert = (action) => (
+  <div>
+    <Icon
+      name={`${action.typeOfAction === 'save' ? 'check' : 'delete'}`}
+      color={`${action.typeOfAction === 'save' ? 'green' : 'red'}`}
+      size="large"  
+    />
+      Preference {`${action.typeOfAction === 'save' ? 'saved' : 'cleared'}`}
+  </div>
+);
+
 class Filter extends Component {
   state = {
     popularSocialOptions,
@@ -113,29 +125,46 @@ class Filter extends Component {
       <Segment>
         <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
         <div className="scrollable-section filter-scrollable">
-          <Button.Group basic>
-            <Button
-              icon="save"
-              labelPosition="left"
-              content="Save"
-              onClick={() => {
-                localStorage.setItem('filterSettings', JSON.stringify(filters));
-              }}
-            />
-            <Button
-              icon="delete"
-              labelPosition="left"
-              content="Clear"
-              onClick={() => {
-                this.props.clearFilters();
-                this.props.fetchArticles(center, zoom, bounds);
-                // localStorage.removeItem('filterSettings');
-              }}
-            />
+          <Button.Group labeled icon>
+            <Tooltip
+              html={<FilterAlert typeOfAction="save" />}
+              trigger="click"
+              duration={1000}
+              hideDelay={2000}
+              animation="scale"
+            >
+              <Button
+                icon="save"
+                content="Save"
+                labelPosition="left"
+                color="green"
+                onClick={() => localStorage.setItem('filterSettings', JSON.stringify(this.props.filters))}
+              />
+            </Tooltip>
+            <Tooltip
+              html={<FilterAlert typeOfAction="clear" />}
+              trigger="click"
+              duration={1000}
+              hideDelay={2000}
+              animation="scale"
+            >
+              <Button
+                icon="delete"
+                labelPosition="left"
+                content="Clear"
+                color="red"
+                onClick={() => {
+                  this.props.clearFilters();
+                  this.props.fetchArticles(center, zoom, bounds);
+                  // localStorage.removeItem('filterSettings');
+                }}
+              />
+            </Tooltip>
             <Button
               icon="hand lizard"
               labelPosition="left"
               content="Insight"
+              color="teal"
             />
           </Button.Group>
           <Divider />

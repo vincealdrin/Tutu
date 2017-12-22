@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Label, Segment, Dropdown, Divider, Button } from 'semantic-ui-react';
+import { Label, Segment, Dropdown, Divider, Button, Input } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Slider from 'rc-slider';
@@ -112,6 +112,7 @@ class Filter extends Component {
     return (
       <Segment>
         <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
+        <Input />
         <Button
           content="save filter"
           onClick={() => {
@@ -181,13 +182,18 @@ class Filter extends Component {
           />
           <Divider />
           <span className="input-label">DATE</span>
-          <DatePicker
-            selected={date}
-            onChange={(newDate) => {
-              this.props.changeDateFilter(newDate);
-              this.props.fetchArticles(center, zoom, bounds);
-            }}
-          />
+          <div className="ui input fluid">
+            <div className="filter-datepicker-wrapper">
+              <DatePicker
+                className="filter-datepicker"
+                selected={date}
+                onChange={(newDate) => {
+                  this.props.changeDateFilter(newDate);
+                  this.props.fetchArticles(center, zoom, bounds);
+                }}
+              />
+            </div>
+          </div>
           <span className="input-label">TIME WINDOW</span>
           <Slider.Range
             min={0}

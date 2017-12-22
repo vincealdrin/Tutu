@@ -46,7 +46,7 @@ while True:
 
         try:
             source = newspaper.build(
-                'http://' + url, config=config, memoize_articles=False)
+                'http://' + url, config=config, memoize_articles=True)
         except Exception as e:
             print('(SOURCE ERROR) Source Skipped\n')
             print(e)
@@ -129,11 +129,11 @@ while True:
                 #         article.authors.append(author)
 
                 if sentiment['compound'] >= 0.5:
-                    sent_val = 1
+                    sent_val = 'pos'
                 elif sentiment['compound'] <= 0.5:
-                    sent_val = -1
+                    sent_val = 'neg'
                 else:
-                    sent_val = 0
+                    sent_val = 'neu'
 
                 new_article = {
                     'id': url_uuid,

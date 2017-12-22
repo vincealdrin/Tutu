@@ -16,16 +16,16 @@ for s in SOURCES:
         tree = etree.fromstring(xml_str.text.encode('utf-8'))
         etree.strip_tags(tree, etree.Comment)
 
-        world_rank = -1
-        country_rank = -1
+        world_rank = 0
+        country_rank = 0
         for x in tree.xpath('/ALEXA/SD/POPULARITY'):
-            world_rank = int(x.get('TEXT')) if x.get('TEXT') else -1
+            world_rank = int(x.get('TEXT')) if x.get('TEXT') else 0
         for x in tree.xpath('/ALEXA/SD/COUNTRY'):
-            country_rank = int(x.get('RANK')) if x.get('RANK') else -1
+            country_rank = int(x.get('RANK')) if x.get('RANK') else 0
         meta = requests.get(
             'http://localhost:5000/api/exposed/submit?url=http://' + url).json(
             )
-        print(meta)
+
         info = {
             'id':
             get_uuid(url),

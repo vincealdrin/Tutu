@@ -185,19 +185,10 @@ module.exports = (conn, io) => {
         .merge((article) => ({
           relatedArticles: getRelatedArticles(article),
         }))
-        .without(
-          'timestamp', 'body', 'id',
-          'summary2', // 'url', // 'title',
-          'publishDate', 'sourceId', 'locations',
-          'popularity', 'topics'
-        )
         .run(conn);
 
       articleInfo.relatedArticles = articleInfo.relatedArticles
-        .filter(({ title }) => {
-          console.log(natural.DiceCoefficient(articleInfo.title, title));
-          return natural.DiceCoefficient(articleInfo.title, title) > 0.30;
-        })
+        .filter(({ title }) => natural.DiceCoefficient(articleInfo.title, title) > 0.30)
         .slice(0, 5);
 
       res.json(articleInfo);

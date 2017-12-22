@@ -20,6 +20,7 @@
   flex-direction: column;
   padding-right: 0.5rem;
 }
+
 .popular-top-container {
   display: flex;
   flex-direction: column;
@@ -28,6 +29,7 @@
 .dropdown.icon.half-width {
   width: 70%;
 }
+
 .dropdown.icon.button.little-width {
   width: 55%;
   padding-left: 3rem !important;
@@ -40,6 +42,13 @@
 
 .filter-scrollable {
   min-width: 288.42px;
+}
+
+.filter-datepicker-wrapper,
+.filter-datepicker,
+.react-datepicker-wrapper,
+.react-datepicker__input-container {
+  width: 100%;
 }
 
 /* .filter-scrollable-section {

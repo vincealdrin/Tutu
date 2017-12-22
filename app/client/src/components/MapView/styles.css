@@ -78,12 +78,13 @@
 
 .tippy-tooltip {
   top: -5rem;
-  left: 2.4rem;
+  left: 1.7rem;
   background: #fff;
   box-shadow: 0 0 3px #94989b;
 }
 
 .arrow-regular {
+  top: 4.2rem !important;
   border-right-color: #fff !important;
 }
 
@@ -184,11 +185,6 @@
   position: absolute !important;
   left: -1rem !important;
   z-index: 1000;
-}
-
-.news-marker-tooltip {
-  top: 1.4rem;
-  left: -2rem;
 }
 
 .sentiment-list {

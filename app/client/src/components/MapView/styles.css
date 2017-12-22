@@ -1,6 +1,6 @@
 .cluster-marker-container {
   position: relative;
-  z-index: 100;
+  z-index: -1000;
   display: flex;
   width: 3.2rem !important;
   height: 3.2rem !important;

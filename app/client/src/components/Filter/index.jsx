@@ -112,23 +112,33 @@ class Filter extends Component {
     return (
       <Segment>
         <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
-        <Input />
-        <Button
-          content="save filter"
-          onClick={() => {
-            localStorage.setItem('filterSettings', JSON.stringify(filters));
-          }}
-        />
-        <Button
-          content="clear filter"
-          onClick={() => {
-            this.props.clearFilters();
-            this.props.fetchArticles(center, zoom, bounds);
-            // localStorage.removeItem('filterSettings');
-          }}
-        />
-        <Button content="get insights" />
         <div className="scrollable-section filter-scrollable">
+          <Button.Group basic>
+            <Button
+              icon="save"
+              labelPosition="left"
+              content="Save"
+              onClick={() => {
+                localStorage.setItem('filterSettings', JSON.stringify(filters));
+              }}
+            />
+            <Button
+              icon="delete"
+              labelPosition="left"
+              content="Clear"
+              onClick={() => {
+                this.props.clearFilters();
+                this.props.fetchArticles(center, zoom, bounds);
+                // localStorage.removeItem('filterSettings');
+              }}
+            />
+            <Button
+              icon="hand lizard"
+              labelPosition="left"
+              content="Insight"
+            />
+          </Button.Group>
+          <Divider />
           <span className="input-label">SEARCH KEYWORDS</span>
           <Dropdown
             placeholder="Keywords"
@@ -307,7 +317,7 @@ class Filter extends Component {
           </div>
 
         </div>
-      </Segment>
+      </Segment >
     );
   }
 }

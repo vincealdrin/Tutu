@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Button, Icon } from 'semantic-ui-react';
-import './style.css';
 
 class DatepickerButton extends Component {
   render() {
@@ -9,7 +8,7 @@ class DatepickerButton extends Component {
         size="large"
         className="datepicker-button"
         onClick={this.props.onClick}
-			>
+      >
         <Icon name="calendar" />
         {this.props.value}
       </Button>

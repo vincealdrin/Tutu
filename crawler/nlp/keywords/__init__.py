@@ -94,7 +94,7 @@ class TopicDetector(object):
 def parse_topics(text_body):
     td = TopicDetector()
 
-    with open('./tl_stopwords.txt', 'r') as f:
+    with open('../detector/tl_stopwords.txt', 'r') as f:
         tl_stopwords = f.read().splitlines()
 
     common = td.extract_topics(text_body).split(',')

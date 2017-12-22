@@ -61,7 +61,8 @@ while True:
 
         config = newspaper.Config()
         config.follow_meta_refresh = True
-        config.memoize_articles = True if PY_ENV == 'production' else False
+        # config.memoize_articles = True if PY_ENV == 'production' else False
+        config.memoize_articles = True
 
         proxy = get_proxy(last_proxy)
         last_proxy = proxy['http']

@@ -21,7 +21,6 @@ import {
   clearFilters,
 } from '../../modules/filters';
 import { mapOptions } from '../../utils';
-import DatepickerButton from './DatepickerButton';
 import './styles.css';
 
 const mapStateToProps = ({
@@ -222,15 +221,18 @@ class Filter extends Component {
           />
           <Divider />
           <span className="input-label">DATE</span>
-          <DatePicker
-            customInput={<DatepickerButton />}
-            selected={date}
-            onChange={(newDate) => {
-              this.props.changeDateFilter(newDate);
-              this.props.fetchArticles(center, zoom, bounds);
-            }}
-          />
-          <Divider />
+          <div className="ui input fluid">
+            <div className="filter-datepicker-wrapper">
+              <DatePicker
+                className="filter-datepicker"
+                selected={date}
+                onChange={(newDate) => {
+                  this.props.changeDateFilter(newDate);
+                  this.props.fetchArticles(center, zoom, bounds);
+                }}
+              />
+            </div>
+          </div>
           <span className="input-label">TIME WINDOW</span>
           <Slider.Range
             min={0}

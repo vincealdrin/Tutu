@@ -1,17 +1,38 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import { Segment, Label, Header, Input, Button, Message } from 'semantic-ui-react';
 import './styles.css';
 
 class Submit extends Component {
   state = {
-    success: false,
+    submitStatus: '',
+    result: '',
+    url: '',
   };
-  submit = () => {
-    this.setState({ success: !this.state.success });
+
+  submit = async () => {
+    this.setState({ submitStatus: 'pending' });
+
+    try {
+      const { data: { prediction } } = await axios.get('/submit', {
+        params: {
+          url: this.state.url,
+        },
+      });
+
+      this.setState({
+        result: prediction,
+        submitStatus: 'success',
+      });
+    } catch (e) {
+      console.log(e);
+      this.setState({ submitStatus: 'error' });
+    }
   }
+
   render() {
-    const { success } = this.state;
+    const { submitStatus, result } = this.state;
     return (
       <div>
         <Segment>
@@ -25,8 +46,11 @@ class Submit extends Component {
               Please insert a Source URL or an Article URL to be checked by the fake news checker
             </p>
 
-            <Input placeholder="Source URL" className="submit-field" />
-            <Input placeholder="Article URL" className="submit-field" />
+            <Input
+              placeholder="Article URL"
+              className="submit-field"
+              onChange={(_, { value }) => this.setState({ url: value })}
+            />
 
             <Button
               color="blue"
@@ -37,13 +61,12 @@ class Submit extends Component {
               Submit
             </Button>
 
-            <Message info className={success ? 'doThis' : 'dontDoThis'}>
+            <Message info>
               <Message.Header>
-                Submission Success!
+                {submitStatus === 'pending' ? 'please wait...' : ''}
+                {submitStatus === 'success' ? result : ''}
+                {submitStatus === 'error' ? 'error' : ''}
               </Message.Header>
-              <p>
-                inquirer.net will be added to our sources after being reviewed. Thank you for your contribution.
-              </p>
             </Message>
           </div>
         </Segment>

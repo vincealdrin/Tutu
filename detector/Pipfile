@@ -1,0 +1,33 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+"newspaper3k" = "*"
+scikit-learn = "*"
+pandas = "*"
+numpy = "*"
+scipy = "*"
+rethinkdb = "*"
+nltk = "*"
+stop-words = "*"
+matplotlib = "*"
+htmldate = "*"
+requests = "*"
+python-dotenv = "*"
+pandas-ml = "*"
+flask = "*"
+fake-useragent = "*"
+
+
+[dev-packages]
+
+
+
+[requires]
+
+python_version = "3.6"

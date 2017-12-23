@@ -37,8 +37,14 @@ class PopularArticles extends Component {
               <div key={shortid.generate()}>
                 <Grid>
                   <Grid.Row className="article-item">
-                    <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important' }}>
+                    <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important', position: 'relative' }}>
                       <Image src={article.topImageUrl} href={article.url} target="_blank" />
+                      <Button
+                        onClick={() => this.props.fetchFocusedInfo(article)}
+                        content="View details"
+                        color="blue"
+                        style={{ position: 'absolute', left: '1rem', bottom: 0 }}
+                      />
                     </Grid.Column>
 
                     <Grid.Column width={10} className="article-info">
@@ -46,7 +52,6 @@ class PopularArticles extends Component {
                       <br />
                       <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a>
                       <p> {article.summary[0]} </p>
-                      <Button onClick={() => this.props.fetchFocusedInfo(article)} content="Take a look!" color="blue" />
                     </Grid.Column>
                   </Grid.Row>
                 </Grid>

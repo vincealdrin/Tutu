@@ -49,14 +49,14 @@ class ClusterModal extends Component {
       >
         {
           status.pending
-          ?
-          (
-            <Dimmer active>
-              <Loader indeterminate>Loading articles...</Loader>
-            </Dimmer>
-          )
-          :
-          ''
+            ?
+            (
+              <Dimmer active>
+                <Loader indeterminate>Loading articles...</Loader>
+              </Dimmer>
+            )
+            :
+            ''
         }
         <Modal.Content scrolling>
           {articles.map(({
@@ -88,7 +88,7 @@ class ClusterModal extends Component {
             return (
               <Segment key={shortid.generate()} raised className="modal-article-container">
                 <Grid columns={2}>
-                  <Grid.Column width={11}>
+                  <Grid.Column width={11} style={{ position: 'relative' }}>
                     <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
                     <div className="image-tag-title-container">
                       <div className="top-image">
@@ -97,6 +97,7 @@ class ClusterModal extends Component {
                         <p className="article-date">
                           {new Date(publishDate).toDateString()} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
                         </p>
+                        <Button as="a" href={url} circular color="blue" target="_blank" className="article-read-more">Read More</Button>
                       </div>
                       <div className="tags">
                         <List divided relaxed>
@@ -136,7 +137,6 @@ class ClusterModal extends Component {
                     </div>
                     <div className="related-stories">
                       <RelatedArticles content={relatedArticles} />
-                      <Button as="a" href={url} circular floated="right" color="blue" target="_blank" className="article-read-more">Read More</Button>
                     </div>
                   </Grid.Column>
                 </Grid>
@@ -150,9 +150,9 @@ class ClusterModal extends Component {
               currentPage={currentPage}
               totalPages={Math.ceil((totalCount || limit) / limit)}
               onChange={(page) => {
-              this.setState({ currentPage: page });
-              fetchArticles(null, page - 1, limit);
-            }}
+                this.setState({ currentPage: page });
+                fetchArticles(null, page - 1, limit);
+              }}
             />
           ) : null}
         </Modal.Actions>

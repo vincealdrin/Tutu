@@ -13,9 +13,9 @@ const mapStateToProps = ({
   },
   socket,
 }) => ({
-    articles,
-    socket,
-  });
+  articles,
+  socket,
+});
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   addRecentArticle,
@@ -52,6 +52,12 @@ class RecentArticles extends Component {
                   <Grid.Row className="article-item">
                     <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important' }}>
                       <Image src={article.topImageUrl} href={article.url} target="_blank" />
+                      <Button
+                        onClick={() => this.props.fetchFocusedInfo(article)}
+                        content="View details"
+                        color="blue"
+                        style={{ position: 'absolute', left: '1rem', bottom: 0 }}
+                      />
                     </Grid.Column>
 
                     <Grid.Column width={10} className="article-info">
@@ -59,7 +65,6 @@ class RecentArticles extends Component {
                       <br />
                       <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a> | <span>{new Date(article.publishDate).toLocaleDateString()}</span>
                       <p> {article.summary[0]} </p>
-                      <Button onClick={() => this.props.fetchFocusedInfo(article)} content="Take a look!" color="blue" />
                     </Grid.Column>
                   </Grid.Row>
                 </Grid>

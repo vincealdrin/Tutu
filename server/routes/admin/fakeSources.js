@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
+const { cleanUrl } = require('../../utils');
 
 module.exports = (conn, io) => {
-  const tbl = 'sources';
+  const tbl = 'fakeSources';
 
   router.get('/', async (req, res, next) => {
     const {
@@ -45,23 +46,68 @@ module.exports = (conn, io) => {
       next(e);
     }
   });
+
   router.post('/', async (req, res, next) => {
     const fakeSources = req.body;
     const timestamp = new Date();
 
     try {
-      const fakeSourcesInfo = await Promise.all(fakeSources.map(async (source) => {
-        const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
+      const sources = await Promise.all(fakeSources.map(async (source) => {
+        const url = cleanUrl(source);
+        const uuid = await r.uuid(url).run(conn);
 
         return {
-          id: await r.uuid(url).run(conn),
+          id: uuid,
           url,
           timestamp,
         };
       }));
+      const uuids = sources.map((source) => source.id);
+      const pendingCursor = await r.table('pendingSources')
+        .getAll(r.args(uuids))
+        .pluck('id', 'url')
+        .run(conn);
+      const matchedPendings = await pendingCursor.toArray();
+      const sourceCursor = await r.table('sources')
+        .getAll(r.args(uuids))
+        .pluck('id', 'url')
+        .run(conn);
+      const matchedSources = await sourceCursor.toArray();
+      const fakeCursor = await r.table('fakeSources')
+        .getAll(r.args(uuids))
+        .pluck('id', 'url')
+        .run(conn);
+      const matchedFakes = await fakeCursor.toArray();
 
-      await r.table(tbl).insert(fakeSourcesInfo).run(conn);
-      return res.json(fakeSourcesInfo);
+      if (matchedPendings || matchedSources) {
+        const errorMessage = [];
+
+        sources.forEach((source) => {
+          const foundFake = matchedFakes.find((mf) => mf.id === source.id);
+          if (foundFake) {
+            errorMessage.push(`${foundFake.url} already exists in list of reliable sources`);
+            return;
+          }
+
+          const foundPending = matchedPendings.find((mp) => mp.id === source.id);
+          if (foundPending) {
+            errorMessage.push(`${foundPending.url} already exists in list of pending sources`);
+          }
+
+          const foundSource = matchedSources.find((ms) => ms.id === source.id);
+          if (foundSource) {
+            errorMessage.push(`${foundSource.url} already exists in list of reliable sources`);
+          }
+        });
+
+        return next({
+          status: 400,
+          message: errorMessage.join(','),
+        });
+      }
+
+      await r.table(tbl).insert(sources).run(conn);
+      return res.json(sources);
     } catch (e) {
       next(e);
     }

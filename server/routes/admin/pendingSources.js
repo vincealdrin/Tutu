@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
+const { cleanUrl } = require('../../utils');
 
 module.exports = (conn, io) => {
   const tbl = 'pendingSources';
@@ -49,31 +50,38 @@ module.exports = (conn, io) => {
   router.post('/', async (req, res, next) => {
     const pendingSource = req.body;
     const timestamp = new Date();
-    const url = /^https?:\/\//.test(pendingSource.url) ? pendingSource.url : `http://${pendingSource.url}`;
-    const cleanUrl = url.replace('www.', '');
+    const url = cleanUrl(pendingSource.url);
 
     try {
-      const uuid = await r.uuid(cleanUrl).run(conn);
+      const uuid = await r.uuid(url).run(conn);
+      const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
       const matchedSource = await r.table('sources').get(uuid).run(conn);
       const matchedFakeSource = await r.table('fakeSources').get(uuid).run(conn);
+
+      if (matchedPending) {
+        return next({
+          status: 400,
+          message: 'Source is already in list of pending sources',
+        });
+      }
 
       if (matchedSource) {
         return next({
           status: 400,
-          message: 'Source is already in sources',
+          message: 'Source is already in list of reliable sources',
         });
       }
 
       if (matchedFakeSource) {
         return next({
           status: 400,
-          message: 'Source is already in fake sources',
+          message: 'Source is already in list of fake sources',
         });
       }
 
       const pendingSourceInfo = {
         ...pendingSource,
-        id: await r.uuid(pendingSource.url).run(conn),
+        id: await r.uuid(url).run(conn),
         timestamp,
       };
       await r.table(tbl).insert(pendingSourceInfo).run(conn);

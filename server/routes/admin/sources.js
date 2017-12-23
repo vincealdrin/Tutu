@@ -9,6 +9,8 @@ const {
   getSourceBrand,
   getTitle,
   getSocialScore,
+  cleanUrl,
+  putHttpUrl,
 } = require('../../utils');
 
 const responseGroups = ['RelatedLinks', 'Categories', 'Rank', 'ContactInfo', 'RankByCountry',
@@ -65,20 +67,69 @@ module.exports = (conn, io) => {
     const timestamp = new Date();
 
     try {
-      const sourcesInfo = await Promise.all(sources.map(async (source) => {
-        const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
-        const urlId = url.replace('www.', '').replace(/https?:\/\//, '');
-        console.log(urlId);
-        console.log(url);
-        const htmlDoc = await rp(url);
-        const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, url);
+      const sourcesWithId = await Promise.all(sources.map(async (source) => {
+        const uuid = await r.uuid(cleanUrl(source)).run(conn);
+
+        return {
+          id: uuid,
+          url: putHttpUrl(source),
+          timestamp,
+        };
+      }));
+      const uuids = sourcesWithId.map((source) => source.id);
+      const pendingCursor = await r.table('pendingSources')
+        .getAll(r.args(uuids))
+        .pluck('id', 'url')
+        .run(conn);
+      const matchedPendings = await pendingCursor.toArray();
+      const sourceCursor = await r.table('sources')
+        .getAll(r.args(uuids))
+        .pluck('id', 'url')
+        .run(conn);
+      const matchedSources = await sourceCursor.toArray();
+      const fakeCursor = await r.table('fakeSources')
+        .getAll(r.args(uuids))
+        .pluck('id', 'url')
+        .run(conn);
+      const matchedFakes = await fakeCursor.toArray();
+
+      if (matchedPendings || matchedSources) {
+        const errorMessage = [];
+
+        sources.forEach((source) => {
+          const foundSource = matchedSources.find((ms) => ms.id === source.id);
+          if (foundSource) {
+            errorMessage.push(`${foundSource.url} already exists in list of reliable sources`);
+          }
+
+          const foundFake = matchedFakes.find((mf) => mf.id === source.id);
+          if (foundFake) {
+            errorMessage.push(`${foundFake.url} already exists in list of reliable sources`);
+            return;
+          }
+
+          const foundPending = matchedPendings.find((mp) => mp.id === source.id);
+          if (foundPending) {
+            errorMessage.push(`${foundPending.url} already exists in list of pending sources`);
+          }
+        });
+
+        return next({
+          status: 400,
+          message: errorMessage.join(','),
+        });
+      }
+
+      const sourcesInfo = await Promise.all(sourcesWithId.map(async (source) => {
+        const htmlDoc = await rp(source.url);
+        const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, source.url);
         const faviconUrl = getFaviconUrl(htmlDoc);
-        const infoPromise = await getSourceInfo(url, responseGroups);
-        const socialScore = await getSocialScore(url);
+        const infoPromise = await getSourceInfo(source.url, responseGroups);
+        const socialScore = await getSocialScore(source.url);
 
         const info = await infoPromise;
         const title = getTitle(htmlDoc);
-        const brand = _.trim(getSourceBrand(url, title));
+        const brand = _.trim(getSourceBrand(source.url, title));
 
         delete info.contactInfo;
         const subdomains = _.get(info, 'trafficData.contributingSubdomains.contributingSubdomain') || [];
@@ -103,6 +154,7 @@ module.exports = (conn, io) => {
           };
 
         return {
+          ...source,
           url: _.get(info, 'contentData.dataUrl', ''),
           title: _.get(info, 'contentData.siteData.title', ''),
           description: _.get(info, 'contentData.siteData.description', ''),
@@ -130,7 +182,6 @@ module.exports = (conn, io) => {
           })),
           subdomains: mappedSubdomains,
           socialScore,
-          id: await r.uuid(urlId).run(conn),
           faviconUrl,
           aboutUsUrl,
           contactUsUrl,

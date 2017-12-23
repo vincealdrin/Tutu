@@ -3,6 +3,7 @@ const awis = require('awis');
 const _ = require('lodash');
 const r = require('rethinkdb');
 const rp = require('request-promise');
+const parseDomain = require('parse-domain');
 
 const awisClient = awis({
   key: process.env.AMAZON_ACCESS_KEY,
@@ -14,6 +15,15 @@ const WEEK_IN_SEC = 604800;
 
 module.exports.PH_TIMEZONE = PH_TIMEZONE;
 module.exports.WEEK_IN_SEC = WEEK_IN_SEC;
+
+module.exports.getDomain = (url) => {
+  const { domain, tld } = parseDomain(url);
+  return `${domain}.${tld}`;
+};
+module.exports.putHttpUrl = (url) => (/^https?:\/\//.test(url) ? url : `http://${url}`);
+module.exports.cleanUrl = (dirtyUrl) => dirtyUrl
+  .replace('www.', '')
+  .replace(/https?:\/\//, '');
 
 module.exports.getSocialScore = async (url) => {
   const reddit = await rp(`https://www.reddit.com/api/info.json?url=${url}`, {

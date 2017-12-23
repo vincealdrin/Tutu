@@ -28,7 +28,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         fakeSources: action.statusText === 'success' ? [
-          ...action.newSources,
+          ...action.newFakeSources,
           ...state.fakeSources,
         ] : state.fakeSources,
         addStatus: updateCrudStatus(action),

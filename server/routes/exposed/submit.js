@@ -1,24 +1,25 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const rp = require('request-promise');
-const parseDomain = require('parse-domain');
-const { getAboutContactUrl } = require('../../utils');
+const {
+  getAboutContactUrl,
+  getDomain,
+  cleanUrl,
+  putHttpUrl,
+} = require('../../utils');
 
 module.exports = (conn, io) => {
   router.get('/', async (req, res, next) => {
     try {
       const { url } = req.query;
-      const hasHttp = /https?:\/\//.test(url);
-      const validUrl = hasHttp ? url : `http://${url}`;
-
-      const { domain, tld } = parseDomain(validUrl);
-      const mainDomain = `${domain}.${tld}`;
-      const uuid = await r.uuid(mainDomain).run(conn);
+      const validUrl = putHttpUrl(url);
+      const domain = getDomain(url);
+      const uuid = await r.uuid(domain).run(conn);
       const matchedSource = await r.table('sources').get(uuid).run(conn);
       const matchedFakeSource = await r.table('fakeSources').get(uuid).run(conn);
 
       if (matchedSource) {
-        console.log(mainDomain);
+        console.log(domain);
         return res.json({
           isReliable: true,
           isVerified: true,

@@ -27,7 +27,7 @@ const columns = [
   { key: 'brand', text: 'Brand' },
   {
     key: 'url',
-    wrappers: (val) => (
+    wrapper: (val) => (
       <a href={`http://${val}`} target="__blank">{val}</a>
     ),
     text: 'URL',
@@ -67,11 +67,11 @@ const mapStateToProps = ({
   },
   fakeSources: {
     fakeSources,
-    fakeTotalCount,
+    totalCount: fakeTotalCount,
   },
   pendingSources: {
     pendingSources,
-    pendingTotalCount,
+    totalCount: pendingTotalCount,
   },
   socket,
 }) => ({

@@ -46,13 +46,13 @@ class PopularArticles extends Component {
                       <br />
                       <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a>
                       <p> {article.summary[0]} </p>
-                      <Button onClick={() => this.props.fetchFocusedInfo(article)} content="focus" />
+                      <Button onClick={() => this.props.fetchFocusedInfo(article)} content="Take a look!" color="blue" />
                     </Grid.Column>
                   </Grid.Row>
                 </Grid>
                 <Divider section />
               </div>
-          ))}
+            ))}
           </div>
         </Segment>
       </div>

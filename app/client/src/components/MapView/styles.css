@@ -99,7 +99,6 @@
   width: 42px;
   height: 42px;
   cursor: pointer;
-  /* background-color: darksalmon; */
   border-radius: 50px;
 }
 
@@ -116,24 +115,26 @@
   margin: 0 0 1.3rem;
 }
 
+.article-read-more {
+  position: absolute;
+  bottom: 5%;
+  left: 2%;
+}
+
+.related-stories {
+  max-height: 180px;
+  margin-top: 1.7rem;
+  overflow-y: auto;
+}
+
 .tooltip-author {
   font-size: 12px;
   color: #a4a4a4;
 }
 
-.tooltip-related-article {
-  font-size: 1.1rem !important;
-}
-
 .ui.circular.label {
   min-width: 100px;
   margin: 0;
-}
-
-.read-more-button {
-  position: absolute;
-  right: 7px;
-  bottom: 7px;
 }
 
 .cluster-list-container:last-child {

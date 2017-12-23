@@ -13,9 +13,9 @@ const mapStateToProps = ({
   },
   socket,
 }) => ({
-  articles,
-  socket,
-});
+    articles,
+    socket,
+  });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   addRecentArticle,
@@ -59,13 +59,13 @@ class RecentArticles extends Component {
                       <br />
                       <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a> | <span>{new Date(article.publishDate).toLocaleDateString()}</span>
                       <p> {article.summary[0]} </p>
-                      <Button onClick={() => this.props.fetchFocusedInfo(article)} content="focus" />
+                      <Button onClick={() => this.props.fetchFocusedInfo(article)} content="Take a look!" color="blue" />
                     </Grid.Column>
                   </Grid.Row>
                 </Grid>
                 <Divider section />
               </div>
-          ))}
+            ))}
           </div>
         </Segment>
       </div>

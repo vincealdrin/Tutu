@@ -7,7 +7,10 @@ import './styles.css';
 class Submit extends Component {
   state = {
     submitStatus: '',
-    result: '',
+    result: {
+      isReliable: false,
+      isVerified: false,
+    },
     url: '',
   };
 
@@ -15,14 +18,17 @@ class Submit extends Component {
     this.setState({ submitStatus: 'pending' });
 
     try {
-      const { data: { prediction } } = await axios.get('/submit', {
+      const { data: { isReliable, isVerified } } = await axios.get('/submit', {
         params: {
           url: this.state.url,
         },
       });
 
       this.setState({
-        result: prediction,
+        result: {
+          isReliable,
+          isVerified,
+        },
         submitStatus: 'success',
       });
     } catch (e) {
@@ -64,7 +70,12 @@ class Submit extends Component {
             <Message info>
               <Message.Header>
                 {submitStatus === 'pending' ? 'please wait...' : ''}
-                {submitStatus === 'success' ? result : ''}
+                {submitStatus === 'success' ? (
+                  <span>
+                    <p>{result.isReliable ? 'reliable' : 'not reliable'}</p>
+                    <p> {result.isVerified ? 'verified' : 'not verified'}</p>
+                  </span>
+                ) : ''}
                 {submitStatus === 'error' ? 'error' : ''}
               </Message.Header>
             </Message>

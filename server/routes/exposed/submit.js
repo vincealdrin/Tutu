@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const rp = require('request-promise');
+const parseDomain = require('parse-domain');
 const { getAboutContactUrl } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -9,6 +10,27 @@ module.exports = (conn, io) => {
       const { url } = req.query;
       const hasHttp = /https?:\/\//.test(url);
       const validUrl = hasHttp ? url : `http://${url}`;
+
+      const { domain, tld } = parseDomain(validUrl);
+      const mainDomain = `${domain}.${tld}`;
+      const uuid = await r.uuid(mainDomain).run(conn);
+      const matchedSource = await r.table('sources').get(uuid).run(conn);
+      const matchedFakeSource = await r.table('fakeSources').get(uuid).run(conn);
+
+      if (matchedSource) {
+        console.log(mainDomain);
+        return res.json({
+          isReliable: true,
+          isVerified: true,
+        });
+      }
+
+      if (matchedFakeSource) {
+        return res.json({
+          isReliable: false,
+          isVerified: true,
+        });
+      }
 
       const htmlDoc = await rp(validUrl);
       const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, validUrl);
@@ -32,11 +54,14 @@ module.exports = (conn, io) => {
         id: await r.uuid(sourceUrl).run(conn),
         url: sourceUrl,
         timestamp: new Date(),
-        isConfirmed: false,
+        isVerified: false,
         isReliable,
       }).run(conn);
 
-      res.json({ reliable: isReliable });
+      res.json({
+        isVerified: false,
+        isReliable,
+      });
     } catch (e) {
       next(e);
     }

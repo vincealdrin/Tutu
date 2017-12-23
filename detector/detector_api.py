@@ -230,7 +230,7 @@ def predict():
     print(sgd_clf.predict(test_df))
     print(sgd_clf.predict_proba(test_df))
 
-    return jsonify({'reliable': prediction[0], 'sourceUrl': domain})
+    return jsonify({'reliable': bool(prediction[0]), 'sourceUrl': domain})
 
 
 if __name__ == '__main__':

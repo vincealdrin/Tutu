@@ -67,6 +67,9 @@ module.exports = (conn, io) => {
     try {
       const sourcesInfo = await Promise.all(sources.map(async (source) => {
         const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
+        const urlId = url.replace('www.', '').replace(/https?:\/\//, '');
+        console.log(urlId);
+        console.log(url);
         const htmlDoc = await rp(url);
         const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, url);
         const faviconUrl = getFaviconUrl(htmlDoc);
@@ -127,7 +130,7 @@ module.exports = (conn, io) => {
           })),
           subdomains: mappedSubdomains,
           socialScore,
-          id: await r.uuid(url).run(conn),
+          id: await r.uuid(urlId).run(conn),
           faviconUrl,
           aboutUsUrl,
           contactUsUrl,

@@ -49,13 +49,31 @@ module.exports = (conn, io) => {
   router.post('/', async (req, res, next) => {
     const pendingSource = req.body;
     const timestamp = new Date();
+    const url = /^https?:\/\//.test(pendingSource.url) ? pendingSource.url : `http://${pendingSource.url}`;
+    const cleanUrl = url.replace('www.', '');
 
     try {
-      const uuid = await r.uuid(pendingSource.url).run(conn);
+      const uuid = await r.uuid(cleanUrl).run(conn);
+      const matchedSource = await r.table('sources').get(uuid).run(conn);
+      const matchedFakeSource = await r.table('fakeSources').get(uuid).run(conn);
+
+      if (matchedSource) {
+        return next({
+          status: 400,
+          message: 'Source is already in sources',
+        });
+      }
+
+      if (matchedFakeSource) {
+        return next({
+          status: 400,
+          message: 'Source is already in fake sources',
+        });
+      }
+
       const pendingSourceInfo = {
         ...pendingSource,
-        confirmed: false,
-        id: uuid,
+        id: await r.uuid(pendingSource.url).run(conn),
         timestamp,
       };
       await r.table(tbl).insert(pendingSourceInfo).run(conn);

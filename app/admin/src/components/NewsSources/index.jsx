@@ -27,16 +27,13 @@ const columns = [
   { key: 'brand', text: 'Brand' },
   {
     key: 'url',
-    wrappers: {
-      url: (val) => (
-        <a href={`http://${val}`} target="__blank">{val}</a>
-      ),
-    },
+    wrappers: (val) => (
+      <a href={`http://${val}`} target="__blank">{val}</a>
+    ),
     text: 'URL',
   },
 ];
 const pendingColumns = [
-  { key: 'brand', text: 'Brand' },
   {
     key: 'url',
     wrapper: (val) => (
@@ -50,9 +47,9 @@ const pendingColumns = [
     text: 'Reliable',
   },
   {
-    key: 'isConfirmed',
+    key: 'isVerified',
     wrapper: (val) => (val ? 'Yes' : 'No'),
-    text: 'Confirmed',
+    text: 'Verified',
   },
   {
     key: 'timestamp',
@@ -156,11 +153,11 @@ class Sources extends Component {
           </Grid.Row>
 
           <Grid.Row>
-            <Grid.Column width={8}>
+            <Grid.Column>
               <Segment>
                 <Label color="orange" ribbon>Pending News Sources</Label>
                 <DataTable
-                  defaultSearchFilter="brand"
+                  defaultSearchFilter="url"
                   label="Pending Source"
                   deleteLabel="Pending Sources"
                   totalCount={pendingTotalCount}
@@ -189,9 +186,10 @@ class Sources extends Component {
                   )}
                 />
               </Segment>
-
             </Grid.Column>
-            <Grid.Column width={8}>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column>
               <Segment>
                 <Label color="red" ribbon>Fake News Sources</Label>
                 <DataTable

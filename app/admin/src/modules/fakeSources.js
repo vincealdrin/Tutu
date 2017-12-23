@@ -1,15 +1,16 @@
 import axios from 'axios';
-import { updateCrudStatus, crudStatus } from '../utils';
+import { updateCrudStatus, crudStatus, httpThunk } from '../utils';
 
-export const FETCH_FAKE_SOURCES = 'pendingSources/FETCH_FAKE_SOURCES';
-export const CREATE_FAKE_SOURCE = 'pendingSources/CREATE_FAKE_SOURCE';
-export const UPDATE_FAKE_SOURCE = 'pendingSources/UPDATE_FAKE_SOURCE';
-export const DELETE_FAKE_SOURCES = 'pendingSources/DELETE_FAKE_SOURCE';
+export const FETCH_FAKE_SOURCES = 'fakeSources/FETCH_FAKE_SOURCES';
+export const ADD_FAKE_SOURCES = 'fakeSources/ADD_FAKE_SOURCES';
+export const UPDATE_FAKE_SOURCE = 'fakeSources/UPDATE_FAKE_SOURCE';
+export const DELETE_FAKE_SOURCES = 'fakeSources/DELETE_SOURCE';
 
 const initialState = {
-  sources: [],
+  fakeSources: [],
+  totalCount: 0,
   fetchStatus: crudStatus,
-  createStatus: crudStatus,
+  addStatus: crudStatus,
   updateStatus: crudStatus,
   deleteStatus: crudStatus,
 };
@@ -19,22 +20,23 @@ export default (state = initialState, action) => {
     case FETCH_FAKE_SOURCES:
       return {
         ...state,
-        sources: action.sources || state.sources,
+        fakeSources: action.fakeSources || state.fakeSources,
         fetchStatus: updateCrudStatus(action),
+        totalCount: action.totalCount || state.totalCount,
       };
-    case CREATE_FAKE_SOURCE:
+    case ADD_FAKE_SOURCES:
       return {
         ...state,
-        sources: [
-          ...action.sources,
-          action.newSource,
-        ],
-        createStatus: updateCrudStatus(action),
+        fakeSources: action.statusText === 'success' ? [
+          ...action.newSources,
+          ...state.fakeSources,
+        ] : state.fakeSources,
+        addStatus: updateCrudStatus(action),
       };
     case UPDATE_FAKE_SOURCE:
       return {
         ...state,
-        sources: state.sources.map((source) => {
+        fakeSources: state.fakeSources.map((source) => {
           if (source.id === action.sourceId) {
             return action.updateSource;
           }
@@ -45,7 +47,9 @@ export default (state = initialState, action) => {
     case DELETE_FAKE_SOURCES:
       return {
         ...state,
-        sources: state.sources.filter((source) => action.deletedIds.includes(source.id)),
+        fakeSources: action.statusText === 'success'
+          ? state.fakeSources.filter((source) => !action.deletedIds.includes(source.id))
+          : state.fakeSources,
         updateStatus: updateCrudStatus(action),
       };
     default:
@@ -53,53 +57,49 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchSources = () => async (dispatch) => {
-  dispatch({ type: FETCH_FAKE_SOURCES, statusText: 'pending' });
+export const fetchFakeSources = (page, limit, filter, search) => httpThunk(FETCH_FAKE_SOURCES, async () => {
+  try {
+    const { data: fakeSources, status, headers } = await axios.get('/fakeSources', {
+      params: {
+        page,
+        limit,
+        filter,
+        search,
+      },
+    });
+
+    return {
+      totalCount: parseInt(headers['x-total-count'], 10),
+      fakeSources,
+      status,
+    };
+  } catch (e) {
+    return e;
+  }
+});
+
+
+export const addFakeSources = () => httpThunk(ADD_FAKE_SOURCES, async (getState) => {
+  const { form } = getState();
+  const urls = Object.values(form.fakeSources.values);
 
   try {
-    const sources = await axios.get('a');
+    const { data: newFakeSources, status } = await axios.post('/fakeSources', urls);
 
-    dispatch({
-      type: FETCH_FAKE_SOURCES,
-      statusText: 'success',
-      sources,
-    });
+    return {
+      newFakeSources,
+      status,
+    };
   } catch (e) {
-    dispatch({
-      type: FETCH_FAKE_SOURCES,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMessage: e.response.data.message,
-    });
+    return e;
   }
-};
+});
 
-export const createSource = (source) => async (dispatch) => {
-  dispatch({ type: CREATE_FAKE_SOURCE, statusText: 'pending' });
-
-  try {
-    const id = await axios.post('a', source);
-
-    dispatch({
-      type: CREATE_FAKE_SOURCE,
-      statusText: 'success',
-      newSource: { ...source, id },
-    });
-  } catch (e) {
-    dispatch({
-      type: CREATE_FAKE_SOURCE,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMessage: e.response.data.message,
-    });
-  }
-};
-
-export const updateSource = (sourceId, source, isIdChanged = false) => async (dispatch) => {
+export const updateFakeSource = (sourceId, source, isIdChanged = false) => async (dispatch) => {
   dispatch({ type: UPDATE_FAKE_SOURCE, statusText: 'pending' });
 
   try {
-    const endpoint = `/sources/${sourceId}`;
+    const endpoint = `/fakeSources/${sourceId}`;
     const path = isIdChanged ? `${endpoint}?isIdChanged=true` : endpoint;
     const updatedSource = await axios.put(path, source);
 
@@ -118,23 +118,19 @@ export const updateSource = (sourceId, source, isIdChanged = false) => async (di
   }
 };
 
-export const deleteSources = (ids) => async (dispatch) => {
-  dispatch({ type: DELETE_FAKE_SOURCES, statusText: 'pending' });
-
+export const deleteFakeSources = (ids) => httpThunk(DELETE_FAKE_SOURCES, async () => {
   try {
-    await axios.put('/sources/', ids);
+    const { status } = await axios.delete('/fakeSources', {
+      data: {
+        ids: ids.join(),
+      },
+    });
 
-    dispatch({
-      type: DELETE_FAKE_SOURCES,
-      statusText: 'success',
+    return {
       deletedIds: ids,
-    });
+      status,
+    };
   } catch (e) {
-    dispatch({
-      type: DELETE_FAKE_SOURCES,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMessage: e.response.data.message,
-    });
+    return e;
   }
-};
+});

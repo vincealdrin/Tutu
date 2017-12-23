@@ -26,6 +26,7 @@ r.db('tutu').table('articles').eqJoin('sourceId', r.db('tutu').table('sources'))
         1,
         0
       ),
+      sourceSocialScore: article('right')('socialScore'),
       sourceCountryRank: article('right')('rankByCountry').filter(c => c('code').eq('PH')).nth(0)('rank'),
       sourceWorldRank: article('right')('rank')
     }))

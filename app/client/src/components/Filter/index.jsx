@@ -92,9 +92,9 @@ const FilterAlert = (action) => (
     <Icon
       name={`${action.typeOfAction === 'save' ? 'check' : 'delete'}`}
       color={`${action.typeOfAction === 'save' ? 'green' : 'red'}`}
-      size="large"  
+      size="large"
     />
-      Preference {`${action.typeOfAction === 'save' ? 'saved' : 'cleared'}`}
+    Preference {`${action.typeOfAction === 'save' ? 'saved' : 'cleared'}`}
   </div>
 );
 
@@ -225,11 +225,14 @@ class Filter extends Component {
             <div className="filter-datepicker-wrapper">
               <DatePicker
                 className="filter-datepicker"
+                dateFormat="MMMM D, YYYY"
                 selected={date}
                 onChange={(newDate) => {
                   this.props.changeDateFilter(newDate);
                   this.props.fetchArticles(center, zoom, bounds);
                 }}
+                showMonthDropdown
+                showYearDropdown
               />
             </div>
           </div>

@@ -2,16 +2,28 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 
 module.exports = (conn, io) => {
-  const tbl = 'fakeSources';
+  const tbl = 'sources';
 
   router.get('/', async (req, res, next) => {
-    const { page = 0, limit = 15 } = req.query;
+    const {
+      page = 0,
+      limit = 15,
+      filter = '',
+      search = '',
+    } = req.query;
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
 
     try {
       const totalCount = await r.table(tbl).count().run(conn);
-      const cursor = await r.table(tbl)
-        .skip(page * limit)
-        .limit(limit)
+      let query = r.table(tbl);
+
+      if (filter && search) {
+        query = query.filter((source) => source(filter).match(`(?i)${search}`));
+      }
+
+      const cursor = await query
+        .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
         .run(conn);
       const sources = await cursor.toArray();
 
@@ -22,7 +34,7 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.get('/:fakeSourceId', async (req, res, next) => {
+  router.get('/:sourceId', async (req, res, next) => {
     const { sourceId } = req.params;
 
     try {
@@ -33,30 +45,29 @@ module.exports = (conn, io) => {
       next(e);
     }
   });
-
   router.post('/', async (req, res, next) => {
-    const sources = req.body;
-    const dateAdded = new Date();
-    const sourcesInfo = await Promise.all(sources.map(async (source) => {
-      const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
-
-      return {
-        ...source,
-        dateAdded,
-        url,
-        id: await r.uuid(url).run(conn),
-      };
-    }));
+    const fakeSources = req.body;
+    const timestamp = new Date();
 
     try {
-      await r.table(tbl).insert(sourcesInfo).run(conn);
-      return res.json(sourcesInfo);
+      const fakeSourcesInfo = await Promise.all(fakeSources.map(async (source) => {
+        const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
+
+        return {
+          id: await r.uuid(url).run(conn),
+          url,
+          timestamp,
+        };
+      }));
+
+      await r.table(tbl).insert(fakeSourcesInfo).run(conn);
+      return res.json(fakeSourcesInfo);
     } catch (e) {
       next(e);
     }
   });
 
-  router.put('/:fakeSourceId', async (req, res, next) => {
+  router.put('/:sourceId', async (req, res, next) => {
     const { sourceId } = req.params;
     const { isIdChanged } = req.query;
     const source = req.body;
@@ -75,10 +86,13 @@ module.exports = (conn, io) => {
   });
 
   router.delete('/', async (req, res, next) => {
-    const { ids = [] } = req.body;
+    const { ids = '' } = req.body;
 
     try {
-      await r.table(tbl).getAll(r.args(ids)).delete().run(conn);
+      await r.table(tbl)
+        .getAll(r.args(ids.split(',')))
+        .delete()
+        .run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -86,7 +100,7 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.delete('/:fakeSourceId', async (req, res, next) => {
+  router.delete('/:sourceId', async (req, res, next) => {
     const { sourceId = '' } = req.params;
 
     try {

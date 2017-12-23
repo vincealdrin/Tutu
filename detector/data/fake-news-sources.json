@@ -369,7 +369,14 @@
   {
     "name": "new beginner",
     "urls": [
-      "newbeginner.altervista.org"
+      "newbeginner.altervista.org",
+      "newspresenter.net"
+    ]
+  },
+  {
+    "name": "philippinezone.altervista.org",
+    "urls": [
+      "philippinezone.altervista.org"
     ]
   },
   {

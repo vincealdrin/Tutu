@@ -114,7 +114,7 @@ while True:
             defragged_url = urldefrag(article.url).url
             qs_idx = defragged_url.find('?')
             clean_url = defragged_url[:qs_idx if qs_idx != -1 else None]
-            clean_url = clean_url.replace('https', 'http').replace('www.', '')
+            clean_url = clean_url.replace('https', 'http').replace('www.', '').replace('beta.', '')
             url_uuid = get_uuid(clean_url)
 
             insert_log(source_id, 'articleCrawl', 'pending', float(slp_time), {
@@ -145,7 +145,7 @@ while True:
                 body = pattern.sub('', body)
 
                 try:
-                    if langdetect.detect(body) != 'en':
+                    if langdetect.detect(body) != 'en' or langdetect.detect(title) != 'en':
                         if PY_ENV == 'development':
                             print('\n(NOT ENGLISH) Skipped: ' +
                                   str(article.url) + '\n')

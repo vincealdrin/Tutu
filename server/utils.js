@@ -2,6 +2,7 @@ const cheerio = require('cheerio');
 const awis = require('awis');
 const _ = require('lodash');
 const r = require('rethinkdb');
+const rp = require('request-promise');
 
 const awisClient = awis({
   key: process.env.AMAZON_ACCESS_KEY,
@@ -13,6 +14,28 @@ const WEEK_IN_SEC = 604800;
 
 module.exports.PH_TIMEZONE = PH_TIMEZONE;
 module.exports.WEEK_IN_SEC = WEEK_IN_SEC;
+
+module.exports.getSocialScore = async (url) => {
+  const reddit = await rp(`https://www.reddit.com/api/info.json?url=${url}`, {
+    json: true,
+  });
+  const infos = reddit.data.children;
+  const subSharedCount = infos.length;
+  const totalScore = infos.reduce((prev, next) => (prev + next.data.score), 0);
+  const totalNumComments = infos.reduce((prev, next) => (prev + next.data.num_comments), 0);
+  const redScore = totalScore + totalNumComments + subSharedCount;
+
+  const sharedCount = await rp(`https://api.sharedcount.com/v1.0/?url=${url}&apikey=${process.env.SHARED_COUNT_API_KEY}`, {
+    json: true,
+  });
+
+  const suScore = sharedCount.StumbleUpon || 0;
+  const pinScore = sharedCount.Pinterest || 0;
+  const liScore = sharedCount.LinkedIn || 0;
+  const fbScore = (sharedCount.Facebook && sharedCount.Facebook.total_count) || 0;
+
+  return redScore + suScore + liScore + fbScore + pinScore;
+};
 
 module.exports.getTitle = (htmlDoc) => {
   const $ = cheerio.load(htmlDoc);

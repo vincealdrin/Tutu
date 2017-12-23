@@ -8,6 +8,7 @@ const {
   getSourceInfo,
   getSourceBrand,
   getTitle,
+  getSocialScore,
 } = require('../../utils');
 
 const responseGroups = ['RelatedLinks', 'Categories', 'Rank', 'ContactInfo', 'RankByCountry',
@@ -70,6 +71,8 @@ module.exports = (conn, io) => {
         const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, url);
         const faviconUrl = getFaviconUrl(htmlDoc);
         const infoPromise = await getSourceInfo(url, responseGroups);
+        const socialScore = await getSocialScore(url);
+
         const info = await infoPromise;
         const title = getTitle(htmlDoc);
         const brand = _.trim(getSourceBrand(url, title));
@@ -123,12 +126,13 @@ module.exports = (conn, io) => {
             rank: parseInt(_.get(country, 'rank') || '0'),
           })),
           subdomains: mappedSubdomains,
+          socialScore,
+          id: await r.uuid(url).run(conn),
           faviconUrl,
           aboutUsUrl,
           contactUsUrl,
           timestamp,
           brand,
-          id: await r.uuid(url).run(conn),
         };
       }));
 

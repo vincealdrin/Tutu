@@ -51,7 +51,7 @@ class Submit extends Component {
             </Header>
 
             <p className="tutu-description" >
-              Please insert a Source URL or an Article URL to be checked by the fake news checker
+              Please insert an Article URL to be checked by the fake news checker
             </p>
 
             <Input
@@ -74,10 +74,24 @@ class Submit extends Component {
                 {submitStatus === 'pending' ? 'please wait...' : ''}
                 {submitStatus === 'success' ? (
                   <span>
-                    <b>prediction: {result.isReliable ? 'reliable' : 'not reliable'}</b>
-                    <p>reliable ({result.pct.reliable.toFixed(2)}%)</p>
-                    <p>not reliable ({result.pct.notReliable.toFixed(2)}%)</p>
-                    <p> {result.isVerified ? 'verified by journalists' : 'not verified by journalists'}</p>
+                    Result:
+                    <ul>
+                      <li>prediction: {result.isReliable ? 'RELIABLE' : 'NOT RELIABLE'}</li>
+                      <li>reliable ({result.pct.reliable.toFixed(2)}%)</li>
+                      <li>not reliable ({result.pct.notReliable.toFixed(2)}%)</li>
+                      <li>Source</li>
+                      <ul>
+                        <li>reliable ({result.pct.source.reliable.toFixed(2)}%)</li>
+                        <li>not reliable ({result.pct.source.notReliable.toFixed(2)}%)</li>
+                      </ul>
+                      <li>Content</li>
+                      <ul>
+                        <li>reliable ({result.pct.content.reliable.toFixed(2)}%)</li>
+                        <li>not reliable ({result.pct.content.notReliable.toFixed(2)}%)</li>
+                      </ul>
+                    </ul>
+
+                    <p> {result.isVerified ? 'verified by journalists' : 'not verified by journalists tho'}</p>
                   </span>
                 ) : ''}
                 {submitStatus === 'error' ? 'error' : ''}

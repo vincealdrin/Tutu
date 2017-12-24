@@ -114,10 +114,18 @@ title_tfidf = TfidfVectorizer(
     min_df=0.01)
 X_title_tfidf = title_tfidf.fit_transform(X_title)
 
-x = hstack([X_body_tfidf, other_df], format='csr')
+x = hstack([X_title_tfidf, X_body_tfidf, other_df], format='csr')
+x_source = other_df
+x_content = hstack([X_title_tfidf, X_body_tfidf], format='csr')
 
 lr_clf = LogisticRegression(penalty='l1')
 lr_clf.fit(x, y)
+
+lr_source_clf = LogisticRegression(penalty='l1')
+lr_source_clf.fit(x_source, y)
+
+lr_content_clf = LogisticRegression(penalty='l1')
+lr_content_clf.fit(x_content, y)
 
 knn_clf = KNeighborsClassifier()
 knn_clf.fit(x, y)
@@ -214,38 +222,53 @@ def predict():
     X_body_test = tfidf.transform(body_test)
     X_title_test = title_tfidf.transform(title_test)
 
-    test_df = hstack([X_body_test, test_other], format='csr')
+    test_df = hstack([X_title_test, X_body_test, test_other], format='csr')
+    test_source_df = test_other
+    test_content_df = hstack([X_title_test, X_body_test], format='csr')
 
-    nb_prediction = clf.predict(test_df)[0]
-    lr_prediction = lr_clf.predict(test_df)[0]
+    # voting
+    nb_pred = clf.predict(test_df)[0]
+    lr_pred = lr_clf.predict(test_df)[0]
+
     lr_proba = lr_clf.predict_proba(test_df)[0]
-    knn_prediction = knn_clf.predict(test_df)[0]
-    lsvc_prediction = lsvc_clf.predict(test_df)[0]
-    result = nb_prediction + lr_prediction + knn_prediction
+    lr_source_proba = lr_source_clf.predict_proba(test_source_df)[0]
+    lr_content_proba = lr_content_clf.predict_proba(test_content_df)[0]
+
+    knn_pred = knn_clf.predict(test_df)[0]
+    lsvc_pred = lsvc_clf.predict(test_df)[0]
+    result = nb_pred + lr_pred + knn_pred
     prediction = result > 1
 
     print('nb')
-    print(nb_prediction)
+    print(nb_pred)
     print(clf.predict_proba(test_df))
 
     print('lr')
-    print(lr_prediction)
+    print(lr_pred)
     print(lr_proba)
 
-    # print('lsvc')
-    # print(lsvc_prediction)
+    print('lsvc')
+    print(lsvc_pred)
 
     print('knn')
-    print(knn_prediction)
+    print(knn_pred)
     print(knn_clf.predict_proba(test_df))
 
-    print('Prediction: ' + 'reliable' if prediction else 'not reliable')
+    # print('Prediction: ' + 'reliable' if pred else 'not reliable')
 
     return jsonify({
-        'reliable': bool(lr_prediction),
+        'reliable': bool(lr_pred),
         'result': {
             'reliable': lr_proba[1] * 100,
-            'notReliable': lr_proba[0] * 100
+            'notReliable': lr_proba[0] * 100,
+            'source': {
+                'reliable': lr_source_proba[1] * 100,
+                'notReliable': lr_source_proba[0] * 100
+            },
+            'content': {
+                'reliable': lr_content_proba[1] * 100,
+                'notReliable': lr_content_proba[0] * 100
+            }
         },
         'sourceUrl': domain
     })

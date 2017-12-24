@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
 import { fetchPopularArticles } from '../../modules/popularArticles';
 import { fetchFocusedInfo } from '../../modules/mapArticles';
+import newsPlaceholder from '../App/placeholder/news-placeholder.png';
 import './styles.css';
 
 const mapStateToProps = ({
@@ -38,7 +39,7 @@ class PopularArticles extends Component {
                 <Grid>
                   <Grid.Row className="article-item">
                     <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important', position: 'relative' }}>
-                      <Image src={article.topImageUrl} href={article.url} target="_blank" />
+                      <Image src={article.topImageUrl ? article.topImageUrl : newsPlaceholder} href={article.url} target="_blank" />
                       <Button
                         onClick={() => this.props.fetchFocusedInfo(article)}
                         content="View details"

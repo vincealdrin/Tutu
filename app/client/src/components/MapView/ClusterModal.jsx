@@ -5,6 +5,7 @@ import RelatedArticles from './RelatedArticles';
 import Carousel from './Carousel';
 import Tags from './Tags';
 import Pagination from './Pagination';
+import newsPlaceholder from '../App/placeholder/news-placeholder.png';
 import './styles.css';
 
 class ClusterModal extends Component {
@@ -92,7 +93,7 @@ class ClusterModal extends Component {
                     <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
                     <div className="image-tag-title-container">
                       <div className="top-image">
-                        <Image src={topImageUrl} />
+                        <Image src={topImageUrl || newsPlaceholder} />
                         <Header as="a" href={url} color="blue" className="news-title" target="_blank">{title}</Header>
                         <p className="article-date">
                           {new Date(publishDate).toDateString()} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}

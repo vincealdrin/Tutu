@@ -12,12 +12,12 @@ class SourcesForm extends Component {
           placeholder="URL"
           fluid
         />
-        <Field
+        {/* <Field
           component={InputField}
           name="brand"
           placeholder="Brand"
           fluid
-        />
+        /> */}
         <Field
           component={Toggle}
           name="isReliable"

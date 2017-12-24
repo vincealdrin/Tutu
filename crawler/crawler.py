@@ -3,7 +3,7 @@
 # for deployment
 # nohup java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 20000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly &
 # hack method to backup db on server
-# rethinkdb dump -c localhost:32769
+# rethinkdb dump -c localhost:28015
 # tar zxvf ./rethinkdb_dump_2017-01-24T21:42:08.tar.gz
 # rm rethinkdb_dump_2017-01-24T21:21:47.tar.gz
 # mv rethinkdb_dump_2017-01-24T21:42:08 rethinkdb_dump_2017-01-24
@@ -19,7 +19,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
 from db import get_locations, get_sources, get_provinces, get_article, insert_article, insert_log, get_uuid, get_rand_sources, get_sources_count
 from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_popularity, get_proxy
-from aylien import categorize
+from aylien import categorize, get_rate_limits
 from nlp import get_entities, summarize
 from nlp.keywords import parse_topics
 from fake_useragent import UserAgent
@@ -106,7 +106,8 @@ while True:
             sleep(slp_time)
             continue
 
-        for article in source.articles:
+        shuffle(source.articles)
+        for article in source.articles[:20]:
             start_time = time.clock()
 
             sleep(slp_time)
@@ -114,7 +115,9 @@ while True:
             defragged_url = urldefrag(article.url).url
             qs_idx = defragged_url.find('?')
             clean_url = defragged_url[:qs_idx if qs_idx != -1 else None]
-            clean_url = clean_url.replace('https', 'http').replace('www.', '').replace('beta.', '')
+            clean_url = clean_url.replace('https',
+                                          'http').replace('www.', '').replace(
+                                              'beta.', '')
             url_uuid = get_uuid(clean_url)
 
             insert_log(source_id, 'articleCrawl', 'pending', float(slp_time), {
@@ -135,17 +138,27 @@ while True:
                 continue
 
             try:
+                rate_limits = get_rate_limits()
+                aylien_status = rate_limits[0]
+                aylien_status2 = rate_limits[1]
+                aylien_status3 = rate_limits[2]
+
+                if not aylien_status or not aylien_status2 or not aylien_status3:
+                    print('REACHED AYLIEN LIMIT')
+                    break
+
                 article.download()
                 article.parse()
                 article.nlp()
 
                 title = article.title.split('|')[0].strip()
-                categories, body, rate_limits = categorize(article.url)
+                categories, body = categorize(article.url)
                 pattern = re.compile(source.brand, re.IGNORECASE)
                 body = pattern.sub('', body)
 
                 try:
-                    if langdetect.detect(body) != 'en' or langdetect.detect(title) != 'en':
+                    # if langdetect.detect(body) != 'en' or langdetect.detect(title) != 'en':
+                    if langdetect.detect(body) != 'en':
                         if PY_ENV == 'development':
                             print('\n(NOT ENGLISH) Skipped: ' +
                                   str(article.url) + '\n')
@@ -317,19 +330,15 @@ while True:
                 src_art_count += 1
 
                 runtime = float(time.clock() - start_time)
-                aylien_status = rate_limits[0]
-                aylien_status2 = rate_limits[1]
-                aylien_status3 = rate_limits[2]
+
                 if PY_ENV == 'development':
                     print(
                         str(count) + '.) ' + str(title) + ' | ' +
                         str(article.url))
-                if PY_ENV == 'development':
                     print('Locations: ' + ' | '.join([
                         ml['location']['formattedAddress']
                         for ml in matched_locations
                     ]))
-                if PY_ENV == 'development':
                     print('AYLIEN REMAINING CALL: [' +
                           str(aylien_status['remaining']) + ', ' +
                           str(aylien_status2['remaining']) + ', ' + str(

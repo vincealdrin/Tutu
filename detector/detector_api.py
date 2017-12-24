@@ -6,6 +6,7 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import LinearSVC
 from sklearn.metrics import f1_score, accuracy_score, recall_score, precision_score
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
@@ -84,7 +85,7 @@ other_df = df.drop(
         'bodyLength',
         # 'sourceHasContactPage',
         # 'sourceHasAboutPage',
-        'sourceCountryRank',
+        # 'sourceCountryRank',
         # 'sourceWorldRank',
     ],
     axis=1)
@@ -120,6 +121,9 @@ lr_clf.fit(x, y)
 
 knn_clf = KNeighborsClassifier()
 knn_clf.fit(x, y)
+
+lsvc_clf = LinearSVC()
+lsvc_clf.fit(x, y)
 
 sgd_clf = SGDClassifier(loss='log')
 sgd_clf.fit(x, y)
@@ -202,7 +206,7 @@ def predict():
             'bodyLength',
             # 'sourceHasContactPage',
             # 'sourceHasAboutPage',
-            'sourceCountryRank',
+            # 'sourceCountryRank',
             # 'sourceWorldRank',
         ],
         axis=1)
@@ -225,10 +229,6 @@ def predict():
     print('knn')
     print(knn_clf.predict(test_df))
     print(knn_clf.predict_proba(test_df))
-
-    print('sgd')
-    print(sgd_clf.predict(test_df))
-    print(sgd_clf.predict_proba(test_df))
 
     return jsonify({'reliable': bool(prediction[0]), 'sourceUrl': domain})
 

@@ -22,7 +22,7 @@
     "urls": [
       "dutertenews.com",
       "du30news.com",
-      "www.dutertenewswatch.com"
+      "dutertenewswatch.com"
     ]
   },
   {
@@ -46,7 +46,7 @@
   {
     "name": "I Am Pilipino",
     "urls": [
-      "www.iampilipino.com"
+      "iampilipino.com"
     ]
   },
   {
@@ -58,13 +58,13 @@
   {
     "name": "Leak News PH",
     "urls": [
-      "www.leaknewsph.com"
+      "leaknewsph.com"
     ]
   },
   {
     "name": "Maharlika News",
     "urls": [
-      "www.maharlikanews.com"
+      "maharlikanews.com"
     ]
   },
   {
@@ -94,13 +94,13 @@
   {
     "name": "Philippine News Portal",
     "urls": [
-      "www.philnewsportal.com"
+      "philnewsportal.com"
     ]
   },
   {
     "name": "Pilipinas Online Updates",
     "urls": [
-      "www.pilipinasonlineupdates.com"
+      "pilipinasonlineupdates.com"
     ]
   },
   {
@@ -168,7 +168,7 @@
   {
     "name": "Social News PH",
     "urls": [
-      "www.socialnewsph.com"
+      "socialnewsph.com"
     ]
   },
   {
@@ -279,7 +279,7 @@
     "name": "grpshorts",
     "urls": [
       "grpshorts.blogspot.com",
-      "feeds.feedburner.com/GrpShorts"
+      "feeds.feedburner.comGrpShorts"
     ]
   },
   {
@@ -466,37 +466,37 @@
   {
     "name": "Duterte Parallel",
     "urls": [
-      "www.duterteparallel.org/"
+      "duterteparallel.org"
     ]
   },
   {
     "name": "Pilipiknows",
     "urls": [
-      "www.pilipiknows.info/"
+      "pilipiknows.info"
     ]
   },
   {
     "name": "Top Informatic Trends",
     "urls": [
-      "topinformatictrends.blogspot.com/"
+      "topinformatictrends.blogspot.com"
     ]
   },
   {
     "name": "Netiviral",
     "urls": [
-      "www.netiviral.com/"
+      "netiviral.com"
     ]
   },
   {
     "name": "Ptv Balita",
     "urls": [
-      "www.ptvbalita.com/"
+      "ptvbalita.com"
     ]
   },
   {
     "name": "Erita's Times",
     "urls": [
-      "www.eritastimes.com/"
+      "eritastimes.com"
     ]
   }
 ]

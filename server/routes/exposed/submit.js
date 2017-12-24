@@ -15,23 +15,30 @@ module.exports = (conn, io) => {
       const validUrl = putHttpUrl(url);
       const domain = getDomain(url);
       const uuid = await r.uuid(domain).run(conn);
+      const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
       const matchedSource = await r.table('sources').get(uuid).run(conn);
       const matchedFakeSource = await r.table('fakeSources').get(uuid).run(conn);
 
-      if (matchedSource) {
-        console.log(domain);
-        return res.json({
-          isReliable: true,
-          isVerified: true,
-        });
-      }
+      // if (matchedPending) {
+      //   return res.json({
+      //     isReliable: matchedPending.isReliable,
+      //     isVerified: false,
+      //   });
+      // }
 
-      if (matchedFakeSource) {
-        return res.json({
-          isReliable: false,
-          isVerified: true,
-        });
-      }
+      // if (matchedSource) {
+      //   return res.json({
+      //     isReliable: true,
+      //     isVerified: true,
+      //   });
+      // }
+
+      // if (matchedFakeSource) {
+      //   return res.json({
+      //     isReliable: false,
+      //     isVerified: true,
+      //   });
+      // }
 
       const htmlDoc = await rp(validUrl);
       const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, validUrl);

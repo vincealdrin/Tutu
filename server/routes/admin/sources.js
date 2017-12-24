@@ -93,18 +93,19 @@ module.exports = (conn, io) => {
         .run(conn);
       const matchedFakes = await fakeCursor.toArray();
 
-      if (matchedPendings || matchedSources) {
+      if (matchedPendings.length || matchedSources.length || matchedFakes.length) {
         const errorMessage = [];
 
-        sources.forEach((source) => {
+        sourcesWithId.forEach((source) => {
           const foundSource = matchedSources.find((ms) => ms.id === source.id);
           if (foundSource) {
             errorMessage.push(`${foundSource.url} already exists in list of reliable sources`);
+            return;
           }
 
           const foundFake = matchedFakes.find((mf) => mf.id === source.id);
           if (foundFake) {
-            errorMessage.push(`${foundFake.url} already exists in list of reliable sources`);
+            errorMessage.push(`${foundFake.url} already exists in list of fake sources`);
             return;
           }
 
@@ -116,7 +117,7 @@ module.exports = (conn, io) => {
 
         return next({
           status: 400,
-          message: errorMessage.join(','),
+          message: errorMessage,
         });
       }
 

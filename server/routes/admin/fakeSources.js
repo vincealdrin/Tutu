@@ -79,19 +79,20 @@ module.exports = (conn, io) => {
         .run(conn);
       const matchedFakes = await fakeCursor.toArray();
 
-      if (matchedPendings || matchedSources) {
+      if (matchedPendings.length || matchedSources.length || matchedFakes.length) {
         const errorMessage = [];
 
         sources.forEach((source) => {
           const foundFake = matchedFakes.find((mf) => mf.id === source.id);
           if (foundFake) {
-            errorMessage.push(`${foundFake.url} already exists in list of reliable sources`);
+            errorMessage.push(`${foundFake.url} already exists in list of fake sources`);
             return;
           }
 
           const foundPending = matchedPendings.find((mp) => mp.id === source.id);
           if (foundPending) {
             errorMessage.push(`${foundPending.url} already exists in list of pending sources`);
+            return;
           }
 
           const foundSource = matchedSources.find((ms) => ms.id === source.id);

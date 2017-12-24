@@ -23,6 +23,7 @@ module.exports.getDomain = (url) => {
 module.exports.putHttpUrl = (url) => (/^https?:\/\//.test(url) ? url : `http://${url}`);
 module.exports.cleanUrl = (dirtyUrl) => dirtyUrl
   .replace('www.', '')
+  .replace(/\/$/, '')
   .replace(/https?:\/\//, '');
 
 module.exports.getSocialScore = async (url) => {

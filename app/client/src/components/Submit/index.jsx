@@ -10,6 +10,7 @@ class Submit extends Component {
     result: {
       isReliable: false,
       isVerified: false,
+      pct: {},
     },
     url: '',
   };
@@ -18,7 +19,7 @@ class Submit extends Component {
     this.setState({ submitStatus: 'pending' });
 
     try {
-      const { data: { isReliable, isVerified } } = await axios.get('/submit', {
+      const { data: { isReliable, isVerified, result } } = await axios.get('/submit', {
         params: {
           url: this.state.url,
         },
@@ -28,6 +29,7 @@ class Submit extends Component {
         result: {
           isReliable,
           isVerified,
+          pct: result,
         },
         submitStatus: 'success',
       });
@@ -72,8 +74,10 @@ class Submit extends Component {
                 {submitStatus === 'pending' ? 'please wait...' : ''}
                 {submitStatus === 'success' ? (
                   <span>
-                    <p>{result.isReliable ? 'reliable' : 'not reliable'}</p>
-                    <p> {result.isVerified ? 'verified' : 'not verified'}</p>
+                    <b>prediction: {result.isReliable ? 'reliable' : 'not reliable'}</b>
+                    <p>reliable ({result.pct.reliable.toFixed(2)}%)</p>
+                    <p>not reliable ({result.pct.notReliable.toFixed(2)}%)</p>
+                    <p> {result.isVerified ? 'verified by journalists' : 'not verified by journalists'}</p>
                   </span>
                 ) : ''}
                 {submitStatus === 'error' ? 'error' : ''}

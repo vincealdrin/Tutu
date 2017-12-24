@@ -47,7 +47,7 @@ module.exports = (conn, io) => {
       const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
       const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);
 
-      const { reliable, sourceUrl } = await rp('http://localhost:5001/predict', {
+      const { reliable, sourceUrl, result } = await rp('http://localhost:5001/predict', {
         method: 'POST',
         body: {
           sourceHasAboutPage: (hasAboutPage && aboutUsUrl) ? 1 : 0,
@@ -68,6 +68,7 @@ module.exports = (conn, io) => {
 
       res.json({
         isVerified: false,
+        result,
         isReliable,
       });
     } catch (e) {

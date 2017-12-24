@@ -85,7 +85,7 @@ other_df = df.drop(
         'bodyLength',
         # 'sourceHasContactPage',
         # 'sourceHasAboutPage',
-        # 'sourceCountryRank',
+        'sourceCountryRank',
         # 'sourceWorldRank',
     ],
     axis=1)
@@ -101,7 +101,7 @@ tfidf = TfidfVectorizer(
     token_pattern=r'(?ui)\b\w*[a-z]{2}\w*\b',
     stop_words=STOP_WORDS,
     ngram_range=(1, 2),
-    max_df=0.85,
+    max_df=0.90,
     min_df=0.01)
 
 X_body_tfidf = tfidf.fit_transform(X_body)
@@ -110,11 +110,11 @@ title_tfidf = TfidfVectorizer(
     token_pattern=r'(?ui)\b\w*[a-z]{2}\w*\b',
     stop_words=STOP_WORDS,
     ngram_range=(1, 3),
-    max_df=0.85,
+    max_df=0.90,
     min_df=0.01)
 X_title_tfidf = title_tfidf.fit_transform(X_title)
 
-x = hstack([X_title_tfidf, X_body_tfidf, other_df], format='csr')
+x = hstack([X_body_tfidf, other_df], format='csr')
 
 lr_clf = LogisticRegression(penalty='l1')
 lr_clf.fit(x, y)
@@ -206,7 +206,7 @@ def predict():
             'bodyLength',
             # 'sourceHasContactPage',
             # 'sourceHasAboutPage',
-            # 'sourceCountryRank',
+            'sourceCountryRank',
             # 'sourceWorldRank',
         ],
         axis=1)
@@ -214,23 +214,41 @@ def predict():
     X_body_test = tfidf.transform(body_test)
     X_title_test = title_tfidf.transform(title_test)
 
-    test_df = hstack([X_title_test, X_body_test, test_other], format='csr')
+    test_df = hstack([X_body_test, test_other], format='csr')
 
-    prediction = knn_clf.predict(test_df)
+    nb_prediction = clf.predict(test_df)[0]
+    lr_prediction = lr_clf.predict(test_df)[0]
+    lr_proba = lr_clf.predict_proba(test_df)[0]
+    knn_prediction = knn_clf.predict(test_df)[0]
+    lsvc_prediction = lsvc_clf.predict(test_df)[0]
+    result = nb_prediction + lr_prediction + knn_prediction
+    prediction = result > 1
 
     print('nb')
-    print(clf.predict(test_df))
+    print(nb_prediction)
     print(clf.predict_proba(test_df))
 
     print('lr')
-    print(lr_clf.predict(test_df))
-    print(lr_clf.predict_proba(test_df))
+    print(lr_prediction)
+    print(lr_proba)
+
+    # print('lsvc')
+    # print(lsvc_prediction)
 
     print('knn')
-    print(knn_clf.predict(test_df))
+    print(knn_prediction)
     print(knn_clf.predict_proba(test_df))
 
-    return jsonify({'reliable': bool(prediction[0]), 'sourceUrl': domain})
+    print('Prediction: ' + 'reliable' if prediction else 'not reliable')
+
+    return jsonify({
+        'reliable': bool(lr_prediction),
+        'result': {
+            'reliable': lr_proba[1] * 100,
+            'notReliable': lr_proba[0] * 100
+        },
+        'sourceUrl': domain
+    })
 
 
 if __name__ == '__main__':

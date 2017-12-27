@@ -1,8 +1,9 @@
-import React, { PureComponent, Component } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GoogleMapReact from 'google-map-react';
 import shortid from 'shortid';
+import { NProgress } from 'redux-nprogress';
 import {
   fetchArticles,
   fetchFocusedInfo,
@@ -105,65 +106,68 @@ class MapView extends Component {
       focusedOn,
       focusedInfo,
       focusedClusterArticles,
+      fetchStatus,
     } = this.props;
 
     return (
-      <GoogleMapReact
-        defaultZoom={DEFAULT_ZOOM}
-        bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
-        options={mapOption}
-        // defaultCenter={mapState.center}
-        center={mapState.center}
-        zoom={mapState.zoom}
-        hoverDistance={HOVER_DISTANCE}
-        onChange={this._onChange}
-        onChildClick={this._onChildClick}
-      >
-        <ClusterModal
-          open={focusedOn === 'cluster' && !clusterStatus.cancelled}
-          articles={focusedClusterInfo}
-          fetchArticles={fetchFocusedClusterInfo}
-          removeFocused={this.props.removeFocused}
-          updateReaction={this.props.updateReaction}
-          status={clusterStatus}
-          totalCount={focusedClusterArticles.length}
-        />
-        <SimpleModal
-          open={focusedOn === 'simple' && !infoStatus.cancelled}
-          article={focusedInfo}
-          removeFocused={this.props.removeFocused}
-          updateReaction={this.props.updateReaction}
-          status={infoStatus}
-        />
+      <div className="map-container">
+        <NProgress />
+        <GoogleMapReact
+          defaultZoom={DEFAULT_ZOOM}
+          bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
+          options={mapOption}
+          // defaultCenter={mapState.center}
+          center={mapState.center}
+          zoom={mapState.zoom}
+          hoverDistance={HOVER_DISTANCE}
+          onChange={this._onChange}
+          onChildClick={this._onChildClick}
+        >
+          <ClusterModal
+            open={focusedOn === 'cluster' && !clusterStatus.cancelled}
+            articles={focusedClusterInfo}
+            fetchArticles={fetchFocusedClusterInfo}
+            removeFocused={this.props.removeFocused}
+            updateReaction={this.props.updateReaction}
+            status={clusterStatus}
+            totalCount={focusedClusterArticles.length}
+          />
+          <SimpleModal
+            open={focusedOn === 'simple' && !infoStatus.cancelled}
+            article={focusedInfo}
+            removeFocused={this.props.removeFocused}
+            updateReaction={this.props.updateReaction}
+            status={infoStatus}
+          />
 
-        {clusters.map(({
-            wx: lng, wy: lat, numPoints, points,
-          }) => {
-          if (numPoints === 1) {
-            const article = articles[points[0].id];
+          {clusters.map(({
+              wx: lng, wy: lat, numPoints, points,
+            }) => {
+            if (numPoints === 1) {
+              const article = articles[points[0].id];
+              return (
+                <SimpleMarker
+                  key={shortid.generate()}
+                  article={article}
+                  lng={lng}
+                  lat={lat}
+                />
+              );
+            }
+
+            const ids = points.map((point) => point.id);
             return (
-              <SimpleMarker
+              <ClusterMarker
                 key={shortid.generate()}
-                article={article}
+                articles={articles.filter((_, i) => ids.includes(i))}
+                count={numPoints}
                 lng={lng}
                 lat={lat}
               />
             );
-          }
-
-          const ids = points.map((point) => point.id);
-          return (
-            <ClusterMarker
-              key={shortid.generate()}
-              articles={articles.filter((_, i) => ids.includes(i))}
-              count={numPoints}
-              lng={lng}
-              lat={lat}
-            />
-          );
-        })}
-
-      </GoogleMapReact>
+          })}
+        </GoogleMapReact>
+      </div>
     );
   }
 }

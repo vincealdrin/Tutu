@@ -1,5 +1,18 @@
 import React, { Component } from 'react';
-import { List, Image, Dimmer, Loader, Label, Modal, Accordion, Icon, Grid, Header, Button } from 'semantic-ui-react';
+import {
+  List,
+  Image,
+  Dimmer,
+  Loader,
+  Label,
+  Modal,
+  Accordion,
+  Icon,
+  Grid,
+  Header,
+  Button,
+  Segment,
+} from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
 import Tags from './Tags';
 import Carousel from './Carousel';
@@ -22,8 +35,11 @@ class SimpleModal extends Component {
       return 'green';
     } else if (sentiment === 'Neutral') {
       return 'grey';
+    } else if (sentiment === 'Negative') {
+      return 'red';
     }
-    return 'red';
+
+    return '';
   }
 
   showRelatedArticles = (_, titleProps) => {
@@ -91,11 +107,13 @@ class SimpleModal extends Component {
         closeOnDimmerClick
         dimmer
       >
-        <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
+        {status.success ? (
+          <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
+        ) : null}
         <Modal.Content scrolling>
           {status.pending ? (
-            <Dimmer active>
-              <Loader indeterminate>Loading article...</Loader>
+            <Dimmer active inverted>
+              <Header as="h4">Loading article...</Header>
             </Dimmer>
           ) : null}
           <Grid columns={2} style={{ marginBottom: '1rem' }}>

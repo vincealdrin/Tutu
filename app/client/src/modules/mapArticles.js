@@ -1,6 +1,7 @@
 import axios from 'axios';
 import supercluster from 'points-cluster';
 import flattenDeep from 'lodash/flattenDeep';
+import { endTask } from 'redux-nprogress';
 import {
   crudStatus,
   updateCrudStatus,
@@ -25,7 +26,7 @@ const initialState = {
   articles: [],
   clusters: [],
   totalCount: 0,
-  articlesStatus: crudStatus,
+  fetchStatus: crudStatus,
   infoStatus: crudStatus,
   clusterStatus: crudStatus,
   reactionStatus: crudStatus,
@@ -54,7 +55,7 @@ export default (state = initialState, action) => {
         ...state,
         articles: action.articles || state.articles,
         clusters: action.clusters || state.clusters,
-        articlesStatus: updateCrudStatus(action),
+        fetchStatus: updateCrudStatus(action),
       };
     case UPDATE_MAP_STATE:
       return {
@@ -167,9 +168,10 @@ export const updateFilterMapState = (center, zoom, bounds) => ({
 });
 
 export const fetchArticles = (center, zoom, bounds) =>
-  httpThunk(FETCH_ARTICLES, async (getState) => {
+  httpThunk(FETCH_ARTICLES, async (getState, dispatch) => {
     if (source) {
       source.cancel();
+      // dispatch(endTask());
     }
     source = axios.CancelToken.source();
 
@@ -235,6 +237,7 @@ export const fetchArticles = (center, zoom, bounds) =>
       });
 
       // dispatch(updateMapState(center, zoom, bounds));
+      source = null;
 
       return {
         totalCount: parseInt(headers['x-total-count'], 10),
@@ -247,46 +250,51 @@ export const fetchArticles = (center, zoom, bounds) =>
     }
   });
 
-export const fetchFocusedInfo = (article) => httpThunk(FETCH_FOCUSED_INFO, async (getState) => {
-  try {
-    if (focusedInfoSource) {
-      focusedInfoSource.cancel();
+export const fetchFocusedInfo = (article) =>
+  httpThunk(FETCH_FOCUSED_INFO, async (getState, dispatch) => {
+    try {
+      if (focusedInfoSource) {
+        focusedInfoSource.cancel();
+        // dispatch(endTask());
+      }
+      focusedInfoSource = axios.CancelToken.source();
+
+      const {
+        filters: {
+          categories,
+        },
+      } = getState();
+      const {
+        data: focusedInfo,
+        status,
+      } = await axios.get('/articles/info', {
+        params: {
+          id: article.id,
+          catsFilterLength: categories.length,
+        },
+        cancelToken: focusedInfoSource.token,
+      });
+
+      focusedInfoSource = null;
+
+      return {
+        focusedInfo: {
+          ...focusedInfo,
+          ...article,
+        },
+        status,
+      };
+    } catch (e) {
+      return e;
     }
-    focusedInfoSource = axios.CancelToken.source();
-
-    const {
-      filters: {
-        categories,
-      },
-    } = getState();
-    const {
-      data: focusedInfo,
-      status,
-    } = await axios.get('/articles/info', {
-      params: {
-        id: article.id,
-        catsFilterLength: categories.length,
-      },
-      cancelToken: focusedInfoSource.token,
-    });
-
-    return {
-      focusedInfo: {
-        ...focusedInfo,
-        ...article,
-      },
-      status,
-    };
-  } catch (e) {
-    return e;
-  }
-});
+  });
 
 export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
-  httpThunk(FETCH_CLUSTER_INFO, async (getState) => {
+  httpThunk(FETCH_CLUSTER_INFO, async (getState, dispatch) => {
     try {
       if (focusedClusterSource) {
         focusedClusterSource.cancel();
+        // dispatch(endTask());
       }
       focusedClusterSource = axios.CancelToken.source();
 
@@ -324,6 +332,8 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
       if (!focusedClusterArticles.length) {
         payload.focusedClusterArticles = articles;
       }
+
+      focusedClusterSource = null;
 
       return payload;
     } catch (e) {

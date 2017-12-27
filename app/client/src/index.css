@@ -1,7 +1,16 @@
 body {
   margin: 0 !important;
   padding: 0 !important;
-	font-family: sans-serif;
-	background: #f4f4f4;
-	cursor: default;
+  font-family: sans-serif;
+  background: #f4f4f4;
+  cursor: default;
+}
+
+#nprogress .bar {
+  height: 3px !important;
+  background: #f25100 !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #f25100, 0 0 5px #f25100 !important;
 }

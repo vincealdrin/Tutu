@@ -142,7 +142,7 @@ class Filter extends Component {
               />
             </Tooltip>
             <Tooltip
-              html={<FilterAlert typeOfAction="clear" />}
+              html={<FilterAlert action="clear" />}
               trigger="click"
               duration={1000}
               hideDelay={2000}

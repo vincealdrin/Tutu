@@ -48,18 +48,12 @@ class ClusterModal extends Component {
         closeOnDimmerClick
         dimmer
       >
-        {
-          status.pending
-            ?
-            (
-              <Dimmer active>
-                <Loader indeterminate>Loading articles...</Loader>
-              </Dimmer>
-            )
-            :
-            ''
-        }
         <Modal.Content scrolling>
+          {status.pending ? (
+            <Dimmer active inverted>
+              <Header as="h4">Loading articles...</Header>
+            </Dimmer>
+          ) : null}
           {articles.map(({
             sentiment,
             summary,
@@ -145,18 +139,20 @@ class ClusterModal extends Component {
             );
           })}
         </Modal.Content>
-        <Modal.Actions>
-          {((open && status.success) || articles.length) && totalCount > limit ? (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={Math.ceil((totalCount || limit) / limit)}
-              onChange={(page) => {
+        {status.success ? (
+          <Modal.Actions>
+            {((open && status.success) || articles.length) && totalCount > limit ? (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil((totalCount || limit) / limit)}
+                onChange={(page) => {
                 this.setState({ currentPage: page });
                 fetchArticles(null, page - 1, limit);
               }}
-            />
+              />
           ) : null}
-        </Modal.Actions>
+          </Modal.Actions>
+        ) : null}
       </Modal>
     );
   }

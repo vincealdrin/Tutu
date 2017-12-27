@@ -5,7 +5,7 @@ import RelatedArticles from './RelatedArticles';
 import Carousel from './Carousel';
 import Tags from './Tags';
 import Pagination from './Pagination';
-import newsPlaceholder from '../App/placeholder/news-placeholder.png';
+import newsPlaceholder from '../../app-assets/placeholder/news-placeholder.png';
 import './styles.css';
 
 class ClusterModal extends Component {

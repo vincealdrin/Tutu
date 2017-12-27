@@ -4,12 +4,12 @@ import { Tooltip } from 'react-tippy';
 import Tags from './Tags';
 import Carousel from './Carousel';
 // import the reaction images
-import happyReact from './reactions/5.svg';
-import amusedReact from './reactions/4.svg';
-import inspiredReact from './reactions/3.svg';
-import afraidReact from './reactions/2.svg';
-import sadReact from './reactions/1.svg';
-import angryReact from './reactions/0.svg';
+import happyReact from '../../app-assets/reactions/5.svg';
+import amusedReact from '../../app-assets/reactions/4.svg';
+import inspiredReact from '../../app-assets/reactions/3.svg';
+import afraidReact from '../../app-assets/reactions/2.svg';
+import sadReact from '../../app-assets/reactions/1.svg';
+import angryReact from '../../app-assets/reactions/0.svg';
 import './styles.css';
 
 class SimpleModal extends Component {
@@ -97,7 +97,7 @@ class SimpleModal extends Component {
             <Dimmer active>
               <Loader indeterminate>Loading article...</Loader>
             </Dimmer>
-            ) : null }
+          ) : null}
           <Grid columns={2} style={{ marginBottom: '1rem' }}>
             <Grid.Column width={7}>
               <div className="image-tag-title-container">
@@ -196,7 +196,7 @@ class SimpleModal extends Component {
                     />
                   </Tooltip>
                 </List.Item>
-            ))}
+              ))}
             </List>
             <Button as="a" href={url} circular color="blue" target="_blank">Read More</Button>
           </div>

@@ -203,10 +203,6 @@ module.exports = (conn, io) => {
         )
         .run(conn);
 
-      articleInfo.relatedArticles = articleInfo.relatedArticles
-        .filter(({ title }) => natural.DiceCoefficient(articleInfo.title, title) > 0.40)
-        .slice(0, 5);
-
       res.json(articleInfo);
     } catch (e) {
       next(e);

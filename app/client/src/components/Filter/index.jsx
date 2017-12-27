@@ -87,14 +87,14 @@ const popularTopOptions = [
   { key: '1000', text: '1000', value: '1000' },
 ];
 
-const FilterAlert = (action) => (
+const FilterAlert = ({ action }) => (
   <div>
     <Icon
-      name={`${action.typeOfAction === 'save' ? 'check' : 'delete'}`}
-      color={`${action.typeOfAction === 'save' ? 'green' : 'red'}`}
+      name={`${action === 'save' ? 'check' : 'delete'}`}
+      color={`${action === 'save' ? 'green' : 'red'}`}
       size="large"
     />
-    Preference {`${action.typeOfAction === 'save' ? 'saved' : 'cleared'}`}
+    Preference {`${action === 'save' ? 'saved' : 'cleared'}`}
   </div>
 );
 
@@ -123,11 +123,11 @@ class Filter extends Component {
 
     return (
       <Segment>
-        <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
+        <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter Articles</Label>
         <div className="scrollable-section filter-scrollable">
           <Button.Group labeled icon>
             <Tooltip
-              html={<FilterAlert typeOfAction="save" />}
+              html={<FilterAlert action="save" />}
               trigger="click"
               duration={1000}
               hideDelay={2000}
@@ -156,14 +156,14 @@ class Filter extends Component {
                 onClick={() => {
                   this.props.clearFilters();
                   this.props.fetchArticles(center, zoom, bounds);
-                  // localStorage.removeItem('filterSettings');
+                  localStorage.removeItem('filterSettings');
                 }}
               />
             </Tooltip>
             <Button
-              icon="hand lizard"
+              icon="bar chart"
               labelPosition="left"
-              content="Insight"
+              content="Insights"
               color="teal"
             />
           </Button.Group>
@@ -172,6 +172,7 @@ class Filter extends Component {
           <Dropdown
             placeholder="Keywords"
             icon="search"
+            noResultsMessage="Add keywords"
             options={keywords.map(mapOptions)}
             value={keywords}
             onChange={(_, { value }) => {
@@ -202,11 +203,12 @@ class Filter extends Component {
             multiple
           />
           <Divider />
-          <span className="input-label">SOURCE</span>
+          <span className="input-label">SOURCES</span>
           <Dropdown
             text="Source"
             // icon="browser"
             // className="icon half-width"
+            noResultsMessage="Add sources"
             options={sources.map(mapOptions)}
             value={sources}
             onChange={(_, { value }) => {
@@ -255,6 +257,7 @@ class Filter extends Component {
           <span className="input-label">ORGANIZATIONS</span>
           <Dropdown
             placeholder="Organizations"
+            noResultsMessage="Add organizations"
             options={organizations.map(mapOptions)}
             value={organizations}
             onChange={(_, { value }) => {
@@ -271,6 +274,7 @@ class Filter extends Component {
           <span className="input-label">PEOPLE</span>
           <Dropdown
             placeholder="People"
+            noResultsMessage="Add people"
             options={people.map(mapOptions)}
             value={people}
             onChange={(_, { value }) => {
@@ -299,6 +303,17 @@ class Filter extends Component {
             upward
             selection
             fluid
+          />
+          <Divider />
+          <span className="input-label">COUNT (<b>{limit}</b>)</span>
+          <Slider
+            min={0}
+            max={10000}
+            value={limit}
+            onChange={(value) => {
+              this.props.changeLimitFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
           />
           <Divider />
           <span className="input-label">POPULAR IN</span>
@@ -343,13 +358,8 @@ class Filter extends Component {
             button
             selection
           />
-          <div className="popular-container">
-            <div className="popular-in-container" />
-            <div className="popular-top-container" />
-          </div>
-
         </div>
-      </Segment >
+      </Segment>
     );
   }
 }

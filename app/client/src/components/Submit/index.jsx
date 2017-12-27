@@ -10,7 +10,9 @@ class Submit extends Component {
     result: {
       isReliable: false,
       isVerified: false,
-      pct: {},
+      result: 0,
+      sourceResult: 0,
+      contentResult: 0,
     },
     url: '',
   };
@@ -19,17 +21,25 @@ class Submit extends Component {
     this.setState({ submitStatus: 'pending' });
 
     try {
-      const { data: { isReliable, isVerified, result } } = await axios.get('/submit', {
-        params: {
-          url: this.state.url,
+      const {
+        data: {
+          isReliable,
+          isVerified,
+          sourcePct,
+          contentPct,
+          pct,
         },
+      } = await axios.get('/submit', {
+        params: { url: this.state.url },
       });
 
       this.setState({
         result: {
           isReliable,
           isVerified,
-          pct: result,
+          pct,
+          sourcePct,
+          contentPct,
         },
         submitStatus: 'success',
       });
@@ -77,18 +87,10 @@ class Submit extends Component {
                     Result:
                     <ul>
                       <li>prediction: {result.isReliable ? 'RELIABLE' : 'NOT RELIABLE'}</li>
-                      <li>reliable ({result.pct.reliable.toFixed(2)}%)</li>
-                      <li>not reliable ({result.pct.notReliable.toFixed(2)}%)</li>
-                      <li>Source</li>
-                      <ul>
-                        <li>reliable ({result.pct.source.reliable.toFixed(2)}%)</li>
-                        <li>not reliable ({result.pct.source.notReliable.toFixed(2)}%)</li>
-                      </ul>
-                      <li>Content</li>
-                      <ul>
-                        <li>reliable ({result.pct.content.reliable.toFixed(2)}%)</li>
-                        <li>not reliable ({result.pct.content.notReliable.toFixed(2)}%)</li>
-                      </ul>
+                      <li>reliability ({result.pct.toFixed(2)}%)</li>
+                      <li />
+                      <li>source reliability ({result.sourcePct.toFixed(2)}%)</li>
+                      <li>content reliability ({result.contentPct.toFixed(2)}%)</li>
                     </ul>
 
                     <p> {result.isVerified ? 'verified by journalists' : 'not verified by journalists tho'}</p>

@@ -16,6 +16,14 @@ def get_uuid(text):
     return r.uuid(text).run(conn)
 
 
+def insert_fake_article(article, tbl='fakeArticles'):
+    article = {
+        **article,
+        'timestamp': r.expr(datetime.now(r.make_timezone(PH_TIMEZONE))),
+    }
+
+    r.table(tbl).insert(article).run(conn)
+
 def insert_article(article, tbl='articles'):
     article = {
         **article,
@@ -66,7 +74,7 @@ def insert_article(article, tbl='articles'):
         )
     ).run(conn)
 
-    r.table(tbl).get(article['id']).update(article).run(conn)
+    r.table(tbl).insert(article).run(conn)
 
 
 def insert_log(sourceId, log_type, status, runTime, info):

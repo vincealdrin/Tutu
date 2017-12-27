@@ -258,18 +258,9 @@ def predict():
 
     return jsonify({
         'reliable': bool(lr_pred),
-        'result': {
-            'reliable': lr_proba[1] * 100,
-            'notReliable': lr_proba[0] * 100,
-            'source': {
-                'reliable': lr_source_proba[1] * 100,
-                'notReliable': lr_source_proba[0] * 100
-            },
-            'content': {
-                'reliable': lr_content_proba[1] * 100,
-                'notReliable': lr_content_proba[0] * 100
-            }
-        },
+        'pct': lr_proba[1] * 100,
+        'sourcePct': lr_source_proba[1] * 100,
+        'contentPct': lr_content_proba[1] * 100,
         'sourceUrl': domain
     })
 

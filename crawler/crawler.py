@@ -44,10 +44,11 @@ crawled_sources = []
 last_proxy = ''
 
 while True:
-    # news_sources = get_rand_sources(not_sources=crawled_sources)
-    news_sources = list(get_sources('timestamp'))
+    news_sources = get_rand_sources(not_sources=crawled_sources)
+    # news_sources = get_sources('timestamp')
 
     for news_source in news_sources:
+        print('Crawled Sources: ' + str(crawled_sources))
         if not news_sources:
             if PY_ENV == 'development':
                 print('CRAWLED ALL SOURCES')
@@ -63,7 +64,7 @@ while True:
         config = newspaper.Config()
         config.follow_meta_refresh = True
         # config.memoize_articles = True if PY_ENV == 'production' else False
-        config.memoize_articles = False
+        config.memoize_articles = True
 
         proxy = get_proxy(last_proxy)
         last_proxy = proxy['http']
@@ -295,6 +296,8 @@ while True:
                     continue
 
                 summary_sentences = summarize(body)
+                summary_sentences = [s for s in summary_sentences if len(s.split(' ')) > 5]
+
                 sentiment = SentimentIntensityAnalyzer().polarity_scores(body)
                 topics = parse_topics(body)
                 popularity = get_popularity(article.url)
@@ -321,7 +324,7 @@ while True:
                     'publishDate': publishDate,
                     'topImageUrl': article.top_image,
                     'summary': summary_sentences,
-                    'summary2': article.summary,
+                    # 'summary2': article.summary,
                     'topics': topics,
                     'locations': matched_locations,
                     'categories': categories,
@@ -380,7 +383,7 @@ while True:
                        'articlesCrawledCount': src_art_count,
                    })
 
-        # crawled_sources.append(source_id)
+        crawled_sources.append(source_id)
 
         if PY_ENV == 'development':
             print('\n' + source.domain + ' done!')

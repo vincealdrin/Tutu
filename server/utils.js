@@ -72,6 +72,7 @@ module.exports.getSourceBrand = (url, title) => {
   if (foundTitle) {
     return foundTitle;
   }
+
   return title;
 };
 

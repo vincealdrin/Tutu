@@ -20,20 +20,20 @@ const CarouselSlide = ({
   activeIndex,
 }) => (
   <li
-    className={
-      index === activeIndex
-      ?
-        'carousel-slide carousel-slide-active'
-      :
-        'carousel-slide'
-    }
-  >
-    <div className="carousel-summary">
-      <p className="carousel-slide-content">
-        {slide}
-      </p>
-    </div>
-  </li>
+      className={
+        index === activeIndex
+          ?
+          'carousel-slide carousel-slide-active'
+          :
+          'carousel-slide'
+      }
+    >
+      <div className="carousel-summary">
+        <p className="carousel-slide-content">
+          {slide}
+        </p>
+      </div>
+    </li>
 );
 
 const CarouselSummaryNumber = ({
@@ -41,18 +41,18 @@ const CarouselSummaryNumber = ({
   activeIndex,
 }) => (
   <li
-    className={
-      index === activeIndex
-      ?
-        'carousel-slide carousel-slide-active'
-      :
-        'carousel-slide'
-    }
-  >
-    <p className="carousel-slide-content article-tags">
-      Summary {index + 1}
-    </p>
-  </li>
+      className={
+        index === activeIndex
+          ?
+          'carousel-slide carousel-slide-active'
+          :
+          'carousel-slide'
+      }
+    >
+      <p className="carousel-slide-content article-tags">
+        Summary {index + 1}
+      </p>
+    </li>
 );
 
 class Carousel extends Component {
@@ -94,7 +94,7 @@ class Carousel extends Component {
               activeIndex={activeIndex}
               slide={sum}
             />
-            ))}
+          ))}
         </ul>
 
         <div className="carousel-arrows">

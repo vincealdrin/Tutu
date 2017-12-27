@@ -35,7 +35,6 @@ const mapStateToProps = ({
     focusedOn,
     focusedClusterArticles,
   },
-  map,
 }) => ({
   // mapState: map.viewport.toJS(),
   mapState,
@@ -65,6 +64,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 const mapOption = {
   zoomControl: false,
   fullscreenControl: false,
+  minZoomOverride: true,
   minZoom: MIN_ZOOM,
   maxZoom: MAX_ZOOM,
   styles: mapStyle,
@@ -72,7 +72,7 @@ const mapOption = {
 };
 
 class MapView extends Component {
-  componentWillMount() {
+  componentDidMount() {
     navigator.geolocation.getCurrentPosition(({ coords }) => {
       this.props.updateMapState({
         lat: coords.latitude,
@@ -102,7 +102,6 @@ class MapView extends Component {
       infoStatus,
       clusterStatus,
       focusedClusterInfo,
-      fetchFocusedClusterInfo,
       focusedOn,
       focusedInfo,
       focusedClusterArticles,

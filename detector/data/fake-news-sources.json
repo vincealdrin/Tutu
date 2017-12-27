@@ -283,6 +283,18 @@
     ]
   },
   {
+    "name": "pinoy news online",
+    "urls": [
+      "www.pinoynewsonline.info"
+    ]
+  },
+  {
+    "name": "philippine news now",
+    "urls": [
+      "philippinenewsnow.com"
+    ]
+  },
+  {
     "name": "philnewscourier",
     "urls": [
       "philnewscourier.blogspot.com"

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "26230efa67e28d4fdce4e69e831eda00cc92daf3d785ea6ba02f3195c2dcd4ab"
+            "sha256": "7e2792963d810e132a60996c3ec39009dfd5f06c35236a55516c11fa79d1ce4d"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -658,6 +658,12 @@
             ],
             "version": "==1.0.0"
         },
+        "similar-text": {
+            "hashes": [
+                "sha256:9410cd4edc38eded0a325c06d96bda24b9a23e8a07096b408688173fe9c613fe"
+            ],
+            "version": "==0.2.0"
+        },
         "six": {
             "hashes": [
                 "sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb",
@@ -712,10 +718,10 @@
         },
         "websocket-client": {
             "hashes": [
-                "sha256:91222bb3a22ba989ac87eec9121655f295dcb746b6207c5576ffa549ab69302c",
-                "sha256:15f585566e2ea7459136a632b9785aa081093064391878a448c382415e948d72"
+                "sha256:6d64de3fddba14de09bdbebbc3cd3b36ba5c4e944ff047460325efa2325c02fc",
+                "sha256:6505c9642396cd670c4514228e04cdae4a4a750fefde732578f0f14f55d6935d"
             ],
-            "version": "==0.44.0"
+            "version": "==0.45.0"
         },
         "xmltodict": {
             "hashes": [

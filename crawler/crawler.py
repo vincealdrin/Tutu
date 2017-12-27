@@ -44,7 +44,8 @@ crawled_sources = []
 last_proxy = ''
 
 while True:
-    news_sources = get_rand_sources(not_sources=crawled_sources)
+    # news_sources = get_rand_sources(not_sources=crawled_sources)
+    news_sources = list(get_sources('timestamp'))
 
     for news_source in news_sources:
         if not news_sources:
@@ -62,7 +63,7 @@ while True:
         config = newspaper.Config()
         config.follow_meta_refresh = True
         # config.memoize_articles = True if PY_ENV == 'production' else False
-        config.memoize_articles = True
+        config.memoize_articles = False
 
         proxy = get_proxy(last_proxy)
         last_proxy = proxy['http']
@@ -112,6 +113,9 @@ while True:
 
             sleep(slp_time)
 
+            if PY_ENV == 'development':
+                print(article.url)
+
             defragged_url = urldefrag(article.url).url
             qs_idx = defragged_url.find('?')
             clean_url = defragged_url[:qs_idx if qs_idx != -1 else None]
@@ -138,20 +142,16 @@ while True:
                 continue
 
             try:
-                rate_limits = get_rate_limits()
-                aylien_status = rate_limits[0]
-                aylien_status2 = rate_limits[1]
-                aylien_status3 = rate_limits[2]
-
-                if not aylien_status or not aylien_status2 or not aylien_status3:
-                    print('REACHED AYLIEN LIMIT')
-                    break
-
                 article.download()
                 article.parse()
                 article.nlp()
 
-                title = article.title.split('|')[0].strip()
+                title = article.title
+                title_split = article.title.split('|')
+
+                if len(title_split) != 1:
+                    title = title_split[0].strip()
+
                 categories, body = categorize(article.url)
                 pattern = re.compile(source.brand, re.IGNORECASE)
                 body = pattern.sub('', body)
@@ -304,6 +304,13 @@ while True:
                     if author:
                         article.authors.append(author)
 
+                top_image = '' if re.match(
+                    'favicon', article.top_image) else article.top_image
+
+                categories = [cat for cat in categories if cat['score'] > 0]
+                categories = sorted(
+                    categories, key=lambda c: c['score'], reverse=True)
+
                 new_article = {
                     'id': url_uuid,
                     'url': clean_url,
@@ -322,14 +329,23 @@ while True:
                     'organizations': organizations,
                     'people': people,
                     'popularity': popularity,
-                    'reactions': []
+                    'reactions': [],
+                    'relatedArticles': []
                 }
 
                 insert_article(new_article)
                 count += 1
                 src_art_count += 1
-
                 runtime = float(time.clock() - start_time)
+
+                rate_limits = get_rate_limits()
+                aylien_status = rate_limits[0]
+                aylien_status2 = rate_limits[1]
+                aylien_status3 = rate_limits[2]
+
+                if not aylien_status or not aylien_status2 or not aylien_status3:
+                    print('REACHED AYLIEN LIMIT')
+                    break
 
                 if PY_ENV == 'development':
                     print(
@@ -364,7 +380,7 @@ while True:
                        'articlesCrawledCount': src_art_count,
                    })
 
-        crawled_sources.append(source_id)
+        # crawled_sources.append(source_id)
 
         if PY_ENV == 'development':
             print('\n' + source.domain + ' done!')

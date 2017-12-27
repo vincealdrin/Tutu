@@ -145,28 +145,10 @@ const mapLocation = (loc) => {
 };
 
 const getCategoriesField = (article, max = 2) => article('categories')
-  .orderBy(r.desc((category) => category('score')))
   .slice(0, max === 0 ? 2 : max)
   .getField('label');
 
 module.exports.getCategoriesField = getCategoriesField;
-
-module.exports.getRelatedArticles = (article) =>
-  r.table('articles').filter((doc) =>
-    article('publishDate').date()
-      .during(
-        r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).sub(WEEK_IN_SEC),
-        r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).add(WEEK_IN_SEC),
-        { rightBound: 'closed' }
-      )
-      .and(article('categories').contains((label) => getCategoriesField(doc).contains(label)))
-      .or(doc('keywords').contains((keyword) => article('topics')('common').coerceTo('string').match(keyword)))
-      .or(doc('people').contains((person) => article('people').coerceTo('string').match(person)))
-      .or(doc('organizations').contains((org) => article('organizations').coerceTo('string').match(org)))
-      .and(doc('id').ne(article('id'))))
-    .orderBy(r.desc('timestamp'))
-    .slice(0, 20)
-    .pluck('title', 'url');
 
 const getSentiment = (sentiment) => r.branch(
   sentiment('compound').ge(0.5), 'Positive',
@@ -174,10 +156,17 @@ const getSentiment = (sentiment) => r.branch(
   'Neutral',
 );
 
+module.exports.mapRelatedArticles = (join) => ({
+  title: join('left')('title'),
+  url: join('left')('url'),
+  publishDate: join('left')('publishDate'),
+  source: join('right')('brand'),
+  sourceUrl: join('right')('url'),
+});
+
 module.exports.mapArticleInfo = (catsFilterLength) => (article) => ({
   id: article('id'),
   url: article('url'),
-  title: article('title'),
   authors: article('authors'),
   keywords: article('topics')('common'),
   people: article('people'),
@@ -185,6 +174,7 @@ module.exports.mapArticleInfo = (catsFilterLength) => (article) => ({
   publishDate: article('publishDate'),
   sentiment: getSentiment(article('sentiment')),
   summary: article('summary'),
+  relatedArticles: article('relatedArticles'),
   categories: getCategoriesField(article, catsFilterLength),
   reactions: article('reactions').group('reaction').count().ungroup(),
 });

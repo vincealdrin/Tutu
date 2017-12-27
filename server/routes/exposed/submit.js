@@ -13,11 +13,11 @@ module.exports = (conn, io) => {
     try {
       const { url } = req.query;
       const validUrl = putHttpUrl(url);
-      const domain = getDomain(url);
-      const uuid = await r.uuid(domain).run(conn);
-      const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
-      const matchedSource = await r.table('sources').get(uuid).run(conn);
-      const matchedFakeSource = await r.table('fakeSources').get(uuid).run(conn);
+      // const domain = getDomain(url);
+      // const uuid = await r.uuid(domain).run(conn);
+      // const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
+      // const matchedSource = await r.table('sources').get(uuid).run(conn);
+      // const matchedFakeSource = await r.table('fakeSources').get(uuid).run(conn);
 
       // if (matchedPending) {
       //   return res.json({

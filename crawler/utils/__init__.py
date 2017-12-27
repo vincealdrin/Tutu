@@ -18,6 +18,7 @@ PROXY_IP2 = os.environ.get('PROXY_IP2')
 PROXY_IP3 = os.environ.get('PROXY_IP3')
 PY_ENV = os.environ.get('PY_ENV')
 PH_TIMEZONE = '+08:00'
+TWO_DAYS_IN_SEC = 172800
 
 proxies = [PROXY_IP, PROXY_IP2, PROXY_IP3]
 

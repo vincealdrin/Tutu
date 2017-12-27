@@ -29,7 +29,6 @@ app.use(compression({
 }));
 app.use(passport.initialize());
 
-
 app.use(cors({ exposedHeaders: 'X-Total-Count' }));
 // app.use(express.static(path.resolve(__dirname, '..', 'app', 'client', 'build')));
 

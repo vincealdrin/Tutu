@@ -53,7 +53,7 @@ const categoriesOptions = [
   { key: 'Crime', text: 'Crime', value: 'Crime' },
   { key: 'Disaster & Accident', text: 'Disaster & Accident', value: 'Disaster & Accident' },
   { key: 'Economy', text: 'Economy', value: 'Economy' },
-  { key: 'Education', text: 'Education', value: 'Education' },
+  { key: 'Environment', text: 'Environment', value: 'Environment' },
   { key: 'Health', text: 'Health', value: 'Health' },
   { key: 'Law & Government', text: 'Law & Government', value: 'Law & Government' },
   { key: 'Lifestyle', text: 'Lifestyle', value: 'Lifestyle' },

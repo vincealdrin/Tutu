@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import shortid from 'shortid';
 import { Accordion, Icon, List } from 'semantic-ui-react';
 
 class RelatedArticles extends Component {
@@ -21,19 +22,17 @@ class RelatedArticles extends Component {
       <Accordion style={{ margin: '1rem 0' }}>
         <Accordion.Title active={activeIndex === 0} index={0} onClick={this.showRelatedArticles}>
           <Icon name="dropdown" />
-            Related Stories
+          Related Stories
         </Accordion.Title>
         <Accordion.Content active={activeIndex === 0}>
           <List divided relaxed>
             {content.length > 0
-            ?
-              content.map((relatedArticle) => (
-                <List.Item>
+              ? content.map((relatedArticle) => (
+                <List.Item key={shortid.generate()}>
                   <List.Header as="a" color="blue" href={relatedArticle.url} target="_blank">{relatedArticle.title}</List.Header>
                 </List.Item>
               ))
-            :
-              <span className="no-info">No related articles found</span>
+              : <span className="no-info">No related articles found</span>
             }
           </List>
         </Accordion.Content>

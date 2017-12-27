@@ -314,9 +314,9 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
       });
 
       const payload = {
-        focusedClusterInfo: sliceArticles.map((article, i) => ({
+        focusedClusterInfo: await sliceArticles.map((article) => ({
           ...article,
-          ...focusedClusterInfo[i],
+          ...focusedClusterInfo.find((info) => info.id === article.id),
         })),
         status,
       };

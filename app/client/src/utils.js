@@ -24,6 +24,8 @@ export const mapOptions = (opt) => ({
   value: opt,
 });
 
+export const articleId = (info) => `${info.title}-${info.source}-${info.publishDate}`;
+
 export const httpThunk = (type, cb) => async (dispatch, getState) => {
   dispatch({ statusText: 'pending', type });
   const payload = await cb(getState, dispatch);

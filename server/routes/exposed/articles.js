@@ -336,7 +336,7 @@ module.exports = (conn, io) => {
   router.put('/reactions', async (req, res, next) => {
     try {
       const {
-        url,
+        id,
         reaction,
       } = req.body;
 
@@ -347,9 +347,8 @@ module.exports = (conn, io) => {
         });
       }
 
-      const uuid = await r.uuid(url).run(conn);
       const ip = requestIp.getClientIp(req);
-      const existingReact = await r.table('articles').get(uuid)('reactions')
+      const existingReact = await r.table('articles').get(id)('reactions')
         .filter((react) => react('ip').eq(ip))
         .nth(0)
         .default(null)
@@ -362,7 +361,7 @@ module.exports = (conn, io) => {
         });
       }
 
-      await r.table('articles').get(uuid).update({
+      await r.table('articles').get(id).update({
         reactions: r.row('reactions').append({
           ip,
           reaction,

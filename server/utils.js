@@ -177,7 +177,9 @@ module.exports.mapArticleInfo = (catsFilterLength) => (article) => ({
   summary: article('summary'),
   relatedArticles: article('relatedArticles'),
   categories: getCategoriesField(article, catsFilterLength),
-  reactions: article('reactions').group('reaction').count().ungroup(),
+  reactions: article('reactions').group('reaction')
+    .count()
+    .ungroup(),
 });
 
 module.exports.mapArticle = (bounds) => (join) => {

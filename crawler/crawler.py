@@ -310,10 +310,6 @@ while True:
                 top_image = '' if re.match(
                     'favicon', article.top_image) else article.top_image
 
-                categories = [cat for cat in categories if cat['score'] > 0]
-                categories = sorted(
-                    categories, key=lambda c: c['score'], reverse=True)
-
                 new_article = {
                     'id': url_uuid,
                     'url': clean_url,

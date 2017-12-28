@@ -1,7 +1,7 @@
 import axios from 'axios';
 import supercluster from 'points-cluster';
 import flattenDeep from 'lodash/flattenDeep';
-import { endTask } from 'redux-nprogress';
+import groupBy from 'lodash/groupBy';
 import {
   crudStatus,
   updateCrudStatus,
@@ -70,7 +70,24 @@ export default (state = initialState, action) => {
     case FETCH_FOCUSED_INFO:
       return {
         ...state,
-        focusedInfo: action.focusedInfo || state.focusedInfo,
+        focusedInfo: action.focusedInfo ?
+          {
+            ...action.focusedInfo,
+            reactions: {
+              happy: 0,
+              sad: 0,
+              afraid: 0,
+              amused: 0,
+              angry: 0,
+              inspired: 0,
+              ...Object.keys(groupBy(action.focusedInfo.reactions, 'group'))
+                .reduce((prev, next) => ({
+                  ...prev,
+                  [next]: groupBy(action.focusedInfo.reactions, 'group')[next][0].reduction,
+                }), {}),
+            },
+          }
+          : state.focusedInfo,
         focusedOn: 'simple',
         infoStatus: updateCrudStatus(action),
         focusedClusterInfo: [],
@@ -78,7 +95,25 @@ export default (state = initialState, action) => {
     case FETCH_CLUSTER_INFO:
       return {
         ...state,
-        focusedClusterInfo: action.focusedClusterInfo || state.focusedClusterInfo,
+        focusedClusterInfo: action.focusedClusterInfo ?
+          action.focusedClusterInfo.map((cluster) => {
+            const groupReactions = groupBy(cluster.reactions, 'group');
+            return {
+              ...cluster,
+              reactions: {
+                happy: 0,
+                sad: 0,
+                afraid: 0,
+                amused: 0,
+                angry: 0,
+                inspired: 0,
+                ...Object.keys(groupReactions).reduce((prev, next) => ({
+                  ...prev,
+                  [next]: groupReactions[next][0].reduction,
+                }), {}),
+              },
+            };
+          }) : state.focusedClusterInfo,
         focusedOn: 'cluster',
         clusterStatus: updateCrudStatus(action),
         focusedClusterArticles: action.focusedClusterArticles || state.focusedClusterArticles,
@@ -100,30 +135,20 @@ export default (state = initialState, action) => {
         ...state,
         focusedInfo: state.focusedOn === 'simple' ? {
           ...state.focusedInfo,
-          reactions: state.focusedInfo.reactions.map((reaction) => {
-            if (reaction.group === action.reaction) {
-              return {
-                group: reaction.group,
-                reduction: reaction.reduction + 1,
-              };
-            }
-            return reaction;
-          }),
+          reactions: {
+            ...state.focusedInfo.reactions,
+            [action.reaction]: state.focusedInfo.reactions[action.reaction] + 1,
+          },
         } : state.focusedInfo,
         focusedClusterInfo: state.focusedOn === 'cluster' ?
           state.focusedClusterInfo.map((article) => {
-            if (article.url === action.url) {
+            if (article.id === action.id) {
               return {
                 ...article,
-                reactions: article.reactions.map((reaction) => {
-                  if (reaction.group === action.reaction) {
-                    return {
-                      group: reaction.group,
-                      reduction: reaction.reduction + 1,
-                    };
-                  }
-                  return reaction;
-                }),
+                reactions: {
+                  ...article.reactions,
+                  [action.reaction]: article.reactions[action.reaction] + 1,
+                },
               };
             }
             return article;
@@ -341,17 +366,17 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
     }
   });
 
-export const updateReaction = (url, reaction) => httpThunk(UPDATE_REACTION, async () => {
+export const updateReaction = (id, reaction) => httpThunk(UPDATE_REACTION, async () => {
   try {
     const {
       status,
     } = await axios.put('/articles/reactions', {
-      url,
+      id,
       reaction,
     });
 
     return {
-      url,
+      id,
       reaction,
       status,
     };

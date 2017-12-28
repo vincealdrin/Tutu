@@ -35,6 +35,7 @@ const mapStateToProps = ({
     filterMapState,
     focusedOn,
     focusedClusterArticles,
+    reactionStatus,
   },
 }) => ({
   // mapState: map.viewport.toJS(),
@@ -50,6 +51,7 @@ const mapStateToProps = ({
   focusedClusterInfo,
   focusedClusterArticles,
   focusedOn,
+  reactionStatus,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -107,11 +109,29 @@ class MapView extends Component {
       focusedInfo,
       focusedClusterArticles,
       fetchStatus,
+      reactionStatus,
     } = this.props;
 
     return (
       <div className="map-container">
         <NProgress />
+        <ClusterModal
+          open={focusedOn === 'cluster' && !clusterStatus.cancelled}
+          articles={focusedClusterInfo}
+          fetchArticles={this.props.fetchFocusedClusterInfo}
+          removeFocused={this.props.removeFocused}
+          updateReaction={this.props.updateReaction}
+          status={clusterStatus}
+          totalCount={focusedClusterArticles.length}
+          reactionStatus={reactionStatus}
+        />
+        <SimpleModal
+          open={focusedOn === 'simple' && !infoStatus.cancelled}
+          article={focusedInfo}
+          removeFocused={this.props.removeFocused}
+          updateReaction={this.props.updateReaction}
+          status={infoStatus}
+        />
         <GoogleMapReact
           defaultZoom={DEFAULT_ZOOM}
           bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
@@ -122,24 +142,8 @@ class MapView extends Component {
           hoverDistance={HOVER_DISTANCE}
           onChange={this._onChange}
           onChildClick={this._onChildClick}
+          reactionStatus={reactionStatus}
         >
-          <ClusterModal
-            open={focusedOn === 'cluster' && !clusterStatus.cancelled}
-            articles={focusedClusterInfo}
-            fetchArticles={fetchFocusedClusterInfo}
-            removeFocused={this.props.removeFocused}
-            updateReaction={this.props.updateReaction}
-            status={clusterStatus}
-            totalCount={focusedClusterArticles.length}
-          />
-          <SimpleModal
-            open={focusedOn === 'simple' && !infoStatus.cancelled}
-            article={focusedInfo}
-            removeFocused={this.props.removeFocused}
-            updateReaction={this.props.updateReaction}
-            status={infoStatus}
-          />
-
           {clusters.map(({
               wx: lng, wy: lat, numPoints, points,
             }) => {

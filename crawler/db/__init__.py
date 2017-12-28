@@ -15,7 +15,6 @@ conn = r.connect(DB_HOST, DB_PORT, db=DB_NAME)
 def get_uuid(text):
     return r.uuid(text).run(conn)
 
-
 def insert_fake_article(article, tbl='fakeArticles'):
     article = {
         **article,
@@ -166,5 +165,10 @@ def insert_fake_source(source):
     r.table('fakeSources').insert(source).run(conn)
 
 
-def get_source(id, table='sources'):
-    return r.table(table).get(id).run(conn)
+def get_source(id, tbl='sources'):
+    return r.table(tbl).get(id).run(conn)
+
+def update_article_field(id, cats, tbl='articles'):
+    r.table(tbl).get(id).update({
+        'categories': cats
+    }).run(conn)

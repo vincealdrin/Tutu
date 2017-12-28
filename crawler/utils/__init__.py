@@ -132,6 +132,7 @@ def search_locations(text, locations, provinces):
                 re.IGNORECASE)
 
             if province_pattern.search(text):
+                location['found'] = 'location'
                 matched_locations.append(location)
 
     if not matched_locations:
@@ -145,6 +146,7 @@ def search_locations(text, locations, provinces):
             matched = province_pattern.search(text)
 
             if matched:
+                province['found'] = 'province'
                 matched_locations.append(province)
 
     return matched_locations

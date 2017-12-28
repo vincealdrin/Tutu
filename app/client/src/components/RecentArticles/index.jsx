@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
 import { addRecentArticle, fetchRecentArticles } from '../../modules/recentArticles';
 import { fetchFocusedInfo } from '../../modules/mapArticles';
-import newsPlaceholder from '../../app-assets/placeholder/news-placeholder.png';
+import newsPlaceholder from '../../assets/placeholder/news-placeholder.png';
 import './styles.css';
 
 const mapStateToProps = ({

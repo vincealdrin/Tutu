@@ -21,6 +21,7 @@ const Reactions = ({
     angry,
   },
   updateReaction,
+  status,
 }) => (
   <List horizontal>
     <List.Item className="reactions">
@@ -31,6 +32,9 @@ const Reactions = ({
         />
       </Tooltip>
       {happy}
+
+      {status.success && !status.pending ? 'Success' : ''}
+      {status.errorMessage}
     </List.Item>
     <List.Item className="reactions">
       <Tooltip title="Amused">

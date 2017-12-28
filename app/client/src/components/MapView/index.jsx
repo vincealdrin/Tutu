@@ -26,7 +26,6 @@ const mapStateToProps = ({
     clusterStatus,
     articles,
     clusters,
-    fetchStatus,
     mapState,
     relatedArticles,
     infoStatus,
@@ -36,13 +35,13 @@ const mapStateToProps = ({
     focusedOn,
     focusedClusterArticles,
     reactionStatus,
+    reactionId,
   },
 }) => ({
   // mapState: map.viewport.toJS(),
   mapState,
   articles,
   clusters,
-  fetchStatus,
   relatedArticles,
   infoStatus,
   clusterStatus,
@@ -52,6 +51,7 @@ const mapStateToProps = ({
   focusedClusterArticles,
   focusedOn,
   reactionStatus,
+  reactionId,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -108,8 +108,8 @@ class MapView extends Component {
       focusedOn,
       focusedInfo,
       focusedClusterArticles,
-      fetchStatus,
       reactionStatus,
+      reactionId,
     } = this.props;
 
     return (
@@ -124,12 +124,14 @@ class MapView extends Component {
           status={clusterStatus}
           totalCount={focusedClusterArticles.length}
           reactionStatus={reactionStatus}
+          reactionId={reactionId}
         />
         <SimpleModal
           open={focusedOn === 'simple' && !infoStatus.cancelled}
           article={focusedInfo}
           removeFocused={this.props.removeFocused}
           updateReaction={this.props.updateReaction}
+          reactionStatus={reactionStatus}
           status={infoStatus}
         />
         <GoogleMapReact

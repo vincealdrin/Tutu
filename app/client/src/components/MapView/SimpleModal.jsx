@@ -181,6 +181,7 @@ class SimpleModal extends Component {
           <div className="extras">
             <Reactions
               reactions={reactions}
+              status={reactionStatus}
               updateReaction={(reaction) => updateReaction(id, reaction)}
             />
             <Button as="a" href={url} circular color="blue" target="_blank">Read More</Button>

@@ -43,6 +43,11 @@ while loop_forever:
             crawled_sources = []
             continue
 
+        if not news_source:
+            print('CRAWLED ALL SOURCES')
+            crawled_sources = []
+            continue
+
         src_start_time = time.clock()
         print(news_source)
         url = news_source['url']
@@ -55,7 +60,7 @@ while loop_forever:
 
         try:
             source = newspaper.build(
-                'http://' + url, config=config, memoize_articles=True)
+                'http://' + url, config=config, memoize_articles=False)
         except Exception as e:
             print('(SOURCE ERROR) Source Skipped\n')
             print(e)

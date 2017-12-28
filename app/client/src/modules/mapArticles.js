@@ -20,6 +20,7 @@ export const FETCH_CLUSTER_INFO = 'mapArticles/FETCH_CLUSTER_INFO';
 export const REMOVE_FOCUSED = 'mapArticles/REMOVE_FOCUSED';
 export const UPDATE_REACTION = 'mapArticles/UPDATE_REACTION';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
+export const SET_REACTION_ID = 'mapArticles/SET_REACTION_ID';
 export const UPDATE_FILTER_MAP_STATE = 'mapArticles/UPDATE_FILTER_MAP_STATE';
 
 const initialState = {
@@ -30,6 +31,7 @@ const initialState = {
   infoStatus: crudStatus,
   clusterStatus: crudStatus,
   reactionStatus: crudStatus,
+  reactionId: '',
   focusedInfo: {},
   focusedClusterInfo: [],
   focusedClusterArticles: [],
@@ -129,6 +131,11 @@ export default (state = initialState, action) => {
         infoStatus: crudStatus,
         clusterStatus: crudStatus,
         reactionStatus: crudStatus,
+      };
+    case SET_REACTION_ID:
+      return {
+        ...state,
+        reactionId: action.id,
       };
     case UPDATE_REACTION:
       return {
@@ -366,21 +373,21 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
     }
   });
 
-export const updateReaction = (id, reaction) => httpThunk(UPDATE_REACTION, async () => {
-  try {
-    const {
-      status,
-    } = await axios.put('/articles/reactions', {
-      id,
-      reaction,
-    });
+export const updateReaction = (id, reaction) =>
+  httpThunk(UPDATE_REACTION, async (_, dispatch) => {
+    try {
+      dispatch({ type: SET_REACTION_ID, id });
+      const { status } = await axios.put('/articles/reactions', {
+        id,
+        reaction,
+      });
 
-    return {
-      id,
-      reaction,
-      status,
-    };
-  } catch (e) {
-    return e;
-  }
-});
+      return {
+        id,
+        reaction,
+        status,
+      };
+    } catch (e) {
+      return e;
+    }
+  });

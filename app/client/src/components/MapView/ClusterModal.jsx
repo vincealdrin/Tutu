@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { List, Image, Label, Dimmer, Loader, Modal, Segment, Grid, Header, Button, Accordion, Icon } from 'semantic-ui-react';
+import { List, Image, Label, Dimmer, Modal, Segment, Grid, Header, Button } from 'semantic-ui-react';
 import shortid from 'shortid';
 import RelatedArticles from './RelatedArticles';
 import Carousel from './Carousel';
@@ -8,10 +8,10 @@ import Reactions from './Reactions';
 import Pagination from './Pagination';
 import newsPlaceholder from '../../assets/placeholder/news-placeholder.png';
 import './styles.css';
+import { crudStatus } from '../../utils';
 
 class ClusterModal extends Component {
   state = {
-    activeIndex: 0,
     currentPage: 1,
     limit: 10,
   };
@@ -39,6 +39,7 @@ class ClusterModal extends Component {
       status,
       fetchArticles,
       reactionStatus,
+      reactionId,
     } = this.props;
     const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
 
@@ -118,6 +119,7 @@ class ClusterModal extends Component {
                       </List>
                       <Reactions
                         reactions={reactions}
+                        status={reactionId === id ? reactionStatus : crudStatus}
                         updateReaction={(reaction) => updateReaction(id, reaction)}
                       />
                     </div>

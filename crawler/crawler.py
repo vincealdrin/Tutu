@@ -130,10 +130,11 @@ while True:
                 'articleUrl': article.url
             })
 
-            if re.search('/(category|gallery|photos?)/', clean_url, re.IGNORECASE):
+            if re.search('/(category|gallery|photos?)/', clean_url,
+                         re.IGNORECASE):
                 if PY_ENV == 'development':
                     print('\n(NOT AN ARTICLE PAGE) Skipped: ' +
-                            str(article.url) + '\n')
+                          str(article.url) + '\n')
                 slp_time = insert_log(
                     source_id, 'articleCrawl', 'error',
                     float(time.clock() - start_time), {
@@ -167,6 +168,20 @@ while True:
                     title = title_split[0].strip()
 
                 categories, body = categorize(article.url)
+
+                if categories is None and body is None:
+                    if PY_ENV == 'development':
+                        print('\n(CAN\'T PARSE BODY) Skipped: ' +
+                              str(article.url) + '\n')
+                    slp_time = insert_log(
+                        source_id, 'articleCrawl', 'error',
+                        float(time.clock() - start_time), {
+                            'articleUrl': article.url,
+                            'articleTitle': title,
+                            'errorMessage': 'CAN\'T PARSE BODY',
+                        })
+                    continue
+
                 pattern = re.compile(source.brand, re.IGNORECASE)
                 body = pattern.sub('', body)
 
@@ -309,7 +324,9 @@ while True:
                     continue
 
                 summary_sentences = summarize(body)
-                summary_sentences = [s for s in summary_sentences if len(s.split(' ')) > 5]
+                summary_sentences = [
+                    s for s in summary_sentences if len(s.split(' ')) > 5
+                ]
 
                 sentiment = SentimentIntensityAnalyzer().polarity_scores(body)
                 topics = parse_topics(body)

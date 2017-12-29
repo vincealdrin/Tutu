@@ -15,6 +15,7 @@ conn = r.connect(DB_HOST, DB_PORT, db=DB_NAME)
 def get_uuid(text):
     return r.uuid(text).run(conn)
 
+
 def insert_fake_article(article, tbl='fakeArticles'):
     article = {
         **article,
@@ -23,39 +24,43 @@ def insert_fake_article(article, tbl='fakeArticles'):
 
     r.table(tbl).insert(article).run(conn)
 
-def insert_article(article, tbl='articles'):
-    article = {
-        **article,
-        # 'id': r.expr(article['id']),
-        # 'categories': r.expr(article['categories']),
-        # 'publishDate': r.expr(article['publishDate']),
-        'timestamp': r.expr(datetime.now(r.make_timezone(PH_TIMEZONE))),
-    }
 
-    rel_articles = list(r.table(tbl).filter(
-        lambda doc: doc['publishDate'].date().during(
+def insert_article(article, tbl='articles'):
+    # article = {
+    #     **article,
+    #     # 'id': r.expr(article['id']),
+    #     # 'categories': r.expr(article['categories']),
+    #     # 'publishDate': r.expr(article['publishDate']),
+    #     'timestamp': r.expr(datetime.now(r.make_timezone(PH_TIMEZONE))),
+    # }
+    article['timestamp'] = r.expr(datetime.now(r.make_timezone(PH_TIMEZONE)))
+
+    rel_articles = r.table(tbl).filter(lambda doc:
+        doc['id'].ne(article['id']) & doc['publishDate'].date().during(
             r.time(article['publishDate'].year(), article['publishDate'].month(), article['publishDate'].day(), PH_TIMEZONE).sub(TWO_DAYS_IN_SEC),
             r.time(article['publishDate'].year(), article['publishDate'].month(), article['publishDate'].day(), PH_TIMEZONE).add(TWO_DAYS_IN_SEC),
             right_bound='closed'
-        ) & doc['id'].ne(article['id']) & r.expr(
-                article['categories']).slice(0, 2).get_field('label').contains(lambda label:
-                    doc['categories'].slice(0, 2).get_field('label').contains(label)).and_(
-                        r.or_(
-                            # r.expr(article['topics']['common']).contains(lambda keyword:
-                            #     doc['topics']['common'].coerce_to('string').match(keyword)),
-                            r.expr(article['people']).contains(lambda person:
-                                doc['people'].coerce_to('string').match(person)),
-                            r.expr(article['organizations']).contains(lambda org:
-                                doc['organizations'].coerce_to('string').match(org))
-                        ))).order_by(
-                        r.desc('publishDate')).slice(0, 10).pluck('title', 'id').run(conn))
+        ).and_(
+            r.expr(article['categories']).slice(0, 2).get_field('label').contains(
+                lambda label: doc['categories'].slice(0, 2).get_field('label').contains(label)).and_(
+                    r.or_(
+                        # r.expr(article['topics']['common']).contains(lambda keyword:
+                        #     doc['topics']['common'].coerce_to('string').match(keyword)),
+                    r.expr(article['people']).contains(lambda person:
+                        doc['people'].coerce_to('string').match(person)),
+                    r.expr(article['organizations']).contains(lambda org:
+                        doc['organizations'].coerce_to('string').match(org))
+                    ))
+        )).order_by(r.desc('publishDate')).slice(0, 10).pluck('title', 'id').run(conn)
 
-    print(rel_articles)
+    print([rel['title'] for rel in rel_articles])
 
     rel_articles = [
-        rel for rel in rel_articles
+        rel for rel in list(rel_articles)
         if similar_text(article['title'], rel['title']) > 35
     ]
+    print([rel['title'] for rel in rel_articles])
+
     rel_ids = [rel['id'] for rel in rel_articles]
 
     for rel in rel_articles:
@@ -121,14 +126,18 @@ def insert_log(sourceId, log_type, status, runTime, info):
 def get_one(item_id, tbl):
     return r.table(tbl).get(item_id).run(conn)
 
+
 def get_all(tbl):
     return list(r.table(tbl).run(conn))
+
 
 def get_count(tbl):
     return r.table(tbl).count().run(conn)
 
+
 def insert_item(item, tbl):
     r.table(tbl).insert(item).run(conn)
+
 
 def get_locations():
     return list(
@@ -174,6 +183,7 @@ def get_provinces():
                 })
             }).without({ 'right': True, 'left': True }).run(conn))
 
+
 def get_sources(order_by='timestamp', desc=False, table='sources'):
     if desc:
         return list(r.table(table).order_by(r.desc(order_by)).run(conn))
@@ -186,14 +196,12 @@ def get_rand_sources(not_sources=[], count=1, table='sources'):
         .filter(lambda source: (~r.expr(not_sources).contains(source['id'])))
         .sample(count).run(conn))
 
+
 def update_field(pr_id, field, val, tbl='articles'):
-    r.table(tbl).get(pr_id).update({
-        field: val
-    }).run(conn)
+    r.table(tbl).get(pr_id).update({field: val}).run(conn)
+
 
 def check_has_same_loc(name):
-    count = r.table('locations').filter(r.row['name'].eq(name)).count().run(conn)
-    return {
-        'has_same_name': count > 1,
-        'count': count
-    }
+    count = r.table('locations').filter(
+        r.row['name'].eq(name)).count().run(conn)
+    return {'has_same_name': count > 1, 'count': count}

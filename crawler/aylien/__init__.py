@@ -46,9 +46,15 @@ def categorize(url):
         'url': url,
         'class': classes[10:]
     })
+    body = category1['text']
+
+    if not body:
+        return None, None
+
     categories = category1['classes'] + category2['classes'] + category3['classes']
+    print(categories)
     categories = [cat for cat in categories if cat['score'] > 0]
     categories = sorted(
         categories, key=lambda c: c['score'], reverse=True)
 
-    return categories, category1['text']
+    return categories, body

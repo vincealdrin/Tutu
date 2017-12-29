@@ -82,9 +82,9 @@ def search_publish_date(publish_date, html):
 
     found_date = htmldate.find_date(html)
     if found_date:
-        return datetime.strptime(htmldate.find_date(html),
+        return r.expr(datetime.strptime(htmldate.find_date(html),
                                  '%Y-%m-%d').astimezone(
-                                     r.make_timezone(PH_TIMEZONE))
+                                     r.make_timezone(PH_TIMEZONE)))
 
     return None
 
@@ -131,7 +131,7 @@ def search_locations(text, locations, provinces):
         if location['location']['name']  == 'Mexico':
             with_prov = True
 
-        if location['location']['name']  in text:
+        if re.search('^'+location['location']['name']+'$',text):
             loc = copy.deepcopy(location)
             del loc['location']['hasSameName']
 

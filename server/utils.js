@@ -139,7 +139,14 @@ module.exports.getAboutContactUrl = (htmlDoc, baseUrl) => {
 
 const mapLocation = (loc) => {
   const coords = loc('location')('position').toGeojson()('coordinates');
+  const address = r.branch(
+    loc('found').eq('location'),
+    loc('location')('formattedAddress'),
+    loc('province')('name').add(', Philippines')
+  );
+
   return {
+    address,
     lng: coords.nth(0),
     lat: coords.nth(1),
   };
@@ -176,10 +183,13 @@ module.exports.mapArticleInfo = (catsFilterLength) => (article) => ({
   sentiment: getSentiment(article('sentiment')),
   summary: article('summary'),
   relatedArticles: article('relatedArticles'),
+  // locations: article('locations').map((location) => r.branch(
+  //   location('found').eq('location'),
+  //   location('location')('formattedAddress'),
+  //   location('province')('name').add(', Philippines')
+  // )),
   categories: getCategoriesField(article, catsFilterLength),
-  reactions: article('reactions').group('reaction')
-    .count()
-    .ungroup(),
+  reactions: article('reactions').group('reaction').count().ungroup(),
 });
 
 module.exports.mapArticle = (bounds) => (join) => {

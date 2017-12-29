@@ -43,13 +43,9 @@ while loop_forever:
             crawled_sources = []
             continue
 
-        if not news_source:
-            print('CRAWLED ALL SOURCES')
-            crawled_sources = []
-            continue
 
         src_start_time = time.clock()
-        print(news_source)
+        print('Source:' + str(news_source))
         url = news_source['url']
         config = newspaper.Config()
         # config.browser_user_agent = UserAgent().random

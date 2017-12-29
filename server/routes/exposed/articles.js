@@ -197,8 +197,8 @@ module.exports = (conn, io) => {
         }))
         .without(
           'timestamp', 'body', 'id',
-          'summary2', 'url', 'title',
-          'publishDate', 'sourceId', 'locations',
+          'summary2', 'title', 'locations',
+          'publishDate', 'sourceId',
           'popularity', 'topics'
         )
         .run(conn);

@@ -311,8 +311,8 @@ export const fetchFocusedInfo = (article) =>
 
       return {
         focusedInfo: {
-          ...focusedInfo,
           ...article,
+          ...focusedInfo,
         },
         status,
       };

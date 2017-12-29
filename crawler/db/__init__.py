@@ -118,20 +118,37 @@ def insert_log(sourceId, log_type, status, runTime, info):
     return randrange(2, 6)
 
 
-def get_article(article_id, table='articles'):
-    return r.table(table).get(article_id).run(conn)
+def get_one(item_id, tbl):
+    return r.table(tbl).get(item_id).run(conn)
 
+def get_all(tbl):
+    return list(r.table(tbl).run(conn))
 
-def get_articles(table='articles'):
-    return list(r.table(table).run(conn))
+def get_count(tbl):
+    return r.table(tbl).count().run(conn)
 
+def insert_item(item, tbl):
+    r.table(tbl).insert(item).run(conn)
 
 def get_locations():
     return list(
         r.table('locations').eq_join('provinceId', r.table('provinces')).merge(lambda doc:
             {
-                'location': doc['left'].without({ 'id': True, 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True}),
-                'province': doc['right'].without({ 'id': True, 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True })
+                'location': doc['left'].without({
+                    'id': True,
+                    'area': True,
+                    'brgyCount': True,
+                    'provinceId': True,
+                    'psgc': True,
+                }),
+                'province': doc['right'].without({
+                    'id': True,
+                    'area': True,
+                    'brgyCount': True,
+                    'capitalId': True,
+                    'townCount': True,
+                    'cityCount': True
+                })
             }).without({ 'right': True, 'left': True }).run(conn))
 
 
@@ -139,14 +156,23 @@ def get_provinces():
     return list(
         r.table('provinces').eq_join('capitalId', r.table('locations')).merge(lambda doc:
             {
-                'province': doc['left'].without({ 'id': True, 'area': True, 'brgyCount': True, 'capitalId': True, 'townCount': True, 'cityCount': True }),
-                'location': doc['right'].without({ 'id': True, 'area': True, 'brgyCount': True, 'provinceId': True , 'psgc': True})
+                'province': doc['left'].without({
+                    'id': True,
+                    'area': True,
+                    'brgyCount': True,
+                    'capitalId': True,
+                    'townCount': True,
+                    'cityCount': True,
+                }),
+                'location': doc['right'].without({
+                    'id': True,
+                    'area': True,
+                    'brgyCount': True,
+                    'provinceId': True,
+                    'psgc': True,
+                    'hasSameName': True
+                })
             }).without({ 'right': True, 'left': True }).run(conn))
-
-
-def get_sources_count(table='sources'):
-    return r.table(table).count().run(conn)
-
 
 def get_sources(order_by='timestamp', desc=False, table='sources'):
     if desc:
@@ -160,15 +186,14 @@ def get_rand_sources(not_sources=[], count=1, table='sources'):
         .filter(lambda source: (~r.expr(not_sources).contains(source['id'])))
         .sample(count).run(conn))
 
-
-def insert_fake_source(source):
-    r.table('fakeSources').insert(source).run(conn)
-
-
-def get_source(id, tbl='sources'):
-    return r.table(tbl).get(id).run(conn)
-
-def update_article_field(id, cats, tbl='articles'):
-    r.table(tbl).get(id).update({
-        'categories': cats
+def update_field(pr_id, field, val, tbl='articles'):
+    r.table(tbl).get(pr_id).update({
+        field: val
     }).run(conn)
+
+def check_has_same_loc(name):
+    count = r.table('locations').filter(r.row['name'].eq(name)).count().run(conn)
+    return {
+        'has_same_name': count > 1,
+        'count': count
+    }

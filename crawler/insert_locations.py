@@ -2,6 +2,7 @@ import rethinkdb as r
 import os
 import json
 from dotenv import load_dotenv, find_dotenv
+from db import get_all, check_has_same_loc, update_article_field
 
 load_dotenv(find_dotenv(), override=True)
 
@@ -44,6 +45,14 @@ for location in locations:
         location['region'],
     }).run(conn)
 
+locations = get_all('locations')
+
+for location in locations:
+    res = check_has_same_loc(location['name'])
+
+    update_article_field(location['id'], 'hasSameName', res['has_same_name'], tbl='locations')
+
+
 for province in provinces:
     p_id = r.uuid(province['ISO']).run(conn)
 
@@ -65,8 +74,8 @@ for province in provinces:
         'id': p_id
     }).run(conn)
 
-    r.table('locations').get(capital['id']).update({
+    r.table('locations').filter(r.row['province'].eq(province['name'])).update({
         'provinceId': p_id
     }).run(conn)
-    r.table('locations').get(capital['id']).replace(
+    r.table('locations').filter(r.row['province'].eq(province['name'])).replace(
         r.row.without('province')).run(conn)

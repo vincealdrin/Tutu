@@ -17,12 +17,13 @@ from random import randrange
 from urllib.parse import urldefrag, urlparse
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
-from db import get_locations, get_sources, get_provinces, get_article, insert_article, insert_log, get_uuid, get_rand_sources, get_sources_count
+from db import get_locations, get_provinces, get_one, insert_article, insert_log, get_uuid, get_rand_sources
 from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_popularity, get_proxy
 from aylien import categorize, get_rate_limits
 from nlp import get_entities, summarize
 from nlp.keywords import parse_topics
 from fake_useragent import UserAgent
+import re
 from random import shuffle
 import os
 
@@ -129,7 +130,19 @@ while True:
                 'articleUrl': article.url
             })
 
-            existing_article = get_article(url_uuid)
+            if re.search('/(category|gallery|photos?)/', clean_url, re.IGNORECASE):
+                if PY_ENV == 'development':
+                    print('\n(NOT AN ARTICLE PAGE) Skipped: ' +
+                            str(article.url) + '\n')
+                slp_time = insert_log(
+                    source_id, 'articleCrawl', 'error',
+                    float(time.clock() - start_time), {
+                        'articleUrl': article.url,
+                        'errorMessage': 'NOT AN ARTICLE PAGE',
+                    })
+                continue
+
+            existing_article = get_one(url_uuid, 'articles')
             if existing_article:
                 if PY_ENV == 'development':
                     print('\n(EXISTING URL) Skipped: ' + str(article.url))

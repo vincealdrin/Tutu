@@ -11,6 +11,7 @@ from fake_useragent import UserAgent
 import asyncio
 from proxybroker import Broker
 import random
+import copy
 
 SHARED_COUNT_API_KEY = os.environ.get('SHARED_COUNT_API_KEY')
 PROXY_IP = os.environ.get('PROXY_IP')
@@ -123,30 +124,44 @@ def search_locations(text, locations, provinces):
     matched_locations = []
 
     for location in locations:
-        if location['location']['name'] in text:
+        with_prov = False
+
+        if location['location']['name']  == 'Angeles':
+            with_prov = True
+        if location['location']['name']  == 'Mexico':
+            with_prov = True
+
+        if location['location']['name']  in text:
+            loc = copy.deepcopy(location)
+            del loc['location']['hasSameName']
+
+            if not location['location']['hasSameName'] and not with_prov:
+                loc['found'] = 'location'
+                matched_locations.append(loc)
+                continue
+
             province_pattern = re.compile(
-                r'\W(' + location['province']['name'] + ' Province|' +
-                location['province']['name'] + '|Metro ' +
+                '(' + location['province']['name'] + ' Province|' + 'Metro ' +
                 location['province']['name'] + '|' +
                 location['province']['name'] + r')+,? ?(Philippines|PH)?\W',
                 re.IGNORECASE)
 
             if province_pattern.search(text):
-                location['found'] = 'location'
-                matched_locations.append(location)
+                loc['found'] = 'location'
+                matched_locations.append(loc)
 
     if not matched_locations:
         for province in provinces:
             province_pattern = re.compile(
-                r'\W(' + province['province']['name'] + ' Province|' +
-                province['province']['name'] + '|Metro ' +
+                '(' + province['province']['name'] + ' Province|' + 'Metro ' +
                 province['province']['name'] + '|' +
                 province['province']['name'] + r')+,? ?(Philippines|PH)?\W',
                 re.IGNORECASE)
             matched = province_pattern.search(text)
 
             if matched:
-                province['found'] = 'province'
-                matched_locations.append(province)
+                pro = copy.deepcopy(province)
+                pro['found'] = 'province'
+                matched_locations.append(pro)
 
     return matched_locations

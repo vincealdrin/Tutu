@@ -90,11 +90,11 @@ const popularTopOptions = [
 const FilterAlert = ({ action }) => (
   <div>
     <Icon
-      name={`${action === 'save' ? 'check' : 'delete'}`}
-      color={`${action === 'save' ? 'green' : 'red'}`}
+      name={`${action.typeOfAction === 'save' ? 'check' : 'delete'}`}
+      color={`${action.typeOfAction === 'save' ? 'green' : 'red'}`}
       size="large"
     />
-    Preference {`${action === 'save' ? 'saved' : 'cleared'}`}
+    Preference has been {`${action.typeOfAction === 'save' ? 'saved' : 'cleared'}`}
   </div>
 );
 

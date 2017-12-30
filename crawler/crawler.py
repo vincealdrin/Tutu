@@ -350,7 +350,7 @@ while True:
                     'publishDate': publishDate,
                     'topImageUrl': article.top_image,
                     'summary': summary_sentences,
-                    # 'summary2': article.summary,
+                    'summary2': article.summary,
                     'topics': topics,
                     'locations': matched_locations,
                     'categories': categories,

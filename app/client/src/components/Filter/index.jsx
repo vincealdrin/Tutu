@@ -92,9 +92,9 @@ const FilterAlert = (action) => (
     <Icon
       name={`${action.typeOfAction === 'save' ? 'check' : 'delete'}`}
       color={`${action.typeOfAction === 'save' ? 'green' : 'red'}`}
-      size="large"  
+      size="large"
     />
-      Preference {`${action.typeOfAction === 'save' ? 'saved' : 'cleared'}`}
+    Preference has been {`${action.typeOfAction === 'save' ? 'saved' : 'cleared'}`}
   </div>
 );
 

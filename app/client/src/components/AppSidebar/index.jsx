@@ -64,9 +64,9 @@ class AppSidebar extends Component {
               <Icon name="plus square outline" color="grey" />
               <span className={`sidebar-text ${isWideClass}`}>Recent Articles</span>
             </Link>
-            <Link to="/filter" onClick={this.beVisible}>
-              <Icon name="filter" color="grey" />
-              <span className={`sidebar-text ${isWideClass}`}>Filter Articles</span>
+            <Link to="/preferences" onClick={this.beVisible}>
+              <Icon name="cogs" color="grey" />
+              <span className={`sidebar-text ${isWideClass}`}>Preferences</span>
             </Link>
             <Link to="/categories" onClick={this.beVisible}>
               <Icon name="tags" color="grey" />

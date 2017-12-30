@@ -24,7 +24,7 @@ const App = () => (
   <div>
     <main className="app-container">
       <Switch>
-        <Route exact path="/(popular|recent|filter|about|categories|submit|themes)?" component={MapView} />
+        <Route exact path="/(popular|recent|preferences|about|categories|submit|themes)?" component={MapView} />
         <Route path="/counter" component={Counter} />
         {/* <Route path="/grid" component={GridLayout} /> */}
         <Redirect to="/" />
@@ -36,7 +36,7 @@ const App = () => (
         <Route path="/" exact component={PopularArticles} />
         <Route path="(.*)/popular" exact component={PopularArticles} />
         <Route path="(.*)/recent" exact component={RecentArticles} />
-        <Route path="(.*)/filter" exact component={Filter} />
+        <Route path="(.*)/preferences" exact component={Filter} />
         <Route path="(.*)/about" exact component={About} />
         <Route path="(.*)/submit" exact component={Submit} />
         <Route path="(.*)/categories" exact component={Categories} />

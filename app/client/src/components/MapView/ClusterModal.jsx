@@ -140,8 +140,8 @@ class ClusterModal extends Component {
         <Modal.Actions>
           {((open && status.success) || articles.length) && totalCount > limit ? (
             <Pagination
-              currentPage={currentPage}
-              totalPages={Math.ceil((totalCount || limit) / limit)}
+              currentPage={currentPage || 1}
+              totalPages={Math.ceil((totalCount || limit) / limit) || 1}
               onChange={(page) => {
                 this.setState({ currentPage: page });
                 fetchArticles(null, page - 1, limit);

@@ -72,7 +72,8 @@ module.exports = (conn, io) => {
       }
 
       if (categories) {
-        query = query.filter((article) => getCategoriesField(article, catsArr.length).eq(r.expr(catsArr)));
+        query = query.filter((article) => getCategoriesField(article)
+          .contains((category) => r.expr(catsArr).contains(category)));
       }
 
       if (orgs) {
@@ -187,7 +188,7 @@ module.exports = (conn, io) => {
       } = req.query;
       const articleInfo = await r.table(tbl)
         .get(id)
-        .merge((article) => mapArticleInfo(parseInt(catsFilterLength))(article))
+        .merge((article) => mapArticleInfo()(article))
         .merge((article) => ({
           relatedArticles: r.table(tbl)
             .getAll(r.args(article('relatedArticles')))
@@ -225,7 +226,7 @@ module.exports = (conn, io) => {
             .map(mapRelatedArticles)
             .coerceTo('array'),
         }))
-        .map(mapArticleInfo(parseInt(catsFilterLength)))
+        .map(mapArticleInfo())
         // .without(
         //   'timestamp', 'body', 'id',
         //   'summary2', 'url', 'title',

@@ -123,7 +123,7 @@ class Filter extends Component {
 
     return (
       <Segment>
-        <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter Articles</Label>
+        <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Preferences</Label>
         <div className="scrollable-section filter-scrollable">
           <Button.Group labeled icon>
             <Tooltip
@@ -324,7 +324,7 @@ class Filter extends Component {
             options={this.state.popularSocialOptions}
             onChange={(_, { value }) => {
               if (value[0] === 'all') {
-                this.setState({ popularSocialOptions: popularSocialOptions[0] });
+                this.setState({ popularSocialOptions: [popularSocialOptions[0]] });
               } else if (!value.length) {
                 this.setState({ popularSocialOptions });
               } else {

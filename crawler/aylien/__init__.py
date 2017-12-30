@@ -1,5 +1,5 @@
-from aylienapiclient import textapi
 import os
+from aylienapiclient import textapi
 
 AYLIEN_APP_ID = os.environ.get('AYLIEN_APP_ID')
 AYLIEN_APP_KEY = os.environ.get('AYLIEN_APP_KEY')

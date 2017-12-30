@@ -172,7 +172,7 @@ module.exports.mapRelatedArticles = (join) => ({
   sourceUrl: join('right')('url'),
 });
 
-module.exports.mapArticleInfo = (catsFilterLength) => (article) => ({
+module.exports.mapArticleInfo = (catsFilterLength = 2) => (article) => ({
   id: article('id'),
   url: article('url'),
   authors: article('authors'),

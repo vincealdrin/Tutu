@@ -2,6 +2,8 @@ const cheerio = require('cheerio');
 const awis = require('awis');
 const _ = require('lodash');
 const r = require('rethinkdb');
+const rp = require('request-promise');
+const parseDomain = require('parse-domain');
 
 const awisClient = awis({
   key: process.env.AMAZON_ACCESS_KEY,
@@ -13,6 +15,38 @@ const WEEK_IN_SEC = 604800;
 
 module.exports.PH_TIMEZONE = PH_TIMEZONE;
 module.exports.WEEK_IN_SEC = WEEK_IN_SEC;
+
+module.exports.getDomain = (url) => {
+  const { domain, tld } = parseDomain(url);
+  return `${domain}.${tld}`;
+};
+module.exports.putHttpUrl = (url) => (/^https?:\/\//.test(url) ? url : `http://${url}`);
+module.exports.cleanUrl = (dirtyUrl) => dirtyUrl
+  .replace('www.', '')
+  .replace(/\/$/, '')
+  .replace(/https?:\/\//, '');
+
+module.exports.getSocialScore = async (url) => {
+  const reddit = await rp(`https://www.reddit.com/api/info.json?url=${url}`, {
+    json: true,
+  });
+  const infos = reddit.data.children;
+  const subSharedCount = infos.length;
+  const totalScore = infos.reduce((prev, next) => (prev + next.data.score), 0);
+  const totalNumComments = infos.reduce((prev, next) => (prev + next.data.num_comments), 0);
+  const redScore = totalScore + totalNumComments + subSharedCount;
+
+  const sharedCount = await rp(`https://api.sharedcount.com/v1.0/?url=${url}&apikey=${process.env.SHARED_COUNT_API_KEY}`, {
+    json: true,
+  });
+
+  const suScore = sharedCount.StumbleUpon || 0;
+  const pinScore = sharedCount.Pinterest || 0;
+  const liScore = sharedCount.LinkedIn || 0;
+  const fbScore = (sharedCount.Facebook && sharedCount.Facebook.total_count) || 0;
+
+  return redScore + suScore + liScore + fbScore + pinScore;
+};
 
 module.exports.getTitle = (htmlDoc) => {
   const $ = cheerio.load(htmlDoc);
@@ -38,6 +72,7 @@ module.exports.getSourceBrand = (url, title) => {
   if (foundTitle) {
     return foundTitle;
   }
+
   return title;
 };
 
@@ -104,35 +139,24 @@ module.exports.getAboutContactUrl = (htmlDoc, baseUrl) => {
 
 const mapLocation = (loc) => {
   const coords = loc('location')('position').toGeojson()('coordinates');
+  const address = r.branch(
+    loc('found').eq('location'),
+    loc('location')('formattedAddress'),
+    loc('province')('name').add(', Philippines')
+  );
+
   return {
+    address,
     lng: coords.nth(0),
     lat: coords.nth(1),
   };
 };
 
 const getCategoriesField = (article, max = 2) => article('categories')
-  .orderBy(r.desc((category) => category('score')))
   .slice(0, max === 0 ? 2 : max)
   .getField('label');
 
 module.exports.getCategoriesField = getCategoriesField;
-
-module.exports.getRelatedArticles = (article) =>
-  r.table('articles').filter((doc) =>
-    article('publishDate').date()
-      .during(
-        r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).sub(WEEK_IN_SEC),
-        r.time(doc('publishDate').year(), doc('publishDate').month(), doc('publishDate').day(), PH_TIMEZONE).add(WEEK_IN_SEC),
-        { rightBound: 'closed' }
-      )
-      .and(article('categories').contains((label) => getCategoriesField(doc).contains(label)))
-      .or(doc('keywords').contains((keyword) => article('topics')('common').coerceTo('string').match(keyword)))
-      .or(doc('people').contains((person) => article('people').coerceTo('string').match(person)))
-      .or(doc('organizations').contains((org) => article('organizations').coerceTo('string').match(org)))
-      .and(doc('id').ne(article('id'))))
-    .orderBy(r.desc('timestamp'))
-    .slice(0, 20)
-    .pluck('title', 'url');
 
 const getSentiment = (sentiment) => r.branch(
   sentiment('compound').ge(0.5), 'Positive',
@@ -140,10 +164,17 @@ const getSentiment = (sentiment) => r.branch(
   'Neutral',
 );
 
+module.exports.mapRelatedArticles = (join) => ({
+  title: join('left')('title'),
+  url: join('left')('url'),
+  publishDate: join('left')('publishDate'),
+  source: join('right')('brand'),
+  sourceUrl: join('right')('url'),
+});
+
 module.exports.mapArticleInfo = (catsFilterLength) => (article) => ({
   id: article('id'),
   url: article('url'),
-  title: article('title'),
   authors: article('authors'),
   keywords: article('topics')('common'),
   people: article('people'),
@@ -151,6 +182,12 @@ module.exports.mapArticleInfo = (catsFilterLength) => (article) => ({
   publishDate: article('publishDate'),
   sentiment: getSentiment(article('sentiment')),
   summary: article('summary'),
+  relatedArticles: article('relatedArticles'),
+  // locations: article('locations').map((location) => r.branch(
+  //   location('found').eq('location'),
+  //   location('location')('formattedAddress'),
+  //   location('province')('name').add(', Philippines')
+  // )),
   categories: getCategoriesField(article, catsFilterLength),
   reactions: article('reactions').group('reaction').count().ungroup(),
 });

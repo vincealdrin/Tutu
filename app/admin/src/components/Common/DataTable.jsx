@@ -53,6 +53,7 @@ class DataTable extends PureComponent {
       data = [],
       totalCount,
       label,
+      deleteLabel,
       addModalContent,
       addModalActions,
       onDeleteSelected,
@@ -78,11 +79,11 @@ class DataTable extends PureComponent {
                 labelPosition="left"
                 size="small"
                 icon={isDeleting ? 'cancel' : 'trash'}
-                content={isDeleting ? 'Cancel ' : `Delete ${label}`}
+                content={isDeleting ? 'Cancel ' : `Delete ${deleteLabel || label}`}
                 onClick={() => {
                   if (isDeleting) {
-                      this.cancelDelete();
-                      this.clearDeletionList();
+                    this.cancelDelete();
+                    this.clearDeletionList();
                   } else {
                     this.enableDelete();
                   }
@@ -176,11 +177,11 @@ class DataTable extends PureComponent {
                     />
                   </Table.Cell>
                 ) : null}
-                {columns.map(({ key, wrappers = {} }) => (
+                {columns.map(({ key, wrapper }) => (
                   <Table.Cell key={shortid.generate()}>
-                    {wrappers[key] ? wrappers[key](datum[key]) : datum[key]}
+                    {wrapper ? wrapper(datum[key]) : datum[key]}
                   </Table.Cell>
-                  ))}
+                ))}
               </Table.Row>
             );
           })}
@@ -211,10 +212,10 @@ class DataTable extends PureComponent {
                   currentPage={currentPage}
                   totalPages={Math.ceil((totalCount || limit) / limit)}
                   onChange={(page) => {
-                  this.setState({ currentPage: page }, () => {
-                    this.debouncedOnPaginate(page - 1, limit, searchFilter, search);
-                  });
-                }}
+                    this.setState({ currentPage: page }, () => {
+                      this.debouncedOnPaginate(page - 1, limit, searchFilter, search);
+                    });
+                  }}
                 />
               ) : null}
             </Table.HeaderCell>

@@ -1,15 +1,16 @@
 import axios from 'axios';
-import { updateCrudStatus, crudStatus } from '../utils';
+import { updateCrudStatus, crudStatus, httpThunk } from '../utils';
 
 export const FETCH_PENDING_SOURCES = 'pendingSources/FETCH_PENDING_SOURCES';
-export const CREATE_PENDING_SOURCE = 'pendingSources/CREATE_PENDING_SOURCE';
+export const ADD_PENDING_SOURCES = 'pendingSources/ADD_PENDING_SOURCES';
 export const UPDATE_PENDING_SOURCE = 'pendingSources/UPDATE_PENDING_SOURCE';
-export const DELETE_PENDING_SOURCES = 'pendingSources/DELETE_PENDING_SOURCE';
+export const DELETE_PENDING_SOURCES = 'pendingSources/DELETE_SOURCE';
 
 const initialState = {
-  sources: [],
+  pendingSources: [],
+  totalCount: 0,
   fetchStatus: crudStatus,
-  createStatus: crudStatus,
+  addStatus: crudStatus,
   updateStatus: crudStatus,
   deleteStatus: crudStatus,
 };
@@ -19,22 +20,23 @@ export default (state = initialState, action) => {
     case FETCH_PENDING_SOURCES:
       return {
         ...state,
-        sources: action.sources || state.sources,
+        pendingSources: action.pendingSources || state.pendingSources,
         fetchStatus: updateCrudStatus(action),
+        totalCount: action.totalCount || state.totalCount,
       };
-    case CREATE_PENDING_SOURCE:
+    case ADD_PENDING_SOURCES:
       return {
         ...state,
-        sources: [
-          ...action.sources,
-          action.newSource,
-        ],
-        createStatus: updateCrudStatus(action),
+        pendingSources: action.statusText === 'success' ? [
+          action.newPendingSource,
+          ...state.pendingSources,
+        ] : state.pendingSources,
+        addStatus: updateCrudStatus(action),
       };
     case UPDATE_PENDING_SOURCE:
       return {
         ...state,
-        sources: state.sources.map((source) => {
+        pendingSources: state.pendingSources.map((source) => {
           if (source.id === action.sourceId) {
             return action.updateSource;
           }
@@ -45,7 +47,9 @@ export default (state = initialState, action) => {
     case DELETE_PENDING_SOURCES:
       return {
         ...state,
-        sources: state.sources.filter((source) => action.deletedIds.includes(source.id)),
+        pendingSources: action.statusText === 'success'
+          ? state.pendingSources.filter((source) => !action.deletedIds.includes(source.id))
+          : state.pendingSources,
         updateStatus: updateCrudStatus(action),
       };
     default:
@@ -53,53 +57,50 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchSources = () => async (dispatch) => {
-  dispatch({ type: FETCH_PENDING_SOURCES, statusText: 'pending' });
+export const fetchPendingSources = (page, limit, filter, search) => httpThunk(FETCH_PENDING_SOURCES, async () => {
+  try {
+    const { data: pendingSources, status, headers } = await axios.get('/pendingSources', {
+      params: {
+        page,
+        limit,
+        filter,
+        search,
+      },
+    });
+
+    return {
+      totalCount: parseInt(headers['x-total-count'], 10),
+      pendingSources,
+      status,
+    };
+  } catch (e) {
+    return e;
+  }
+});
+
+
+export const addPendingSources = () => httpThunk(ADD_PENDING_SOURCES, async (getState) => {
+  const { form } = getState();
 
   try {
-    const sources = await axios.get('a');
-
-    dispatch({
-      type: FETCH_PENDING_SOURCES,
-      statusText: 'success',
-      sources,
+    const { data: newPendingSource, status } = await axios.post('/pendingSources', {
+      ...form.pendingSources.values,
     });
+
+    return {
+      newPendingSource,
+      status,
+    };
   } catch (e) {
-    dispatch({
-      type: FETCH_PENDING_SOURCES,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMessage: e.response.data.message,
-    });
+    return e;
   }
-};
+});
 
-export const createSource = (source) => async (dispatch) => {
-  dispatch({ type: CREATE_PENDING_SOURCE, statusText: 'pending' });
-
-  try {
-    const id = await axios.post('a', source);
-
-    dispatch({
-      type: CREATE_PENDING_SOURCE,
-      statusText: 'success',
-      newSource: { ...source, id },
-    });
-  } catch (e) {
-    dispatch({
-      type: CREATE_PENDING_SOURCE,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMessage: e.response.data.message,
-    });
-  }
-};
-
-export const updateSource = (sourceId, source, isIdChanged = false) => async (dispatch) => {
+export const updatePendingSource = (sourceId, source, isIdChanged = false) => async (dispatch) => {
   dispatch({ type: UPDATE_PENDING_SOURCE, statusText: 'pending' });
 
   try {
-    const endpoint = `/sources/${sourceId}`;
+    const endpoint = `/pendingSources/${sourceId}`;
     const path = isIdChanged ? `${endpoint}?isIdChanged=true` : endpoint;
     const updatedSource = await axios.put(path, source);
 
@@ -118,23 +119,19 @@ export const updateSource = (sourceId, source, isIdChanged = false) => async (di
   }
 };
 
-export const deleteSources = (ids) => async (dispatch) => {
-  dispatch({ type: DELETE_PENDING_SOURCES, statusText: 'pending' });
-
+export const deletePendingSources = (ids) => httpThunk(DELETE_PENDING_SOURCES, async () => {
   try {
-    await axios.put('/sources/', ids);
+    const { status } = await axios.delete('/pendingSources', {
+      data: {
+        ids: ids.join(),
+      },
+    });
 
-    dispatch({
-      type: DELETE_PENDING_SOURCES,
-      statusText: 'success',
+    return {
       deletedIds: ids,
-    });
+      status,
+    };
   } catch (e) {
-    dispatch({
-      type: DELETE_PENDING_SOURCES,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMessage: e.response.data.message,
-    });
+    return e;
   }
-};
+});

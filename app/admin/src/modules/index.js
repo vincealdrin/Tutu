@@ -5,6 +5,8 @@ import io from 'socket.io-client';
 import counter from './counter';
 import users from './users';
 import sources from './sources';
+import pendingSources from './pendingSources';
+import fakeSources from './fakeSources';
 import articles from './articles';
 import crawler from './crawler';
 import user, { LOGOUT } from './user';
@@ -17,6 +19,8 @@ const appReducer = combineReducers({
   counter,
   users,
   sources,
+  pendingSources,
+  fakeSources,
   articles,
   crawler,
   user,

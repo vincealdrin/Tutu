@@ -1,17 +1,30 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
+const { cleanUrl } = require('../../utils');
 
 module.exports = (conn, io) => {
   const tbl = 'fakeSources';
 
   router.get('/', async (req, res, next) => {
-    const { page = 0, limit = 15 } = req.query;
+    const {
+      page = 0,
+      limit = 15,
+      filter = '',
+      search = '',
+    } = req.query;
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
 
     try {
       const totalCount = await r.table(tbl).count().run(conn);
-      const cursor = await r.table(tbl)
-        .skip(page * limit)
-        .limit(limit)
+      let query = r.table(tbl);
+
+      if (filter && search) {
+        query = query.filter((source) => source(filter).match(`(?i)${search}`));
+      }
+
+      const cursor = await query
+        .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
         .run(conn);
       const sources = await cursor.toArray();
 
@@ -22,7 +35,7 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.get('/:fakeSourceId', async (req, res, next) => {
+  router.get('/:sourceId', async (req, res, next) => {
     const { sourceId } = req.params;
 
     try {
@@ -35,28 +48,73 @@ module.exports = (conn, io) => {
   });
 
   router.post('/', async (req, res, next) => {
-    const sources = req.body;
-    const dateAdded = new Date();
-    const sourcesInfo = await Promise.all(sources.map(async (source) => {
-      const url = /^https?:\/\//.test(source) ? source : `http://${source}`;
-
-      return {
-        ...source,
-        dateAdded,
-        url,
-        id: await r.uuid(url).run(conn),
-      };
-    }));
+    const fakeSources = req.body;
+    const timestamp = new Date();
 
     try {
-      await r.table(tbl).insert(sourcesInfo).run(conn);
-      return res.json(sourcesInfo);
+      const sources = await Promise.all(fakeSources.map(async (source) => {
+        const url = cleanUrl(source);
+        const uuid = await r.uuid(url).run(conn);
+
+        return {
+          id: uuid,
+          url,
+          timestamp,
+        };
+      }));
+      const uuids = sources.map((source) => source.id);
+      const pendingCursor = await r.table('pendingSources')
+        .getAll(r.args(uuids))
+        .pluck('id', 'url')
+        .run(conn);
+      const matchedPendings = await pendingCursor.toArray();
+      const sourceCursor = await r.table('sources')
+        .getAll(r.args(uuids))
+        .pluck('id', 'url')
+        .run(conn);
+      const matchedSources = await sourceCursor.toArray();
+      const fakeCursor = await r.table('fakeSources')
+        .getAll(r.args(uuids))
+        .pluck('id', 'url')
+        .run(conn);
+      const matchedFakes = await fakeCursor.toArray();
+
+      if (matchedPendings.length || matchedSources.length || matchedFakes.length) {
+        const errorMessage = [];
+
+        sources.forEach((source) => {
+          const foundFake = matchedFakes.find((mf) => mf.id === source.id);
+          if (foundFake) {
+            errorMessage.push(`${foundFake.url} already exists in list of fake sources`);
+            return;
+          }
+
+          const foundPending = matchedPendings.find((mp) => mp.id === source.id);
+          if (foundPending) {
+            errorMessage.push(`${foundPending.url} already exists in list of pending sources`);
+            return;
+          }
+
+          const foundSource = matchedSources.find((ms) => ms.id === source.id);
+          if (foundSource) {
+            errorMessage.push(`${foundSource.url} already exists in list of reliable sources`);
+          }
+        });
+
+        return next({
+          status: 400,
+          message: errorMessage.join(','),
+        });
+      }
+
+      await r.table(tbl).insert(sources).run(conn);
+      return res.json(sources);
     } catch (e) {
       next(e);
     }
   });
 
-  router.put('/:fakeSourceId', async (req, res, next) => {
+  router.put('/:sourceId', async (req, res, next) => {
     const { sourceId } = req.params;
     const { isIdChanged } = req.query;
     const source = req.body;
@@ -75,10 +133,13 @@ module.exports = (conn, io) => {
   });
 
   router.delete('/', async (req, res, next) => {
-    const { ids = [] } = req.body;
+    const { ids = '' } = req.body;
 
     try {
-      await r.table(tbl).getAll(r.args(ids)).delete().run(conn);
+      await r.table(tbl)
+        .getAll(r.args(ids.split(',')))
+        .delete()
+        .run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -86,7 +147,7 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.delete('/:fakeSourceId', async (req, res, next) => {
+  router.delete('/:sourceId', async (req, res, next) => {
     const { sourceId = '' } = req.params;
 
     try {

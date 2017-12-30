@@ -7,7 +7,13 @@ import './styles.css';
 class Submit extends Component {
   state = {
     submitStatus: '',
-    result: '',
+    result: {
+      isReliable: false,
+      isVerified: false,
+      result: 0,
+      sourceResult: 0,
+      contentResult: 0,
+    },
     url: '',
   };
 
@@ -15,14 +21,26 @@ class Submit extends Component {
     this.setState({ submitStatus: 'pending' });
 
     try {
-      const { data: { prediction } } = await axios.get('/submit', {
-        params: {
-          url: this.state.url,
+      const {
+        data: {
+          isReliable,
+          isVerified,
+          sourcePct,
+          contentPct,
+          pct,
         },
+      } = await axios.get('/submit', {
+        params: { url: this.state.url },
       });
 
       this.setState({
-        result: prediction,
+        result: {
+          isReliable,
+          isVerified,
+          pct,
+          sourcePct,
+          contentPct,
+        },
         submitStatus: 'success',
       });
     } catch (e) {
@@ -43,7 +61,7 @@ class Submit extends Component {
             </Header>
 
             <p className="tutu-description" >
-              Please insert a Source URL or an Article URL to be checked by the fake news checker
+              Please insert an Article URL to be checked by the fake news checker
             </p>
 
             <Input
@@ -64,7 +82,20 @@ class Submit extends Component {
             <Message info>
               <Message.Header>
                 {submitStatus === 'pending' ? 'please wait...' : ''}
-                {submitStatus === 'success' ? result : ''}
+                {submitStatus === 'success' ? (
+                  <span>
+                    Result:
+                    <ul>
+                      <li>prediction: {result.isReliable ? 'RELIABLE' : 'NOT RELIABLE'}</li>
+                      <li>reliability ({result.pct.toFixed(2)}%)</li>
+                      <li />
+                      <li>source reliability ({result.sourcePct.toFixed(2)}%)</li>
+                      <li>content reliability ({result.contentPct.toFixed(2)}%)</li>
+                    </ul>
+
+                    <p> {result.isVerified ? 'verified by journalists' : 'not verified by journalists tho'}</p>
+                  </span>
+                ) : ''}
                 {submitStatus === 'error' ? 'error' : ''}
               </Message.Header>
             </Message>

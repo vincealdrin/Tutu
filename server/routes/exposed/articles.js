@@ -7,12 +7,13 @@ const {
   mapArticleInfo,
   PH_TIMEZONE,
   mapSideArticle,
-  getRelatedArticles,
   getCategoriesField,
+  mapRelatedArticles,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
   const tbl = 'articles';
+
   router.get('/', async (req, res, next) => {
     const {
       neLng,
@@ -34,7 +35,12 @@ module.exports = (conn, io) => {
       popular = '',
       sentiment = '',
     } = req.query;
-    const bounds = r.polygon([parseFloat(swLng), parseFloat(swLat)], [parseFloat(seLng), parseFloat(seLat)], [parseFloat(neLng), parseFloat(neLat)], [parseFloat(nwLng), parseFloat(nwLat)],);
+    const bounds = r.polygon(
+      [parseFloat(swLng), parseFloat(swLat)],
+      [parseFloat(seLng), parseFloat(seLat)],
+      [parseFloat(neLng), parseFloat(neLat)],
+      [parseFloat(nwLng), parseFloat(nwLat)]
+    );
     const catsArr = categories.split(',');
 
     try {
@@ -90,7 +96,7 @@ module.exports = (conn, io) => {
         }
       }
 
-      query = query.eqJoin(r.row('sourceId'), r.table('sources'));
+      query = query.eqJoin('sourceId', r.table('sources'));
 
       if (popular) {
         const [socialNetworks, top] = popular.split('|');
@@ -152,7 +158,7 @@ module.exports = (conn, io) => {
 
 
       if (sources) {
-        query = query.filter((article) => article('right')('brand')
+        query = query.filter((article) => article('right')('url')
           .match(`(?i)${sources.replace(',', '|')}`));
       }
 
@@ -183,13 +189,19 @@ module.exports = (conn, io) => {
         .get(id)
         .merge((article) => mapArticleInfo(parseInt(catsFilterLength))(article))
         .merge((article) => ({
-          relatedArticles: getRelatedArticles(article),
+          relatedArticles: r.table(tbl)
+            .getAll(r.args(article('relatedArticles')))
+            .eqJoin('sourceId', r.table('sources'))
+            .map(mapRelatedArticles)
+            .coerceTo('array'),
         }))
+        .without(
+          'timestamp', 'body', 'id',
+          'summary2', 'title', 'locations',
+          'publishDate', 'sourceId',
+          'popularity', 'topics'
+        )
         .run(conn);
-
-      articleInfo.relatedArticles = articleInfo.relatedArticles
-        .filter(({ title }) => natural.DiceCoefficient(articleInfo.title, title) > 0.30)
-        .slice(0, 5);
 
       res.json(articleInfo);
     } catch (e) {
@@ -206,10 +218,14 @@ module.exports = (conn, io) => {
       const uuids = ids.split(',');
       const cursor = await r.table(tbl)
         .getAll(r.args(uuids))
-        .map(mapArticleInfo(parseInt(catsFilterLength)))
         .merge((article) => ({
-          relatedArticles: getRelatedArticles(article),
+          relatedArticles: r.table(tbl)
+            .getAll(r.args(article('relatedArticles')))
+            .eqJoin('sourceId', r.table('sources'))
+            .map(mapRelatedArticles)
+            .coerceTo('array'),
         }))
+        .map(mapArticleInfo(parseInt(catsFilterLength)))
         // .without(
         //   'timestamp', 'body', 'id',
         //   'summary2', 'url', 'title',
@@ -220,21 +236,8 @@ module.exports = (conn, io) => {
       const articles = await cursor.toArray();
 
       // console.log(articles);
-      const filteredArticles = uuids.map((id) => {
-        const article = articles.find((a) => a.id === id);
-        delete article.id;
 
-        return {
-          ...article,
-          relatedArticles: article.relatedArticles
-            .filter(({
-              title,
-            }) => natural.DiceCoefficient(article.title, title) > 0.30)
-            .slice(0, 5),
-        };
-      });
-
-      res.json(filteredArticles);
+      res.json(articles);
     } catch (e) {
       next(e);
     }
@@ -333,7 +336,7 @@ module.exports = (conn, io) => {
   router.put('/reactions', async (req, res, next) => {
     try {
       const {
-        url,
+        id,
         reaction,
       } = req.body;
 
@@ -344,9 +347,8 @@ module.exports = (conn, io) => {
         });
       }
 
-      const uuid = await r.uuid(url).run(conn);
       const ip = requestIp.getClientIp(req);
-      const existingReact = await r.table('articles').get(uuid)('reactions')
+      const existingReact = await r.table('articles').get(id)('reactions')
         .filter((react) => react('ip').eq(ip))
         .nth(0)
         .default(null)
@@ -359,7 +361,7 @@ module.exports = (conn, io) => {
         });
       }
 
-      await r.table('articles').get(uuid).update({
+      await r.table('articles').get(id).update({
         reactions: r.row('reactions').append({
           ip,
           reaction,

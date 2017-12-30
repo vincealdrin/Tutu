@@ -17,6 +17,7 @@ class AppSidebar extends Component {
   render() {
     const { isWide } = this.state;
     const { visible } = this.state;
+    const isWideClass = isWide ? 'show' : 'hide';
     let isVisible;
     let isIconVisible;
 
@@ -32,7 +33,7 @@ class AppSidebar extends Component {
     }
 
     return (
-      <div className="container">
+      <div className="side-bar-container">
         <div className="item-container">
           <div className="article-display-button" onClick={this.toggleVisibility}>
             <Icon name={`angle ${isIconVisible}`} size="large" />
@@ -50,42 +51,42 @@ class AppSidebar extends Component {
           <div className="logo">
             <Icon name="map" color="grey" size="big" style={{ margin: '2rem auto 1rem' }} />
             <Link to="/top">
-              <Header as="h2" className={`tutu-logo ${isWide ? 'show' : 'hide'}`}>TUTÛ</Header>
+              <Header as="h2" className={`tutu-logo ${isWideClass}`}>TUTÛ</Header>
             </Link>
           </div>
           <div className="side-menu">
-            <span className={`label ${isWide ? 'show' : 'hide'}`}>MENU</span>
+            <span className={`label ${isWideClass}`}>MENU</span>
             <Link to="/popular" onClick={this.beVisible}>
               <Icon name="newspaper" color="grey" />
-              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Popular News</span>
+              <span className={`sidebar-text ${isWideClass}`}>Popular News</span>
             </Link>
             <Link to="/recent" onClick={this.beVisible}>
               <Icon name="plus square outline" color="grey" />
-              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Recent Articles</span>
+              <span className={`sidebar-text ${isWideClass}`}>Recent Articles</span>
             </Link>
             <Link to="/filter" onClick={this.beVisible}>
               <Icon name="filter" color="grey" />
-              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Filter</span>
+              <span className={`sidebar-text ${isWideClass}`}>Filter Articles</span>
             </Link>
             <Link to="/categories" onClick={this.beVisible}>
               <Icon name="tags" color="grey" />
-              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Categories</span>
+              <span className={`sidebar-text ${isWideClass}`}>Categories</span>
             </Link>
             <Link to="/about" onClick={this.beVisible}>
               <Icon name="browser" color="grey" />
-              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>About</span>
+              <span className={`sidebar-text ${isWideClass}`}>About</span>
             </Link>
             <Link to="/submit" onClick={this.beVisible}>
               <Icon name="send outline" color="grey" />
-              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Submit</span>
+              <span className={`sidebar-text ${isWideClass}`}>Submit</span>
             </Link>
             <Link to="/themes" onClick={this.beVisible}>
               <Icon name="globe" color="grey" />
-              <span className={`sidebar-text ${isWide ? 'show' : 'hide'}`}>Map Themes</span>
+              <span className={`sidebar-text ${isWideClass}`}>Map Themes</span>
             </Link>
           </div>
           <div className="popular">
-            <span className={`label ${isWide ? 'show' : 'hide'}`}>POPULAR</span>
+            <span className={`label ${isWideClass}`}>POPULAR</span>
           </div>
           <div className="top-places">
             {isWide ? <span className="label">TOP PLACES</span> : null}

@@ -1,15 +1,20 @@
 import React, { Component } from 'react';
-import { List, Image, Dimmer, Loader, Label, Modal, Accordion, Icon, Grid, Header, Button } from 'semantic-ui-react';
+import {
+  List,
+  Image,
+  Dimmer,
+  Label,
+  Modal,
+  Accordion,
+  Icon,
+  Grid,
+  Header,
+  Button,
+} from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
 import Tags from './Tags';
 import Carousel from './Carousel';
-// import the reaction images
-import happyReact from '../../app-assets/reactions/5.svg';
-import amusedReact from '../../app-assets/reactions/4.svg';
-import inspiredReact from '../../app-assets/reactions/3.svg';
-import afraidReact from '../../app-assets/reactions/2.svg';
-import sadReact from '../../app-assets/reactions/1.svg';
-import angryReact from '../../app-assets/reactions/0.svg';
+import Reactions from './Reactions';
 import './styles.css';
 
 class SimpleModal extends Component {
@@ -22,8 +27,11 @@ class SimpleModal extends Component {
       return 'green';
     } else if (sentiment === 'Neutral') {
       return 'grey';
+    } else if (sentiment === 'Negative') {
+      return 'red';
     }
-    return 'red';
+
+    return '';
   }
 
   showRelatedArticles = (_, titleProps) => {
@@ -48,38 +56,28 @@ class SimpleModal extends Component {
         source,
         sourceUrl,
         url,
+        id,
         topImageUrl,
+        reactions = {
+          happy: 0,
+          sad: 0,
+          afraid: 0,
+          amused: 0,
+          angry: 0,
+          inspired: 0,
+        },
         authors = [],
         categories = [],
         keywords = [],
         organizations = [],
         people = [],
-        reactions = [],
         relatedArticles = [],
       },
       removeFocused,
       updateReaction,
       status,
+      reactionStatus,
     } = this.props;
-
-    const reactionsImages = [
-      { image: happyReact, name: 'happy' },
-      { image: amusedReact, name: 'amused' },
-      { image: inspiredReact, name: 'inspired' },
-      { image: afraidReact, name: 'afraid' },
-      { image: sadReact, name: 'sad' },
-      { image: angryReact, name: 'angry' },
-    ];
-
-    const [
-      afraid = { reduction: 0 },
-      amused = { reduction: 0 },
-      angry = { reduction: 0 },
-      happy = { reduction: 0 },
-      inspired = { reduction: 0 },
-      sad = { reduction: 0 },
-    ] = reactions;
-
     const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
 
     return (
@@ -91,11 +89,13 @@ class SimpleModal extends Component {
         closeOnDimmerClick
         dimmer
       >
-        <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
+        {status.success ? (
+          <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
+        ) : null}
         <Modal.Content scrolling>
           {status.pending ? (
-            <Dimmer active>
-              <Loader indeterminate>Loading article...</Loader>
+            <Dimmer active inverted>
+              <Header as="h4">Loading article...</Header>
             </Dimmer>
           ) : null}
           <Grid columns={2} style={{ marginBottom: '1rem' }}>
@@ -114,36 +114,34 @@ class SimpleModal extends Component {
               </div>
             </Grid.Column>
             <Grid.Column width={9}>
-              <div>
-                <List divided relaxed>
-                  <List.Item>
-                    <Label
-                      as="a"
-                      className="tag-label"
-                      color={this.getSentimentColor(sentiment)}
-                    >
+              <List divided relaxed>
+                <List.Item>
+                  <Label
+                    as="a"
+                    className="tag-label"
+                    color={this.getSentimentColor(sentiment)}
+                  >
                       Sentiment
-                    </Label>
-                    <span className="article-tags">{sentiment}</span>
-                  </List.Item>
-                  <List.Item>
-                    <Label as="a" className="tag-label">Categories</Label>
-                    <Tags content={categories} />
-                  </List.Item>
-                  <List.Item>
-                    <Label as="a" className="tag-label">Keywords</Label>
-                    <Tags content={keywords} />
-                  </List.Item>
-                  <List.Item>
-                    <Label as="a" className="tag-label">Organizations</Label>
-                    <Tags content={organizations} />
-                  </List.Item>
-                  <List.Item>
-                    <Label as="a" className="tag-label">People</Label>
-                    <Tags content={people} />
-                  </List.Item>
-                </List>
-              </div>
+                  </Label>
+                  <span className="article-tags">{sentiment}</span>
+                </List.Item>
+                <List.Item>
+                  <Label as="a" className="tag-label">Categories</Label>
+                  <Tags content={categories} />
+                </List.Item>
+                <List.Item>
+                  <Label as="a" className="tag-label">Keywords</Label>
+                  <Tags content={keywords} />
+                </List.Item>
+                <List.Item>
+                  <Label as="a" className="tag-label">Organizations</Label>
+                  <Tags content={organizations} />
+                </List.Item>
+                <List.Item>
+                  <Label as="a" className="tag-label">People</Label>
+                  <Tags content={people} />
+                </List.Item>
+              </List>
             </Grid.Column>
           </Grid>
           <Header as="a" color="blue" href={url} target="_blank">{title}</Header>
@@ -162,7 +160,7 @@ class SimpleModal extends Component {
             </Accordion.Title>
             <Accordion.Content active={activeIndex === 0} index={0}>
               <List divided relaxed>
-                {relatedArticles.length > 0
+                {relatedArticles.length
                   ? relatedArticles.map((related) => (
                     <List.Item>
                       <List.Header
@@ -181,23 +179,11 @@ class SimpleModal extends Component {
             </Accordion.Content>
           </Accordion>
           <div className="extras">
-            <List horizontal>
-              {reactionsImages.map((reactionItem) => (
-                <List.Item className="reactions">
-                  <Tooltip
-                    html={
-                      <span style={{ textTransform: 'capitalize' }}>{reactionItem.name}</span>
-                    }
-                    distance={-4}
-                  >
-                    <Image
-                      src={reactionItem.image}
-                      onClick={() => updateReaction(url, reactionItem.name)}
-                    />
-                  </Tooltip>
-                </List.Item>
-              ))}
-            </List>
+            <Reactions
+              reactions={reactions}
+              status={reactionStatus}
+              updateReaction={(reaction) => updateReaction(id, reaction)}
+            />
             <Button as="a" href={url} circular color="blue" target="_blank">Read More</Button>
           </div>
         </Modal.Content>

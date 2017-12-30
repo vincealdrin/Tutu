@@ -1,4 +1,5 @@
 import { Cancel } from 'axios';
+import { beginTask, endTask } from 'redux-nprogress';
 
 export const updateCrudStatus = (action) => ({
   pending: action.statusText === 'pending',
@@ -24,8 +25,11 @@ export const mapOptions = (opt) => ({
   value: opt,
 });
 
+export const articleId = (info) => `${info.title}-${info.source}-${info.publishDate}`;
+
 export const httpThunk = (type, cb) => async (dispatch, getState) => {
   dispatch({ statusText: 'pending', type });
+  dispatch(beginTask());
   const payload = await cb(getState, dispatch);
 
   if (payload instanceof Error) {
@@ -50,4 +54,5 @@ export const httpThunk = (type, cb) => async (dispatch, getState) => {
       type,
     });
   }
+  dispatch(endTask());
 };

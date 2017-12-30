@@ -5,8 +5,7 @@ from lxml import etree
 from db import insert_fake_source, get_uuid
 from utils import get_popularity
 
-with open(
-        '../fake-news-detector/fake-news-sources/fake-news-sources.json') as f:
+with open('../detector/data/fake-news-sources.json') as f:
     SOURCES = json.load(f)
 
 HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/json'}
@@ -23,8 +22,8 @@ for s in SOURCES:
         for x in tree.xpath('/ALEXA/SD/COUNTRY'):
             country_rank = int(x.get('RANK')) if x.get('RANK') else 0
         meta = requests.get(
-            'http://localhost:5000/api/exposed/submit?url=http://' + url).json(
-            )
+            'http://localhost:5000/api/exposed/submit/meta?url=http://' + url
+        ).json()
 
         info = {
             'id':

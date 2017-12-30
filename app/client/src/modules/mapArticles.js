@@ -1,6 +1,7 @@
 import axios from 'axios';
 import supercluster from 'points-cluster';
 import flattenDeep from 'lodash/flattenDeep';
+import groupBy from 'lodash/groupBy';
 import {
   crudStatus,
   updateCrudStatus,
@@ -19,16 +20,18 @@ export const FETCH_CLUSTER_INFO = 'mapArticles/FETCH_CLUSTER_INFO';
 export const REMOVE_FOCUSED = 'mapArticles/REMOVE_FOCUSED';
 export const UPDATE_REACTION = 'mapArticles/UPDATE_REACTION';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
+export const SET_REACTION_ID = 'mapArticles/SET_REACTION_ID';
 export const UPDATE_FILTER_MAP_STATE = 'mapArticles/UPDATE_FILTER_MAP_STATE';
 
 const initialState = {
   articles: [],
   clusters: [],
   totalCount: 0,
-  articlesStatus: crudStatus,
+  fetchStatus: crudStatus,
   infoStatus: crudStatus,
   clusterStatus: crudStatus,
   reactionStatus: crudStatus,
+  reactionId: '',
   focusedInfo: {},
   focusedClusterInfo: [],
   focusedClusterArticles: [],
@@ -54,7 +57,7 @@ export default (state = initialState, action) => {
         ...state,
         articles: action.articles || state.articles,
         clusters: action.clusters || state.clusters,
-        articlesStatus: updateCrudStatus(action),
+        fetchStatus: updateCrudStatus(action),
       };
     case UPDATE_MAP_STATE:
       return {
@@ -69,7 +72,24 @@ export default (state = initialState, action) => {
     case FETCH_FOCUSED_INFO:
       return {
         ...state,
-        focusedInfo: action.focusedInfo || state.focusedInfo,
+        focusedInfo: action.focusedInfo ?
+          {
+            ...action.focusedInfo,
+            reactions: {
+              happy: 0,
+              sad: 0,
+              afraid: 0,
+              amused: 0,
+              angry: 0,
+              inspired: 0,
+              ...Object.keys(groupBy(action.focusedInfo.reactions, 'group'))
+                .reduce((prev, next) => ({
+                  ...prev,
+                  [next]: groupBy(action.focusedInfo.reactions, 'group')[next][0].reduction,
+                }), {}),
+            },
+          }
+          : state.focusedInfo,
         focusedOn: 'simple',
         infoStatus: updateCrudStatus(action),
         focusedClusterInfo: [],
@@ -77,7 +97,25 @@ export default (state = initialState, action) => {
     case FETCH_CLUSTER_INFO:
       return {
         ...state,
-        focusedClusterInfo: action.focusedClusterInfo || state.focusedClusterInfo,
+        focusedClusterInfo: action.focusedClusterInfo ?
+          action.focusedClusterInfo.map((cluster) => {
+            const groupReactions = groupBy(cluster.reactions, 'group');
+            return {
+              ...cluster,
+              reactions: {
+                happy: 0,
+                sad: 0,
+                afraid: 0,
+                amused: 0,
+                angry: 0,
+                inspired: 0,
+                ...Object.keys(groupReactions).reduce((prev, next) => ({
+                  ...prev,
+                  [next]: groupReactions[next][0].reduction,
+                }), {}),
+              },
+            };
+          }) : state.focusedClusterInfo,
         focusedOn: 'cluster',
         clusterStatus: updateCrudStatus(action),
         focusedClusterArticles: action.focusedClusterArticles || state.focusedClusterArticles,
@@ -94,35 +132,30 @@ export default (state = initialState, action) => {
         clusterStatus: crudStatus,
         reactionStatus: crudStatus,
       };
+    case SET_REACTION_ID:
+      return {
+        ...state,
+        reactionId: action.id,
+      };
     case UPDATE_REACTION:
       return {
         ...state,
         focusedInfo: state.focusedOn === 'simple' ? {
           ...state.focusedInfo,
-          reactions: state.focusedInfo.reactions.map((reaction) => {
-            if (reaction.group === action.reaction) {
-              return {
-                group: reaction.group,
-                reduction: reaction.reduction + 1,
-              };
-            }
-            return reaction;
-          }),
+          reactions: {
+            ...state.focusedInfo.reactions,
+            [action.reaction]: state.focusedInfo.reactions[action.reaction] + 1,
+          },
         } : state.focusedInfo,
         focusedClusterInfo: state.focusedOn === 'cluster' ?
           state.focusedClusterInfo.map((article) => {
-            if (article.url === action.url) {
+            if (article.id === action.id) {
               return {
                 ...article,
-                reactions: article.reactions.map((reaction) => {
-                  if (reaction.group === action.reaction) {
-                    return {
-                      group: reaction.group,
-                      reduction: reaction.reduction + 1,
-                    };
-                  }
-                  return reaction;
-                }),
+                reactions: {
+                  ...article.reactions,
+                  [action.reaction]: article.reactions[action.reaction] + 1,
+                },
               };
             }
             return article;
@@ -167,9 +200,10 @@ export const updateFilterMapState = (center, zoom, bounds) => ({
 });
 
 export const fetchArticles = (center, zoom, bounds) =>
-  httpThunk(FETCH_ARTICLES, async (getState) => {
+  httpThunk(FETCH_ARTICLES, async (getState, dispatch) => {
     if (source) {
       source.cancel();
+      // dispatch(endTask());
     }
     source = axios.CancelToken.source();
 
@@ -235,6 +269,7 @@ export const fetchArticles = (center, zoom, bounds) =>
       });
 
       // dispatch(updateMapState(center, zoom, bounds));
+      source = null;
 
       return {
         totalCount: parseInt(headers['x-total-count'], 10),
@@ -247,46 +282,51 @@ export const fetchArticles = (center, zoom, bounds) =>
     }
   });
 
-export const fetchFocusedInfo = (article) => httpThunk(FETCH_FOCUSED_INFO, async (getState) => {
-  try {
-    if (focusedInfoSource) {
-      focusedInfoSource.cancel();
+export const fetchFocusedInfo = (article) =>
+  httpThunk(FETCH_FOCUSED_INFO, async (getState, dispatch) => {
+    try {
+      if (focusedInfoSource) {
+        focusedInfoSource.cancel();
+        // dispatch(endTask());
+      }
+      focusedInfoSource = axios.CancelToken.source();
+
+      const {
+        filters: {
+          categories,
+        },
+      } = getState();
+      const {
+        data: focusedInfo,
+        status,
+      } = await axios.get('/articles/info', {
+        params: {
+          id: article.id,
+          catsFilterLength: categories.length,
+        },
+        cancelToken: focusedInfoSource.token,
+      });
+
+      focusedInfoSource = null;
+
+      return {
+        focusedInfo: {
+          ...article,
+          ...focusedInfo,
+        },
+        status,
+      };
+    } catch (e) {
+      return e;
     }
-    focusedInfoSource = axios.CancelToken.source();
-
-    const {
-      filters: {
-        categories,
-      },
-    } = getState();
-    const {
-      data: focusedInfo,
-      status,
-    } = await axios.get('/articles/info', {
-      params: {
-        id: article.id,
-        catsFilterLength: categories.length,
-      },
-      cancelToken: focusedInfoSource.token,
-    });
-
-    return {
-      focusedInfo: {
-        ...focusedInfo,
-        ...article,
-      },
-      status,
-    };
-  } catch (e) {
-    return e;
-  }
-});
+  });
 
 export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
-  httpThunk(FETCH_CLUSTER_INFO, async (getState) => {
+  httpThunk(FETCH_CLUSTER_INFO, async (getState, dispatch) => {
     try {
       if (focusedClusterSource) {
         focusedClusterSource.cancel();
+        // dispatch(endTask());
       }
       focusedClusterSource = axios.CancelToken.source();
 
@@ -314,9 +354,9 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
       });
 
       const payload = {
-        focusedClusterInfo: sliceArticles.map((article, i) => ({
+        focusedClusterInfo: await sliceArticles.map((article) => ({
           ...article,
-          ...focusedClusterInfo[i],
+          ...focusedClusterInfo.find((info) => info.id === article.id),
         })),
         status,
       };
@@ -325,27 +365,29 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
         payload.focusedClusterArticles = articles;
       }
 
+      focusedClusterSource = null;
+
       return payload;
     } catch (e) {
       return e;
     }
   });
 
-export const updateReaction = (url, reaction) => httpThunk(UPDATE_REACTION, async () => {
-  try {
-    const {
-      status,
-    } = await axios.put('/articles/reactions', {
-      url,
-      reaction,
-    });
+export const updateReaction = (id, reaction) =>
+  httpThunk(UPDATE_REACTION, async (_, dispatch) => {
+    try {
+      dispatch({ type: SET_REACTION_ID, id });
+      const { status } = await axios.put('/articles/reactions', {
+        id,
+        reaction,
+      });
 
-    return {
-      url,
-      reaction,
-      status,
-    };
-  } catch (e) {
-    return e;
-  }
-});
+      return {
+        id,
+        reaction,
+        status,
+      };
+    } catch (e) {
+      return e;
+    }
+  });

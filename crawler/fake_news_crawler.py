@@ -10,7 +10,7 @@ from random import randrange
 from urllib.parse import urldefrag, urlparse
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
-from db import get_locations, get_sources, get_provinces, get_article, insert_article, insert_log, get_uuid, get_rand_sources, get_source
+from db import get_locations, get_sources, get_provinces, get_article, insert_fake_article, insert_log, get_uuid, get_rand_sources, get_source
 from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_popularity
 from aylien import article_extraction
 from nlp import get_entities, summarize
@@ -22,20 +22,30 @@ load_dotenv(find_dotenv(), override=True)
 count = 0
 slp_time = 0
 crawled_sources = []
+loop_forever = True
 
-while True:
+while loop_forever:
     news_sources = get_rand_sources(
         not_sources=crawled_sources, count=1, table='fakeSources')
     # news_sources = [get_source('0ec1a833-9082-5d60-8c61-53305c7a2a90', table='fakeSources')]
 
     for news_source in news_sources:
+        print('Crawled Sources: ' + str(crawled_sources))
+
+        if news_source['id'] in crawled_sources:
+            print(news_source)
+            print('may mali')
+            loop_forever = False
+            break
 
         if not news_sources:
             print('CRAWLED ALL SOURCES')
             crawled_sources = []
             continue
 
+
         src_start_time = time.clock()
+        print('Source:' + str(news_source))
         url = news_source['url']
         config = newspaper.Config()
         # config.browser_user_agent = UserAgent().random
@@ -46,7 +56,7 @@ while True:
 
         try:
             source = newspaper.build(
-                'http://' + url, config=config, memoize_articles=True)
+                'http://' + url, config=config, memoize_articles=False)
         except Exception as e:
             print('(SOURCE ERROR) Source Skipped\n')
             print(e)
@@ -150,7 +160,7 @@ while True:
                     'sourceCountryRank': news_source['countryRank'],
                 }
 
-                insert_article(new_article, 'fakeArticles')
+                insert_fake_article(new_article)
                 count += 1
                 src_art_count += 1
 

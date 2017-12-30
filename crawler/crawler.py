@@ -3,7 +3,7 @@
 # for deployment
 # nohup java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 20000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly &
 # hack method to backup db on server
-# rethinkdb dump -c localhost:32769
+# rethinkdb dump -c localhost:28015
 # tar zxvf ./rethinkdb_dump_2017-01-24T21:42:08.tar.gz
 # rm rethinkdb_dump_2017-01-24T21:21:47.tar.gz
 # mv rethinkdb_dump_2017-01-24T21:42:08 rethinkdb_dump_2017-01-24
@@ -17,12 +17,13 @@ from random import randrange
 from urllib.parse import urldefrag, urlparse
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
-from db import get_locations, get_sources, get_provinces, get_article, insert_article, insert_log, get_uuid, get_rand_sources, get_sources_count
+from db import get_locations, get_provinces, get_one, insert_article, insert_log, get_uuid, get_rand_sources
 from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_popularity, get_proxy
-from aylien import categorize
+from aylien import categorize, get_rate_limits
 from nlp import get_entities, summarize
 from nlp.keywords import parse_topics
 from fake_useragent import UserAgent
+import re
 from random import shuffle
 import os
 
@@ -45,8 +46,10 @@ last_proxy = ''
 
 while True:
     news_sources = get_rand_sources(not_sources=crawled_sources)
+    # news_sources = get_sources('timestamp')
 
     for news_source in news_sources:
+        print('Crawled Sources: ' + str(crawled_sources))
         if not news_sources:
             if PY_ENV == 'development':
                 print('CRAWLED ALL SOURCES')
@@ -106,22 +109,41 @@ while True:
             sleep(slp_time)
             continue
 
-        for article in source.articles:
+        shuffle(source.articles)
+        for article in source.articles[:20]:
             start_time = time.clock()
 
             sleep(slp_time)
 
+            if PY_ENV == 'development':
+                print(article.url)
+
             defragged_url = urldefrag(article.url).url
             qs_idx = defragged_url.find('?')
             clean_url = defragged_url[:qs_idx if qs_idx != -1 else None]
-            clean_url = clean_url.replace('https', 'http').replace('www.', '')
+            clean_url = clean_url.replace('https',
+                                          'http').replace('www.', '').replace(
+                                              'beta.', '')
             url_uuid = get_uuid(clean_url)
 
             insert_log(source_id, 'articleCrawl', 'pending', float(slp_time), {
                 'articleUrl': article.url
             })
 
-            existing_article = get_article(url_uuid)
+            if re.search('/(category|gallery|photos?)/', clean_url,
+                         re.IGNORECASE):
+                if PY_ENV == 'development':
+                    print('\n(NOT AN ARTICLE PAGE) Skipped: ' +
+                          str(article.url) + '\n')
+                slp_time = insert_log(
+                    source_id, 'articleCrawl', 'error',
+                    float(time.clock() - start_time), {
+                        'articleUrl': article.url,
+                        'errorMessage': 'NOT AN ARTICLE PAGE',
+                    })
+                continue
+
+            existing_article = get_one(url_uuid, 'articles')
             if existing_article:
                 if PY_ENV == 'development':
                     print('\n(EXISTING URL) Skipped: ' + str(article.url))
@@ -139,12 +161,32 @@ while True:
                 article.parse()
                 article.nlp()
 
-                title = article.title.split('|')[0].strip()
-                categories, body, rate_limits = categorize(article.url)
+                title = article.title
+                title_split = article.title.split('|')
+
+                if len(title_split) != 1:
+                    title = title_split[0].strip()
+
+                categories, body = categorize(article.url)
+
+                if categories is None and body is None:
+                    if PY_ENV == 'development':
+                        print('\n(CAN\'T PARSE BODY) Skipped: ' +
+                              str(article.url) + '\n')
+                    slp_time = insert_log(
+                        source_id, 'articleCrawl', 'error',
+                        float(time.clock() - start_time), {
+                            'articleUrl': article.url,
+                            'articleTitle': title,
+                            'errorMessage': 'CAN\'T PARSE BODY',
+                        })
+                    continue
+
                 pattern = re.compile(source.brand, re.IGNORECASE)
                 body = pattern.sub('', body)
 
                 try:
+                    # if langdetect.detect(body) != 'en' or langdetect.detect(title) != 'en':
                     if langdetect.detect(body) != 'en':
                         if PY_ENV == 'development':
                             print('\n(NOT ENGLISH) Skipped: ' +
@@ -282,6 +324,10 @@ while True:
                     continue
 
                 summary_sentences = summarize(body)
+                summary_sentences = [
+                    s for s in summary_sentences if len(s.split(' ')) > 5
+                ]
+
                 sentiment = SentimentIntensityAnalyzer().polarity_scores(body)
                 topics = parse_topics(body)
                 popularity = get_popularity(article.url)
@@ -290,6 +336,9 @@ while True:
                     author = search_authors(article.html)
                     if author:
                         article.authors.append(author)
+
+                top_image = '' if re.match(
+                    'favicon', article.top_image) else article.top_image
 
                 new_article = {
                     'id': url_uuid,
@@ -301,7 +350,7 @@ while True:
                     'publishDate': publishDate,
                     'topImageUrl': article.top_image,
                     'summary': summary_sentences,
-                    'summary2': article.summary,
+                    # 'summary2': article.summary,
                     'topics': topics,
                     'locations': matched_locations,
                     'categories': categories,
@@ -309,27 +358,32 @@ while True:
                     'organizations': organizations,
                     'people': people,
                     'popularity': popularity,
-                    'reactions': []
+                    'reactions': [],
+                    'relatedArticles': []
                 }
 
                 insert_article(new_article)
                 count += 1
                 src_art_count += 1
-
                 runtime = float(time.clock() - start_time)
+
+                rate_limits = get_rate_limits()
                 aylien_status = rate_limits[0]
                 aylien_status2 = rate_limits[1]
                 aylien_status3 = rate_limits[2]
+
+                if not aylien_status or not aylien_status2 or not aylien_status3:
+                    print('REACHED AYLIEN LIMIT')
+                    break
+
                 if PY_ENV == 'development':
                     print(
                         str(count) + '.) ' + str(title) + ' | ' +
                         str(article.url))
-                if PY_ENV == 'development':
                     print('Locations: ' + ' | '.join([
                         ml['location']['formattedAddress']
                         for ml in matched_locations
                     ]))
-                if PY_ENV == 'development':
                     print('AYLIEN REMAINING CALL: [' +
                           str(aylien_status['remaining']) + ', ' +
                           str(aylien_status2['remaining']) + ', ' + str(

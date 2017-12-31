@@ -34,7 +34,11 @@ class AppSidebar extends Component {
 
     return (
       <div className="side-bar-container">
+
         <div className="item-container">
+          <div className="top-buttons">
+            {this.props.topChildren}
+          </div>
           <div className="article-display-button" onClick={this.toggleVisibility}>
             <Icon name={`angle ${isIconVisible}`} size="large" />
           </div>

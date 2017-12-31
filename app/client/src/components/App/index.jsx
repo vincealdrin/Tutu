@@ -13,6 +13,7 @@ import Filter from '../Filter';
 import About from '../About';
 import Categories from '../Categories';
 import Submit from '../Submit';
+import Insights from '../Insights';
 import MapThemes from '../MapThemes';
 import Counter from '../Counter';
 // import GridLayout from '../GridView';
@@ -31,7 +32,7 @@ const App = () => (
       </Switch>
     </main>
 
-    <AppSidebar>
+    <AppSidebar topChildren={<Insights />}>
       <Switch>
         <Route path="/" exact component={PopularArticles} />
         <Route path="(.*)/popular" exact component={PopularArticles} />

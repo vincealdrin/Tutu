@@ -7,6 +7,7 @@ import mapArticles from './mapArticles';
 import recentArticles from './recentArticles';
 import popularArticles from './popularArticles';
 import filters from './filters';
+import insights from './insights';
 import mapThemes from './mapThemes';
 
 const socket = io.connect('/client');
@@ -19,6 +20,7 @@ export default combineReducers({
   recentArticles,
   popularArticles,
   filters,
+  insights,
   mapThemes,
 });
 

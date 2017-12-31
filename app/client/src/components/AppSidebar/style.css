@@ -24,8 +24,19 @@
   box-shadow: -3px 3px 1rem -3px #1b272b;
 }
 
+.top-buttons {
+  position: absolute;
+  top: 1.5%;
+  left: -10.5rem;
+  z-index: 100;
+}
+
 .article-info p {
   font-size: 12px;
+}
+
+.top-btn {
+  position: relative;
 }
 
 .side-bar-container {

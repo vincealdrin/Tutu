@@ -4,7 +4,8 @@ import { crudStatus, updateCrudStatus, httpThunk } from '../utils';
 export const FETCH_INSIGHTS = 'insights/FETCH_INSIGHTS';
 
 const initialState = {
-  insights: [],
+  sentiment: [],
+  categories: [],
   fetchStatus: crudStatus,
 };
 
@@ -22,11 +23,9 @@ export default (state = initialState, action) => {
 };
 
 export const fetchInsights = (ids) =>
-  httpThunk(FETCH_INSIGHTS, () => async (dispatch) => {
-    dispatch({ type: FETCH_INSIGHTS, statusText: 'pending' });
-
+  httpThunk(FETCH_INSIGHTS, async () => {
     try {
-      const { data: insights, status } = await axios.get('/insights', {
+      const { data: insights, status } = await axios.get('/insights/sentiment', {
         params: {
           ids,
         },

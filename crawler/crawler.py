@@ -11,6 +11,7 @@
 import newspaper
 import json
 import time
+from datetime import datetime
 import re
 import langdetect
 from random import randrange
@@ -18,11 +19,12 @@ from urllib.parse import urldefrag, urlparse
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
 from db import get_locations, get_provinces, get_one, insert_article, insert_log, get_uuid, get_rand_sources
-from utils import PH_TIMEZONE, search_locations, search_authors, search_publish_date, sleep, get_popularity, get_proxy
+from utils import PH_TIMEZONE, search_locations, search_authors, get_publish_date, sleep, get_popularity, get_proxy
 from aylien import categorize, get_rate_limits
 from nlp import get_entities, summarize
 from nlp.keywords import parse_topics
 from fake_useragent import UserAgent
+import rethinkdb as r
 import re
 from random import shuffle
 import os
@@ -159,7 +161,7 @@ while True:
             try:
                 article.download()
                 article.parse()
-                article.nlp()
+                # article.nlp()
 
                 title = article.title
                 title_split = article.title.split('|')
@@ -292,8 +294,20 @@ while True:
                             })
                         continue
 
-                publishDate = search_publish_date(article.publish_date,
-                                                  article.html)
+                publishDate = r.expr(get_publish_date(article.html))
+
+                if (publishDate.year < 2017 or publishDate.year > datetime.today().year):
+                    if PY_ENV == 'development':
+                        print('\n(PUBLISH DATE NOT IN RANGE) Skipped: ' +
+                              str(article.url) + '\n')
+                    slp_time = insert_log(
+                        source_id, 'articleCrawl', 'error',
+                        float(time.clock() - start_time), {
+                            'articleUrl': article.url,
+                            'articleTitle': title,
+                            'errorMessage': 'PUBLISH DATE NOT IN RANGE'
+                        })
+                    continue
 
                 if (not publishDate):
                     if PY_ENV == 'development':

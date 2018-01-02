@@ -161,7 +161,7 @@ while True:
             try:
                 article.download()
                 article.parse()
-                # article.nlp()
+                article.nlp()
 
                 title = article.title
                 title_split = article.title.split('|')
@@ -343,7 +343,7 @@ while True:
                 ]
 
                 sentiment = SentimentIntensityAnalyzer().polarity_scores(body)
-                topics = parse_topics(body)
+                # topics = parse_topics(body)
                 popularity = get_popularity(article.url)
 
                 if not article.authors:
@@ -353,6 +353,17 @@ while True:
 
                 top_image = '' if re.match(
                     'favicon', article.top_image) else article.top_image
+
+                keywords = []
+                for key, value in article.keywords.items():
+                    keywords.append({
+                        'word': key,
+                        'score': value
+                    })
+
+                keywords = sorted(
+                        keywords, key=lambda k: k['score'], reverse=True)
+                keywords = [keyword['word'] for keyword in keywords]
 
                 new_article = {
                     'id': url_uuid,
@@ -365,7 +376,7 @@ while True:
                     'topImageUrl': article.top_image,
                     'summary': summary_sentences,
                     'summary2': article.summary,
-                    'topics': topics,
+                    'keywords': keywords,
                     'locations': matched_locations,
                     'categories': categories,
                     'sentiment': sentiment,

@@ -176,7 +176,7 @@ module.exports.mapArticleInfo = (catsFilterLength = 2) => (article) => ({
   id: article('id'),
   url: article('url'),
   authors: article('authors'),
-  keywords: article('topics')('common'),
+  keywords: article('keywords'),
   people: article('people'),
   organizations: article('organizations'),
   publishDate: article('publishDate'),

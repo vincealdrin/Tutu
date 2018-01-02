@@ -16,12 +16,11 @@ import copy
 SHARED_COUNT_API_KEY = os.environ.get('SHARED_COUNT_API_KEY')
 PROXY_IP = os.environ.get('PROXY_IP')
 PROXY_IP2 = os.environ.get('PROXY_IP2')
-PROXY_IP3 = os.environ.get('PROXY_IP3')
 PY_ENV = os.environ.get('PY_ENV')
 PH_TIMEZONE = '+08:00'
 TWO_DAYS_IN_SEC = 172800
 
-proxies = [PROXY_IP, PROXY_IP2, PROXY_IP3]
+proxies = [PROXY_IP, PROXY_IP2]
 
 
 def get_proxy(last=''):
@@ -75,17 +74,12 @@ def get_popularity(url):
     }
 
 
-def search_publish_date(publish_date, html):
-    if publish_date:
-        return r.expr(
-            publish_date.replace(tzinfo=r.make_timezone(PH_TIMEZONE)))
-
+def get_publish_date(html):
     found_date = htmldate.find_date(html)
     if found_date:
-        return r.expr(datetime.strptime(htmldate.find_date(html),
+        return datetime.strptime(htmldate.find_date(html),
                                  '%Y-%m-%d').astimezone(
-                                     r.make_timezone(PH_TIMEZONE)))
-
+                                     r.make_timezone(PH_TIMEZONE))
     return None
 
 
@@ -126,12 +120,12 @@ def search_locations(text, locations, provinces):
     for location in locations:
         with_prov = False
 
-        if location['location']['name']  == 'Angeles':
+        if location['location']['name'] == 'Angeles':
             with_prov = True
-        if location['location']['name']  == 'Mexico':
+        if location['location']['name'] == 'Mexico':
             with_prov = True
 
-        if re.search('^'+location['location']['name']+'$',text):
+        if re.search('^' + location['location']['name'] + '$', text):
             loc = copy.deepcopy(location)
             del loc['location']['hasSameName']
 

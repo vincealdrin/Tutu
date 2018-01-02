@@ -5,25 +5,54 @@ const { getCategoriesField } = require('../../utils');
 module.exports = (conn) => {
   router.get('/top', async (req, res, next) => {
     try {
-      const { ids, field, limit } = req.query;
+      const { ids, field, limit = '10' } = req.query;
+      let fieldName = '';
+
+      switch (field) {
+      case 'locations':
+        fieldName = 'location';
+        break;
+      case 'people':
+        fieldName = 'person';
+        break;
+      case 'organizations':
+        fieldName = 'organization';
+        break;
+      case 'keywords':
+        fieldName = 'keyword';
+        break;
+      default:
+        return next({
+          status: 400,
+          message: 'Wrong field value',
+        });
+      }
 
       const cursor = await r.table('articles')
         .getAll(r.args(ids.split(',')))
+        // .limit(10)
         .getField(field)
         .reduce((left, right) => left.add(right))
-        .map((person) => ({ name: person }))
-        .group('name')
+        .map((row) => r.object(fieldName, field === 'locations' ? (
+          r.branch(
+            row('found').eq('location'),
+            row('location')('formattedAddress'),
+            row('province')('name').add(', Philippines'),
+          )) : row))
+        .group(fieldName)
         .ungroup()
-        .map({
-          name: r.row('group'),
-          count: r.row('reduction').count(),
-        })
+        .map(r.object(
+          fieldName,
+          r.row('group'),
+          'count',
+          r.row('reduction').count()
+        ))
         .orderBy(r.desc('count'))
         .limit(parseInt(limit))
         .run(conn);
-      const people = await cursor.toArray();
+      const words = await cursor.toArray();
 
-      return res.json(people);
+      return res.json(words);
     } catch (e) {
       next(e);
     }
@@ -89,6 +118,7 @@ module.exports = (conn) => {
                 'Business & Finance': r.branch(categories.contains('Business & Finance'), 1, 0),
                 'Disaster & Accident': r.branch(categories.contains('Disaster & Accident'), 1, 0),
                 'Entertainment & Arts': r.branch(categories.contains('Entertainment & Arts'), 1, 0),
+                'Law & Government': r.branch(categories.contains('Law & Government'), 1, 0),
                 'Science & Technology': r.branch(categories.contains('Science & Technology'), 1, 0),
               };
             })
@@ -106,6 +136,7 @@ module.exports = (conn) => {
               'Business & Finance': left('Business & Finance').add(right('Business & Finance')),
               'Disaster & Accident': left('Disaster & Accident').add(right('Disaster & Accident')),
               'Entertainment & Arts': left('Entertainment & Arts').add(right('Entertainment & Arts')),
+              'Law & Government': left('Law & Government').add(right('Law & Government')),
               'Science & Technology': left('Science & Technology').add(right('Science & Technology')),
             })),
         }))

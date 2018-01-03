@@ -8,6 +8,8 @@ import {
   fetchSentimentInsights,
   fetchTopInsights,
   fetchCategoriesInsights,
+  openModal,
+  closeModal,
 } from '../../modules/insights';
 import { getLineDataset } from '../../utils';
 
@@ -18,42 +20,48 @@ const mapStateToProps = ({
     topPeople,
     topOrgs,
     topLocations,
-    topkeywords,
+    topKeywords,
     fetchStatus,
+    isModalOpen,
   },
   mapArticles: {
     articles,
+    focusedOn,
   },
 }) => ({
+  isFocused: Boolean(focusedOn),
+  ids: articles.map((article) => article.id).join(),
   sentiment,
   categories,
   topPeople,
   topOrgs,
   topLocations,
-  topkeywords,
+  topKeywords,
   fetchStatus,
-  ids: articles.map((article) => article.id).join(),
+  isModalOpen,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchSentimentInsights,
   fetchTopInsights,
   fetchCategoriesInsights,
+  openModal,
+  closeModal,
 }, dispatch);
 
 class Insights extends Component {
-  state = { isOpen: false }
-
-  openModal = () => this.setState({ isOpen: true });
-  closeModal = () => this.setState({ isOpen: false });
-
   render() {
     const {
       ids,
       sentiment,
       categories,
+      topKeywords,
+      topPeople,
+      topLocations,
+      topOrgs,
+      isModalOpen,
+      isFocused,
     } = this.props;
-    const { isOpen } = this.state;
     const sentimentLineData = {
       labels: sentiment.labels,
       datasets: getLineDataset([
@@ -273,30 +281,104 @@ class Insights extends Component {
         },
       ],
     };
+    const peopleBarData = {
+      type: 'horizontalBar',
+      labels: topPeople.map(({ person }) => person),
+      datasets: [
+        {
+          label: 'Person',
+          backgroundColor: [
+            'rgba(255,99,132,0.2)',
+          ],
+          borderColor: [
+            'rgba(255,99,132,1)',
+          ],
+          hoverBackgroundColor: [
+            'rgba(255,99,132,0.4)',
+          ],
+          hoverBorderColor: [
+            'rgba(255,99,132,1)',
+          ],
+          borderWidth: 1,
+          barThickness: 1,
+          data: topPeople.map(({ count }) => count),
+        },
+      ],
+    };
+    const locationsBarData = {
+      type: 'horizontalBar',
+      labels: topLocations.map(({ location }) => location),
+      datasets: [
+        {
+          label: 'Location',
+          backgroundColor: [
+            'rgba(255,99,132,0.2)',
+          ],
+          borderColor: [
+            'rgba(255,99,132,1)',
+          ],
+          hoverBackgroundColor: [
+            'rgba(255,99,132,0.4)',
+          ],
+          hoverBorderColor: [
+            'rgba(255,99,132,1)',
+          ],
+          borderWidth: 1,
+          barThickness: 1,
+          data: topPeople.map(({ count }) => count),
+        },
+      ],
+    };
+    const orgsBarData = {
+      type: 'horizontalBar',
+      labels: topOrgs.map(({ organization }) => organization),
+      datasets: [
+        {
+          label: 'Organization',
+          backgroundColor: [
+            'rgba(255,99,132,0.2)',
+          ],
+          borderColor: [
+            'rgba(255,99,132,1)',
+          ],
+          hoverBackgroundColor: [
+            'rgba(255,99,132,0.4)',
+          ],
+          hoverBorderColor: [
+            'rgba(255,99,132,1)',
+          ],
+          borderWidth: 1,
+          barThickness: 1,
+          data: topPeople.map(({ count }) => count),
+        },
+      ],
+    };
 
     return (
       <div>
-        <Button
-          content="Insights"
-          icon="bar chart"
-          labelPosition="left"
-          onClick={() => {
-            this.openModal();
-            this.props.fetchTopInsights(ids, 'people', 10);
-            this.props.fetchTopInsights(ids, 'organizations', 10);
-            this.props.fetchTopInsights(ids, 'locations', 10);
-            this.props.fetchTopInsights(ids, 'keywords', 1000);
-            this.props.fetchSentimentInsights(ids);
-            this.props.fetchCategoriesInsights(ids);
-          }}
-        />
+        {!isModalOpen && !isFocused ? (
+          <Button
+            content="Insights"
+            icon="bar chart"
+            labelPosition="left"
+            onClick={() => {
+              this.props.openModal();
+              this.props.fetchTopInsights(ids, 'people', 10);
+              this.props.fetchTopInsights(ids, 'organizations', 10);
+              this.props.fetchTopInsights(ids, 'locations', 10);
+              this.props.fetchTopInsights(ids, 'keywords', 500);
+              this.props.fetchSentimentInsights(ids);
+              this.props.fetchCategoriesInsights(ids);
+            }}
+          />
+        ) : null}
         <Modal
-          open={isOpen}
-          onClose={this.closeModal}
+          open={isModalOpen}
+          onClose={this.props.closeModal}
           closeOnDimmerClick
         >
           <Modal.Header>Insights</Modal.Header>
-          <Modal.Content>
+          <Modal.Content scrolling>
             Sentiment
             <Line data={sentimentLineData} />
             <Pie data={sentimentPieData} />
@@ -305,6 +387,23 @@ class Insights extends Component {
             <Pie data={categoriesPieData} />
             <HorizontalBar data={categoriesBarData} />
             word cloud
+            <WordCloud
+              font="lato"
+              width={700}
+              height={500}
+              // padding={(word) => word.value / 10}
+              data={topKeywords.map(({ keyword, count }) => ({
+                text: keyword,
+                value: count,
+              }))}
+              fontSizeMapper={(word) => Math.log2(word.value) * 10}
+              rotate={(word) => word.value % 360}
+            />
+            top 10
+            <HorizontalBar data={peopleBarData} />
+            <HorizontalBar data={orgsBarData} />
+            <HorizontalBar data={locationsBarData} />
+
           </Modal.Content>
           <Modal.Actions>
             <Button

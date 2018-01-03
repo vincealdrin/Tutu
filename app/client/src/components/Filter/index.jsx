@@ -160,12 +160,6 @@ class Filter extends Component {
                 }}
               />
             </Tooltip>
-            <Button
-              icon="bar chart"
-              labelPosition="left"
-              content="Insights"
-              color="teal"
-            />
           </Button.Group>
           <Divider />
           <span className="input-label">SEARCH KEYWORDS</span>

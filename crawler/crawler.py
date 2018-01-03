@@ -9,6 +9,8 @@
 # mv rethinkdb_dump_2017-01-24T21:42:08 rethinkdb_dump_2017-01-24
 # tar -czvf rethinkdb_dump_2017-01-24.tar.gz rethinkdb_dump_2017-01-24
 import newspaper
+from newspaper.nlp import summarize, keywords
+from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
 import json
 import time
 from datetime import datetime
@@ -18,10 +20,10 @@ from random import randrange
 from urllib.parse import urldefrag, urlparse
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
-from db import get_locations, get_provinces, get_one, insert_article, insert_log, get_uuid, get_rand_sources
+from db import get_locations, get_provinces, get_one, insert_article, insert_log, get_uuid, get_rand_sources, get_sources
 from utils import PH_TIMEZONE, search_locations, search_authors, get_publish_date, sleep, get_popularity, get_proxy
 from aylien import categorize, get_rate_limits
-from nlp import get_entities, summarize
+from nlp import get_entities, summarize2
 from nlp.keywords import parse_topics
 from fake_useragent import UserAgent
 import rethinkdb as r
@@ -47,8 +49,8 @@ crawled_sources = []
 last_proxy = ''
 
 while True:
-    news_sources = get_rand_sources(not_sources=crawled_sources)
-    # news_sources = get_sources('timestamp')
+    # news_sources = get_rand_sources(not_sources=crawled_sources)
+    news_sources = get_sources('timestamp')
 
     for news_source in news_sources:
         print('Crawled Sources: ' + str(crawled_sources))
@@ -67,7 +69,7 @@ while True:
         config = newspaper.Config()
         config.follow_meta_refresh = True
         # config.memoize_articles = True if PY_ENV == 'production' else False
-        config.memoize_articles = True
+        config.memoize_articles = False
 
         proxy = get_proxy(last_proxy)
         last_proxy = proxy['http']
@@ -111,8 +113,8 @@ while True:
             sleep(slp_time)
             continue
 
-        shuffle(source.articles)
-        for article in source.articles[:20]:
+        # shuffle(source.articles)
+        for article in source.articles:
             start_time = time.clock()
 
             sleep(slp_time)
@@ -161,7 +163,6 @@ while True:
             try:
                 article.download()
                 article.parse()
-                article.nlp()
 
                 title = article.title
                 title_split = article.title.split('|')
@@ -170,6 +171,15 @@ while True:
                     title = title_split[0].strip()
 
                 categories, body = categorize(article.url)
+
+                if categories == 'API LIMIT':
+                    print('REACHED AYLIEN LIMIT')
+                    insert_log(source_id, 'articleCrawl', 'error',
+                               float(time.clock() - start_time), {
+                                   'errorMessage': 'REACHED AYLIEN LIMIT',
+                               })
+                    sleep(3600)
+                    continue
 
                 if categories is None and body is None:
                     if PY_ENV == 'development':
@@ -294,9 +304,10 @@ while True:
                             })
                         continue
 
-                publishDate = r.expr(get_publish_date(article.html))
+                publish_date = get_publish_date(article.html)
 
-                if (publishDate.year < 2017 or publishDate.year > datetime.today().year):
+                if publish_date.year < 2017 or publish_date.year > datetime.today(
+                ).year:
                     if PY_ENV == 'development':
                         print('\n(PUBLISH DATE NOT IN RANGE) Skipped: ' +
                               str(article.url) + '\n')
@@ -309,7 +320,7 @@ while True:
                         })
                     continue
 
-                if (not publishDate):
+                if (not publish_date):
                     if PY_ENV == 'development':
                         print('\n(CAN\'T FIND PUBLISH DATE) Skipped: ' +
                               str(article.url) + '\n')
@@ -322,6 +333,7 @@ while True:
                         })
                     continue
 
+                publish_date = r.expr(publish_date)
                 organizations, people, error = get_entities(body)
 
                 if error:
@@ -337,10 +349,10 @@ while True:
                         })
                     continue
 
-                summary_sentences = summarize(body)
-                summary_sentences = [
-                    s for s in summary_sentences if len(s.split(' ')) > 5
-                ]
+                # summary_sentences = summarize2(body)
+                # summary_sentences = [
+                #     s for s in summary_sentences if len(s.split(' ')) > 5
+                # ]
 
                 sentiment = SentimentIntensityAnalyzer().polarity_scores(body)
                 # topics = parse_topics(body)
@@ -354,16 +366,34 @@ while True:
                 top_image = '' if re.match(
                     'favicon', article.top_image) else article.top_image
 
-                keywords = []
-                for key, value in article.keywords.items():
-                    keywords.append({
-                        'word': key,
-                        'score': value
-                    })
+                with open('../detector/tl_stopwords.txt', 'r') as f:
+                    TL_STOPWORDS = f.read().splitlines()
 
-                keywords = sorted(
-                        keywords, key=lambda k: k['score'], reverse=True)
-                keywords = [keyword['word'] for keyword in keywords]
+                STOP_WORDS = ENGLISH_STOP_WORDS.union(TL_STOPWORDS)
+                cleaned_body = [
+                    word for word in body.split()
+                    if word.lower() not in STOP_WORDS
+                ]
+                cleaned_title = [
+                    word for word in article.title.split()
+                    if word.lower() not in STOP_WORDS
+                ]
+                text_keyws = list(keywords(cleaned_body).keys())
+                title_keyws = list(keywords(cleaned_title).keys())
+                keyws = list(set(title_keyws + text_keyws))
+                summary = summarize(
+                    title=article.title, text=body, max_sents=3)
+
+                # keywords = []
+                # for key, value in article.keywords.items():
+                #     keywords.append({
+                #         'word': key,
+                #         'score': value
+                #     })
+
+                # keywords = sorted(
+                #         keywords, key=lambda k: k['score'], reverse=True)
+                # keywords = [keyword['word'] for keyword in keywords]
 
                 new_article = {
                     'id': url_uuid,
@@ -372,11 +402,11 @@ while True:
                     'title': title.encode('ascii', 'ignore').decode('utf-8'),
                     'authors': article.authors,
                     'body': body,
-                    'publishDate': publishDate,
+                    'publishDate': publish_date,
                     'topImageUrl': article.top_image,
-                    'summary': summary_sentences,
-                    'summary2': article.summary,
-                    'keywords': keywords,
+                    # 'summary': summary_sentences,
+                    'summary': summary,
+                    'keywords': keyws,
                     'locations': matched_locations,
                     'categories': categories,
                     'sentiment': sentiment,
@@ -396,10 +426,6 @@ while True:
                 aylien_status = rate_limits[0]
                 aylien_status2 = rate_limits[1]
                 aylien_status3 = rate_limits[2]
-
-                if not aylien_status or not aylien_status2 or not aylien_status3:
-                    print('REACHED AYLIEN LIMIT')
-                    break
 
                 if PY_ENV == 'development':
                     print(
@@ -434,7 +460,7 @@ while True:
                        'articlesCrawledCount': src_art_count,
                    })
 
-        crawled_sources.append(source_id)
+        # crawled_sources.append(source_id)
 
         if PY_ENV == 'development':
             print('\n' + source.domain + ' done!')

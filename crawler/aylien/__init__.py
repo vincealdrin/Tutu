@@ -34,27 +34,32 @@ def get_rate_limits():
 
 def categorize(url):
     categories = []
-    category1 = text_client.UnsupervisedClassify({
-        'url': url,
-        'class': classes[:5]
-    })
-    category2 = text_client2.UnsupervisedClassify({
-        'url': url,
-        'class': classes[5:10]
-    })
-    category3 = text_client3.UnsupervisedClassify({
-        'url': url,
-        'class': classes[10:]
-    })
-    body = category1['text']
 
-    if not body:
-        return None, None
+    try:
+        category1 = text_client.UnsupervisedClassify({
+            'url': url,
+            'class': classes[:5]
+        })
+        category2 = text_client2.UnsupervisedClassify({
+            'url': url,
+            'class': classes[5:10]
+        })
+        category3 = text_client3.UnsupervisedClassify({
+            'url': url,
+            'class': classes[10:]
+        })
+        body = category1['text']
 
-    categories = category1['classes'] + category2['classes'] + category3['classes']
-    print(categories)
-    categories = [cat for cat in categories if cat['score'] > 0]
-    categories = sorted(
-        categories, key=lambda c: c['score'], reverse=True)
+        if not body:
+            return None, None
 
-    return categories, body
+        categories = category1['classes'] + category2['classes'] + category3['classes']
+        # print(categories)
+        categories = [cat for cat in categories if cat['score'] > 0]
+        categories = sorted(
+            categories, key=lambda c: c['score'], reverse=True)
+
+        return categories, body
+
+    except Exception:
+        return 'API LIMIT', None

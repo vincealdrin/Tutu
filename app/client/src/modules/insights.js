@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { crudStatus, updateCrudStatus, httpThunk } from '../utils';
 
+export const OPEN_MODAL = 'insights/OPEN_MODAL';
+export const CLOSE_MODAL = 'insights/CLOSE_MODAL';
 export const FETCH_SENTIMENT = 'insights/FETCH_SENTIMENT';
 export const FETCH_CATEGORIES = 'insights/FETCH_CATEGORIES';
 export const FETCH_TOP_PEOPLE = 'insights/FETCH_TOP_PEOPLE';
@@ -9,6 +11,7 @@ export const FETCH_TOP_KEYWORDS = 'insights/FETCH_TOP_KEYWORDS';
 export const FETCH_TOP_LOCATIONS = 'insights/FETCH_TOP_LOCATIONS';
 
 const initialState = {
+  isModalOpen: false,
   sentiment: {
     labels: [],
     posCount: [],
@@ -47,6 +50,13 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case OPEN_MODAL:
+      return {
+        ...state,
+        isModalOpen: true,
+      };
+    case CLOSE_MODAL:
+      return initialState;
     case FETCH_SENTIMENT:
       return {
         ...state,
@@ -143,12 +153,10 @@ export const fetchTopInsights = (ids, field, limit) => {
 
   return httpThunk(actionType, async () => {
     try {
-      const { data: insights, status } = await axios.get('/insights/top', {
-        params: {
-          field,
-          ids,
-          limit,
-        },
+      const { data: insights, status } = await axios.post('/insights/top', {
+        field,
+        limit,
+        ids,
       });
 
       return {
@@ -166,11 +174,10 @@ export const fetchTopInsights = (ids, field, limit) => {
 export const fetchSentimentInsights = (ids) =>
   httpThunk(FETCH_SENTIMENT, async () => {
     try {
-      const { data: insights, status } = await axios.get('/insights/sentiment', {
-        params: {
-          ids,
-        },
-      });
+      const { data: insights, status } = await axios.post(
+        '/insights/sentiment',
+        { ids },
+      );
 
       return {
         statusText: 'success',
@@ -185,11 +192,10 @@ export const fetchSentimentInsights = (ids) =>
 export const fetchCategoriesInsights = (ids) =>
   httpThunk(FETCH_CATEGORIES, async () => {
     try {
-      const { data: insights, status } = await axios.get('/insights/categories', {
-        params: {
-          ids,
-        },
-      });
+      const { data: insights, status } = await axios.post(
+        '/insights/categories',
+        { ids },
+      );
 
       return {
         statusText: 'success',
@@ -201,3 +207,5 @@ export const fetchCategoriesInsights = (ids) =>
     }
   });
 
+export const openModal = () => ({ type: OPEN_MODAL });
+export const closeModal = () => ({ type: CLOSE_MODAL });

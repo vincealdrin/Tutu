@@ -21,8 +21,13 @@ const io = socketIo(server);
 const ioClient = io.of('/client');
 
 app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  limit: '100mb',
+  extended: false,
+}));
+app.use(bodyParser.json({
+  limit: '100mb',
+}));
 app.use(compression({
   level: 9,
   memLevel: 9,

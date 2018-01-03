@@ -49,7 +49,7 @@ stemmer = Stemmer(LANGUAGE)
 summarizer = Summarizer(stemmer)
 summarizer.stop_words = get_stop_words(LANGUAGE)
 
-def summarize(text):
+def summarize2(text):
     summary_sentences = []
     document = PlaintextParser.from_string(text, Tokenizer(LANGUAGE)).document
 

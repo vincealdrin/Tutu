@@ -53,13 +53,13 @@ def insert_article(article, tbl='articles'):
                     ))
         )).order_by(r.desc('publishDate')).slice(0, 10).pluck('title', 'id').run(conn)
 
-    print([rel['title'] for rel in rel_articles])
+    # print([rel['title'] for rel in rel_articles])
 
     rel_articles = [
         rel for rel in list(rel_articles)
         if similar_text(article['title'], rel['title']) > 35
     ]
-    print([rel['title'] for rel in rel_articles])
+    # print([rel['title'] for rel in rel_articles])
 
     rel_ids = [rel['id'] for rel in rel_articles]
 

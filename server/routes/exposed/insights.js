@@ -3,9 +3,9 @@ const r = require('rethinkdb');
 const { getCategoriesField } = require('../../utils');
 
 module.exports = (conn) => {
-  router.get('/top', async (req, res, next) => {
+  router.post('/top', async (req, res, next) => {
     try {
-      const { ids, field, limit = '10' } = req.query;
+      const { ids, field, limit = '10' } = req.body;
       let fieldName = '';
 
       switch (field) {
@@ -58,9 +58,9 @@ module.exports = (conn) => {
     }
   });
 
-  router.get('/sentiment', async (req, res, next) => {
+  router.post('/sentiment', async (req, res, next) => {
     try {
-      const { ids } = req.query;
+      const { ids } = req.body;
 
       const cursor = await r.table('articles')
         .getAll(r.args(ids.split(',')))
@@ -91,9 +91,9 @@ module.exports = (conn) => {
     }
   });
 
-  router.get('/categories', async (req, res, next) => {
+  router.post('/categories', async (req, res, next) => {
     try {
-      const { ids } = req.query;
+      const { ids } = req.body;
 
       const cursor = await r.table('articles')
         .getAll(r.args(ids.split(',')))

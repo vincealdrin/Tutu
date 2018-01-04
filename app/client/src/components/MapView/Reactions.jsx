@@ -34,12 +34,19 @@ const Reactions = ({
               <p>
                 {status.success && !status.pending
                 ?
-                  <span><Icon name="check" color="green" />Success</span>
+                  (
+                    <span>
+                      <Icon name="check" color="green" />
+                      Success
+                    </span>
+                  )
                 :
-                  <span>
-                    <Icon name="close" color="red" />
-                    {status.errorMessage}
-                  </span>
+                  (
+                    <span>
+                      <Icon name="close" color="red" />
+                      {status.errorMessage}
+                    </span>
+                  )
                 }
               </p>
             </div>
@@ -62,12 +69,19 @@ const Reactions = ({
               <p>
                 {status.success && !status.pending
                 ?
-                  <span><Icon name="check" color="green" />Success</span>
+                  (
+                    <span>
+                      <Icon name="check" color="green" />
+                      Success
+                    </span>
+                  )
                 :
-                  <span>
-                    <Icon name="close" color="red" />
-                    {status.errorMessage}
-                  </span>
+                  (
+                    <span>
+                      <Icon name="close" color="red" />
+                      {status.errorMessage}
+                    </span>
+                  )
                 }
               </p>
             </div>
@@ -90,12 +104,19 @@ const Reactions = ({
               <p>
                 {status.success && !status.pending
                 ?
-                  <span><Icon name="check" color="green" />Success</span>
+                  (
+                    <span>
+                      <Icon name="check" color="green" />
+                      Success
+                    </span>
+                  )
                 :
-                  <span>
-                    <Icon name="close" color="red" />
-                    {status.errorMessage}
-                  </span>
+                  (
+                    <span>
+                      <Icon name="close" color="red" />
+                      {status.errorMessage}
+                    </span>
+                  )
                 }
               </p>
             </div>
@@ -118,12 +139,19 @@ const Reactions = ({
               <p>
                 {status.success && !status.pending
                 ?
-                  <span><Icon name="check" color="green" />Success</span>
+                  (
+                    <span>
+                      <Icon name="check" color="green" />
+                      Success
+                    </span>
+                  )
                 :
-                  <span>
-                    <Icon name="close" color="red" />
-                    {status.errorMessage}
-                  </span>
+                  (
+                    <span>
+                      <Icon name="close" color="red" />
+                      {status.errorMessage}
+                    </span>
+                  )
                 }
               </p>
             </div>
@@ -146,12 +174,19 @@ const Reactions = ({
               <p>
                 {status.success && !status.pending
                 ?
-                  <span><Icon name="check" color="green" />Success</span>
+                  (
+                    <span>
+                      <Icon name="check" color="green" />
+                      Success
+                    </span>
+                  )
                 :
-                  <span>
-                    <Icon name="close" color="red" />
-                    {status.errorMessage}
-                  </span>
+                  (
+                    <span>
+                      <Icon name="close" color="red" />
+                      {status.errorMessage}
+                    </span>
+                  )
                 }
               </p>
             </div>
@@ -174,12 +209,19 @@ const Reactions = ({
               <p>
                 {status.success && !status.pending
                 ?
-                  <span><Icon name="check" color="green" />Success</span>
+                  (
+                    <span>
+                      <Icon name="check" color="green" />
+                      Success
+                    </span>
+                  )
                 :
-                  <span>
-                    <Icon name="close" color="red" />
-                    {status.errorMessage}
-                  </span>
+                  (
+                    <span>
+                      <Icon name="close" color="red" />
+                      {status.errorMessage}
+                    </span>
+                  )
                 }
               </p>
             </div>

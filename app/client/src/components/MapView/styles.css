@@ -133,6 +133,12 @@
   left: 2%;
 }
 
+.ui.button.read-more-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .related-stories {
   max-height: 180px;
   margin-top: 1.7rem;
@@ -208,7 +214,16 @@
   width: 3rem;
   padding: 0 !important;
   margin: 0 !important;
+  font-size: 0.9rem !important;
+  color: #767676;
+  text-align: center;
   cursor: pointer;
+}
+
+.reaction-alert {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .accordion-container {

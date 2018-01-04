@@ -10,6 +10,7 @@ import inspiredReact from '../../assets/reactions/3.svg';
 import afraidReact from '../../assets/reactions/2.svg';
 import sadReact from '../../assets/reactions/1.svg';
 import angryReact from '../../assets/reactions/0.svg';
+import Icon from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon';
 
 const Reactions = ({
   reactions: {
@@ -26,58 +27,169 @@ const Reactions = ({
   <List horizontal>
     <List.Item className="reactions">
       <Tooltip title="Happy">
-        <Image
-          src={happyReact}
-          onClick={() => updateReaction('happy')}
-        />
+        <Tooltip
+          trigger="click"
+          html={
+            <div className="reaction-alert">
+              <p>
+                {status.success && !status.pending
+                ?
+                  <span><Icon name="check" color="green" />Success</span>
+                :
+                  <span>
+                    <Icon name="close" color="red" />
+                    {status.errorMessage}
+                  </span>
+                }
+              </p>
+            </div>
+          }
+        >
+          <Image
+            src={happyReact}
+            onClick={() => updateReaction('happy')}
+          />
+        </Tooltip>
       </Tooltip>
       {happy}
-
-      {status.success && !status.pending ? 'Success' : ''}
-      {status.errorMessage}
     </List.Item>
     <List.Item className="reactions">
       <Tooltip title="Amused">
-        <Image
-          src={amusedReact}
-          onClick={() => updateReaction('amused')}
-        />
+        <Tooltip
+          trigger="click"
+          html={
+            <div className="reaction-alert">
+              <p>
+                {status.success && !status.pending
+                ?
+                  <span><Icon name="check" color="green" />Success</span>
+                :
+                  <span>
+                    <Icon name="close" color="red" />
+                    {status.errorMessage}
+                  </span>
+                }
+              </p>
+            </div>
+          }
+        >
+          <Image
+            src={amusedReact}
+            onClick={() => updateReaction('amused')}
+          />
+        </Tooltip>
       </Tooltip>
       {amused}
     </List.Item>
     <List.Item className="reactions">
       <Tooltip title="Inspired">
-        <Image
-          src={inspiredReact}
-          onClick={() => updateReaction('inspired')}
-        />
+        <Tooltip
+          trigger="click"
+          html={
+            <div className="reaction-alert">
+              <p>
+                {status.success && !status.pending
+                ?
+                  <span><Icon name="check" color="green" />Success</span>
+                :
+                  <span>
+                    <Icon name="close" color="red" />
+                    {status.errorMessage}
+                  </span>
+                }
+              </p>
+            </div>
+          }
+        >
+          <Image
+            src={inspiredReact}
+            onClick={() => updateReaction('inspired')}
+          />
+        </Tooltip>
       </Tooltip>
       {inspired}
     </List.Item>
     <List.Item className="reactions">
       <Tooltip title="Afraid">
-        <Image
-          src={afraidReact}
-          onClick={() => updateReaction('afraid')}
-        />
+        <Tooltip
+          trigger="click"
+          html={
+            <div className="reaction-alert">
+              <p>
+                {status.success && !status.pending
+                ?
+                  <span><Icon name="check" color="green" />Success</span>
+                :
+                  <span>
+                    <Icon name="close" color="red" />
+                    {status.errorMessage}
+                  </span>
+                }
+              </p>
+            </div>
+          }
+        >
+          <Image
+            src={afraidReact}
+            onClick={() => updateReaction('afraid')}
+          />
+        </Tooltip>
       </Tooltip>
       {afraid}
     </List.Item>
     <List.Item className="reactions">
       <Tooltip title="Sad">
-        <Image
-          src={sadReact}
-          onClick={() => updateReaction('sad')}
-        />
+        <Tooltip
+          trigger="click"
+          html={
+            <div className="reaction-alert">
+              <p>
+                {status.success && !status.pending
+                ?
+                  <span><Icon name="check" color="green" />Success</span>
+                :
+                  <span>
+                    <Icon name="close" color="red" />
+                    {status.errorMessage}
+                  </span>
+                }
+              </p>
+            </div>
+          }
+        >
+          <Image
+            src={sadReact}
+            onClick={() => updateReaction('sad')}
+          />
+        </Tooltip>
       </Tooltip>
       {sad}
     </List.Item>
     <List.Item className="reactions">
       <Tooltip title="Angry">
-        <Image
-          src={angryReact}
-          onClick={() => updateReaction('angry')}
-        />
+        <Tooltip
+          trigger="click"
+          html={
+            <div className="reaction-alert">
+              <p>
+                {status.success && !status.pending
+                ?
+                  <span><Icon name="check" color="green" />Success</span>
+                :
+                  <span>
+                    <Icon name="close" color="red" />
+                    {status.errorMessage}
+                  </span>
+                }
+              </p>
+            </div>
+          }
+        >
+          <Image
+            src={angryReact}
+            onClick={() => updateReaction('angry')}
+          />
+        </Tooltip>
       </Tooltip>
       {angry}
     </List.Item>

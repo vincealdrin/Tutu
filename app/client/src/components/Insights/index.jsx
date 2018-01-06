@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Button, Modal } from 'semantic-ui-react';
+import { Button, Modal, Header, Divider } from 'semantic-ui-react';
 import { HorizontalBar, Bar, Line, Pie } from 'react-chartjs-2';
 import WordCloud from 'react-d3-cloud';
 import {
@@ -12,6 +12,7 @@ import {
   closeModal,
 } from '../../modules/insights';
 import { getLineDataset } from '../../utils';
+import './styles.css';
 
 const mapStateToProps = ({
   insights: {
@@ -67,17 +68,17 @@ class Insights extends Component {
       datasets: getLineDataset([
         {
           label: 'Positive',
-          color: '75,192,192',
+          color: '41,199,202',
           data: sentiment.posCount,
         },
         {
           label: 'Neutral',
-          color: '106,125,143',
+          color: '70,76,88',
           data: sentiment.neuCount,
         },
         {
           label: 'Negative',
-          color: '255,99,132',
+          color: '234,95,72',
           data: sentiment.negCount,
         },
       ]),
@@ -95,9 +96,9 @@ class Insights extends Component {
           sentiment.negCount.reduce((a, b) => (a + b), 0),
         ],
         backgroundColor: [
-          '#4bc0c0',
-          '#6a7d8f',
-          '#FF6384',
+          '#29c7ca',
+          '#464c58',
+          '#ea5f48',
         ],
       }],
     };
@@ -107,52 +108,52 @@ class Insights extends Component {
       datasets: getLineDataset([
         {
           label: 'Crime',
-          color: '255,99,132',
+          color: '234,95,72',
           data: categories.crimeCount,
         },
         {
           label: 'Culture',
-          color: '106,125,143',
+          color: '41,199,202',
           data: categories.cultureCount,
         },
         {
           label: 'Economy',
-          color: '75,192,192',
+          color: '174,18,255',
           data: categories.econCount,
         },
         {
           label: 'Environment',
-          color: '75,192,192',
+          color: '121,255,59',
           data: categories.envCount,
         },
         {
           label: 'Health',
-          color: '106,125,143',
+          color: '255,63,53',
           data: categories.healthCount,
         },
         {
           label: 'Lifestyle',
-          color: '106,125,143',
+          color: '255,253,0',
           data: categories.lifeCount,
         },
         {
           label: 'Nation',
-          color: '255,99,132',
+          color: '36,125,232',
           data: categories.nationCount,
         },
         {
           label: 'Sports',
-          color: '255,99,132',
+          color: '135,60,13',
           data: categories.sportsCount,
         },
         {
           label: 'Weather',
-          color: '75,192,192',
+          color: '255,43,138',
           data: categories.weatherCount,
         },
         {
           label: 'Politics',
-          color: '75,192,192',
+          color: '255,114,24',
           data: categories.polCount,
         },
         {
@@ -162,22 +163,22 @@ class Insights extends Component {
         },
         {
           label: 'Disaster & Accident',
-          color: '255,99,132',
+          color: '6,255,0',
           data: categories.disAccCount,
         },
         {
           label: 'Entertainment & Arts',
-          color: '255,99,132',
+          color: '232,105,144',
           data: categories.entArtCount,
         },
         {
           label: 'Law & Government',
-          color: '255,99,132',
+          color: '113,95,127',
           data: categories.lawGovCount,
         },
         {
           label: 'Science & Technology',
-          color: '255,99,132',
+          color: '40,127,0',
           data: categories.sciTechCount,
         },
       ]),
@@ -219,9 +220,21 @@ class Insights extends Component {
           categories.sciTechCount.reduce((a, b) => (a + b), 0),
         ],
         backgroundColor: [
-          '#4bc0c0',
-          '#6a7d8f',
-          '#FF6384',
+          '#EA5F48',
+          '#29C7CA',
+          '#AE12FF',
+          '#79FF3B',
+          '#FF3F35',
+          '#FFFD00',
+          '#247DE8',
+          '#873C0D',
+          '#FF2B8A',
+          '#FF7218',
+          '#6A7D8F',
+          '#06FF00',
+          '#E86990',
+          '#715F7F',
+          '#287F00',
         ],
       }],
     };
@@ -379,26 +392,34 @@ class Insights extends Component {
         >
           <Modal.Header>Insights</Modal.Header>
           <Modal.Content scrolling>
-            Sentiment
+            <Header as="h2" className="insight-header">Sentiment</Header>
             <Line data={sentimentLineData} />
             <Pie data={sentimentPieData} />
-            Categories
+
+            <Divider />
+
+            <Header as="h2" className="insight-header">Categories</Header>
             <Line data={categoriesLineData} />
             <Pie data={categoriesPieData} />
             <HorizontalBar data={categoriesBarData} />
-            word cloud
-            <WordCloud
-              font="lato"
-              width={700}
-              height={500}
-              // padding={(word) => word.value / 10}
-              data={topKeywords.map(({ keyword, count }) => ({
-                text: keyword,
-                value: count,
-              }))}
-              fontSizeMapper={(word) => Math.log2(word.value) * 10}
-              rotate={(word) => word.value % 360}
-            />
+
+            <Divider />
+
+            <Header as="h2">Word Cloud</Header>
+            <div className="word-cloud">
+              <WordCloud
+                font="lato"
+                width={700}
+                height={500}
+                // padding={(word) => word.value / 10}
+                data={topKeywords.map(({ keyword, count }) => ({
+                  text: keyword,
+                  value: count,
+                }))}
+                fontSizeMapper={(word) => Math.log2(word.value) * 10}
+                rotate={(word) => word.value % 360}
+              />
+            </div>
             top 10
             <HorizontalBar data={peopleBarData} />
             <HorizontalBar data={orgsBarData} />

@@ -366,7 +366,7 @@ class Insights extends Component {
               this.props.fetchTopInsights(ids, 'people', 10);
               this.props.fetchTopInsights(ids, 'organizations', 10);
               this.props.fetchTopInsights(ids, 'locations', 10);
-              this.props.fetchTopInsights(ids, 'keywords', 500);
+              this.props.fetchTopInsights(ids, 'keywords', 300);
               this.props.fetchSentimentInsights(ids);
               this.props.fetchCategoriesInsights(ids);
             }}
@@ -396,8 +396,8 @@ class Insights extends Component {
                 text: keyword,
                 value: count,
               }))}
-              fontSizeMapper={(word) => Math.log2(word.value) * 10}
-              rotate={(word) => word.value % 360}
+              fontSizeMapper={(word) => (word.value * 1000) / 80}
+              rotate={(word) => ((word.value * (Math.random() * 100)) % 90) - 45}
             />
             top 10
             <HorizontalBar data={peopleBarData} />
@@ -407,7 +407,7 @@ class Insights extends Component {
           </Modal.Content>
           <Modal.Actions>
             <Button
-              onClick={this.closeModal}
+              onClick={this.props.closeModal}
               content="Close"
             />
           </Modal.Actions>

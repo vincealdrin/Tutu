@@ -186,11 +186,11 @@ class SimpleModal extends Component {
             />
             <Button
               as="a"
-              href={url}
-              circular
+              className="read-more-button"
               color="blue"
               target="_blank"
-              className="read-more-button"
+              href={url}
+              circular
             >
               Read More
             </Button>

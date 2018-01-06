@@ -1,4 +1,5 @@
-[{
+[
+    {
         "name": "Bangued",
         "province": "Abra",
         "type": "Municipality",
@@ -9726,7 +9727,7 @@
         "brgyCount": "15",
         "area": "407.30/km^2",
         "psgc": "118601000",
-        "formattedAddress": "Don Marcelino, Davao del Sur, Philippines",
+        "formattedAddress": "Don Marcelino, Davao Occidental, Philippines",
         "coordinates": {
             "latitude": 6.145601999999999,
             "longitude": 125.6314191
@@ -9744,7 +9745,7 @@
         "brgyCount": "26",
         "area": "600.06/km^2",
         "psgc": "118602000",
-        "formattedAddress": "Jose Abad Santos, Davao del Sur, Philippines",
+        "formattedAddress": "Jose Abad Santos, Davao Occidental, Philippines",
         "coordinates": {
             "latitude": 5.8340662,
             "longitude": 125.5438967
@@ -9762,7 +9763,7 @@
         "brgyCount": "30",
         "area": "883.37/km^2",
         "psgc": "118603000",
-        "formattedAddress": "Jose Abad Santos, Davao del Sur, Philippines",
+        "formattedAddress": "Malita, Davao Occidental, Philippines",
         "coordinates": {
             "latitude": 5.8340662,
             "longitude": 125.5438967
@@ -9780,7 +9781,7 @@
         "brgyCount": "22",
         "area": "175.00/km^2",
         "psgc": "118604000",
-        "formattedAddress": "Santa Maria, Davao del Sur, Philippines",
+        "formattedAddress": "Santa Maria, Davao Occidental, Philippines",
         "coordinates": {
             "latitude": 6.5152085,
             "longitude": 125.4562795
@@ -9798,7 +9799,7 @@
         "brgyCount": "12",
         "area": "97.72/km^2",
         "psgc": "118605000",
-        "formattedAddress": "Municipality of Sarangani, Davao del Sur, Philippines",
+        "formattedAddress": "Municipality of Sarangani, Davao Occidental, Philippines",
         "coordinates": {
             "latitude": 5.403681,
             "longitude": 125.3789377
@@ -21228,7 +21229,7 @@
         "brgyCount": "62",
         "area": "250.06/km^2",
         "psgc": "175205000",
-        "formattedAddress": "Bulalacao, Oriental Mindoro, Philippines",
+        "formattedAddress": "Calapan, Oriental Mindoro, Philippines",
         "coordinates": {
             "latitude": 12.3443972,
             "longitude": 121.3361897

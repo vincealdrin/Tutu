@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { updateCrudStatus, crudStatus } from '../utils';
+import { updateCrudStatus, crudStatus, httpThunk } from '../utils';
 
 export const FETCH_USERS = 'users/FETCH_USERS';
-export const CREATE_USER = 'users/CREATE_USER';
+export const ADD_USER = 'users/ADD_USER';
 export const UPDATE_USER = 'users/UPDATE_USER';
 export const DELETE_USERS = 'users/DELETE_USER';
 export const DECREMENT = 'users/DECREMENT';
@@ -11,7 +11,7 @@ const initialState = {
   users: [],
   totalCount: 0,
   fetchStatus: crudStatus,
-  createStatus: crudStatus,
+  addStatus: crudStatus,
   updateStatus: crudStatus,
   deleteStatus: crudStatus,
 };
@@ -21,21 +21,18 @@ export default (state = initialState, action) => {
     case FETCH_USERS:
       return {
         ...state,
-        users: action.users ? [
-          ...state.users,
-          ...action.users,
-        ] : state.users,
+        users: action.users || state.users,
         totalCount: action.totalCount,
         fetchStatus: updateCrudStatus(action),
       };
-    case CREATE_USER:
+    case ADD_USER:
       return {
         ...state,
-        users: [
-          ...action.users,
+        users: action.statusText === 'success' ? [
           action.newUser,
-        ],
-        createStatus: updateCrudStatus(action),
+          ...state.users,
+        ] : state.users,
+        addStatus: updateCrudStatus(action),
       };
     case UPDATE_USER:
       return {
@@ -51,8 +48,10 @@ export default (state = initialState, action) => {
     case DELETE_USERS:
       return {
         ...state,
-        users: state.users.filter((user) => action.deletedIds.includes(user.id)),
-        updateStatus: updateCrudStatus(action),
+        users: action.statusText === 'success'
+          ? state.users.filter((user) => !action.deletedIds.includes(user.id))
+          : state.users,
+        deleteStatus: updateCrudStatus(action),
       };
     default:
       return state;
@@ -84,29 +83,26 @@ export const fetchUsers = (page, limit, filter, search) => async (dispatch) => {
       type: FETCH_USERS,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMessage: e.response.data.message,
     });
   }
 };
 
-export const createUser = (user) => async (dispatch) => {
-  dispatch({ type: CREATE_USER, statusText: 'pending' });
+export const addUser = () => httpThunk(ADD_USER, async (getState) => {
+  const { form } = getState();
+  const userInfo = form.user.values;
 
   try {
-    const id = await axios.post('/users', user);
+    const { data: newUser, status } = await axios.post('/users', userInfo);
 
-    dispatch({
-      type: CREATE_USER,
-      statusText: 'success',
-      newUser: { ...user, id },
-    });
+    return {
+      newUser,
+      status,
+    };
   } catch (e) {
-    dispatch({
-      type: CREATE_USER,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-    });
+    return e;
   }
-};
+});
 
 export const updateUser = (userId, user, isIdChanged = false) => async (dispatch) => {
   dispatch({ type: UPDATE_USER, statusText: 'pending' });
@@ -126,26 +122,24 @@ export const updateUser = (userId, user, isIdChanged = false) => async (dispatch
       type: UPDATE_USER,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMessage: e.response.data.message,
     });
   }
 };
 
-export const deleteUsers = (ids) => async (dispatch) => {
-  dispatch({ type: DELETE_USERS, statusText: 'pending' });
-
+export const deleteUsers = (ids) => httpThunk(DELETE_USERS, async () => {
   try {
-    await axios.put('/users/', ids);
+    const { status } = await axios.delete('/users', {
+      data: {
+        ids: ids.join(),
+      },
+    });
 
-    dispatch({
-      type: DELETE_USERS,
-      statusText: 'success',
+    return {
       deletedIds: ids,
-    });
+      status,
+    };
   } catch (e) {
-    dispatch({
-      type: DELETE_USERS,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-    });
+    return e;
   }
-};
+});

@@ -1,120 +1,50 @@
 import React, { Component } from 'react';
-import { Popup, List, Image, Label, Modal, Segment, Grid, Header, Button } from 'semantic-ui-react';
+import { List, Image, Label, Grid } from 'semantic-ui-react';
 import shortid from 'shortid';
+import { Tooltip } from 'react-tippy';
 import './styles.css';
 
 class ClusterMarker extends Component {
-  state = { open: false };
-  show = (dimmer, size) => () => this.setState({ dimmer, size, open: true });
-  close = () => this.setState({ open: false });
-
   render() {
-    const { open, dimmer, size } = this.state;
-    const { count, articles } = this.props;
-    const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
+    const { count, articles, $hover } = this.props;
 
     return (
-      <div>
-        <Popup
-          position="top left"
-          trigger={
-            <div
-              className="cluster-marker-container"
-              // style={{
-              //   width: `${count * 3}px`,
-              //   height: `${count * 3}px`,
-              //   maxWidth: 50,
-              //   maxHeight: 50,
-              //   fontSize: `${count * 3}px`,
-              // }}
-            >
-              <p>{count}</p>
-            </div>
-        }
-          hoverable
-          className="popup-container"
-        >
+      <Tooltip
+        position="right-start"
+        html={
           <List divided relaxed className="cluster-list-container">
-            {articles.map((article) => (
+            {articles.slice(0, 4).map((article) => (
               <List.Item key={shortid.generate()} className="cluster-article-container">
-                <div className="favicon-container">
-                  <Image src={article.sourceFaviconUrl} className="news-source-favicon" />
-                </div>
-                <div className="article-title-container">
-                  <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
-                  <List.Description className="article-date">{new Date(article.publishDate).toDateString()}</List.Description>
-                </div>
-              </List.Item>
-            ))}
-            <Label className="see-more-button" attached="bottom" as="a" onClick={this.show('blurring', 'large')}>See More</Label>
-          </List>
-        </Popup>
-
-        <Modal
-          dimmer={dimmer}
-          size={size}
-          open={open}
-          onClose={this.close}
-          className="modal-container"
-        >
-          <Modal.Content scrolling>
-            {articles.map((article) => (
-              <Segment key={shortid.generate()} raised className="modal-article-container">
                 <Grid>
-                  <Grid.Row columns={3}>
-                    <Grid.Column width={4}>
-                      <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{article.source}</Label>
-                      <Image src={article.topImageUrl} />
+                  <Grid.Row columns={2}>
+                    <Grid.Column width={7}>
+                      {$hover ? <Image src={article.topImageUrl} /> : null}
                     </Grid.Column>
-                    <Grid.Column width={8}>
-                      <Header as="h3" href={article.sourceUrl} color="blue">{article.title}</Header>
-                      <div className="author-date-container">
-                        {article.authors.map((author) => (
-                          <span key={shortid.generate()}>
-                            {author},
-                          </span>
-                        ))}
-                        <br />
-                        {new Date(article.publishDate).toDateString()}
-                      </div>
+                    <Grid.Column width={9} className="marker-title-column">
                       <div>
-                        {`${article.summary[0].substring(0, 500)}...`}
+                        <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
+                        <List.Description className="article-date">
+                          {new Date(article.publishDate).toDateString()}
+                        </List.Description>
+                        <Label as="a" circular className="source-label">{article.source}</Label>
                       </div>
-                    </Grid.Column>
-                    <Grid.Column width={4}>
-                      <Label.Group size="tiny" className="label-group">
-                        <div className="label-master">
-                          <Label basic color="pink">Category</Label>
-                        </div>
-                        <div>
-                          {article.categories.map((category) => (<Label tag key={shortid.generate()}>{category.label}</Label>))}
-                        </div>
-                      </Label.Group>
-                      <Label.Group size="tiny" className="label-group">
-                        <div className="label-master">
-                          <Label basic color="teal">Keywords</Label>
-                        </div>
-                        <div>
-                          {article.keywords.slice(0, 5).map((keyword) => (<Label as="a" tag style={{ marginBottom: '0.3rem' }} key={shortid.generate()}>{keyword}</Label>))}
-                        </div>
-                      </Label.Group>
-                      <Label.Group size="tiny" className="label-group cluster-modal-sentiment">
-                        <div className="label-master">
-                          <Label basic color="orange">Sentiment</Label>
-                        </div>
-                        <div>
-                          <Label tag>Good 99%</Label>
-                        </div>
-                      </Label.Group>
-                      <Button color="blue" circular style={{ float: 'right' }} href={article.url} target="_blank">Read More</Button>
                     </Grid.Column>
                   </Grid.Row>
                 </Grid>
-              </Segment>
+              </List.Item>
             ))}
-          </Modal.Content>
-        </Modal>
-      </div>
+            <Label className="see-more-button" attached="bottom">Click marker to view more stories...</Label>
+          </List>
+        }
+        open={$hover}
+        animateFill={false}
+        sticky
+      >
+        <div className="cluster-marker-container" style={$hover ? { zIndex: 10000 } : {}}>
+          <div className={`cluster-marker-container-radiant ${$hover ? 'cluster-marker-container-hovered' : ''}`} />
+          <p>{count}</p>
+        </div>
+      </Tooltip>
     );
   }
 }

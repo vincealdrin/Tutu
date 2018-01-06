@@ -1,12 +1,24 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import { routerMiddleware } from 'react-router-redux';
 import thunk from 'redux-thunk';
+import axios from 'axios';
 import createHistory from 'history/createBrowserHistory';
 import rootReducer from './modules';
+import { crudStatus } from './utils';
 
 export const history = createHistory();
 
-const initialState = {};
+const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+const initialState = {
+  user: {
+    info: userInfo.info || {},
+    token: userInfo.token || '',
+    isLogin: !!userInfo.token,
+    loginStatus: crudStatus,
+  },
+};
+axios.defaults.headers.common.Authorization = initialState.user.token;
+
 const enhancers = [];
 const middleware = [
   thunk,
@@ -31,7 +43,6 @@ const store = createStore(
   initialState,
   composedEnhancers,
 );
-
 
 if (process.env.NODE_ENV === 'development') {
   if (module.hot) {

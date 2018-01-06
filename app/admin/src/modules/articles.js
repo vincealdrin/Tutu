@@ -67,9 +67,10 @@ export const fetchArticles = () => async (dispatch) => {
     });
   } catch (e) {
     dispatch({
-      type: FETCH_ARTICLES,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMessage: e.response.data.message,
+      type: FETCH_ARTICLES,
     });
   }
 };
@@ -87,9 +88,10 @@ export const createArticle = (article) => async (dispatch) => {
     });
   } catch (e) {
     dispatch({
-      type: CREATE_ARTICLE,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMessage: e.response.data.message,
+      type: CREATE_ARTICLE,
     });
   }
 };
@@ -109,9 +111,10 @@ export const updateArticle = (articleId, article, isIdChanged = false) => async 
     });
   } catch (e) {
     dispatch({
-      type: UPDATE_ARTICLE,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMessage: e.response.data.message,
+      type: UPDATE_ARTICLE,
     });
   }
 };
@@ -129,9 +132,10 @@ export const deleteArticles = (ids) => async (dispatch) => {
     });
   } catch (e) {
     dispatch({
-      type: DELETE_ARTICLES,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMessage: e.response.data.message,
+      type: DELETE_ARTICLES,
     });
   }
 };

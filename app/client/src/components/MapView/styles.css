@@ -1,20 +1,79 @@
 .cluster-marker-container {
+  position: relative;
+  z-index: -1000;
   display: flex;
-  width: 3rem;
-  height: 3rem;
+  width: 3.2rem !important;
+  height: 3.2rem !important;
   background: #fff;
   border: 5px solid #f25100;
   border-radius: 100%;
+  box-shadow: 0 3px 24px #1b272b;
+  transform-origin: center;
+  transition: all 0.2s cubic-bezier(0.56, 0.21, 0.38, 1.55);
 }
 
 .cluster-marker-container > p {
   margin: auto;
-  font-size: 1.7rem;
+  font-size: 1.1rem;
 }
 
+.cluster-marker-container-hovered {
+  animation: pulse 2s infinite;
+}
+
+.cluster-marker-container-radiant {
+  position: absolute;
+  top: -0.37rem;
+  left: -0.37rem;
+  z-index: -20000;
+  width: 3.2rem;
+  height: 3.2rem;
+  background: #fff;
+  border: 5px solid #f25100;
+  border-radius: 100%;
+  transform-origin: center;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+
+.map-progress {
+  position: fixed !important;
+  z-index: 1000;
+  width: 100%;
+  margin-bottom: 0 !important;
+}
+
+/* radar pulse animation for cluster marker */
+@keyframes pulse {
+  1% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+.simple-marker {
+  min-height: 200px;
+  text-align: left;
+}
+
+.simple-marker-title {
+  font-size: 1.1rem !important;
+}
+
+.marker-title-column {
+  padding-right: 2rem !important;
+  padding-left: 0 !important;
+}
 
 .popup-container {
-  max-width: 300px !important;
+  max-width: 324px !important;
   min-height: 100px;
 }
 
@@ -26,19 +85,32 @@
   position: absolute;
   bottom: 1px;
   left: -13.5px;
+  transition: all 0.141592654s ease-in-out;
+}
+
+.tippy-tooltip {
+  top: -5rem;
+  left: 1.7rem;
+  background: #fff;
+  box-shadow: 0 0 3px #94989b;
+}
+
+.arrow-regular {
+  top: 4.2rem !important;
+  border-right-color: #fff !important;
 }
 
 .cluster-marker-container {
   position: absolute;
-  top: -20px;
-  left: -20px;
+  top: -21px;
+  left: -21px;
+  z-index: -100;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 20px;
-  height: 20px;
+  width: 42px;
+  height: 42px;
   cursor: pointer;
-  background-color: darksalmon;
   border-radius: 50px;
 }
 
@@ -55,44 +127,32 @@
   margin: 0 0 1.3rem;
 }
 
+.article-read-more {
+  position: absolute;
+  bottom: 5%;
+  left: 2%;
+}
+
+.ui.button.read-more-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.related-stories {
+  max-height: 180px;
+  margin-top: 1.7rem;
+  overflow-y: auto;
+}
+
 .tooltip-author {
   font-size: 12px;
   color: #a4a4a4;
 }
 
-.tooltip-related-article {
-  font-size: 1.1rem !important;
-}
-
-.label-master {
-  margin-right: 0.4rem;
-}
-
-.label-group {
-  display: flex;
-}
-.label-group:not(:last-child) {
-  margin-bottom: 0.4rem;
-}
-
-.image-container {
-  position: relative;
-  margin-bottom: 0.3rem;
-}
-
-.read-more-button {
-  position: absolute;
-  right: 7px;
-  bottom: 7px;
-}
-
-.favicon-container {
-  width: 5% !important;
-}
-
-.cluster-list-container {
-  max-height: 365px;
-  overflow-y: auto;
+.ui.circular.label {
+  min-width: 100px;
+  margin: 0;
 }
 
 .cluster-list-container:last-child {
@@ -102,19 +162,32 @@
 .cluster-article-container {
   display: flex !important;
   align-items: center;
+  text-align: left;
 }
 
 .article-title-container {
   padding-left: 1rem;
 }
 
-.article-date {
+.article-date,
+.article-tags {
+  margin: 0.6rem 0;
   font-size: 12px;
+  color: #767676;
 }
 
 .see-more-button {
   padding: 1rem !important;
   text-align: center;
+}
+
+/* see more button sa tags */
+.see-more {
+  color: #2185d0;
+  cursor: pointer;
+}
+.see-more:hover {
+  text-decoration: underline;
 }
 
 /* MODAL ARTICLE CONTAINER */
@@ -133,26 +206,24 @@
   z-index: 1000;
 }
 
-.news-marker-tooltip {
-  top: 0.7rem;
-  left: -2rem;
+.sentiment-list {
+  display: inline;
+  list-style: none;
+}
+.reactions {
+  width: 3rem;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 0.9rem !important;
+  color: #767676;
+  text-align: center;
+  cursor: pointer;
 }
 
-.news-source-image {
-  width: 20%;
-}
-
-.news-source-summary {
-  width: 60%;
-}
-
-.news-source-summary,
-.news-source-tags {
-  padding: 1rem;
-}
-
-.cluster-modal-sentiment {
-  margin-bottom: 2rem !important;
+.reaction-alert {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .accordion-container {
@@ -168,8 +239,78 @@
   padding: 0;
 }
 
-.marker {
-  position: absolute;
-  bottom: 1px;
-  left: -26px;
+/* cluster modal articles */
+
+.image-tag-title-container {
+  display: flex;
+}
+
+.ui.header.news-title {
+  font-size: 1.1rem;
+}
+
+.top-image {
+  width: 100%;
+}
+
+.tags {
+  width: 100%;
+  padding: 0 0 0 1rem;
+}
+
+.tag-label {
+  margin-right: 0.5rem !important;
+}
+
+.extras {
+  display: flex;
+  justify-content: space-between;
+}
+
+.no-info {
+  font-size: 0.9rem;
+  color: #767676;
+}
+
+/* CAROUSEL STYLING */
+.carousel-slides {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+/* JUMPING ARROWS FIX */
+.carousel {
+  display: flex;
+  flex-direction: column;
+}
+
+.carousel-slide {
+  display: none;
+  max-width: 400px;
+  margin: auto;
+  text-align: center;
+  list-style: none;
+}
+
+.carousel-slide-active {
+  display: block;
+}
+
+.carousel-summary:nth-child(1) {
+  display: flex;
+  height: 150px;
+  margin: 1rem 0;
+  overflow-y: auto;
+}
+
+.carousel-slide-content {
+  /* margin-bottom: 1.6rem !important; */
+  margin: auto;
+}
+
+.carousel-arrows {
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
 }

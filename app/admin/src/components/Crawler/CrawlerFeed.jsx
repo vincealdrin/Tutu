@@ -4,51 +4,78 @@ import timeago from 'timeago.js';
 import shortid from 'shortid';
 
 class CrawlerFeed extends Component {
-  getLogAction = (type, status) => {
-    if (type === 'articleCrawl') {
-      switch (status) {
+  getLogAction = (log) => {
+    if (log.type === 'articleCrawl') {
+      switch (log.status) {
         case 'pending':
           return {
-            actionMsg: 'Crawling has started',
+            feedHtml: (
+              <a href={log.articleUrl} target="__blank">{log.articleUrl}</a>
+            ),
+            actionMessage: 'Crawling has started',
             icon: 'bug',
           };
         case 'success':
           return {
-            actionMsg: 'Crawling was successful',
+            feedHtml: (
+              <p>
+                {log.article.summary}<br />
+                <i>Publish date: {new Date(log.article.publishDate).toDateString()}</i>
+              </p>
+            ),
+            actionMessage: 'Crawling was successful',
             icon: 'thumbs up',
-          };
-        case 'error':
-          return {
-            actionMsg: 'Crawling has stopped for some reason',
-            icon: 'warning sign',
           };
         default:
           return {
-            actionMsg: 'Something went wrong...',
+            feedHtml: (
+              <span>
+                <a href={log.articleUrl} target="__blank">{log.articleUrl}</a>
+                <p>{`-- ${log.errorMessage}`}</p>
+              </span>
+            ),
+            actionMessage: 'Crawling has stopped for some reason',
             icon: 'warning sign',
           };
       }
     }
 
-    switch (status) {
+    switch (log.status) {
       case 'pending':
         return {
-          actionMsg: 'Building the news source',
+          feedHtml: (
+            <p>
+              <a href={`http://${log.sourceUrl}`} target="__blank">{log.sourceBrand}</a>
+              {` has ${log.articlesCount} article${log.articlesCount === 1 ? '' : 's'}`}
+              <br />
+              <span>Proxy: {log.proxy}</span>
+              <br />
+              <span>User-Agent: {log.userAgent}</span>
+            </p>
+          ),
+          actionMessage: 'Building the news source',
           icon: 'cogs',
         };
       case 'success':
         return {
-          actionMsg: 'Succesfully crawled the news source',
+          feedHtml: (
+            <p>
+              {`${log.articlesCrawledCount} article${log.articlesCrawledCount === 1 ? ' was' : 's were'} crawled on `}
+              <a href={log.sourceUrl} target="__blank">{log.sourceBrand}</a>
+            </p>
+          ),
+          actionMessage: 'Succesfully crawled the news source',
           icon: 'thumbs up',
-        };
-      case 'error':
-        return {
-          actionMsg: 'Building the news source has failed',
-          icon: 'warning sign',
         };
       default:
         return {
-          actionMsg: 'Something went wrong...',
+          feedHtml: (
+            <span>
+              <a href={log.sourceUrl} target="__blank">{log.sourceBrand}</a>
+              <p>{`-- ${log.errorMessage}`}</p>
+            </span>
+          ),
+          actionMessage: 'Building the news source has failed',
           icon: 'warning sign',
         };
     }
@@ -62,64 +89,36 @@ class CrawlerFeed extends Component {
         {logs.map((log) => {
           const {
             icon,
-            actionMsg,
-          } = this.getLogAction(log.type, log.status);
+            actionMessage,
+            feedHtml,
+          } = this.getLogAction(log);
 
           return (
             <Feed.Event key={shortid.generate()}>
               <Feed.Label icon={icon} />
               <Feed.Content>
                 <Feed.Summary>
-                  {actionMsg}
+                  {actionMessage}
                   <Feed.Date>{timeago().format(log.timestamp)}</Feed.Date>
                 </Feed.Summary>
                 <Feed.Extra>
                   {log.article && <a href={log.article.url} target="__blank">{log.article.title}</a>}
-                  <a href={log.articleUrl} target="__blank">{log.articleUrl}</a>
-                  {log.error ? <p>{`-- ${log.error}`}</p> : null}
-                  {log.type === 'sourceCrawl' ? (
-                    <span>
-                      {log.status === 'pending' ? (
-                        <p>
-                          <a href={log.sourceUrl} target="__blank">{log.sourceTitle}</a>
-                          {` has ${log.articlesCount} article${log.articlesCount > 1 ? 's' : ''}`}
-                        </p>
-                      ) : (
-                        <p>
-                          {`${log.articlesCrawledCount} article${log.articlesCrawledCount > 1 ? 's were' : ' was'} crawled on `}
-                          <a href={log.sourceUrl} target="__blank">{log.sourceTitle}</a>
-                        </p>
-                      )}
-                    </span>
-                  ) : null}
-                  {log.type === 'articleCrawl' && log.status === 'success' ? (
-                    <p>
-                      {log.article.summary}<br />
-                      <i>Publish date: {new Date(log.article.publishDate).toDateString()}</i>
-                    </p>
-                  ) : null}
+                  {feedHtml}
                 </Feed.Extra>
-                {log.type === 'articleCrawl' ? (
-                  <Feed.Meta>
-                    <Feed.Like>
-                      {log.status === 'pending' ? (
-                        <span>
-                          <Icon name="time" />
-                          {log.sleepTime} seconds
-                        </span>
-                      ) : (
-                        <span>
-                          <Icon name="time" />
-                          {log.runtime.toFixed(2)} seconds
-                        </span>
-                      )}
-                    </Feed.Like>
+                <Feed.Meta>
+                  <Feed.Like>
+                    <span>
+                      <Icon name={log.type === 'articleCrawl' && log.status === 'pending' ? 'hourglass start' : 'time'} />
+                      {log.runTime.toFixed(2)} seconds
+                    </span>
+                  </Feed.Like>
+                  {log.type === 'articleCrawl' ? (
                     <Feed.Like href={`http://${log.sourceUrl}`} target="__blank">
                       <Icon name="world" />
-                      {log.sourceTitle}
+                      {log.sourceBrand}
                     </Feed.Like>
-                  </Feed.Meta>
                   ) : null}
+                </Feed.Meta>
               </Feed.Content>
             </Feed.Event>
           );

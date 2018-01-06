@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { Input, Icon, Label, Segment, Dropdown } from 'semantic-ui-react';
+import { Label, Segment, Dropdown, Divider, Button, Icon } from 'semantic-ui-react';
+import { Tooltip } from 'react-tippy';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { fetchArticles } from '../../modules/mapArticles';
 import Slider from 'rc-slider';
+import DatePicker from 'react-datepicker';
+import { fetchArticles } from '../../modules/mapArticles';
 import {
   changeCategoriesFilter,
   changeKeywordsFilter,
@@ -14,24 +16,26 @@ import {
   changePopularTopFilter,
   changeSentimentFilter,
   changeSourcesFilter,
-  changTimeWindowFilter,
+  changeTimeWindowFilter,
+  changeDateFilter,
+  clearFilters,
 } from '../../modules/filters';
 import { mapOptions } from '../../utils';
 import './styles.css';
 
 const mapStateToProps = ({
   filters,
-  mapArticles: { mapState },
+  mapArticles: { filterMapState },
 }) => ({
   filters,
-  mapState,
+  filterMapState,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   changeKeywordsFilter,
   changeCategoriesFilter,
   changeSourcesFilter,
-  changTimeWindowFilter,
+  changeTimeWindowFilter,
   changeLimitFilter,
   changeOrganizationsFilter,
   changePeopleFilter,
@@ -39,22 +43,25 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   changePopularTopFilter,
   changeSentimentFilter,
   fetchArticles,
+  changeDateFilter,
+  clearFilters,
 }, dispatch);
 
 const categoriesOptions = [
-  { key: 'Government & Politics', text: 'Government & Politics', value: 'Government & Politics' },
-  { key: 'Nation', text: 'Nation', value: 'Nation' },
-  { key: 'Weather', text: 'Weather', value: 'Weather' },
-  { key: 'Business', text: 'Business', value: 'Business' },
-  { key: 'Entertainment', text: 'Entertainment', value: 'Entertainment' },
-  { key: 'Economy & Finance', text: 'Economy & Finance', value: 'Economy & Finance' },
-  { key: 'Lifestyle', text: 'Lifestyle', value: 'Lifestyle' },
-  { key: 'Science & Technology', text: 'Science & Technology', value: 'Science & Technology' },
-  { key: 'Health', text: 'Health', value: 'Health' },
-  { key: 'Sports', text: 'Sports', value: 'Sports' },
-  { key: 'Accident', text: 'Accident', value: 'Accident' },
+  { key: 'Arts & Entertainment', text: 'Arts & Entertainment', value: 'Arts & Entertainment' },
+  { key: 'Business & Finance', text: 'Business & Finance', value: 'Business & Finance' },
   { key: 'Crime', text: 'Crime', value: 'Crime' },
-  { key: 'Calamity', text: 'Calamity', value: 'Calamity' },
+  { key: 'Disaster & Accident', text: 'Disaster & Accident', value: 'Disaster & Accident' },
+  { key: 'Economy', text: 'Economy', value: 'Economy' },
+  { key: 'Environment', text: 'Environment', value: 'Environment' },
+  { key: 'Health', text: 'Health', value: 'Health' },
+  { key: 'Law & Government', text: 'Law & Government', value: 'Law & Government' },
+  { key: 'Lifestyle', text: 'Lifestyle', value: 'Lifestyle' },
+  { key: 'Nation', text: 'Nation', value: 'Nation' },
+  { key: 'Politics', text: 'Politics', value: 'Politics' },
+  { key: 'Science & Technology', text: 'Science & Technology', value: 'Science & Technology' },
+  { key: 'Sports', text: 'Sports', value: 'Sports' },
+  { key: 'Weather', text: 'Weather', value: 'Weather' },
 ];
 
 const sentimentsOptions = [
@@ -64,6 +71,15 @@ const sentimentsOptions = [
   { key: 'negative', text: 'Negative', value: 'negative' },
 ];
 
+const popularSocialOptions = [
+  { key: 'all', text: 'All', value: 'all' },
+  { key: 'facebook', text: 'Facebook', value: 'facebook' },
+  { key: 'reddit', text: 'Reddit', value: 'reddit' },
+  { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
+  { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
+  { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
+];
+
 const popularTopOptions = [
   { key: '100', text: '100', value: '100' },
   { key: '300', text: '300', value: '300' },
@@ -71,22 +87,26 @@ const popularTopOptions = [
   { key: '1000', text: '1000', value: '1000' },
 ];
 
+const FilterAlert = ({ action }) => (
+  <div>
+    <Icon
+      name={`${action === 'save' ? 'check' : 'delete'}`}
+      color={`${action === 'save' ? 'green' : 'red'}`}
+      size="large"
+    />
+    Preference has been {`${action === 'save' ? 'saved' : 'cleared'}`}
+  </div>
+);
+
 class Filter extends Component {
   state = {
-    popularSocialOptions: [
-      { key: 'all', text: 'All', value: 'all' },
-      { key: 'facebook', text: 'Facebook', value: 'facebook' },
-      { key: 'reddit', text: 'Reddit', value: 'reddit' },
-      { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
-      { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
-      { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
-    ],
+    popularSocialOptions,
   }
 
   render() {
     const {
       filters,
-      mapState: { center, zoom, bounds },
+      filterMapState: { center, zoom, bounds },
     } = this.props;
     const {
       keywords,
@@ -95,166 +115,245 @@ class Filter extends Component {
       organizations,
       timeWindow,
       limit,
+      categories,
+      date,
     } = filters;
+    const startRange = 31 - timeWindow[0];
+    const endRange = 31 - timeWindow[1];
 
     return (
-      <div>
-        <Segment>
-          <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Filter</Label>
-          <div className="scrollable-section">
-            timewindow
-            <Slider.Range
-              min={0}
-              max={31}
-              allowCross={false}
-              value={timeWindow}
-              onChange={(value) => {
-                this.props.changTimeWindowFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-            />
-            {`${31 - timeWindow[0]}days ago - ${31 - timeWindow[1]}days ago`}
-            <br />
-            keywords -
-            <Dropdown
-              placeholder="Keywords"
-              options={keywords.map(mapOptions)}
-              value={keywords}
-              onChange={(_, { value }) => {
-                this.props.changeKeywordsFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-              search
-              selection
-              fluid
-              multiple
-              allowAdditions
-            />
-            categories -
-            <Dropdown
-              placeholder="Categories"
-              options={categoriesOptions}
-              onChange={(_, { value }) => {
-                this.props.changeCategoriesFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-              search
-              selection
-              fluid
-              multiple
-            />
-            Sources -
-            <Dropdown
-              placeholder="Sources"
-              options={sources.map(mapOptions)}
-              value={sources}
-              onChange={(_, { value }) => {
-                this.props.changeSourcesFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-              search
-              selection
-              fluid
-              multiple
-              allowAdditions
-            />
-            orgs -
-            <Dropdown
-              placeholder="Organizations"
-              options={organizations.map(mapOptions)}
-              value={organizations}
-              onChange={(_, { value }) => {
-                this.props.changeOrganizationsFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-              search
-              selection
-              fluid
-              multiple
-              allowAdditions
-            />
-            pips -
-            <Dropdown
-              placeholder="People"
-              options={people.map(mapOptions)}
-              value={people}
-              onChange={(_, { value }) => {
-                this.props.changePeopleFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-              search
-              selection
-              fluid
-              multiple
-              allowAdditions
-            />
-            sentiment -
-            <Dropdown
-              placeholder="Sentiment"
-              defaultValue="none"
-              options={sentimentsOptions}
-              onChange={(_, { value }) => {
-                this.props.changeSentimentFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-              search
-              selection
-              fluid
-            />
-            Popular social -
-            <Dropdown
-              placeholder="Popular"
-              options={this.state.popularSocialOptions}
-              onChange={(_, { value }) => {
-                if (value[0] === 'all') {
-                  this.setState({ popularSocialOptions: [{ key: 'all', text: 'All', value: 'all' }] });
-                } else if (!value.length) {
-                  this.setState({
-                    popularSocialOptions: [
-                      { key: 'all', text: 'All', value: 'all' },
-                      { key: 'facebook', text: 'Facebook', value: 'facebook' },
-                      { key: 'reddit', text: 'Reddit', value: 'reddit' },
-                      { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
-                      { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
-                      { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
-                    ],
-                  });
-                } else {
-                  this.setState({
-                    popularSocialOptions: [
-                      { key: 'facebook', text: 'Facebook', value: 'facebook' },
-                      { key: 'reddit', text: 'Reddit', value: 'reddit' },
-                      { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
-                      { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
-                      { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
-                    ],
-                  });
-                }
-                this.props.changePopularSocialsFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-              search
-              selection
-              multiple
-              fluid
-            />
-            Popular top -
-            <Dropdown
-              placeholder="Popular top"
-              defaultValue="100"
-              options={popularTopOptions}
-              onChange={(_, { value }) => {
-                this.props.changePopularTopFilter(value);
-                this.props.fetchArticles(center, zoom, bounds);
-              }}
-              search
-              selection
-              // fluid
-            />
-
+      <Segment>
+        <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Preferences</Label>
+        <div className="scrollable-section filter-scrollable">
+          <Button.Group labeled icon>
+            <Tooltip
+              html={<FilterAlert action="save" />}
+              trigger="click"
+              duration={1000}
+              hideDelay={2000}
+              animation="scale"
+            >
+              <Button
+                icon="save"
+                content="Save"
+                labelPosition="left"
+                color="green"
+                onClick={() => localStorage.setItem('filterSettings', JSON.stringify(this.props.filters))}
+              />
+            </Tooltip>
+            <Tooltip
+              html={<FilterAlert action="clear" />}
+              trigger="click"
+              duration={1000}
+              hideDelay={2000}
+              animation="scale"
+            >
+              <Button
+                icon="delete"
+                labelPosition="left"
+                content="Clear"
+                color="red"
+                onClick={() => {
+                  this.props.clearFilters();
+                  this.props.fetchArticles(center, zoom, bounds);
+                  localStorage.removeItem('filterSettings');
+                }}
+              />
+            </Tooltip>
+          </Button.Group>
+          <Divider />
+          <span className="input-label">SEARCH KEYWORDS</span>
+          <Dropdown
+            placeholder="Keywords"
+            icon="search"
+            noResultsMessage="Add keywords"
+            options={keywords.map(mapOptions)}
+            value={keywords}
+            onChange={(_, { value }) => {
+              this.props.changeKeywordsFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <Divider />
+          <span className="input-label">CATEGORIES</span>
+          <Dropdown
+            text="Select Category"
+            // icon="globe"
+            // className="icon half-width"
+            options={categoriesOptions}
+            onChange={(_, { value }) => {
+              this.props.changeCategoriesFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            value={categories}
+            search
+            selection
+            fluid
+            multiple
+          />
+          <Divider />
+          <span className="input-label">SOURCES</span>
+          <Dropdown
+            text="Source"
+            // icon="browser"
+            // className="icon half-width"
+            noResultsMessage="Add sources"
+            options={sources.map(mapOptions)}
+            value={sources}
+            onChange={(_, { value }) => {
+              this.props.changeSourcesFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <Divider />
+          <span className="input-label">DATE</span>
+          <div className="ui input fluid">
+            <div className="filter-datepicker-wrapper">
+              <DatePicker
+                className="filter-datepicker"
+                dateFormat="MMMM D, YYYY"
+                selected={date}
+                onChange={(newDate) => {
+                  this.props.changeDateFilter(newDate);
+                  this.props.fetchArticles(center, zoom, bounds);
+                }}
+                showMonthDropdown
+                showYearDropdown
+              />
+            </div>
           </div>
-        </Segment>
-      </div>
+          <span className="input-label">TIME WINDOW</span>
+          <Slider.Range
+            min={0}
+            max={31}
+            allowCross={false}
+            value={timeWindow}
+            onChange={(value) => {
+              this.props.changeTimeWindowFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+          />
+          <span className="timewindow-text">
+            <span>{`${startRange} day${startRange === 1 ? '' : 's'} ago`}</span>
+            <span>{`${endRange} day${endRange === 1 ? '' : 's'} ago`}</span>
+          </span>
+          <Divider />
+          <span className="input-label">ORGANIZATIONS</span>
+          <Dropdown
+            placeholder="Organizations"
+            noResultsMessage="Add organizations"
+            options={organizations.map(mapOptions)}
+            value={organizations}
+            onChange={(_, { value }) => {
+              this.props.changeOrganizationsFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <Divider />
+          <span className="input-label">PEOPLE</span>
+          <Dropdown
+            placeholder="People"
+            noResultsMessage="Add people"
+            options={people.map(mapOptions)}
+            value={people}
+            onChange={(_, { value }) => {
+              this.props.changePeopleFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <Divider />
+          <span className="input-label">SENTIMENT</span>
+          <Dropdown
+            // text="Sentiment"
+            // icon="smile"
+            // className="icon little-width"
+            defaultValue="none"
+            options={sentimentsOptions}
+            onChange={(_, { value }) => {
+              this.props.changeSentimentFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            search
+            upward
+            selection
+            fluid
+          />
+          <Divider />
+          <span className="input-label">COUNT (<b>{limit}</b>)</span>
+          <Slider
+            min={0}
+            max={10000}
+            value={limit}
+            onChange={(value) => {
+              this.props.changeLimitFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+          />
+          <Divider />
+          <span className="input-label">POPULAR IN</span>
+          <Dropdown
+            text="Popular in..."
+            // icon="internet explorer"
+            // className="icon"
+            options={this.state.popularSocialOptions}
+            onChange={(_, { value }) => {
+              if (value[0] === 'all') {
+                this.setState({ popularSocialOptions: [popularSocialOptions[0]] });
+              } else if (!value.length) {
+                this.setState({ popularSocialOptions });
+              } else {
+                this.setState({
+                  popularSocialOptions: popularSocialOptions.slice(0),
+                });
+              }
+              this.props.changePopularSocialsFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            upward
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <span className="input-label">POPULAR TOP</span>
+          <Dropdown
+            icon="sort"
+            className="icon"
+            defaultValue="100"
+            options={popularTopOptions}
+            onChange={(_, { value }) => {
+              this.props.changePopularTopFilter(value);
+              this.props.fetchArticles(center, zoom, bounds);
+            }}
+            fluid
+            upward
+            labeled
+            button
+            selection
+          />
+        </div>
+      </Segment>
     );
   }
 }

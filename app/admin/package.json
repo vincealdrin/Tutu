@@ -1,7 +1,16 @@
 {
-  "name": "client",
+  "name": "admin",
   "version": "0.1.0",
   "private": true,
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:5000"
+    },
+    "/socket.io": {
+      "target": "ws://localhost:5000",
+      "ws": true
+    }
+  },
   "dependencies": {
     "axios": "^0.17.1",
     "chart.js": "^2.7.1",
@@ -9,12 +18,16 @@
     "lodash": "^4.17.4",
     "react": "^16.1.0",
     "react-chartjs-2": "^2.6.4",
+    "react-d3-cloud": "^0.5.0",
     "react-dom": "^16.1.0",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.8",
     "react-scripts": "1.0.17",
+    "react-semantic-redux-form": "^1.2.1",
+    "react-ultimate-pagination": "^1.0.3",
     "redux": "^3.7.2",
+    "redux-form": "^7.2.0",
     "redux-thunk": "^2.2.0",
     "semantic-ui-css": "^2.2.12",
     "semantic-ui-react": "^0.76.0",

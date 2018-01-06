@@ -1,15 +1,16 @@
 import axios from 'axios';
-import { updateCrudStatus, crudStatus } from '../utils';
+import { updateCrudStatus, crudStatus, httpThunk } from '../utils';
 
 export const FETCH_SOURCES = 'sources/FETCH_SOURCES';
-export const CREATE_SOURCE = 'sources/CREATE_SOURCE';
+export const ADD_SOURCES = 'sources/ADD_SOURCES';
 export const UPDATE_SOURCE = 'sources/UPDATE_SOURCE';
 export const DELETE_SOURCES = 'sources/DELETE_SOURCE';
 
 const initialState = {
   sources: [],
+  totalCount: 0,
   fetchStatus: crudStatus,
-  createStatus: crudStatus,
+  addStatus: crudStatus,
   updateStatus: crudStatus,
   deleteStatus: crudStatus,
 };
@@ -21,15 +22,16 @@ export default (state = initialState, action) => {
         ...state,
         sources: action.sources || state.sources,
         fetchStatus: updateCrudStatus(action),
+        totalCount: action.totalCount || state.totalCount,
       };
-    case CREATE_SOURCE:
+    case ADD_SOURCES:
       return {
         ...state,
-        sources: [
-          ...action.sources,
-          action.newSource,
-        ],
-        createStatus: updateCrudStatus(action),
+        sources: action.statusText === 'success' ? [
+          ...action.newSources,
+          ...state.sources,
+        ] : state.sources,
+        addStatus: updateCrudStatus(action),
       };
     case UPDATE_SOURCE:
       return {
@@ -45,7 +47,9 @@ export default (state = initialState, action) => {
     case DELETE_SOURCES:
       return {
         ...state,
-        sources: state.sources.filter((source) => action.deletedIds.includes(source.id)),
+        sources: action.statusText === 'success'
+          ? state.sources.filter((source) => !action.deletedIds.includes(source.id))
+          : state.sources,
         updateStatus: updateCrudStatus(action),
       };
     default:
@@ -53,45 +57,43 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchSources = () => async (dispatch) => {
-  dispatch({ type: FETCH_SOURCES, statusText: 'pending' });
-
+export const fetchSources = (page, limit, filter, search) => httpThunk(FETCH_SOURCES, async () => {
   try {
-    const sources = await axios.get('a');
+    const { data: sources, status, headers } = await axios.get('/sources', {
+      params: {
+        page,
+        limit,
+        filter,
+        search,
+      },
+    });
 
-    dispatch({
-      type: FETCH_SOURCES,
-      statusText: 'success',
+    return {
+      totalCount: parseInt(headers['x-total-count'], 10),
       sources,
-    });
+      status,
+    };
   } catch (e) {
-    dispatch({
-      type: FETCH_SOURCES,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-    });
+    return e;
   }
-};
+});
 
-export const createSource = (source) => async (dispatch) => {
-  dispatch({ type: CREATE_SOURCE, statusText: 'pending' });
+
+export const addSources = () => httpThunk(ADD_SOURCES, async (getState) => {
+  const { form } = getState();
+  const urls = Object.values(form.sources.values);
 
   try {
-    const id = await axios.post('a', source);
+    const { data: newSources, status } = await axios.post('/sources', urls);
 
-    dispatch({
-      type: CREATE_SOURCE,
-      statusText: 'success',
-      newSource: { ...source, id },
-    });
+    return {
+      newSources,
+      status,
+    };
   } catch (e) {
-    dispatch({
-      type: CREATE_SOURCE,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-    });
+    return e;
   }
-};
+});
 
 export const updateSource = (sourceId, source, isIdChanged = false) => async (dispatch) => {
   dispatch({ type: UPDATE_SOURCE, statusText: 'pending' });
@@ -111,26 +113,24 @@ export const updateSource = (sourceId, source, isIdChanged = false) => async (di
       type: UPDATE_SOURCE,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMessage: e.response.data.message,
     });
   }
 };
 
-export const deleteSources = (ids) => async (dispatch) => {
-  dispatch({ type: DELETE_SOURCES, statusText: 'pending' });
-
+export const deleteSources = (ids) => httpThunk(DELETE_SOURCES, async () => {
   try {
-    await axios.put('/sources/', ids);
+    const { status } = await axios.delete('/sources', {
+      data: {
+        ids: ids.join(),
+      },
+    });
 
-    dispatch({
-      type: DELETE_SOURCES,
-      statusText: 'success',
+    return {
       deletedIds: ids,
-    });
+      status,
+    };
   } catch (e) {
-    dispatch({
-      type: DELETE_SOURCES,
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-    });
+    return e;
   }
-};
+});

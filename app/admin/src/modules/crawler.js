@@ -34,7 +34,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         logs: state.logs.length >= 30
-          ? [action.newLog, ...state.logs.slice(1)]
+          ? [action.newLog, ...state.logs.slice(0, state.logs.length - 1)]
           : [action.newLog, ...state.logs],
       };
     case INCREMENT_SUCCESS_COUNT:
@@ -90,6 +90,7 @@ export const fetchLogs = () => async (dispatch) => {
       type: FETCH_LOGS,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMessage: e.response.data.message,
     });
   }
 };
@@ -112,6 +113,7 @@ export const fetchStats = (cb) => async (dispatch) => {
       type: FETCH_STATS,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMessage: e.response.data.message,
     });
   }
 

@@ -1,27 +1,45 @@
-import React from 'react';
-import { Route } from 'react-router-dom';
+import React, { Component } from 'react';
 import axios from 'axios';
 import 'semantic-ui-css/semantic.min.css';
-import Home from '../Home';
-import Users from '../Users';
-import Counter from '../Counter';
-import Crawler from '../Crawler';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import { logout } from '../../modules/user';
 import Sidebar from '../Sidebar';
+import Routes from './Routes';
 import './styles.css';
 
-axios.defaults.baseURL = 'http://localhost:5000/api';
+axios.defaults.baseURL = '/api/admin';
 
-const App = () => (
-  <div>
-    <Sidebar>
-      <main>
-        <Route exact path="/" component={Home} />
-        <Route exact path="/users" component={Users} />
-        <Route exact path="/counter" component={Counter} />
-        <Route exact path="/crawler" component={Crawler} />
-      </main>
-    </Sidebar>
-  </div>
-);
+const mapStateToProps = ({
+  user: {
+    isLogin,
+    token,
+  },
+}) => ({
+  isLogin,
+});
 
-export default App;
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  logout,
+}, dispatch);
+
+class App extends Component {
+  render() {
+    const { isLogin } = this.props;
+
+    return (
+      <Sidebar
+        isLogin={isLogin}
+        logout={this.props.logout}
+      >
+        <Routes isLogin={isLogin} />
+      </Sidebar>
+    );
+  }
+}
+
+export default withRouter(connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(App));

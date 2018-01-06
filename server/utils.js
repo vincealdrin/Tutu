@@ -1,13 +1,58 @@
 const cheerio = require('cheerio');
 const awis = require('awis');
+const _ = require('lodash');
 const r = require('rethinkdb');
+const rp = require('request-promise');
+const parseDomain = require('parse-domain');
 
 const awisClient = awis({
   key: process.env.AMAZON_ACCESS_KEY,
   secret: process.env.AMAZON_SECRET_KEY,
 });
 
-module.exports.PH_TIMEZONE = '+08:00';
+const PH_TIMEZONE = '+08:00';
+const WEEK_IN_SEC = 604800;
+
+module.exports.PH_TIMEZONE = PH_TIMEZONE;
+module.exports.WEEK_IN_SEC = WEEK_IN_SEC;
+
+module.exports.getDomain = (url) => {
+  const { domain, tld } = parseDomain(url);
+  return `${domain}.${tld}`;
+};
+module.exports.putHttpUrl = (url) => (/^https?:\/\//.test(url) ? url : `http://${url}`);
+module.exports.cleanUrl = (dirtyUrl) => dirtyUrl
+  .replace('www.', '')
+  .replace(/\/$/, '')
+  .replace(/https?:\/\//, '');
+
+module.exports.getSocialScore = async (url) => {
+  const reddit = await rp(`https://www.reddit.com/api/info.json?url=${url}`, {
+    json: true,
+  });
+  const infos = reddit.data.children;
+  const subSharedCount = infos.length;
+  const totalScore = infos.reduce((prev, next) => (prev + next.data.score), 0);
+  const totalNumComments = infos.reduce((prev, next) => (prev + next.data.num_comments), 0);
+  const redScore = totalScore + totalNumComments + subSharedCount;
+
+  const sharedCount = await rp(`https://api.sharedcount.com/v1.0/?url=${url}&apikey=${process.env.SHARED_COUNT_API_KEY}`, {
+    json: true,
+  });
+
+  const suScore = sharedCount.StumbleUpon || 0;
+  const pinScore = sharedCount.Pinterest || 0;
+  const liScore = sharedCount.LinkedIn || 0;
+  const fbScore = (sharedCount.Facebook && sharedCount.Facebook.total_count) || 0;
+
+  return redScore + suScore + liScore + fbScore + pinScore;
+};
+
+module.exports.getTitle = (htmlDoc) => {
+  const $ = cheerio.load(htmlDoc);
+
+  return $('title').text();
+};
 
 module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, reject) => {
   awisClient({
@@ -19,6 +64,17 @@ module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, re
     resolve(info);
   });
 });
+
+module.exports.getSourceBrand = (url, title) => {
+  const titleArr = title.split(/-|\|/);
+  const foundTitle = titleArr.find((word) => new RegExp(_.trim(word), 'i').test(url));
+
+  if (foundTitle) {
+    return foundTitle;
+  }
+
+  return title;
+};
 
 const cleanUrl = (dirtyUrl = '', baseUrl) => {
   let url = dirtyUrl;
@@ -77,64 +133,79 @@ module.exports.getAboutContactUrl = (htmlDoc, baseUrl) => {
 
     return { aboutUsUrl, contactUsUrl };
   } catch (e) {
-    console.error(e);
     return { error: 'Source Error' };
   }
 };
 
 const mapLocation = (loc) => {
   const coords = loc('location')('position').toGeojson()('coordinates');
+  const address = r.branch(
+    loc('found').eq('location'),
+    loc('location')('formattedAddress'),
+    loc('province')('name').add(', Philippines')
+  );
+
   return {
+    address,
     lng: coords.nth(0),
     lat: coords.nth(1),
   };
 };
 
+const getCategoriesField = (article, max = 2) => article('categories')
+  .slice(0, max === 0 ? 2 : max)
+  .getField('label');
+
+module.exports.getCategoriesField = getCategoriesField;
+
 const getSentiment = (sentiment) => r.branch(
-  sentiment('compound').ge(0.5),
-  { result: 'positive', pct: sentiment('pos') },
-  sentiment('compound').le(-0.5),
-  { result: 'positive', pct: sentiment('neg') },
-  { result: 'neutral', pct: sentiment('neu') },
+  sentiment('compound').ge(0.5), 'Positive',
+  sentiment('compound').le(-0.5), 'Negative',
+  'Neutral',
 );
 
-module.exports.mapArticle = (bounds, catsLength) => (join) => {
-  const article = {
-    url: join('left')('url'),
-    title: join('left')('title'),
-    authors: join('left')('authors'),
-    // keywords: join('left')('keywords'),
-    keywords: join('left')('topics')('common').split(','),
-    people: join('left')('people'),
-    organizations: join('left')('organizations'),
-    publishDate: join('left')('publishDate'),
-    sentiment: getSentiment(join('left')('sentiment')),
-    summary: join('left')('summary'),
-    summary2: join('left')('summary2'),
-    topImageUrl: join('left')('topImageUrl'),
-    timestamp: join('left')('timestamp'),
-    source: join('right')('contentData')('siteData')('title'),
-    sourceUrl: join('right')('contentData')('dataUrl'),
-    sourceFaviconUrl: join('right')('faviconUrl'),
-  };
+module.exports.mapRelatedArticles = (join) => ({
+  title: join('left')('title'),
+  url: join('left')('url'),
+  publishDate: join('left')('publishDate'),
+  source: join('right')('brand'),
+  sourceUrl: join('right')('url'),
+});
 
-  if (catsLength) {
-    article.categories = join('left')('categories')
-      .filter((category) => category('score').gt(0))
-      .orderBy(r.desc((category) => category('score')))
-      .slice(0, catsLength)
-      .concatMap((c) => [c('label')]);
-  } else {
-    article.categories = join('left')('categories')
-      .filter((category) => category('score').gt(0))
-      .orderBy(r.desc((category) => category('score')))
-      .slice(0, 2)
-      .concatMap((c) => [c('label')]);
-  }
+module.exports.mapArticleInfo = (catsFilterLength = 2) => (article) => ({
+  id: article('id'),
+  url: article('url'),
+  authors: article('authors'),
+  keywords: article('keywords'),
+  people: article('people'),
+  organizations: article('organizations'),
+  publishDate: article('publishDate'),
+  sentiment: getSentiment(article('sentiment')),
+  summary: article('summary'),
+  relatedArticles: article('relatedArticles'),
+  // locations: article('locations').map((location) => r.branch(
+  //   location('found').eq('location'),
+  //   location('location')('formattedAddress'),
+  //   location('province')('name').add(', Philippines')
+  // )),
+  categories: getCategoriesField(article, catsFilterLength),
+  reactions: article('reactions').group('reaction').count().ungroup(),
+});
+
+module.exports.mapArticle = (bounds) => (join) => {
+  const article = {
+    id: join('left')('id'),
+    title: join('left')('title'),
+    publishDate: join('left')('publishDate'),
+    topImageUrl: join('left')('topImageUrl'),
+    source: join('right')('brand'),
+    sourceUrl: join('right')('url'),
+  };
 
   if (bounds) {
     article.locations = join('left')('locations')
-      .filter((loc) => bounds.intersects(loc('location')('position'))).map(mapLocation);
+      .filter((loc) => bounds.intersects(loc('location')('position')))
+      .map(mapLocation);
   } else {
     article.locations = join('left')('locations').map(mapLocation);
   }
@@ -142,26 +213,31 @@ module.exports.mapArticle = (bounds, catsLength) => (join) => {
   return article;
 };
 
+module.exports.mapSideArticle = (join) => {
+  const article = {
+    id: join('left')('id'),
+    url: join('left')('url'),
+    title: join('left')('title'),
+    publishDate: join('left')('publishDate'),
+    summary: join('left')('summary'),
+    topImageUrl: join('left')('topImageUrl'),
+    source: join('right')('brand'),
+    sourceUrl: join('right')('url'),
+  };
+
+  return article;
+};
+
 module.exports.mapFeedArticle = (join) => {
   const article = {
+    id: join('left')('new_val')('id'),
     url: join('left')('new_val')('url'),
     title: join('left')('new_val')('title'),
-    authors: join('left')('new_val')('authors'),
-    keywords: join('left')('new_val')('topics')('common').split(','),
     publishDate: join('left')('new_val')('publishDate'),
-    sentiment: getSentiment(join('left')('new_val')('sentiment')),
     summary: join('left')('new_val')('summary'),
-    summary2: join('left')('new_val')('summary2'),
     topImageUrl: join('left')('new_val')('topImageUrl'),
-    timestamp: join('left')('new_val')('timestamp'),
-    categories: join('left')('new_val')('categories')
-      .filter((category) => category('score').gt(0))
-      .orderBy(r.desc((category) => category('score')))
-      .slice(0, 2),
-    locations: join('left')('new_val')('locations').map(mapLocation),
-    source: join('right')('contentData')('siteData')('title'),
-    sourceUrl: join('right')('contentData')('dataUrl'),
-    sourceFaviconUrl: join('right')('faviconUrl'),
+    source: join('right')('brand'),
+    sourceUrl: join('right')('url'),
   };
 
   return {
@@ -175,15 +251,16 @@ module.exports.mapFeedLog = (join) => ({
   log: {
     status: join('left')('new_val')('status'),
     type: join('left')('new_val')('type'),
-    runtime: join('left')('new_val')('runtime').default(0),
+    runTime: join('left')('new_val')('runTime').default(0),
     articleUrl: join('left')('new_val')('articleUrl').default(''),
-    sleepTime: join('left')('new_val')('sleepTime').default(0),
     timestamp: join('left')('new_val')('timestamp'),
     articlesCount: join('left')('new_val')('articlesCount').default(0),
     articlesCrawledCount: join('left')('new_val')('articlesCrawledCount').default(0),
-    error: join('left')('error').default(''),
-    sourceUrl: join('right')('contentData')('dataUrl'),
-    sourceTitle: join('right')('contentData')('siteData')('title'),
+    proxy: join('left')('new_val')('proxy').default(''),
+    userAgent: join('left')('new_val')('userAgent').default(''),
+    errorMessage: join('left')('new_val')('errorMessage').default(''),
+    sourceUrl: join('right')('url'),
+    sourceBrand: join('right')('brand'),
     article: r.table('articles')
       .get(join('left')('new_val')('articleId'))
       .pluck('authors', 'title', 'summary', 'url', 'publishDate')
@@ -195,15 +272,16 @@ module.exports.mapFeedLog = (join) => ({
 module.exports.mapLog = (join) => ({
   status: join('left')('status'),
   type: join('left')('type'),
-  runtime: join('left')('runtime').default(0),
+  runTime: join('left')('runTime').default(0),
   articleUrl: join('left')('articleUrl').default(''),
-  sleepTime: join('left')('sleepTime').default(0),
   timestamp: join('left')('timestamp'),
   articlesCount: join('left')('articlesCount').default(0),
   articlesCrawledCount: join('left')('articlesCrawledCount').default(0),
-  error: join('left')('error').default(''),
-  sourceUrl: join('right')('contentData')('dataUrl'),
-  sourceTitle: join('right')('contentData')('siteData')('title'),
+  proxy: join('left')('proxy').default(''),
+  userAgent: join('left')('userAgent').default(''),
+  errorMessage: join('left')('errorMessage').default(''),
+  sourceUrl: join('right')('url'),
+  sourceBrand: join('right')('brand'),
   article: r.table('articles')
     .get(join('left')('articleId'))
     .pluck('authors', 'title', 'summary', 'url', 'publishDate')

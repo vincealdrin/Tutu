@@ -1,4 +1,7 @@
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 const express = require('express');
 const socketIo = require('socket.io');
 const morgan = require('morgan');
@@ -18,21 +21,27 @@ const io = socketIo(server);
 const ioClient = io.of('/client');
 
 app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  limit: '100mb',
+  extended: false,
+}));
+app.use(bodyParser.json({
+  limit: '100mb',
+}));
 app.use(compression({
   level: 9,
   memLevel: 9,
 }));
+app.use(passport.initialize());
 
 app.use(cors({ exposedHeaders: 'X-Total-Count' }));
+// app.use(express.static(path.resolve(__dirname, '..', 'app', 'client', 'build')));
 
 const isProduction = process.env.NODE_ENV === 'production';
 
 if (isProduction) {
   app.use(errorhandler());
 }
-
 initDb((conn) => {
   io.sockets.on('connection', (socket) => {
     console.log(`${socket.id} has connected`);
@@ -45,9 +54,15 @@ initDb((conn) => {
   startIoAdmin(io, conn);
   startIoClient(ioClient, conn);
 
-  app.use(routes(conn, io));
+  app.use('/api', routes(conn, io));
 
-  // / catch 404 and forward to error handler
+  // always return the main index.html, so react-router render the route in the client
+  // app.get('*', (req, res) => {
+  //   res.sendFile(path.resolve(__dirname, '..', 'app', 'client', 'build', 'index.html'));
+  // });
+
+
+  // catch 404 and forward to error handler
   app.use((req, res, next) => {
     const err = new Error('Not Found');
     err.status = 404;
@@ -65,7 +80,8 @@ initDb((conn) => {
       res.status(err.status || 500);
 
       res.json({
-        errors: {
+        message: err.message,
+        error: {
           message: err.message,
           error: err,
         },
@@ -78,14 +94,12 @@ initDb((conn) => {
   app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.json({
-      errors: {
-        message: err.message,
-        error: {},
-      },
+      message: err.message || err.message,
     });
   });
 
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 5000;
+
   server.listen(PORT, () => {
     console.log(`listening at port ${PORT}`);
   });

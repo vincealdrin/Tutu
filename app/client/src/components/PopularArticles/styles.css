@@ -7,13 +7,4 @@
 
 .row { align-items: flex-start !important; }
 .article-item { padding: 0 !important; }
-
-@media screen and (min-width: 1367px) {
-  .scrollable-section {
-    height: 100vh;
-  }
-}
-
-.popular-section-container {
-  width: 320px;
-}
+.article-info { height: 100%; }

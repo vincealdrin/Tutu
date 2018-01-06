@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
 from difflib import SequenceMatcher
 
+
 class TopicDetector(object):
     def tokenize_sent(self, words):
         data = sent_tokenize(words)
@@ -61,7 +62,9 @@ class TopicDetector(object):
 
     def most_common(self, words):
         data = word_tokenize(words)
-        content = [word for word in data if word not in stopwords.words('english')]
+        content = [
+            word for word in data if word not in stopwords.words('english')
+        ]
         freq = FreqDist(content)
         return freq
 
@@ -75,8 +78,9 @@ class TopicDetector(object):
 
     def main_topics(self, words):
         data = self.most_common(words)
-        freq = [w for w, c in data.most_common(5)
-                if pos_tag([w])[0][1] in "NNP"]
+        freq = [
+            w for w, c in data.most_common(5) if pos_tag([w])[0][1] in "NNP"
+        ]
         et = word_tokenize(self.extract_topics(words))
         main_topics = set([e for e in et if e.split()[0] in freq])
         main_topics = self.readable(main_topics)
@@ -86,10 +90,17 @@ class TopicDetector(object):
         data = ','.join(words)
         return data
 
-def parse_topics(text):
+
+def parse_topics(text_body):
     td = TopicDetector()
 
+    with open('../detector/tl_stopwords.txt', 'r') as f:
+        tl_stopwords = f.read().splitlines()
+
+    common = td.extract_topics(text_body).split(',')
+    main = td.main_topics(text_body).split(',')
+
     return {
-        'common': td.extract_topics(text),
-        'main': td.main_topics(text)
+        'common': [ct for ct in common if ct not in tl_stopwords],
+        'main': [mt for mt in main if mt not in tl_stopwords]
     }

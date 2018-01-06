@@ -30,7 +30,7 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchRecentArticles = (limit) => async (dispatch) => {
+export const fetchRecentArticles = (limit, cb) => async (dispatch) => {
   dispatch({ type: FETCH_RECENT_ARTICLES, statusText: 'pending' });
 
   try {
@@ -47,11 +47,14 @@ export const fetchRecentArticles = (limit) => async (dispatch) => {
       articles,
       status,
     });
+
+    if (cb) cb();
   } catch (e) {
     dispatch({
       type: FETCH_RECENT_ARTICLES,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
+      errorMessage: e.response.data.message,
     });
   }
 };

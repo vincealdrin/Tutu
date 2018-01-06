@@ -9,11 +9,9 @@ name = "pypi"
 
 "newspaper3k" = "*"
 requests = "*"
-"psycopg2" = "*"
 "beautifulsoup4" = "*"
 xmltodict = "*"
 python-dotenv = "*"
-"pypiwin32" = "*"
 pandas = "*"
 langdetect = "*"
 fake-useragent = "*"
@@ -32,13 +30,11 @@ chardet = "*"
 certifi = "*"
 idna = "*"
 twython = "*"
-gensim = "*"
 stop-words = "*"
 concepts = "*"
-
-
-[dev-packages]
-
+proxybroker = "*"
+asyncio = "*"
+similar_text = "*"
 
 
 [requires]

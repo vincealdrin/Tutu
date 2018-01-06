@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, Header, Image } from 'semantic-ui-react';
-import tutuLogo from '../../assets/logo/tutu-logo.svg';
+import tutuLogo from '../../assets/logo/tutu-logo.png';
 import './style.css';
 
 class AppSidebar extends Component {
@@ -55,7 +55,7 @@ class AppSidebar extends Component {
         >
           <div className="logo">
             {/* <Icon name="map" color="grey" size="big" style={{ margin: '2rem auto 1rem' }} /> */}
-            <Image src={tutuLogo} style={{ width: 200, height: 200 }} />
+            <Image src={tutuLogo} className="tutu-logo" />
             <Link to="/top">
               <Header as="h2" className={`tutu-logo ${isWideClass}`}>TUTÛ</Header>
             </Link>

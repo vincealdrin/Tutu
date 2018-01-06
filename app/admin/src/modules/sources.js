@@ -31,6 +31,9 @@ export default (state = initialState, action) => {
           ...action.newSources,
           ...state.sources,
         ] : state.sources,
+        totalCount: action.statusText === 'success'
+          ? state.totalCount + action.newSources.length
+          : state.totalCount,
         addStatus: updateCrudStatus(action),
       };
     case UPDATE_SOURCE:
@@ -50,6 +53,9 @@ export default (state = initialState, action) => {
         sources: action.statusText === 'success'
           ? state.sources.filter((source) => !action.deletedIds.includes(source.id))
           : state.sources,
+        totalCount: action.statusText === 'success'
+          ? state.totalCount - action.deletedIds.length
+          : state.totalCount,
         updateStatus: updateCrudStatus(action),
       };
     default:
@@ -80,11 +86,14 @@ export const fetchSources = (page, limit, filter, search) => httpThunk(FETCH_SOU
 
 
 export const addSources = () => httpThunk(ADD_SOURCES, async (getState) => {
-  const { form } = getState();
+  const { form, user: { info } } = getState();
   const urls = Object.values(form.sources.values);
 
   try {
-    const { data: newSources, status } = await axios.post('/sources', urls);
+    const { data: newSources, status } = await axios.post('/sources', {
+      sources: urls,
+      userId: info.id,
+    });
 
     return {
       newSources,

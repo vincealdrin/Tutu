@@ -15,6 +15,7 @@ import {
   fetchPendingSources,
   addPendingSources,
   deletePendingSources,
+  verifyPendingSource,
 } from '../../modules/pendingSources';
 import {
   fetchFakeSources,
@@ -28,7 +29,7 @@ const columns = [
   {
     key: 'url',
     wrapper: (val) => (
-      <a href={`http://${val}`} target="__blank">{val}</a>
+      <a href={val} target="__blank">{val}</a>
     ),
     text: 'URL',
   },
@@ -37,9 +38,13 @@ const pendingColumns = [
   {
     key: 'url',
     wrapper: (val) => (
-      <a href={`http://${val}`} target="__blank">{val}</a>
+      <a href={val} target="__blank">{val}</a>
     ),
     text: 'URL',
+  },
+  {
+    key: 'brand',
+    text: 'Brand',
   },
   {
     key: 'isReliable',
@@ -94,6 +99,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchFakeSources,
   addFakeSources,
   deleteFakeSources,
+  verifyPendingSource,
 }, dispatch);
 
 class Sources extends Component {
@@ -147,6 +153,11 @@ class Sources extends Component {
                       />
                     </div>
                   )}
+                  rowActions={(id) => (
+                    <div>
+                      {id}
+                    </div>
+                  )}
                 />
               </Segment>
             </Grid.Column>
@@ -184,6 +195,20 @@ class Sources extends Component {
                       />
                     </div>
                   )}
+                  rowActions={(id) => (
+                    <div>
+                      <Button
+                        color="green"
+                        content="Reliable"
+                        onClick={() => this.props.verifyPendingSource(id, true)}
+                      />
+                      <Button
+                        color="red"
+                        content="Not Reliable"
+                        onClick={() => this.props.verifyPendingSource(id, false)}
+                      />
+                    </div>
+                  )}
                 />
               </Segment>
             </Grid.Column>
@@ -217,6 +242,11 @@ class Sources extends Component {
                         }}
                         content="Add All Fake Sources"
                       />
+                    </div>
+                  )}
+                  rowActions={(id) => (
+                    <div>
+                      {id}
                     </div>
                   )}
                 />

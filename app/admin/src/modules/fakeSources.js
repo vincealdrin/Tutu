@@ -31,6 +31,9 @@ export default (state = initialState, action) => {
           ...action.newFakeSources,
           ...state.fakeSources,
         ] : state.fakeSources,
+        totalCount: action.statusText === 'success'
+          ? state.totalCount + action.newFakeSources.length
+          : state.totalCount,
         addStatus: updateCrudStatus(action),
       };
     case UPDATE_FAKE_SOURCE:
@@ -50,6 +53,9 @@ export default (state = initialState, action) => {
         fakeSources: action.statusText === 'success'
           ? state.fakeSources.filter((source) => !action.deletedIds.includes(source.id))
           : state.fakeSources,
+        totalCount: action.statusText === 'success'
+          ? state.totalCount - action.deletedIds.length
+          : state.totalCount,
         updateStatus: updateCrudStatus(action),
       };
     default:
@@ -57,34 +63,38 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchFakeSources = (page, limit, filter, search) => httpThunk(FETCH_FAKE_SOURCES, async () => {
-  try {
-    const { data: fakeSources, status, headers } = await axios.get('/fakeSources', {
-      params: {
-        page,
-        limit,
-        filter,
-        search,
-      },
-    });
+export const fetchFakeSources = (page, limit, filter, search) =>
+  httpThunk(FETCH_FAKE_SOURCES, async () => {
+    try {
+      const { data: fakeSources, status, headers } = await axios.get('/fakeSources', {
+        params: {
+          page,
+          limit,
+          filter,
+          search,
+        },
+      });
 
-    return {
-      totalCount: parseInt(headers['x-total-count'], 10),
-      fakeSources,
-      status,
-    };
-  } catch (e) {
-    return e;
-  }
-});
+      return {
+        totalCount: parseInt(headers['x-total-count'], 10),
+        fakeSources,
+        status,
+      };
+    } catch (e) {
+      return e;
+    }
+  });
 
 
 export const addFakeSources = () => httpThunk(ADD_FAKE_SOURCES, async (getState) => {
-  const { form } = getState();
+  const { form, user: { info } } = getState();
   const urls = Object.values(form.fakeSources.values);
 
   try {
-    const { data: newFakeSources, status } = await axios.post('/fakeSources', urls);
+    const { data: newFakeSources, status } = await axios.post('/fakeSources', {
+      fakeSources: urls,
+      userId: info.id,
+    });
 
     return {
       newFakeSources,

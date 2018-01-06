@@ -1,10 +1,13 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const rp = require('request-promise');
+const cheerio = require('cheerio');
 const {
-  getAboutContactUrl,
   getDomain,
   cleanUrl,
+  getAboutContactUrl,
+  getSourceBrand,
+  getTitle,
   putHttpUrl,
 } = require('../../utils');
 
@@ -40,10 +43,9 @@ module.exports = (conn, io) => {
       //   });
       // }
 
-      const htmlDoc = await rp(validUrl);
-      const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, validUrl);
-      console.log(aboutUsUrl);
-      console.log(contactUsUrl);
+      const cheerioDoc = cheerio.load(await rp(validUrl));
+      const brand = getSourceBrand(cheerioDoc) || validUrl;
+      const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, validUrl);
       const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
       const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);
 
@@ -53,6 +55,9 @@ module.exports = (conn, io) => {
         sourceUrl,
         sourcePct,
         contentPct,
+        socialScore,
+        countryRank,
+        worldRank,
       } = await rp('http://localhost:5001/predict', {
         method: 'POST',
         body: {
@@ -66,10 +71,16 @@ module.exports = (conn, io) => {
 
       await r.table('pendingSources').insert({
         id: await r.uuid(sourceUrl).run(conn),
-        url: sourceUrl,
+        url: putHttpUrl(sourceUrl),
         timestamp: new Date(),
         isVerified: false,
+        brand,
         isReliable,
+        hasAboutPage,
+        hasContactPage,
+        socialScore,
+        countryRank,
+        worldRank,
       }).run(conn);
 
       res.json({
@@ -78,6 +89,7 @@ module.exports = (conn, io) => {
         sourcePct,
         contentPct,
         isReliable,
+        brand,
       });
     } catch (e) {
       next(e);
@@ -87,8 +99,8 @@ module.exports = (conn, io) => {
   router.get('/meta', async (req, res, next) => {
     try {
       const { url } = req.query;
-      const htmlDoc = await rp(url);
-      const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, url);
+      const cheerioDoc = cheerio.load(await rp(url));
+      const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, url);
 
       res.json({
         aboutUsUrl,

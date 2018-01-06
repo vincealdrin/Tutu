@@ -69,7 +69,7 @@ while True:
         config = newspaper.Config()
         config.follow_meta_refresh = True
         # config.memoize_articles = True if PY_ENV == 'production' else False
-        config.memoize_articles = False
+        config.memoize_articles = True
 
         proxy = get_proxy(last_proxy)
         last_proxy = proxy['http']
@@ -176,7 +176,7 @@ while True:
                     print('REACHED AYLIEN LIMIT')
                     insert_log(source_id, 'articleCrawl', 'error',
                                float(time.clock() - start_time), {
-                                   'errorMessage': 'REACHED AYLIEN LIMIT',
+                                   'errorMessage': 'REACHED AYLIEN LIMIT (1 HOUR SLEEP)',
                                })
                     sleep(3600)
                     continue
@@ -370,17 +370,18 @@ while True:
                     TL_STOPWORDS = f.read().splitlines()
 
                 STOP_WORDS = ENGLISH_STOP_WORDS.union(TL_STOPWORDS)
-                cleaned_body = [
+                cleaned_body = ' '.join([
                     word for word in body.split()
                     if word.lower() not in STOP_WORDS
-                ]
-                cleaned_title = [
-                    word for word in article.title.split()
+                ])
+                cleaned_title = ' '.join([
+                    word for word in title.split()
                     if word.lower() not in STOP_WORDS
-                ]
+                ])
                 text_keyws = list(keywords(cleaned_body).keys())
                 title_keyws = list(keywords(cleaned_title).keys())
                 keyws = list(set(title_keyws + text_keyws))
+
                 summary = summarize(
                     title=article.title, text=body, max_sents=3)
 

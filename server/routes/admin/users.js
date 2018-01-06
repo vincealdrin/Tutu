@@ -16,14 +16,15 @@ module.exports = (conn, io) => {
     const parsedLimit = parseInt(limit);
 
     try {
-      const totalCount = await r.table(tbl).count().run(conn);
       let query = r.table(tbl).filter(r.row('role').ne('superadmin'));
 
       if (filter && search) {
         query = query.filter((user) => user(filter).match(`(?i)${search}`));
       }
 
+      const totalCount = await query.count().run(conn);
       const cursor = await query
+        .orderBy(r.desc('timestamp'))
         .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
         .without('password')
         .run(conn);

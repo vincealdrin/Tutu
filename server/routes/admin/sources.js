@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const _ = require('lodash');
+const cheerio = require('cheerio');
 const rp = require('request-promise');
 const {
   getAboutContactUrl,
@@ -31,14 +32,15 @@ module.exports = (conn, io) => {
     const parsedLimit = parseInt(limit);
 
     try {
-      const totalCount = await r.table(tbl).count().run(conn);
       let query = r.table(tbl);
 
       if (filter && search) {
         query = query.filter((source) => source(filter).match(`(?i)${search}`));
       }
 
+      const totalCount = await query.count().run(conn);
       const cursor = await query
+        .orderBy(r.desc('timestamp'))
         .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
         .run(conn);
       const sources = await cursor.toArray();
@@ -63,7 +65,10 @@ module.exports = (conn, io) => {
   });
 
   router.post('/', async (req, res, next) => {
-    const sources = req.body;
+    const {
+      userId,
+      sources,
+    } = req.body;
     const timestamp = new Date();
 
     try {
@@ -122,15 +127,14 @@ module.exports = (conn, io) => {
       }
 
       const sourcesInfo = await Promise.all(sourcesWithId.map(async (source) => {
-        const htmlDoc = await rp(source.url);
-        const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, source.url);
-        const faviconUrl = getFaviconUrl(htmlDoc);
+        const cheerioDoc = cheerio.load(await rp(source.url));
+        const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, source.url);
+        const faviconUrl = getFaviconUrl(cheerioDoc);
         const infoPromise = await getSourceInfo(source.url, responseGroups);
         const socialScore = await getSocialScore(source.url);
 
         const info = await infoPromise;
-        const title = getTitle(htmlDoc);
-        const brand = _.trim(getSourceBrand(source.url, title));
+        const brand = getSourceBrand(cheerioDoc) || source.url;
 
         delete info.contactInfo;
         const subdomains = _.get(info, 'trafficData.contributingSubdomains.contributingSubdomain') || [];
@@ -156,6 +160,7 @@ module.exports = (conn, io) => {
 
         return {
           ...source,
+          verifiedBy: userId,
           url: _.get(info, 'contentData.dataUrl', ''),
           title: _.get(info, 'contentData.siteData.title', ''),
           description: _.get(info, 'contentData.siteData.description', ''),

@@ -32,6 +32,9 @@ export default (state = initialState, action) => {
           action.newUser,
           ...state.users,
         ] : state.users,
+        totalCount: action.statusText === 'success'
+          ? state.totalCount + action.users.length
+          : state.totalCount,
         addStatus: updateCrudStatus(action),
       };
     case UPDATE_USER:
@@ -51,6 +54,9 @@ export default (state = initialState, action) => {
         users: action.statusText === 'success'
           ? state.users.filter((user) => !action.deletedIds.includes(user.id))
           : state.users,
+        totalCount: action.statusText === 'success'
+          ? state.totalCount - action.deletedIds.length
+          : state.totalCount,
         deleteStatus: updateCrudStatus(action),
       };
     default:

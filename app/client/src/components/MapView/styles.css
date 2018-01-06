@@ -139,6 +139,24 @@
   align-items: center;
 }
 
+.ui.image.tutu-logo {
+  width: auto;
+  height: 100px;
+  padding: 1.4rem 1rem 1rem;
+  transition: all 0.3s ease-in-out;
+}
+
+.tryThis {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+}
+
 .related-stories {
   max-height: 180px;
   margin-top: 1.7rem;

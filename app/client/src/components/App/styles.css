@@ -8,6 +8,6 @@
 }
 
 .app-container {
-  width: 100%;
+  width: calc(100% - 75px);
   height: 100vh;
 }

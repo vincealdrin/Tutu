@@ -25,7 +25,11 @@ const App = () => (
   <div>
     <main className="app-container">
       <Switch>
-        <Route exact path="/(popular|recent|preferences|about|categories|submit|themes)?" component={MapView} />
+        <Route
+          path="/(popular|recent|preferences|about|categories|submit|themes)?"
+          component={MapView}
+          exact
+        />
         <Route path="/counter" component={Counter} />
         {/* <Route path="/grid" component={GridLayout} /> */}
         <Redirect to="/" />
@@ -34,14 +38,14 @@ const App = () => (
 
     <AppSidebar topChildren={<Insights />}>
       <Switch>
-        <Route path="/" exact component={PopularArticles} />
-        <Route path="(.*)/popular" exact component={PopularArticles} />
-        <Route path="(.*)/recent" exact component={RecentArticles} />
-        <Route path="(.*)/preferences" exact component={Filter} />
-        <Route path="(.*)/about" exact component={About} />
-        <Route path="(.*)/submit" exact component={Submit} />
-        <Route path="(.*)/categories" exact component={Categories} />
-        <Route path="(.*)/themes" exact component={MapThemes} />
+        <Route path="/" component={PopularArticles} exact />
+        <Route path="(.*)/popular" component={PopularArticles} exact />
+        <Route path="(.*)/recent" component={RecentArticles} exact />
+        <Route path="(.*)/preferences" component={Filter} exact />
+        <Route path="(.*)/about" component={About} exact />
+        <Route path="(.*)/submit" component={Submit} exact />
+        <Route path="(.*)/categories" component={Categories} exact />
+        <Route path="(.*)/themes" component={MapThemes} exact />
         <Redirect to="/" />
       </Switch>
     </AppSidebar>

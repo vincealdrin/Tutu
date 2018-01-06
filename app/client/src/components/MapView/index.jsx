@@ -14,7 +14,16 @@ import {
   updateFilterMapState,
 } from '../../modules/mapArticles';
 import SimpleMarker from './SimpleMarker';
-import { HOVER_DISTANCE, MAX_ZOOM, MIN_ZOOM, DEFAULT_ZOOM } from '../../constants';
+import {
+  MARGIN_TOP,
+  MARGIN_RIGHT,
+  MARGIN_BOTTOM,
+  MARGIN_LEFT,
+  HOVER_DISTANCE,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  DEFAULT_ZOOM,
+} from '../../constants';
 import ClusterMarker from './ClusterMarker';
 import ClusterModal from './ClusterModal';
 import SimpleModal from './SimpleModal';
@@ -84,9 +93,13 @@ class MapView extends Component {
     });
   }
 
-  _onChange = ({ center, zoom, bounds }) => {
-    this.props.updateFilterMapState(center, zoom, bounds);
-    this.props.fetchArticles(center, zoom, bounds);
+  _onChange = ({
+    center,
+    zoom,
+    marginBounds,
+  }) => {
+    this.props.updateFilterMapState(center, zoom, marginBounds);
+    this.props.fetchArticles(center, zoom, marginBounds);
   }
 
   _onChildClick = (_, childProps) => {
@@ -142,6 +155,7 @@ class MapView extends Component {
           center={mapState.center}
           zoom={mapState.zoom}
           hoverDistance={HOVER_DISTANCE}
+          margin={[MARGIN_TOP, MARGIN_RIGHT, MARGIN_BOTTOM, MARGIN_LEFT]}
           onChange={this._onChange}
           onChildClick={this._onChildClick}
           reactionStatus={reactionStatus}

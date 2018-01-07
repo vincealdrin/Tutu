@@ -12,6 +12,7 @@ import {
   closeModal,
 } from '../../modules/insights';
 import { getLineDataset } from '../../utils';
+import './styles.css';
 
 const mapStateToProps = ({
   insights: {

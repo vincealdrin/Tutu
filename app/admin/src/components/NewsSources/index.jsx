@@ -29,7 +29,7 @@ const columns = [
   {
     key: 'url',
     wrapper: (val) => (
-      <a href={val} target="__blank">{val}</a>
+      <a href={`http://${val}`} target="__blank">{val}</a>
     ),
     text: 'URL',
   },
@@ -39,7 +39,7 @@ const pendingColumns = [
   {
     key: 'url',
     wrapper: (val) => (
-      <a href={val} target="__blank">{val}</a>
+      <a href={`http://${val}`} target="__blank">{val}</a>
     ),
     text: 'URL',
   },

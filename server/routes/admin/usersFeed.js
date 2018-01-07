@@ -20,7 +20,7 @@ module.exports = (conn, io) => {
             timestamp: item('timestamp'),
             user: r.table('users').get(item('userId')).getField('name'),
             type: item('type'),
-            sources: r.table(item('table')).getAll(r.args(item('sourceIds'))),
+            sources: r.table(item('table')).getAll(r.args(item('sourceIds'))).pluck('brand', 'url').coerceTo('array'),
           },
           item('type').eq('update'),
           {
@@ -29,7 +29,10 @@ module.exports = (conn, io) => {
             user: r.table('users').get(item('userId')).getField('name'),
             type: item('type'),
             updated: item('updated'),
-            source: r.table(item('table')).get(item('sourceId')),
+            source: r.table(item('table'))
+              .get(item('sourceId'))
+              .pluck('brand', 'url')
+              .default({ brand: '', url: '' }),
           },
           item('type').eq('delete'),
           {
@@ -45,7 +48,10 @@ module.exports = (conn, io) => {
             user: r.table('users').get(item('userId')).getField('name'),
             type: item('type'),
             isReliable: item('verified')('table').eq('sources'),
-            verifiedSource: r.table(item('verified')('table')).get(item('verified')('id')),
+            verifiedSource: r.table(item('verified')('table'))
+              .get(item('verified')('id'))
+              .pluck('brand', 'url')
+              .default({ brand: '', url: '' }),
           }
         ))
         .run(conn);

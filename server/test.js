@@ -1,5 +1,9 @@
 const { getAlexaRank } = require('./utils');
 
 (async () => {
-  console.log(await getAlexaRank('facebook.com'));
+  try {
+    console.log(await getAlexaRank('facebook.com'));
+  } catch (e) {
+    console.log(e);
+  }
 })();

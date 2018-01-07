@@ -86,14 +86,11 @@ export const fetchSources = (page, limit, filter, search) => httpThunk(FETCH_SOU
 
 
 export const addSources = () => httpThunk(ADD_SOURCES, async (getState) => {
-  const { form, user: { info } } = getState();
+  const { form } = getState();
   const urls = Object.values(form.sources.values);
 
   try {
-    const { data: newSources, status } = await axios.post('/sources', {
-      sources: urls,
-      userId: info.id,
-    });
+    const { data: newSources, status } = await axios.post('/sources', urls);
 
     return {
       newSources,

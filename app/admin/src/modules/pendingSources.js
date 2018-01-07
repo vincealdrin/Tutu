@@ -154,11 +154,9 @@ export const deletePendingSources = (ids) => httpThunk(DELETE_PENDING_SOURCES, a
 });
 
 export const verifyPendingSource = (id, isReliable) =>
-  httpThunk(VERIFY_PENDING_SOURCE, async (getState) => {
+  httpThunk(VERIFY_PENDING_SOURCE, async () => {
     try {
-      const { user: { info } } = getState();
       const { status } = await axios.post('/pendingSources/verify', {
-        userId: info.id,
         id,
         isReliable,
       });

@@ -9,6 +9,8 @@ const {
   getAlexaRank,
   getSocialScore,
   putHttpUrl,
+  getUpdatedFields,
+  PH_TIMEZONE,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -35,6 +37,14 @@ module.exports = (conn, io) => {
       const cursor = await query
         .orderBy(r.desc('timestamp'))
         .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
+        .eqJoin('verifiedByUserId', r.table('users'))
+        .map({
+          brand: r.row('left')('brand'),
+          timestamp: r.row('left')('timestamp'),
+          url: r.row('left')('url'),
+          id: r.row('left')('id'),
+          verifiedBy: r.row('right')('name'),
+        })
         .run(conn);
       const sources = await cursor.toArray();
 
@@ -58,10 +68,7 @@ module.exports = (conn, io) => {
   });
 
   router.post('/', async (req, res, next) => {
-    const {
-      fakeSources,
-      userId,
-    } = req.body;
+    const fakeSources = req.body;
 
     try {
       const sources = await Promise.all(fakeSources.map(async (source) => {
@@ -80,7 +87,7 @@ module.exports = (conn, io) => {
           id: await r.uuid(sourceCleanUrl).run(conn),
           url: sourceCleanUrl,
           timestamp: new Date(),
-          verifiedBy: userId,
+          verifiedBy: req.user.id,
           socialScore,
           countryRank,
           worldRank,
@@ -134,8 +141,20 @@ module.exports = (conn, io) => {
         });
       }
 
-      await r.table(tbl).insert(sources).run(conn);
-      return res.json(sources);
+      const { changes } = await r.table(tbl)
+        .insert(sources, { returnChanges: true })
+        .run(conn);
+      const insertedVals = changes.map((change) => change.new_val);
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'create',
+        sourceIds: sources.map((source) => source.id),
+        timestamp: insertedVals[0].timestamp,
+        table: tbl,
+      }).run(conn);
+
+      return res.json(insertedVals);
     } catch (e) {
       next(e);
     }
@@ -151,7 +170,19 @@ module.exports = (conn, io) => {
     }
 
     try {
-      await r.table(tbl).get(sourceId).update(source).run(conn);
+      const { changes } = await r.table(tbl)
+        .get(sourceId)
+        .update(source, { returnChanges: true })
+        .run(conn);
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'update',
+        updated: getUpdatedFields(changes),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+        sourceId: source.id,
+      }).run(conn);
 
       res.json(source);
     } catch (e) {
@@ -163,10 +194,18 @@ module.exports = (conn, io) => {
     const { ids = '' } = req.body;
 
     try {
-      await r.table(tbl)
+      const { changes } = await r.table(tbl)
         .getAll(r.args(ids.split(',')))
-        .delete()
+        .delete({ returnChanges: true })
         .run(conn);
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'delete',
+        deleted: changes.map((change) => change.old_val),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -178,7 +217,18 @@ module.exports = (conn, io) => {
     const { sourceId = '' } = req.params;
 
     try {
-      await r.table(tbl).getAll(sourceId).delete().run(conn);
+      const { changes } = await r.table(tbl)
+        .get(sourceId)
+        .delete({ returnChanges: true })
+        .run(conn);
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'delete',
+        deleted: changes.map((change) => change.old_val),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.status(204).end();
     } catch (e) {

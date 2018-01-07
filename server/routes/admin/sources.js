@@ -11,7 +11,9 @@ const {
   getTitle,
   getSocialScore,
   cleanUrl,
+  PH_TIMEZONE,
   putHttpUrl,
+  getUpdatedFields,
 } = require('../../utils');
 
 const responseGroups = ['RelatedLinks', 'Categories', 'Rank', 'ContactInfo', 'RankByCountry',
@@ -42,6 +44,14 @@ module.exports = (conn, io) => {
       const cursor = await query
         .orderBy(r.desc('timestamp'))
         .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
+        .eqJoin('verifiedByUserId', r.table('users'))
+        .map({
+          brand: r.row('left')('brand'),
+          timestamp: r.row('left')('timestamp'),
+          url: r.row('left')('url'),
+          id: r.row('left')('id'),
+          verifiedBy: r.row('right')('name'),
+        })
         .run(conn);
       const sources = await cursor.toArray();
 
@@ -65,11 +75,7 @@ module.exports = (conn, io) => {
   });
 
   router.post('/', async (req, res, next) => {
-    const {
-      userId,
-      sources,
-    } = req.body;
-    const timestamp = new Date();
+    const sources = req.body;
 
     try {
       const sourcesWithId = await Promise.all(sources.map(async (source) => {
@@ -78,7 +84,6 @@ module.exports = (conn, io) => {
         return {
           id: uuid,
           url: putHttpUrl(source),
-          timestamp,
         };
       }));
       const uuids = sourcesWithId.map((source) => source.id);
@@ -160,7 +165,7 @@ module.exports = (conn, io) => {
 
         return {
           ...source,
-          verifiedBy: userId,
+          verifiedByUserId: req.user.id,
           url: _.get(info, 'contentData.dataUrl', ''),
           title: _.get(info, 'contentData.siteData.title', ''),
           description: _.get(info, 'contentData.siteData.description', ''),
@@ -187,17 +192,29 @@ module.exports = (conn, io) => {
             rank: parseInt(_.get(country, 'rank') || '0'),
           })),
           subdomains: mappedSubdomains,
+          timestamp: r.now().inTimezone(PH_TIMEZONE),
           socialScore,
           faviconUrl,
           aboutUsUrl,
           contactUsUrl,
-          timestamp,
           brand,
         };
       }));
 
-      await r.table(tbl).insert(sourcesInfo).run(conn);
-      return res.json(sourcesInfo);
+      const { changes } = await r.table(tbl)
+        .insert(sourcesInfo, { returnChanges: true })
+        .run(conn);
+      const insertedVals = changes.map((change) => change.new_val);
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'create',
+        sourceIds: sourcesInfo.map((info) => info.id),
+        timestamp: insertedVals[0].timestamp,
+        table: tbl,
+      }).run(conn);
+
+      return res.json(insertedVals);
     } catch (e) {
       next(e);
     }
@@ -213,7 +230,19 @@ module.exports = (conn, io) => {
     }
 
     try {
-      await r.table(tbl).get(sourceId).update(source).run(conn);
+      const { changes } = await r.table(tbl)
+        .get(sourceId)
+        .update(source, { returnChanges: true })
+        .run(conn);
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'update',
+        updated: getUpdatedFields(changes),
+        sourceId: source.id,
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.json(source);
     } catch (e) {
@@ -225,10 +254,18 @@ module.exports = (conn, io) => {
     const { ids = '' } = req.body;
 
     try {
-      await r.table(tbl)
+      const { changes } = await r.table(tbl)
         .getAll(r.args(ids.split(',')))
-        .delete()
+        .delete({ returnChanges: true })
         .run(conn);
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'delete',
+        deleted: changes.map((change) => change.old_val),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -240,7 +277,18 @@ module.exports = (conn, io) => {
     const { sourceId = '' } = req.params;
 
     try {
-      await r.table(tbl).getAll(sourceId).delete().run(conn);
+      const { changes } = await r.table(tbl)
+        .get(sourceId)
+        .delete({ returnChanges: true })
+        .run(conn);
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'delete',
+        deleted: changes.map((change) => change.old_val),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.status(204).end();
     } catch (e) {

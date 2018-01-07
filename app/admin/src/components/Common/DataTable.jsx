@@ -209,7 +209,7 @@ class DataTable extends PureComponent {
                   </Table.Cell>
                 ))}
                 <Table.Cell>
-                  {rowActions(datum.id)}
+                  {rowActions && rowActions(datum.id)}
                 </Table.Cell>
               </Table.Row>
             );

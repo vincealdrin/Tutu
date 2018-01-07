@@ -9,6 +9,7 @@ const {
   getSourceBrand,
   getTitle,
   putHttpUrl,
+  PH_TIMEZONE,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -72,7 +73,7 @@ module.exports = (conn, io) => {
       await r.table('pendingSources').insert({
         id: await r.uuid(sourceUrl).run(conn),
         url: putHttpUrl(sourceUrl),
-        timestamp: new Date(),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
         isVerified: false,
         brand,
         isReliable,

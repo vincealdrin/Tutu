@@ -74,8 +74,12 @@ class Users extends Component {
                 content="Add User"
               />
             </div>
-          )
-        }
+          )}
+          rowActions={(id) => (
+            <div>
+              {id}
+            </div>
+          )}
         />
       </div>
     );

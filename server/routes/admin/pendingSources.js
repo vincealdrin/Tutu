@@ -9,6 +9,8 @@ const {
   getAlexaRank,
   getSocialScore,
   putHttpUrl,
+  getUpdatedFields,
+  PH_TIMEZONE,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -102,7 +104,7 @@ module.exports = (conn, io) => {
         ...pendingSource,
         id: await r.uuid(sourceCleanUrl).run(conn),
         url: sourceCleanUrl,
-        timestamp: new Date(),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
         socialScore,
         countryRank,
         worldRank,
@@ -110,9 +112,20 @@ module.exports = (conn, io) => {
         hasAboutPage,
         hasContactPage,
       };
-      await r.table(tbl).insert(pendingSourceInfo).run(conn);
+      const { changes } = await r.table(tbl)
+        .insert(pendingSourceInfo, { returnChanges: true })
+        .run(conn);
+      const insertedVal = changes[0].new_val;
 
-      return res.json(pendingSourceInfo);
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'create',
+        sourceIds: [pendingSourceInfo.id],
+        timestamp: insertedVal.timestamp,
+        table: tbl,
+      }).run(conn);
+
+      return res.json(insertedVal);
     } catch (e) {
       next(e);
     }
@@ -128,7 +141,19 @@ module.exports = (conn, io) => {
     }
 
     try {
-      await r.table(tbl).get(sourceId).update(source).run(conn);
+      const { changes } = await r.table(tbl)
+        .get(sourceId)
+        .update(source, { returnChanges: true })
+        .run(conn);
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'update',
+        sourceid: source.id,
+        updated: getUpdatedFields(changes),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.json(source);
     } catch (e) {
@@ -140,10 +165,18 @@ module.exports = (conn, io) => {
     const { ids = '' } = req.body;
 
     try {
-      await r.table(tbl)
+      const { changes } = await r.table(tbl)
         .getAll(r.args(ids.split(',')))
-        .delete()
+        .delete({ returnChanges: true })
         .run(conn);
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'delete',
+        deleted: changes.map((change) => change.old_val),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -155,7 +188,18 @@ module.exports = (conn, io) => {
     const { sourceId = '' } = req.params;
 
     try {
-      await r.table(tbl).getAll(sourceId).delete().run(conn);
+      const { changes } = await r.table(tbl)
+        .get(sourceId)
+        .delete({ returnChanges: true })
+        .run(conn);
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'delete',
+        deleted: changes.map((change) => change.old_val),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -167,24 +211,42 @@ module.exports = (conn, io) => {
     const {
       id,
       isReliable,
-      userId,
     } = req.body;
 
     try {
-      const pendingSource = await r.table(tbl).get(id).run(conn);
+      const { changes } = await r.table(tbl)
+        .get(id)
+        .delete({ returnChanges: true })
+        .run(conn);
+
+      const pendingSource = changes[0].old_val;
 
       delete pendingSource.isReliable;
-      delete pendingSource.isVerified;
 
       const newSource = {
         ...pendingSource,
-        verifiedBy: userId,
-        timestamp: new Date(),
+        verifiedByUserId: req.user.id,
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
       };
-      await r.table(isReliable ? 'sources' : 'fakeSources').insert(newSource).run(conn);
-      await r.table(tbl).get(id).delete().run(conn);
 
-      res.status(204).end();
+      const table = isReliable ? 'sources' : 'fakeSources';
+      const { changes: insertedVals } = await r.table(table)
+        .insert(newSource, { returnChanges: true })
+        .run(conn);
+      const insertedVal = insertedVals[0].new_val;
+
+      await r.table('usersFeed').insert({
+        user: req.user.id,
+        type: 'verify',
+        timestamp: insertedVal.timestamp,
+        verified: {
+          id: newSource.id,
+          table,
+        },
+        table: tbl,
+      }).run(conn);
+
+      res.json(insertedVal);
     } catch (e) {
       next(e);
     }

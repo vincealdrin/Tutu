@@ -33,6 +33,7 @@ const columns = [
     ),
     text: 'URL',
   },
+  { key: 'verifiedBy', text: 'Verified by' },
 ];
 const pendingColumns = [
   {
@@ -52,18 +53,12 @@ const pendingColumns = [
     text: 'Reliable',
   },
   {
-    key: 'isVerified',
-    wrapper: (val) => (val ? 'Yes' : 'No'),
-    text: 'Verified',
-  },
-  {
     key: 'timestamp',
     wrapper: (val) => new Date(val).toLocaleString(),
     text: 'Timestamp',
   },
 
 ];
-
 
 const mapStateToProps = ({
   sources: {

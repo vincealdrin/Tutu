@@ -27,10 +27,26 @@ module.exports.cleanUrl = (dirtyUrl) => dirtyUrl
   .replace(/\/$/, '')
   .replace(/https?:\/\//, '');
 
+module.exports.getUpdatedFields = (changes) =>
+  changes.map((change) => {
+    const newVal = {};
+    const oldVal = {};
+
+    _.each(change.new_val, (val, key) => {
+      if (val !== change.old_val[key]) {
+        newVal[key] = val;
+        oldVal[key] = change.old_val[key];
+      }
+    });
+
+    return {
+      newVal,
+      oldVal,
+    };
+  });
 
 const parseXML = (xmlString) => new Promise((resolve, reject) => {
   parseString(xmlString, (err, res) => {
-    console.log(err);
     if (err) {
       reject(err);
     } else {
@@ -40,13 +56,14 @@ const parseXML = (xmlString) => new Promise((resolve, reject) => {
 });
 module.exports.getAlexaRank = async (url) => {
   const xmlString = await rp(`http://data.alexa.com/data?cli=10&url=${url}`);
-  const res = await parseXML(xmlString); // hey
+  const res = await parseXML(xmlString); // error here fix dis
   const info = {
     sourceUrl: res.ALEXA.SD ? res.ALEXA.SD[0].POPULARITY[0].$.URL : url,
     countryRank: res.ALEXA.SD ? parseInt(res.ALEXA.SD[0].POPULARITY[0].$.TEXT) : 0,
     worldRank: res.ALEXA.SD ? parseInt(res.ALEXA.SD[0].COUNTRY[0].$.RANK) : 0,
   };
-  return parseXML(info);
+
+  return info;
 };
 
 module.exports.getSocialScore = async (url) => {

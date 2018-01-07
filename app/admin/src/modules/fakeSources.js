@@ -87,14 +87,11 @@ export const fetchFakeSources = (page, limit, filter, search) =>
 
 
 export const addFakeSources = () => httpThunk(ADD_FAKE_SOURCES, async (getState) => {
-  const { form, user: { info } } = getState();
+  const { form } = getState();
   const urls = Object.values(form.fakeSources.values);
 
   try {
-    const { data: newFakeSources, status } = await axios.post('/fakeSources', {
-      fakeSources: urls,
-      userId: info.id,
-    });
+    const { data: newFakeSources, status } = await axios.post('/fakeSources', urls);
 
     return {
       newFakeSources,

@@ -3,6 +3,7 @@ import { Header, Grid, Image, Icon, Label } from 'semantic-ui-react';
 import { Motion, spring } from 'react-motion';
 import { Tooltip } from 'react-tippy';
 import './styles.css';
+import { fetchRelatedArticles } from '../../modules/mapArticles';
 
 const config = { stiffness: 140, damping: 14 };
 const toCSS = (translateX) => ({ transform: `translateX: ${translateX}px` });

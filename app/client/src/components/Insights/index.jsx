@@ -12,7 +12,6 @@ import {
   closeModal,
 } from '../../modules/insights';
 import { getLineDataset } from '../../utils';
-import './styles.css';
 
 const mapStateToProps = ({
   insights: {
@@ -420,7 +419,7 @@ class Insights extends Component {
                 rotate={(word) => word.value % 360}
               />
             </div>
-        
+
             top 10
             <HorizontalBar data={peopleBarData} />
             <HorizontalBar data={orgsBarData} />

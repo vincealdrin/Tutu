@@ -72,21 +72,21 @@ module.exports = (conn, io) => {
       if (matchedPending) {
         return next({
           status: 400,
-          message: 'Source is already in list of pending sources',
+          message: 'Source is already in the list of pending sources',
         });
       }
 
       if (matchedSource) {
         return next({
           status: 400,
-          message: 'Source is already in list of reliable sources',
+          message: 'Source is already in the list of reliable sources',
         });
       }
 
       if (matchedFakeSource) {
         return next({
           status: 400,
-          message: 'Source is already in list of fake sources',
+          message: 'Source is already in the list of fake sources',
         });
       }
 
@@ -118,10 +118,10 @@ module.exports = (conn, io) => {
       const insertedVal = changes[0].new_val;
 
       await r.table('usersFeed').insert({
-        user: req.user.id,
+        userId: req.user.id,
         type: 'create',
         sourceIds: [pendingSourceInfo.id],
-        timestamp: insertedVal.timestamp,
+        timestamp: r.expr(insertedVal.timestamp).inTimezone(PH_TIMEZONE),
         table: tbl,
       }).run(conn);
 
@@ -147,7 +147,7 @@ module.exports = (conn, io) => {
         .run(conn);
 
       await r.table('usersFeed').insert({
-        user: req.user.id,
+        userId: req.user.id,
         type: 'update',
         sourceid: source.id,
         updated: getUpdatedFields(changes),
@@ -171,7 +171,7 @@ module.exports = (conn, io) => {
         .run(conn);
 
       await r.table('usersFeed').insert({
-        user: req.user.id,
+        userId: req.user.id,
         type: 'delete',
         deleted: changes.map((change) => change.old_val),
         timestamp: r.now().inTimezone(PH_TIMEZONE),
@@ -194,7 +194,7 @@ module.exports = (conn, io) => {
         .run(conn);
 
       await r.table('usersFeed').insert({
-        user: req.user.id,
+        userId: req.user.id,
         type: 'delete',
         deleted: changes.map((change) => change.old_val),
         timestamp: r.now().inTimezone(PH_TIMEZONE),
@@ -236,7 +236,7 @@ module.exports = (conn, io) => {
       const insertedVal = insertedVals[0].new_val;
 
       await r.table('usersFeed').insert({
-        user: req.user.id,
+        userId: req.user.id,
         type: 'verify',
         timestamp: insertedVal.timestamp,
         verified: {

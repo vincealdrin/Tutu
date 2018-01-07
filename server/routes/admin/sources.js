@@ -109,19 +109,19 @@ module.exports = (conn, io) => {
         sourcesWithId.forEach((source) => {
           const foundSource = matchedSources.find((ms) => ms.id === source.id);
           if (foundSource) {
-            errorMessage.push(`${foundSource.url} already exists in list of reliable sources`);
+            errorMessage.push(`${foundSource.url} already exists in the list of reliable sources`);
             return;
           }
 
           const foundFake = matchedFakes.find((mf) => mf.id === source.id);
           if (foundFake) {
-            errorMessage.push(`${foundFake.url} already exists in list of fake sources`);
+            errorMessage.push(`${foundFake.url} already exists in the list of fake sources`);
             return;
           }
 
           const foundPending = matchedPendings.find((mp) => mp.id === source.id);
           if (foundPending) {
-            errorMessage.push(`${foundPending.url} already exists in list of pending sources`);
+            errorMessage.push(`${foundPending.url} already exists in the list of pending sources`);
           }
         });
 
@@ -207,14 +207,17 @@ module.exports = (conn, io) => {
       const insertedVals = changes.map((change) => change.new_val);
 
       await r.table('usersFeed').insert({
-        user: req.user.id,
+        userId: req.user.id,
         type: 'create',
         sourceIds: sourcesInfo.map((info) => info.id),
-        timestamp: insertedVals[0].timestamp,
+        timestamp: r.expr(insertedVals[0].timestamp).inTimezone(PH_TIMEZONE),
         table: tbl,
       }).run(conn);
 
-      return res.json(insertedVals);
+      return res.json(insertedVals.map((insertedVal) => ({
+        ...insertedVal,
+        verifiedBy: req.user.name,
+      })));
     } catch (e) {
       next(e);
     }
@@ -236,7 +239,7 @@ module.exports = (conn, io) => {
         .run(conn);
 
       await r.table('usersFeed').insert({
-        user: req.user.id,
+        userId: req.user.id,
         type: 'update',
         updated: getUpdatedFields(changes),
         sourceId: source.id,
@@ -260,7 +263,7 @@ module.exports = (conn, io) => {
         .run(conn);
 
       await r.table('usersFeed').insert({
-        user: req.user.id,
+        userId: req.user.id,
         type: 'delete',
         deleted: changes.map((change) => change.old_val),
         timestamp: r.now().inTimezone(PH_TIMEZONE),
@@ -283,7 +286,7 @@ module.exports = (conn, io) => {
         .run(conn);
 
       await r.table('usersFeed').insert({
-        user: req.user.id,
+        userId: req.user.id,
         type: 'delete',
         deleted: changes.map((change) => change.old_val),
         timestamp: r.now().inTimezone(PH_TIMEZONE),

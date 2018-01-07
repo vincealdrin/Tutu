@@ -56,11 +56,16 @@ const parseXML = (xmlString) => new Promise((resolve, reject) => {
 });
 module.exports.getAlexaRank = async (url) => {
   const xmlString = await rp(`http://data.alexa.com/data?cli=10&url=${url}`);
-  const res = await parseXML(xmlString); // error here fix dis
+  const res = await parseXML(xmlString);
+
   const info = {
     sourceUrl: res.ALEXA.SD ? res.ALEXA.SD[0].POPULARITY[0].$.URL : url,
-    countryRank: res.ALEXA.SD ? parseInt(res.ALEXA.SD[0].POPULARITY[0].$.TEXT) : 0,
-    worldRank: res.ALEXA.SD ? parseInt(res.ALEXA.SD[0].COUNTRY[0].$.RANK) : 0,
+    countryRank: res.ALEXA.SD && res.ALEXA.SD[0].POPULARITY
+      ? parseInt(res.ALEXA.SD[0].POPULARITY[0].$.TEXT)
+      : 0,
+    worldRank: res.ALEXA.SD && res.ALEXA.SD[0].COUNTRY
+      ? parseInt(res.ALEXA.SD[0].COUNTRY[0].$.RANK)
+      : 0,
   };
 
   return info;

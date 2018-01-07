@@ -4,6 +4,7 @@ import { reducer as formReducer } from 'redux-form';
 import io from 'socket.io-client';
 import counter from './counter';
 import users from './users';
+import usersFeed from './usersFeed';
 import sources from './sources';
 import pendingSources from './pendingSources';
 import fakeSources from './fakeSources';
@@ -18,6 +19,7 @@ const appReducer = combineReducers({
   socket: () => socket,
   counter,
   users,
+  usersFeed,
   sources,
   pendingSources,
   fakeSources,

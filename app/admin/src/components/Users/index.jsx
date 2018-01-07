@@ -5,6 +5,7 @@ import { Button } from 'semantic-ui-react';
 import { fetchUsers, addUser, deleteUsers } from '../../modules/users';
 import DataTable from '../Common/DataTable';
 import UserForm from './UserForm';
+import UsersFeed from './UsersFeed';
 
 const columns = [
   { key: 'username', text: 'Username' },
@@ -81,6 +82,7 @@ class Users extends Component {
             </div>
           )}
         />
+        <UsersFeed />
       </div>
     );
   }

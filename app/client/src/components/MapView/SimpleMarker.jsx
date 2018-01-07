@@ -1,13 +1,7 @@
-<<<<<<< HEAD
-import React, { Component } from 'react';
-import { Label, Popup, Header, Icon, Image, Button, Accordion } from 'semantic-ui-react';
-import shortid from 'shortid';
-=======
 import React, { PureComponent } from 'react';
 import { Header, Grid, Image, Icon, Label } from 'semantic-ui-react';
 import { Motion, spring } from 'react-motion';
 import { Tooltip } from 'react-tippy';
->>>>>>> 66f79f3305b9288d5616dca6f5eee0249f53cf71
 import './styles.css';
 import { fetchRelatedArticles } from '../../modules/mapArticles';
 

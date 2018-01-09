@@ -86,7 +86,6 @@ class ClusterModal extends Component {
                       <p className="article-date">
                         {new Date(publishDate).toDateString()} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
                       </p>
-                      <Button as="a" href={url} circular color="blue" target="_blank" className="article-read-more">Read More</Button>
                     </div>
                     <div className="tags">
                       <List divided relaxed>

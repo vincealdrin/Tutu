@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Grid, Image, Header, Divider, Label, Segment } from 'semantic-ui-react';
+import { Button, Grid, Image, Header, Divider, Label, Segment, Dimmer } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
@@ -10,10 +10,12 @@ import './styles.css';
 
 const mapStateToProps = ({
   popularArticles: {
-    articles,
+		articles,
+		fetchStatus
   },
 }) => ({
-  articles,
+	articles,
+	fetchStatus
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -27,11 +29,16 @@ class PopularArticles extends Component {
   }
 
   render() {
-    const { articles } = this.props;
+    const { articles, fetchStatus } = this.props;
 
     return (
       <div className="popular-section-container">
         <Segment>
+					{fetchStatus.pending ? (
+						<Dimmer active inverted>
+							<Header as="h4">Loading article...</Header>
+						</Dimmer>
+					) : null}
           <Label as="a" color="red" ribbon style={{ marginBottom: '1rem' }}>Popular Articles</Label>
           <div className="scrollable-section">
 						{articles.length

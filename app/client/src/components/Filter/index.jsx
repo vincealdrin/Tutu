@@ -98,6 +98,8 @@ const FilterAlert = ({ action }) => (
   </div>
 );
 
+const now = new Date();
+
 class Filter extends Component {
   state = {
     popularSocialOptions,
@@ -223,6 +225,7 @@ class Filter extends Component {
                 className="filter-datepicker"
                 dateFormat="MMMM D, YYYY"
                 selected={date}
+                maxDate={now}
                 onChange={(newDate) => {
                   this.props.changeDateFilter(newDate);
                   this.props.fetchArticles(center, zoom, bounds);

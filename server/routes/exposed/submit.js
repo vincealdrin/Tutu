@@ -3,25 +3,24 @@ const r = require('rethinkdb');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const {
-  getDomain,
   cleanUrl,
   getAboutContactUrl,
   getSourceBrand,
   getTitle,
-  putHttpUrl,
+  getFaviconUrl,
   PH_TIMEZONE,
+  getDomainOnly,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
   router.get('/', async (req, res, next) => {
     try {
       const { url } = req.query;
-      const validUrl = putHttpUrl(url);
+      const validUrl = cleanUrl(url);
       // const domain = getDomain(url);
       // const uuid = await r.uuid(domain).run(conn);
       // const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
       // const matchedSource = await r.table('sources').get(uuid).run(conn);
-      // const matchedFakeSource = await r.table('fakeSources').get(uuid).run(conn);
 
       // if (matchedPending) {
       //   return res.json({
@@ -32,20 +31,15 @@ module.exports = (conn, io) => {
 
       // if (matchedSource) {
       //   return res.json({
-      //     isReliable: true,
-      //     isVerified: true,
-      //   });
-      // }
-
-      // if (matchedFakeSource) {
-      //   return res.json({
-      //     isReliable: false,
+      //     isReliable: matchedSource.isReliable,
       //     isVerified: true,
       //   });
       // }
 
       const cheerioDoc = cheerio.load(await rp(validUrl));
-      const brand = getSourceBrand(cheerioDoc) || validUrl;
+      const brand = getSourceBrand(cheerioDoc) || getDomainOnly(validUrl);
+      const title = getTitle(cheerioDoc);
+      const faviconUrl = getFaviconUrl(cheerioDoc, validUrl);
       const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, validUrl);
       const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
       const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);
@@ -68,28 +62,30 @@ module.exports = (conn, io) => {
         },
         json: true,
       });
-      const isReliable = Boolean(reliable);
+      const isReliablePred = Boolean(reliable);
 
       await r.table('pendingSources').insert({
         id: await r.uuid(sourceUrl).run(conn),
-        url: putHttpUrl(sourceUrl),
+        url: cleanUrl(sourceUrl),
         timestamp: r.now().inTimezone(PH_TIMEZONE),
         isVerified: false,
         brand,
-        isReliable,
-        hasAboutPage,
-        hasContactPage,
+        isReliablePred,
+        aboutUsUrl,
+        contactUsUrl,
         socialScore,
         countryRank,
         worldRank,
+        faviconUrl,
+        title,
       }).run(conn);
 
       res.json({
         isVerified: false,
+        isReliable: isReliablePred,
         pct,
         sourcePct,
         contentPct,
-        isReliable,
         brand,
       });
     } catch (e) {

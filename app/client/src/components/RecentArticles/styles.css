@@ -15,6 +15,27 @@
   font-size: 1.141592654rem;
 }
 
+.no-article-container {
+	display: flex;
+	height: 90vh;
+	text-align: center;
+  color: #767676;
+}
+
+.no-article-emoji-container {
+	margin: auto;
+}
+
+.ui.header.no-article-emoji {
+	font-size: 2rem;
+	padding: 2rem;
+}
+
+.no-article-desc {
+	font-size: 1.1rem;
+	letter-spacing: 3px;
+}
+
 .row { align-items: flex-start !important; }
 .article-item { padding: 0 !important; }
 

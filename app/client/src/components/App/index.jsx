@@ -16,7 +16,6 @@ import Submit from '../Submit';
 import Insights from '../Insights';
 import MapThemes from '../MapThemes';
 import Counter from '../Counter';
-// import GridLayout from '../GridView';
 import './styles.css';
 
 axios.defaults.baseURL = '/api/exposed';
@@ -30,8 +29,6 @@ const App = () => (
           component={MapView}
           exact
         />
-        <Route path="/counter" component={Counter} />
-        {/* <Route path="/grid" component={GridLayout} /> */}
         <Redirect to="/" />
       </Switch>
     </main>

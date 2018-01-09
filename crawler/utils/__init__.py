@@ -118,26 +118,28 @@ def search_locations(text, locations, provinces):
     matched_locations = []
 
     for location in locations:
-        with_prov = False
+        # without_prov = False
+        # without_prov_locs = [
+        #     'Angeles', 'Mexico', 'Gloria', 'Dolores', 'La Paz',
+        #     'Tubo', 'Oras', 'Salcedo', 'Santa', 'Lala', 'Adams'
+        #     'Alfonso', 'Pola', 'Panay', 'Pugo', 'Caba'
+        # ]
+        # if location['location']['name'] in with_prov_locs:
+        #     with_prov = True
 
-        if location['location']['name'] == 'Angeles':
-            with_prov = True
-        if location['location']['name'] == 'Mexico':
-            with_prov = True
-
-        if re.search('^' + location['location']['name'] + '$', text):
+        if re.search('\W*' + location['location']['name'] + '\W+', text):
             loc = copy.deepcopy(location)
             del loc['location']['hasSameName']
 
-            if not location['location']['hasSameName'] and not with_prov:
-                loc['found'] = 'location'
-                matched_locations.append(loc)
-                continue
+            # if not location['location']['hasSameName'] and not with_prov:
+            #     loc['found'] = 'location'
+            #     matched_locations.append(loc)
+            #     continue
 
             province_pattern = re.compile(
-                '(' + location['province']['name'] + ' Province|' + 'Metro ' +
+                '\W*(' + location['province']['name'] + ' Province|' + 'Metro ' +
                 location['province']['name'] + '|' +
-                location['province']['name'] + r')+,? ?(Philippines|PH)?\W',
+                location['province']['name'] + ')+,? ?(Philippines|PH)?\W+',
                 re.IGNORECASE)
 
             if province_pattern.search(text):
@@ -147,9 +149,9 @@ def search_locations(text, locations, provinces):
     if not matched_locations:
         for province in provinces:
             province_pattern = re.compile(
-                '(' + province['province']['name'] + ' Province|' + 'Metro ' +
+                '\W*(' + province['province']['name'] + ' Province|' + 'Metro ' +
                 province['province']['name'] + '|' +
-                province['province']['name'] + r')+,? ?(Philippines|PH)?\W',
+                province['province']['name'] + ')+,? ?(Philippines|PH)?\W+',
                 re.IGNORECASE)
             matched = province_pattern.search(text)
 

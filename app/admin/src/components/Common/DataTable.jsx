@@ -37,6 +37,9 @@ class DataTable extends PureComponent {
   cancelDelete = () => this.setState({ isDeleting: false })
 
   clearDeletionList = () => this.setState({ deletionList: [] })
+  appendAllDeletion = (ids) => {
+    this.setState({ deletionList: ids });
+  }
   appendDeletion = (selectedId) => {
     this.setState({ deletionList: [...this.state.deletionList, selectedId] });
   }
@@ -58,6 +61,7 @@ class DataTable extends PureComponent {
       addModalActions,
       onDeleteSelected,
       onPaginate,
+      rowActions,
     } = this.props;
     const {
       isEditing,
@@ -69,6 +73,7 @@ class DataTable extends PureComponent {
       searchFilter,
       search,
     } = this.state;
+    const totalPages = Math.ceil((totalCount || limit) / limit);
 
     return (
       <Table celled>
@@ -127,6 +132,13 @@ class DataTable extends PureComponent {
                     onClick={async () => {
                       await onDeleteSelected(deletionList);
                       this.cancelDelete();
+
+                      if (totalCount - deletionList.length > 0 && totalPages !== 1) {
+                        this.setState({ currentPage: 1 }, () => {
+                          this.debouncedOnPaginate(0, limit, searchFilter, search);
+                        });
+                      }
+
                       this.clearDeletionList();
                     }}
                   />
@@ -136,8 +148,8 @@ class DataTable extends PureComponent {
                   icon="search"
                   placeholder="Search..."
                   onChange={(__, { value }) => {
-                    this.setState({ search: value }, () => {
-                      this.debouncedOnPaginate(currentPage - 1, limit, searchFilter, value);
+                    this.setState({ search: value, currentPage: 1 }, () => {
+                      this.debouncedOnPaginate(0, limit, searchFilter, value);
                     });
                   }}
                   label={(
@@ -152,18 +164,33 @@ class DataTable extends PureComponent {
             </Table.HeaderCell>
           </Table.Row>
           <Table.Row>
-            {this.state.isDeleting ? <Table.HeaderCell /> : null}
+            {this.state.isDeleting ? (
+              <Table.HeaderCell>
+                <Checkbox
+                  onClick={() => {
+                    if (deletionList.length === data.length) {
+                      this.clearDeletionList();
+                    } else {
+                      this.appendAllDeletion(data.map((d) => d.id));
+                    }
+                  }}
+                  checked={deletionList.length === data.length}
+                />
+              </Table.HeaderCell>
+            ) : null}
             {columns.map(({ text }) => (
               <Table.HeaderCell key={shortid.generate()}>
                 {text}
               </Table.HeaderCell>
             ))}
+            <Table.HeaderCell>Actions</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
 
         <Table.Body>
-          {data.map((datum) => {
+          {data.slice(0, limit).map((datum) => {
             const isChecked = deletionList.includes(datum.id);
+
             return (
               <Table.Row key={shortid.generate()}>
                 {this.state.isDeleting ? (
@@ -173,7 +200,6 @@ class DataTable extends PureComponent {
                         ? this.removeDeletion(datum.id)
                         : this.appendDeletion(datum.id))}
                       checked={isChecked}
-                      slider
                     />
                   </Table.Cell>
                 ) : null}
@@ -182,6 +208,9 @@ class DataTable extends PureComponent {
                     {wrapper ? wrapper(datum[key]) : datum[key]}
                   </Table.Cell>
                 ))}
+                <Table.Cell>
+                  {rowActions && rowActions(datum.id)}
+                </Table.Cell>
               </Table.Row>
             );
           })}
@@ -210,7 +239,7 @@ class DataTable extends PureComponent {
               {limit < totalCount ? (
                 <Pagination
                   currentPage={currentPage}
-                  totalPages={Math.ceil((totalCount || limit) / limit)}
+                  totalPages={totalPages}
                   onChange={(page) => {
                     this.setState({ currentPage: page }, () => {
                       this.debouncedOnPaginate(page - 1, limit, searchFilter, search);

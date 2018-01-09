@@ -4,7 +4,8 @@ import { updateCrudStatus, crudStatus, httpThunk } from '../utils';
 export const FETCH_PENDING_SOURCES = 'pendingSources/FETCH_PENDING_SOURCES';
 export const ADD_PENDING_SOURCES = 'pendingSources/ADD_PENDING_SOURCES';
 export const UPDATE_PENDING_SOURCE = 'pendingSources/UPDATE_PENDING_SOURCE';
-export const DELETE_PENDING_SOURCES = 'pendingSources/DELETE_SOURCE';
+export const DELETE_PENDING_SOURCES = 'pendingSources/DELETE_PENDING_SOURCES';
+export const VERIFY_PENDING_SOURCE = 'pendingSources/VERIFY_PENDING_SOURCE';
 
 const initialState = {
   pendingSources: [],
@@ -13,6 +14,7 @@ const initialState = {
   addStatus: crudStatus,
   updateStatus: crudStatus,
   deleteStatus: crudStatus,
+  verifyStatus: crudStatus,
 };
 
 export default (state = initialState, action) => {
@@ -31,6 +33,9 @@ export default (state = initialState, action) => {
           action.newPendingSource,
           ...state.pendingSources,
         ] : state.pendingSources,
+        totalCount: action.statusText === 'success'
+          ? state.totalCount + 1
+          : state.totalCount,
         addStatus: updateCrudStatus(action),
       };
     case UPDATE_PENDING_SOURCE:
@@ -50,33 +55,45 @@ export default (state = initialState, action) => {
         pendingSources: action.statusText === 'success'
           ? state.pendingSources.filter((source) => !action.deletedIds.includes(source.id))
           : state.pendingSources,
+        totalCount: action.statusText === 'success'
+          ? state.totalCount - action.deletedIds.length
+          : state.totalCount,
         updateStatus: updateCrudStatus(action),
+      };
+    case VERIFY_PENDING_SOURCE:
+      return {
+        ...state,
+        pendingSources: action.statusText === 'success'
+          ? state.pendingSources.filter((source) => action.id !== source.id)
+          : state.pendingSources,
+        verifyStatus: updateCrudStatus(action),
       };
     default:
       return state;
   }
 };
 
-export const fetchPendingSources = (page, limit, filter, search) => httpThunk(FETCH_PENDING_SOURCES, async () => {
-  try {
-    const { data: pendingSources, status, headers } = await axios.get('/pendingSources', {
-      params: {
-        page,
-        limit,
-        filter,
-        search,
-      },
-    });
+export const fetchPendingSources = (page, limit, filter, search) =>
+  httpThunk(FETCH_PENDING_SOURCES, async () => {
+    try {
+      const { data: pendingSources, status, headers } = await axios.get('/pendingSources', {
+        params: {
+          page,
+          limit,
+          filter,
+          search,
+        },
+      });
 
-    return {
-      totalCount: parseInt(headers['x-total-count'], 10),
-      pendingSources,
-      status,
-    };
-  } catch (e) {
-    return e;
-  }
-});
+      return {
+        totalCount: parseInt(headers['x-total-count'], 10),
+        pendingSources,
+        status,
+      };
+    } catch (e) {
+      return e;
+    }
+  });
 
 
 export const addPendingSources = () => httpThunk(ADD_PENDING_SOURCES, async (getState) => {
@@ -135,3 +152,21 @@ export const deletePendingSources = (ids) => httpThunk(DELETE_PENDING_SOURCES, a
     return e;
   }
 });
+
+export const verifyPendingSource = (id, isReliable) =>
+  httpThunk(VERIFY_PENDING_SOURCE, async () => {
+    try {
+      const { status } = await axios.post('/pendingSources/verify', {
+        id,
+        isReliable,
+      });
+
+      return {
+        id,
+        status,
+        isReliable,
+      };
+    } catch (e) {
+      return e;
+    }
+  });

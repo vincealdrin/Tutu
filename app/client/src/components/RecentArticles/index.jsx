@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Image, Header, Divider, Label, Segment, Button } from 'semantic-ui-react';
+import { Grid, Image, Header, Divider, Label, Segment, Button, Dimmer } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
@@ -10,11 +10,13 @@ import './styles.css';
 
 const mapStateToProps = ({
   recentArticles: {
-    articles,
+		articles,
+		fetchStatus
   },
   socket,
 }) => ({
-  articles,
+	articles,
+	fetchStatus,
   socket,
 });
 
@@ -40,11 +42,16 @@ class RecentArticles extends Component {
   }
 
   render() {
-    const { articles } = this.props;
+    const { articles, fetchStatus } = this.props;
 
     return (
       <div>
         <Segment>
+					{fetchStatus.pending ? (
+						<Dimmer active inverted>
+							<Header as="h4">Loading article...</Header>
+						</Dimmer>
+					) : null}
           <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Recent Articles</Label>
           <div className="scrollable-section">
 						{articles.length

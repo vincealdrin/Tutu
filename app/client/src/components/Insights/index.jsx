@@ -189,7 +189,10 @@ class Insights extends Component {
         <Modal
           open={isModalOpen}
           onClose={this.props.closeModal}
-          closeOnDimmerClick
+					closeOnDimmerClick
+					style={{
+						minHeight: 613.13
+					}}
         >
 					<Label as="a" color="teal" size="huge" ribbon>Insights</Label>
           <Modal.Content scrolling>

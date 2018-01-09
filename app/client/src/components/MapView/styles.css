@@ -127,34 +127,17 @@
   margin: 0 0 1.3rem;
 }
 
-.article-read-more {
-  position: absolute;
-  bottom: 5%;
-  left: 2%;
-}
-
-.ui.button.read-more-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .ui.image.tutu-logo {
-  width: auto;
+  width: 75px;
   height: 100px;
   padding: 1.4rem 1rem 1rem;
   transition: all 0.3s ease-in-out;
 }
 
-.tryThis {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 200;
-  display: flex;
-  width: 100vw;
-  height: 100vh;
-  background: #fff;
+.ui.list > .item > .header.related-articles {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .related-stories {

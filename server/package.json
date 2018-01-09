@@ -27,7 +27,8 @@
     "request-ip": "^2.0.2",
     "request-promise": "^4.2.2",
     "rethinkdb": "^2.3.3",
-    "socket.io": "^2.0.4"
+    "socket.io": "^2.0.4",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "eslint": "^4.11.0",

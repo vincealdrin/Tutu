@@ -8,13 +8,14 @@ module.exports = (conn, io) => {
     const { page = 0, limit = 20 } = req.query;
 
     try {
-      const totalCount = await r.table(tbl).count().run(conn);
       const cursor = await r.table(tbl)
         .skip(page * limit)
         .limit(limit)
+        .orderBy(r.desc('timestamp'))
         .run(conn);
       const articles = await cursor.toArray();
 
+      // const totalCount = await query.count().run(conn);
       res.setHeader('X-Total-Count', totalCount);
       return res.json(articles);
     } catch (e) {

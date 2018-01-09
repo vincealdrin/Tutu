@@ -261,7 +261,10 @@ def predict():
         'pct': lr_proba[1] * 100,
         'sourcePct': lr_source_proba[1] * 100,
         'contentPct': lr_content_proba[1] * 100,
-        'sourceUrl': domain
+        'sourceUrl': domain,
+        'socialScore': source_soc_score,
+        'countryRank': country_rank,
+        'worldRank': world_rank,
     })
 
 

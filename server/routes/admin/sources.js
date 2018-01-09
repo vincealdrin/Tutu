@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const _ = require('lodash');
+const cheerio = require('cheerio');
 const rp = require('request-promise');
 const {
   getAboutContactUrl,
@@ -10,7 +11,9 @@ const {
   getTitle,
   getSocialScore,
   cleanUrl,
+  PH_TIMEZONE,
   putHttpUrl,
+  getUpdatedFields,
 } = require('../../utils');
 
 const responseGroups = ['RelatedLinks', 'Categories', 'Rank', 'ContactInfo', 'RankByCountry',
@@ -31,15 +34,24 @@ module.exports = (conn, io) => {
     const parsedLimit = parseInt(limit);
 
     try {
-      const totalCount = await r.table(tbl).count().run(conn);
       let query = r.table(tbl);
 
       if (filter && search) {
         query = query.filter((source) => source(filter).match(`(?i)${search}`));
       }
 
+      const totalCount = await query.count().run(conn);
       const cursor = await query
+        .orderBy(r.desc('timestamp'))
         .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
+        .eqJoin('verifiedByUserId', r.table('users'))
+        .map({
+          brand: r.row('left')('brand'),
+          timestamp: r.row('left')('timestamp'),
+          url: r.row('left')('url'),
+          id: r.row('left')('id'),
+          verifiedBy: r.row('right')('name'),
+        })
         .run(conn);
       const sources = await cursor.toArray();
 
@@ -64,7 +76,6 @@ module.exports = (conn, io) => {
 
   router.post('/', async (req, res, next) => {
     const sources = req.body;
-    const timestamp = new Date();
 
     try {
       const sourcesWithId = await Promise.all(sources.map(async (source) => {
@@ -73,7 +84,6 @@ module.exports = (conn, io) => {
         return {
           id: uuid,
           url: putHttpUrl(source),
-          timestamp,
         };
       }));
       const uuids = sourcesWithId.map((source) => source.id);
@@ -99,19 +109,19 @@ module.exports = (conn, io) => {
         sourcesWithId.forEach((source) => {
           const foundSource = matchedSources.find((ms) => ms.id === source.id);
           if (foundSource) {
-            errorMessage.push(`${foundSource.url} already exists in list of reliable sources`);
+            errorMessage.push(`${foundSource.url} already exists in the list of reliable sources`);
             return;
           }
 
           const foundFake = matchedFakes.find((mf) => mf.id === source.id);
           if (foundFake) {
-            errorMessage.push(`${foundFake.url} already exists in list of fake sources`);
+            errorMessage.push(`${foundFake.url} already exists in the list of fake sources`);
             return;
           }
 
           const foundPending = matchedPendings.find((mp) => mp.id === source.id);
           if (foundPending) {
-            errorMessage.push(`${foundPending.url} already exists in list of pending sources`);
+            errorMessage.push(`${foundPending.url} already exists in the list of pending sources`);
           }
         });
 
@@ -122,15 +132,14 @@ module.exports = (conn, io) => {
       }
 
       const sourcesInfo = await Promise.all(sourcesWithId.map(async (source) => {
-        const htmlDoc = await rp(source.url);
-        const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(htmlDoc, source.url);
-        const faviconUrl = getFaviconUrl(htmlDoc);
+        const cheerioDoc = cheerio.load(await rp(source.url));
+        const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, source.url);
+        const faviconUrl = getFaviconUrl(cheerioDoc);
         const infoPromise = await getSourceInfo(source.url, responseGroups);
         const socialScore = await getSocialScore(source.url);
 
         const info = await infoPromise;
-        const title = getTitle(htmlDoc);
-        const brand = _.trim(getSourceBrand(source.url, title));
+        const brand = getSourceBrand(cheerioDoc) || source.url;
 
         delete info.contactInfo;
         const subdomains = _.get(info, 'trafficData.contributingSubdomains.contributingSubdomain') || [];
@@ -156,6 +165,7 @@ module.exports = (conn, io) => {
 
         return {
           ...source,
+          verifiedByUserId: req.user.id,
           url: _.get(info, 'contentData.dataUrl', ''),
           title: _.get(info, 'contentData.siteData.title', ''),
           description: _.get(info, 'contentData.siteData.description', ''),
@@ -182,17 +192,32 @@ module.exports = (conn, io) => {
             rank: parseInt(_.get(country, 'rank') || '0'),
           })),
           subdomains: mappedSubdomains,
+          timestamp: r.now().inTimezone(PH_TIMEZONE),
           socialScore,
           faviconUrl,
           aboutUsUrl,
           contactUsUrl,
-          timestamp,
           brand,
         };
       }));
 
-      await r.table(tbl).insert(sourcesInfo).run(conn);
-      return res.json(sourcesInfo);
+      const { changes } = await r.table(tbl)
+        .insert(sourcesInfo, { returnChanges: true })
+        .run(conn);
+      const insertedVals = changes.map((change) => change.new_val);
+
+      await r.table('usersFeed').insert({
+        userId: req.user.id,
+        type: 'create',
+        sourceIds: sourcesInfo.map((info) => info.id),
+        timestamp: r.expr(insertedVals[0].timestamp).inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
+
+      return res.json(insertedVals.map((insertedVal) => ({
+        ...insertedVal,
+        verifiedBy: req.user.name,
+      })));
     } catch (e) {
       next(e);
     }
@@ -208,7 +233,19 @@ module.exports = (conn, io) => {
     }
 
     try {
-      await r.table(tbl).get(sourceId).update(source).run(conn);
+      const { changes } = await r.table(tbl)
+        .get(sourceId)
+        .update(source, { returnChanges: true })
+        .run(conn);
+
+      await r.table('usersFeed').insert({
+        userId: req.user.id,
+        type: 'update',
+        updated: getUpdatedFields(changes),
+        sourceId: source.id,
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.json(source);
     } catch (e) {
@@ -220,10 +257,18 @@ module.exports = (conn, io) => {
     const { ids = '' } = req.body;
 
     try {
-      await r.table(tbl)
+      const { changes } = await r.table(tbl)
         .getAll(r.args(ids.split(',')))
-        .delete()
+        .delete({ returnChanges: true })
         .run(conn);
+
+      await r.table('usersFeed').insert({
+        userId: req.user.id,
+        type: 'delete',
+        deleted: changes.map((change) => change.old_val),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -235,7 +280,18 @@ module.exports = (conn, io) => {
     const { sourceId = '' } = req.params;
 
     try {
-      await r.table(tbl).getAll(sourceId).delete().run(conn);
+      const { changes } = await r.table(tbl)
+        .get(sourceId)
+        .delete({ returnChanges: true })
+        .run(conn);
+
+      await r.table('usersFeed').insert({
+        userId: req.user.id,
+        type: 'delete',
+        deleted: changes.map((change) => change.old_val),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.status(204).end();
     } catch (e) {

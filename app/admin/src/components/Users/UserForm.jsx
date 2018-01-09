@@ -24,12 +24,12 @@ class UserForm extends Component {
           placeholder="Name"
           fluid
         />
-        <Field
+        {/* <Field
           component={InputField}
           name="role"
           placeholder="Role"
           fluid
-        />
+        /> */}
       </div>
     );
   }

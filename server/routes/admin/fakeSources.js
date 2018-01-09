@@ -1,6 +1,17 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
-const { cleanUrl } = require('../../utils');
+const cheerio = require('cheerio');
+const rp = require('request-promise');
+const {
+  cleanUrl,
+  getAboutContactUrl,
+  getSourceBrand,
+  getAlexaRank,
+  getSocialScore,
+  putHttpUrl,
+  getUpdatedFields,
+  PH_TIMEZONE,
+} = require('../../utils');
 
 module.exports = (conn, io) => {
   const tbl = 'fakeSources';
@@ -16,15 +27,24 @@ module.exports = (conn, io) => {
     const parsedLimit = parseInt(limit);
 
     try {
-      const totalCount = await r.table(tbl).count().run(conn);
       let query = r.table(tbl);
 
       if (filter && search) {
         query = query.filter((source) => source(filter).match(`(?i)${search}`));
       }
 
+      const totalCount = await query.count().run(conn);
       const cursor = await query
+        .orderBy(r.desc('timestamp'))
         .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
+        .eqJoin('verifiedByUserId', r.table('users'))
+        .map({
+          brand: r.row('left')('brand'),
+          timestamp: r.row('left')('timestamp'),
+          url: r.row('left')('url'),
+          id: r.row('left')('id'),
+          verifiedBy: r.row('right')('name'),
+        })
         .run(conn);
       const sources = await cursor.toArray();
 
@@ -49,17 +69,31 @@ module.exports = (conn, io) => {
 
   router.post('/', async (req, res, next) => {
     const fakeSources = req.body;
-    const timestamp = new Date();
 
     try {
       const sources = await Promise.all(fakeSources.map(async (source) => {
         const url = cleanUrl(source);
-        const uuid = await r.uuid(url).run(conn);
+        const validUrl = putHttpUrl(url);
+        const cheerioDoc = cheerio.load(await rp(validUrl));
+        const brand = getSourceBrand(cheerioDoc) || validUrl;
+        const socialScore = await getSocialScore(validUrl);
+        const { countryRank, worldRank, sourceUrl } = await getAlexaRank(validUrl);
+        const sourceCleanUrl = putHttpUrl(cleanUrl(sourceUrl));
+        const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, sourceCleanUrl);
+        const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
+        const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);
 
         return {
-          id: uuid,
-          url,
-          timestamp,
+          id: await r.uuid(sourceCleanUrl).run(conn),
+          url: sourceCleanUrl,
+          timestamp: new Date(),
+          verifiedByUserId: req.user.id,
+          socialScore,
+          countryRank,
+          worldRank,
+          brand,
+          hasAboutPage,
+          hasContactPage,
         };
       }));
       const uuids = sources.map((source) => source.id);
@@ -85,19 +119,19 @@ module.exports = (conn, io) => {
         sources.forEach((source) => {
           const foundFake = matchedFakes.find((mf) => mf.id === source.id);
           if (foundFake) {
-            errorMessage.push(`${foundFake.url} already exists in list of fake sources`);
+            errorMessage.push(`${foundFake.url} already exists in the list of fake sources`);
             return;
           }
 
           const foundPending = matchedPendings.find((mp) => mp.id === source.id);
           if (foundPending) {
-            errorMessage.push(`${foundPending.url} already exists in list of pending sources`);
+            errorMessage.push(`${foundPending.url} already exists in the list of pending sources`);
             return;
           }
 
           const foundSource = matchedSources.find((ms) => ms.id === source.id);
           if (foundSource) {
-            errorMessage.push(`${foundSource.url} already exists in list of reliable sources`);
+            errorMessage.push(`${foundSource.url} already exists in the list of reliable sources`);
           }
         });
 
@@ -107,8 +141,23 @@ module.exports = (conn, io) => {
         });
       }
 
-      await r.table(tbl).insert(sources).run(conn);
-      return res.json(sources);
+      const { changes } = await r.table(tbl)
+        .insert(sources, { returnChanges: true })
+        .run(conn);
+      const insertedVals = changes.map((change) => change.new_val);
+
+      await r.table('usersFeed').insert({
+        userId: req.user.id,
+        type: 'create',
+        sourceIds: sources.map((source) => source.id),
+        timestamp: r.expr(insertedVals[0].timestamp).inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
+
+      return res.json(insertedVals.map((insertedVal) => ({
+        ...insertedVal,
+        verifiedBy: req.user.name,
+      })));
     } catch (e) {
       next(e);
     }
@@ -124,7 +173,19 @@ module.exports = (conn, io) => {
     }
 
     try {
-      await r.table(tbl).get(sourceId).update(source).run(conn);
+      const { changes } = await r.table(tbl)
+        .get(sourceId)
+        .update(source, { returnChanges: true })
+        .run(conn);
+
+      await r.table('usersFeed').insert({
+        userId: req.user.id,
+        type: 'update',
+        updated: getUpdatedFields(changes),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+        sourceId: source.id,
+      }).run(conn);
 
       res.json(source);
     } catch (e) {
@@ -136,10 +197,18 @@ module.exports = (conn, io) => {
     const { ids = '' } = req.body;
 
     try {
-      await r.table(tbl)
+      const { changes } = await r.table(tbl)
         .getAll(r.args(ids.split(',')))
-        .delete()
+        .delete({ returnChanges: true })
         .run(conn);
+
+      await r.table('usersFeed').insert({
+        userId: req.user.id,
+        type: 'delete',
+        deleted: changes.map((change) => change.old_val),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.status(204).end();
     } catch (e) {
@@ -151,7 +220,18 @@ module.exports = (conn, io) => {
     const { sourceId = '' } = req.params;
 
     try {
-      await r.table(tbl).getAll(sourceId).delete().run(conn);
+      const { changes } = await r.table(tbl)
+        .get(sourceId)
+        .delete({ returnChanges: true })
+        .run(conn);
+
+      await r.table('usersFeed').insert({
+        userId: req.user.id,
+        type: 'delete',
+        deleted: changes.map((change) => change.old_val),
+        timestamp: r.now().inTimezone(PH_TIMEZONE),
+        table: tbl,
+      }).run(conn);
 
       res.status(204).end();
     } catch (e) {

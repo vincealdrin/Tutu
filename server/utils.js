@@ -1,6 +1,7 @@
 const cheerio = require('cheerio');
 const awis = require('awis');
 const _ = require('lodash');
+const { parseString } = require('xml2js');
 const r = require('rethinkdb');
 const rp = require('request-promise');
 const parseDomain = require('parse-domain');
@@ -26,6 +27,50 @@ module.exports.cleanUrl = (dirtyUrl) => dirtyUrl
   .replace(/\/$/, '')
   .replace(/https?:\/\//, '');
 
+module.exports.getUpdatedFields = (changes) =>
+  changes.map((change) => {
+    const newVal = {};
+    const oldVal = {};
+
+    _.each(change.new_val, (val, key) => {
+      if (val !== change.old_val[key]) {
+        newVal[key] = val;
+        oldVal[key] = change.old_val[key];
+      }
+    });
+
+    return {
+      newVal,
+      oldVal,
+    };
+  });
+
+const parseXML = (xmlString) => new Promise((resolve, reject) => {
+  parseString(xmlString, (err, res) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(res);
+    }
+  });
+});
+module.exports.getAlexaRank = async (url) => {
+  const xmlString = await rp(`http://data.alexa.com/data?cli=10&url=${url}`);
+  const res = await parseXML(xmlString);
+
+  const info = {
+    sourceUrl: res.ALEXA.SD ? res.ALEXA.SD[0].POPULARITY[0].$.URL : url,
+    countryRank: res.ALEXA.SD && res.ALEXA.SD[0].POPULARITY
+      ? parseInt(res.ALEXA.SD[0].POPULARITY[0].$.TEXT)
+      : 0,
+    worldRank: res.ALEXA.SD && res.ALEXA.SD[0].COUNTRY
+      ? parseInt(res.ALEXA.SD[0].COUNTRY[0].$.RANK)
+      : 0,
+  };
+
+  return info;
+};
+
 module.exports.getSocialScore = async (url) => {
   const reddit = await rp(`https://www.reddit.com/api/info.json?url=${url}`, {
     json: true,
@@ -48,11 +93,7 @@ module.exports.getSocialScore = async (url) => {
   return redScore + suScore + liScore + fbScore + pinScore;
 };
 
-module.exports.getTitle = (htmlDoc) => {
-  const $ = cheerio.load(htmlDoc);
-
-  return $('title').text();
-};
+module.exports.getTitle = ($) => $('title').text();
 
 module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, reject) => {
   awisClient({
@@ -65,15 +106,10 @@ module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, re
   });
 });
 
-module.exports.getSourceBrand = (url, title) => {
-  const titleArr = title.split(/-|\|/);
-  const foundTitle = titleArr.find((word) => new RegExp(_.trim(word), 'i').test(url));
+module.exports.getSourceBrand = ($) => {
+  const brand = $('meta[property="og:site_name"]').attr('content');
 
-  if (foundTitle) {
-    return foundTitle;
-  }
-
-  return title;
+  return _.trim(brand);
 };
 
 const cleanUrl = (dirtyUrl = '', baseUrl) => {
@@ -90,17 +126,14 @@ const cleanUrl = (dirtyUrl = '', baseUrl) => {
   return url;
 };
 
-module.exports.getFaviconUrl = (htmlDoc, baseUrl) => {
-  const $ = cheerio.load(htmlDoc);
+module.exports.getFaviconUrl = ($, baseUrl) => {
   const url = $('link[rel="shortcut icon"]').attr('href');
 
   return cleanUrl(url, baseUrl);
 };
 
-module.exports.getAboutContactUrl = (htmlDoc, baseUrl) => {
+module.exports.getAboutContactUrl = ($, baseUrl) => {
   try {
-    const $ = cheerio.load(htmlDoc);
-
     let aboutUsUrl = cleanUrl($('a:contains("About")')
       .filter(function() {
         return (/about ?(us)?/i).test($(this).text());

@@ -9,23 +9,23 @@ module.exports = (conn, io) => {
     const {
       page = 0,
       limit = 15,
-      filter,
-      search,
+      filter = '',
+      search = '',
     } = req.query;
     const parsedPage = parseInt(page);
     const parsedLimit = parseInt(limit);
 
     try {
-      const totalCount = await r.table(tbl).count().run(conn);
       let query = r.table(tbl).filter(r.row('role').ne('superadmin'));
 
       if (filter && search) {
-        query = query.filter((user) => user(filter).match(`(?i)${search}`));
+        query = query.filter((source) => source(filter).match(`(?i)${search}`));
       }
 
+      const totalCount = await query.count().run(conn);
       const cursor = await query
+        .orderBy(r.desc('timestamp'))
         .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
-        .without('password')
         .run(conn);
       const users = await cursor.toArray();
 
@@ -52,12 +52,23 @@ module.exports = (conn, io) => {
     const user = req.body;
     const id = await r.uuid(user.username).run(conn);
 
+    const matchedUser = await r.table(tbl).get(id).run(conn);
+
+    if (matchedUser) {
+      return next({
+        message: 'User already exists with the same username',
+        status: 400,
+      });
+    }
+
     if (user.role === 'superadmin') {
       return next({
         message: 'Can\'t create user with superadmin role',
         status: 400,
       });
     }
+
+    user.role = 'curator';
 
     bcrypt.hash(user.password, null, null, async (err, hash) => {
       if (err) throw err;

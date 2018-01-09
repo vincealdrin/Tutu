@@ -30,6 +30,9 @@ export default (state = initialState, action) => {
           ...action.articles,
           action.newArticle,
         ],
+        totalCount: action.statusText === 'success'
+          ? state.totalCount + action.articles.length
+          : state.totalCount,
         createStatus: updateCrudStatus(action),
       };
     case UPDATE_ARTICLE:
@@ -47,6 +50,9 @@ export default (state = initialState, action) => {
       return {
         ...state,
         articles: state.articles.filter((article) => action.deletedIds.includes(article.id)),
+        totalCount: action.statusText === 'success'
+          ? state.totalCount - action.deletedIds.length
+          : state.totalCount,
         updateStatus: updateCrudStatus(action),
       };
     default:

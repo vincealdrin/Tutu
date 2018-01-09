@@ -31,6 +31,9 @@ export default (state = initialState, action) => {
           ...action.newSources,
           ...state.sources,
         ] : state.sources,
+        totalCount: action.statusText === 'success'
+          ? state.totalCount + action.newSources.length
+          : state.totalCount,
         addStatus: updateCrudStatus(action),
       };
     case UPDATE_SOURCE:
@@ -50,6 +53,9 @@ export default (state = initialState, action) => {
         sources: action.statusText === 'success'
           ? state.sources.filter((source) => !action.deletedIds.includes(source.id))
           : state.sources,
+        totalCount: action.statusText === 'success'
+          ? state.totalCount - action.deletedIds.length
+          : state.totalCount,
         updateStatus: updateCrudStatus(action),
       };
     default:

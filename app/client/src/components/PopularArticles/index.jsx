@@ -34,10 +34,8 @@ class PopularArticles extends Component {
         <Segment>
           <Label as="a" color="red" ribbon style={{ marginBottom: '1rem' }}>Popular Articles</Label>
           <div className="scrollable-section">
-            {
-							articles.length > 0
-							?
-							(
+						{articles.length
+							? (
 								articles.map((article) => (
 									<div key={shortid.generate()}>
 										<Grid>
@@ -64,16 +62,14 @@ class PopularArticles extends Component {
 									</div>
 								))
 							)
-							:
-							(
-							<div className="no-article-container">
-								<div className="no-article-emoji-container">
-									<Header className="no-article-emoji">┏༼ ◉ ╭╮ ◉༽┓</Header>
-									<p className="no-article-desc">NO ARTICLES AVAILABLE</p>
+							: (
+								<div className="no-article-container">
+									<div className="no-article-emoji-container">
+										<Header className="no-article-emoji">┏༼ ◉ ╭╮ ◉༽┓</Header>
+										<p className="no-article-desc">NO ARTICLES AVAILABLE</p>
+									</div>
 								</div>
-							</div>
-							)
-						}
+							)}
           </div>
         </Segment>
       </div>

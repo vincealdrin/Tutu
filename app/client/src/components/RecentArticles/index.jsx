@@ -47,10 +47,8 @@ class RecentArticles extends Component {
         <Segment>
           <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Recent Articles</Label>
           <div className="scrollable-section">
-            {
-							articles.length > 0
-							?
-							(
+						{articles.length
+							? (
 								articles.map((article) => (
 									<div key={shortid.generate()}>
 										<Grid>
@@ -64,7 +62,7 @@ class RecentArticles extends Component {
 														style={{ position: 'absolute', left: '1rem', bottom: 0 }}
 													/>
 												</Grid.Column>
-		
+
 												<Grid.Column width={10} className="article-info">
 													<Header color="blue" as="a" href={article.url} className="article-title" target="_blank">{article.title}</Header>
 													<br />
@@ -77,16 +75,14 @@ class RecentArticles extends Component {
 									</div>
 								))
 							)
-							:
-							(
+							: (
 								<div className="no-article-container">
 									<div className="no-article-emoji-container">
 										<Header className="no-article-emoji">┏༼ ◉ ╭╮ ◉༽┓</Header>
 										<p className="no-article-desc">NO ARTICLES AVAILABLE</p>
 									</div>
 								</div>
-							)
-						}
+							)}
           </div>
         </Segment>
       </div>

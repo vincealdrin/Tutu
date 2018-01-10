@@ -4,7 +4,7 @@
   height: 100vh;
   max-width: 390px;
   background: #fff;
-  box-shadow: -3px 0 1rem -3px #1b272b;
+  box-shadow: -3px 0 1rem -3px rgba(0,0,0,0.2);
 }
 
 .article-display-button {
@@ -21,7 +21,7 @@
   background: #fff;
   border-bottom-left-radius: 7px;
   border-top-left-radius: 7px;
-  box-shadow: -3px 3px 1rem -3px #1b272b;
+  box-shadow: -3px 3px 1rem -3px rgba(0,0,0,0.2);
 }
 
 .top-buttons {
@@ -52,8 +52,8 @@
   flex-direction: column;
   align-items: center;
   height: 100vh;
-  background-color: #ececec;
-  box-shadow: -3px 0 1rem -3px #666;
+  background-color: #fff;
+  box-shadow: -3px 0 1rem -3px rgba(0,0,0,0.2);
   transition: all 0.4s cubic-bezier(0.56, 0.21, 0.38, 1.55);
 }
 
@@ -80,6 +80,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 100%;
   margin-bottom: 0.67rem;
 }
@@ -89,6 +90,9 @@
 }
 
 .tutu-logo {
+  font-weight: lighter;
+  font-family: 'Lato';
+  width: 100%;
   margin-top: 0 !important;
 }
 

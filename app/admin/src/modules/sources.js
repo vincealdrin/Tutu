@@ -67,6 +67,7 @@ export const fetchSources = (page, limit, filter, search) => httpThunk(FETCH_SOU
   try {
     const { data: sources, status, headers } = await axios.get('/sources', {
       params: {
+        isReliable: true,
         page,
         limit,
         filter,
@@ -90,7 +91,10 @@ export const addSources = () => httpThunk(ADD_SOURCES, async (getState) => {
   const urls = Object.values(form.sources.values);
 
   try {
-    const { data: newSources, status } = await axios.post('/sources', urls);
+    const { data: newSources, status } = await axios.post('/sources', {
+      isReliable: true,
+      urls,
+    });
 
     return {
       newSources,

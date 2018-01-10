@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Grid, Image, Header, Divider, Label, Segment } from 'semantic-ui-react';
+import { Button, Grid, Image, Header, Divider, Label, Segment, Dimmer } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
@@ -10,10 +10,12 @@ import './styles.css';
 
 const mapStateToProps = ({
   popularArticles: {
-    articles,
+		articles,
+		fetchStatus
   },
 }) => ({
-  articles,
+	articles,
+	fetchStatus
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -27,38 +29,54 @@ class PopularArticles extends Component {
   }
 
   render() {
-    const { articles } = this.props;
+    const { articles, fetchStatus } = this.props;
 
     return (
       <div className="popular-section-container">
         <Segment>
+					{fetchStatus.pending ? (
+						<Dimmer active inverted>
+							<Header as="h4">Loading article...</Header>
+						</Dimmer>
+					) : null}
           <Label as="a" color="red" ribbon style={{ marginBottom: '1rem' }}>Popular Articles</Label>
           <div className="scrollable-section">
-            {articles.map((article) => (
-              <div key={shortid.generate()}>
-                <Grid>
-                  <Grid.Row className="article-item">
-                    <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important', position: 'relative' }}>
-                      <Image src={article.topImageUrl ? article.topImageUrl : newsPlaceholder} href={article.url} target="_blank" />
-                      <Button
-                        onClick={() => this.props.fetchFocusedInfo(article)}
-                        content="View details"
-                        color="blue"
-                        style={{ position: 'absolute', left: '1rem', bottom: 0 }}
-                      />
-                    </Grid.Column>
-
-                    <Grid.Column width={10} className="article-info">
-                      <Header color="blue" as="a" href={article.url} className="article-title" target="_blank">{article.title}</Header>
-                      <br />
-                      <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a>
-                      <p> {article.summary[0]} </p>
-                    </Grid.Column>
-                  </Grid.Row>
-                </Grid>
-                <Divider section />
-              </div>
-            ))}
+						{articles.length
+							? (
+								articles.map((article) => (
+									<div key={shortid.generate()}>
+										<Grid>
+											<Grid.Row className="article-item">
+												<Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important', position: 'relative' }}>
+													<Image src={article.topImageUrl ? article.topImageUrl : newsPlaceholder} href={article.url} target="_blank" />
+													<Button
+														onClick={() => this.props.fetchFocusedInfo(article)}
+														content="View details"
+														color="blue"
+														style={{ position: 'absolute', left: '1rem', bottom: 0 }}
+													/>
+												</Grid.Column>
+		
+												<Grid.Column width={10} className="article-info">
+													<Header color="blue" as="a" href={article.url} className="article-title" target="_blank">{article.title}</Header>
+													<br />
+													<a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a>
+													<p> {article.summary[0]} </p>
+												</Grid.Column>
+											</Grid.Row>
+										</Grid>
+										<Divider section />
+									</div>
+								))
+							)
+							: (
+								<div className="no-article-container">
+									<div className="no-article-emoji-container">
+										<Header className="no-article-emoji">┏༼ ◉ ╭╮ ◉༽┓</Header>
+										<p className="no-article-desc">NO ARTICLES AVAILABLE</p>
+									</div>
+								</div>
+							)}
           </div>
         </Segment>
       </div>

@@ -18,12 +18,12 @@ class SourcesForm extends Component {
           placeholder="Brand"
           fluid
         /> */}
-        <Field
+        {/* <Field
           component={Toggle}
-          name="isReliable"
+          name="isReliablePred"
           label="Reliable"
           fluid
-        />
+        /> */}
       </div>
     );
   }
@@ -31,4 +31,7 @@ class SourcesForm extends Component {
 
 export default reduxForm({
   form: 'pendingSources',
+  // initialValues: {
+  //   isReliablePred: false,
+  // },
 })(SourcesForm);

@@ -58,7 +58,6 @@ class SimpleMarker extends PureComponent {
           }}
         >
           {(v) =>
-            // console.log();
             (
               <div>
                 <Icon

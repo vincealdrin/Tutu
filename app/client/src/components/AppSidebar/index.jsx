@@ -54,9 +54,8 @@ class AppSidebar extends Component {
           onMouseLeave={this.shrinkSidebar}
         >
           <div className="logo">
-            {/* <Icon name="map" color="grey" size="big" style={{ margin: '2rem auto 1rem' }} /> */}
             <Image src={tutuLogo} className="tutu-logo" />
-            <Link to="/top">
+            <Link to="/">
               <Header as="h2" className={`tutu-logo ${isWideClass}`}>TUTÛ</Header>
             </Link>
           </div>

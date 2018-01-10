@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Image, Header, Divider, Label, Segment, Button } from 'semantic-ui-react';
+import { Grid, Image, Header, Divider, Label, Segment, Button, Dimmer } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
@@ -10,11 +10,13 @@ import './styles.css';
 
 const mapStateToProps = ({
   recentArticles: {
-    articles,
+		articles,
+		fetchStatus
   },
   socket,
 }) => ({
-  articles,
+	articles,
+	fetchStatus,
   socket,
 });
 
@@ -40,38 +42,54 @@ class RecentArticles extends Component {
   }
 
   render() {
-    const { articles } = this.props;
+    const { articles, fetchStatus } = this.props;
 
     return (
       <div>
         <Segment>
+					{fetchStatus.pending ? (
+						<Dimmer active inverted>
+							<Header as="h4">Loading article...</Header>
+						</Dimmer>
+					) : null}
           <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Recent Articles</Label>
           <div className="scrollable-section">
-            {articles.map((article) => (
-              <div key={shortid.generate()}>
-                <Grid>
-                  <Grid.Row className="article-item">
-                    <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important' }}>
-                      <Image src={article.topImageUrl ? article.topImageUrl : newsPlaceholder} href={article.url} target="_blank" />
-                      <Button
-                        onClick={() => this.props.fetchFocusedInfo(article)}
-                        content="View details"
-                        color="blue"
-                        style={{ position: 'absolute', left: '1rem', bottom: 0 }}
-                      />
-                    </Grid.Column>
+						{articles.length
+							? (
+								articles.map((article) => (
+									<div key={shortid.generate()}>
+										<Grid>
+											<Grid.Row className="article-item">
+												<Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important' }}>
+													<Image src={article.topImageUrl ? article.topImageUrl : newsPlaceholder} href={article.url} target="_blank" />
+													<Button
+														onClick={() => this.props.fetchFocusedInfo(article)}
+														content="View details"
+														color="blue"
+														style={{ position: 'absolute', left: '1rem', bottom: 0 }}
+													/>
+												</Grid.Column>
 
-                    <Grid.Column width={10} className="article-info">
-                      <Header color="blue" as="a" href={article.url} className="article-title" target="_blank">{article.title}</Header>
-                      <br />
-                      <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a> | <span>{new Date(article.publishDate).toLocaleDateString()}</span>
-                      <p> {article.summary[0]} </p>
-                    </Grid.Column>
-                  </Grid.Row>
-                </Grid>
-                <Divider section />
-              </div>
-            ))}
+												<Grid.Column width={10} className="article-info">
+													<Header color="blue" as="a" href={article.url} className="article-title" target="_blank">{article.title}</Header>
+													<br />
+													<a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a> | <span>{new Date(article.publishDate).toLocaleDateString()}</span>
+													<p> {article.summary[0]} </p>
+												</Grid.Column>
+											</Grid.Row>
+										</Grid>
+										<Divider section />
+									</div>
+								))
+							)
+							: (
+								<div className="no-article-container">
+									<div className="no-article-emoji-container">
+										<Header className="no-article-emoji">┏༼ ◉ ╭╮ ◉༽┓</Header>
+										<p className="no-article-desc">NO ARTICLES AVAILABLE</p>
+									</div>
+								</div>
+							)}
           </div>
         </Segment>
       </div>

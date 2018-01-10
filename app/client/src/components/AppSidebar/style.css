@@ -90,10 +90,15 @@
 }
 
 .tutu-logo {
-  font-weight: lighter;
-  font-family: 'Lato';
+  font-weight: 300;
   width: 100%;
   margin-top: 0 !important;
+}
+
+.ui.header.tutu-logo {
+	margin-top: 0;
+	font-size: 2.2rem;
+	color: #222;
 }
 
 .side-menu {

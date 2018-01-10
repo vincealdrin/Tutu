@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import shortid from 'shortid';
-import { Accordion, Icon, List } from 'semantic-ui-react';
+import { Accordion, Icon, List, Label } from 'semantic-ui-react';
 
 class RelatedArticles extends Component {
   state = {
@@ -28,9 +28,23 @@ class RelatedArticles extends Component {
           <List divided relaxed>
             {content.length > 0
               ? content.map((relatedArticle) => (
-                <List.Item key={shortid.generate()}>
-                  <List.Header as="a" color="blue" href={relatedArticle.url} target="_blank">{relatedArticle.title}</List.Header>
-                </List.Item>
+                <List.Item>
+									<List.Header
+										as="a"
+										color="blue"
+										href={relatedArticle.url}
+										target="_blank"
+										className="related-articles"
+									>
+										{relatedArticle.title}
+										<Label circular>{relatedArticle.source}</Label>
+									</List.Header>
+									<List.Description>
+										<p className="article-date">
+											{new Date(relatedArticle.publishDate).toDateString()}
+										</p>
+									</List.Description>
+								</List.Item>
               ))
               : <span className="no-info">No related articles found</span>
             }

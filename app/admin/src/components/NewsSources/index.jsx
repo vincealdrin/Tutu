@@ -29,7 +29,7 @@ const columns = [
   {
     key: 'url',
     wrapper: (val) => (
-      <a href={`http://${val}`} target="__blank">{val}</a>
+      <a href={val} target="__blank">{val}</a>
     ),
     text: 'URL',
   },
@@ -39,7 +39,7 @@ const pendingColumns = [
   {
     key: 'url',
     wrapper: (val) => (
-      <a href={`http://${val}`} target="__blank">{val}</a>
+      <a href={val} target="__blank">{val}</a>
     ),
     text: 'URL',
   },
@@ -49,6 +49,7 @@ const pendingColumns = [
   },
   {
     key: 'isReliable',
+    accessor: (val) => val.prediction.isReliable,
     wrapper: (val) => (val ? 'Yes' : 'No'),
     text: 'Reliable',
   },
@@ -204,6 +205,7 @@ class Sources extends Component {
                       />
                     </div>
                   )}
+                  hideAddBtn
                 />
               </Segment>
             </Grid.Column>

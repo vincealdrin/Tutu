@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Button, Modal, Header, Divider } from 'semantic-ui-react';
+import { Route, Switch, Redirect } from 'react-router-dom';
+import { Button, Modal, Header, Label, Grid, Segment, Icon } from 'semantic-ui-react';
 import { HorizontalBar, Bar, Line, Pie } from 'react-chartjs-2';
 import WordCloud from 'react-d3-cloud';
 import {
@@ -11,6 +12,10 @@ import {
   openModal,
   closeModal,
 } from '../../modules/insights';
+import SentimentCharts from './SentimentCharts';
+import CategoriesCharts from './CategoriesCharts';
+import InsightWordCloud from './InsightWordCloud';
+import TopTen from './TopTen';
 import { getLineDataset } from '../../utils';
 import './styles.css';
 
@@ -50,6 +55,105 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   closeModal,
 }, dispatch);
 
+const InsightMenuItem = ({
+	icon,
+	header,
+	desc
+}) => (
+	<Segment raised textAlign="center" className="insight-menu-item">
+		<Icon name={icon} color="grey" size="big" />
+		<Header className="insight-menu-name">{header}</Header>
+		<p>{desc}</p>
+	</Segment>
+)
+
+const InsightMenu = ({
+		closeModal,
+		sentiment,
+		categories,
+		wordCloud,
+		topPeople,
+		topLocations,
+		topOrgs
+	}) => (
+		<div>
+			<Grid>
+				<Grid.Row columns={2}>
+				<Grid.Column>
+					<Modal
+						trigger={
+							<Segment raised textAlign="center" className="insight-menu-item">
+								<Icon name="smile" color="grey" size="big" />
+								<Header className="insight-menu-name">Sentiments</Header>
+								<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sed ex, ullam beatae quo dolore reiciendis nulla ratione earum dolor pariatur quibusdam animi eius!</p>
+							</Segment>
+					}>
+						<Label as="a" color="teal" size="huge" ribbon>Sentiments</Label>
+						<Button icon="close" content="CLOSE" floated="right" basic onClick={closeModal} />
+						<Modal.Content scrolling>
+							<SentimentCharts sentiment={sentiment} />
+						</Modal.Content>
+					</Modal>
+				</Grid.Column>
+				<Grid.Column>
+					<Modal
+						trigger={
+							<Segment raised textAlign="center" className="insight-menu-item">
+								<Icon name="tags" color="grey" size="big" />
+								<Header className="insight-menu-name">Categories</Header>
+								<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sed ex, ullam beatae quo dolore reiciendis nulla ratione earum dolor pariatur quibusdam animi eius!</p>
+							</Segment>
+						}>
+						<Label as="a" color="teal" size="huge" ribbon>Categories</Label>
+						<Button icon="close" content="CLOSE" floated="right" basic onClick={closeModal} />
+						<Modal.Content scrolling>
+							<CategoriesCharts categories={categories} />
+						</Modal.Content>
+					</Modal>
+				</Grid.Column>
+			</Grid.Row>
+			<Grid.Row columns={2}>
+				<Grid.Column>
+					<Modal
+						trigger={
+							<Segment raised textAlign="center" className="insight-menu-item">
+								<Icon name="cloud" color="grey" size="big" />
+								<Header className="insight-menu-name">Word Cloud</Header>
+								<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sed ex, ullam beatae quo dolore reiciendis nulla ratione earum dolor pariatur quibusdam animi eius!</p>
+							</Segment>
+						}>
+							<Label as="a" color="teal" size="huge" ribbon>WordCloud</Label>
+							<Button icon="close" content="CLOSE" floated="right" basic onClick={closeModal} />>
+							<Modal.Content scrolling>
+								<InsightWordCloud wordCloud={wordCloud} />
+							</Modal.Content>
+						</Modal>
+				</Grid.Column>
+				<Grid.Column>
+					<Modal
+						trigger={
+							<Segment raised textAlign="center" className="insight-menu-item">
+								<Icon name="ordered list" color="grey" size="big" />
+								<Header className="insight-menu-name">Top Ten</Header>
+								<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sed ex, ullam beatae quo dolore reiciendis nulla ratione earum dolor pariatur quibusdam animi eius!</p>
+							</Segment>
+					}>
+						<Label as="a" color="teal" size="huge" ribbon>Top Ten</Label>
+						<Button icon="close" content="CLOSE" floated="right" basic onClick={closeModal} />
+						<Modal.Content scrolling>
+							<TopTen
+								topPeople={topPeople}
+								topOrgs={topOrgs}
+								topLocations={topLocations}
+							/>
+						</Modal.Content>
+					</Modal>
+				</Grid.Column>
+			</Grid.Row>
+		</Grid>
+	</div>
+	)
+
 class Insights extends Component {
   render() {
     const {
@@ -63,319 +167,16 @@ class Insights extends Component {
       isModalOpen,
       isFocused,
     } = this.props;
-    const sentimentLineData = {
-      labels: sentiment.labels,
-      datasets: getLineDataset([
-        {
-          label: 'Positive',
-          color: '41,199,202',
-          data: sentiment.posCount,
-        },
-        {
-          label: 'Neutral',
-          color: '70,76,88',
-          data: sentiment.neuCount,
-        },
-        {
-          label: 'Negative',
-          color: '234,95,72',
-          data: sentiment.negCount,
-        },
-      ]),
-    };
-    const sentimentPieData = {
-      labels: [
-        'Positive',
-        'Neutral',
-        'Negative',
-      ],
-      datasets: [{
-        data: [
-          sentiment.posCount.reduce((a, b) => (a + b), 0),
-          sentiment.neuCount.reduce((a, b) => (a + b), 0),
-          sentiment.negCount.reduce((a, b) => (a + b), 0),
-        ],
-        backgroundColor: [
-          '#29c7ca',
-          '#464c58',
-          '#ea5f48',
-        ],
-      }],
-    };
-
-    const categoriesLineData = {
-      labels: categories.labels,
-      datasets: getLineDataset([
-        {
-          label: 'Crime',
-          color: '234,95,72',
-          data: categories.crimeCount,
-        },
-        {
-          label: 'Culture',
-          color: '41,199,202',
-          data: categories.cultureCount,
-        },
-        {
-          label: 'Economy',
-          color: '174,18,255',
-          data: categories.econCount,
-        },
-        {
-          label: 'Environment',
-          color: '121,255,59',
-          data: categories.envCount,
-        },
-        {
-          label: 'Health',
-          color: '255,63,53',
-          data: categories.healthCount,
-        },
-        {
-          label: 'Lifestyle',
-          color: '255,253,0',
-          data: categories.lifeCount,
-        },
-        {
-          label: 'Nation',
-          color: '36,125,232',
-          data: categories.nationCount,
-        },
-        {
-          label: 'Sports',
-          color: '135,60,13',
-          data: categories.sportsCount,
-        },
-        {
-          label: 'Weather',
-          color: '255,43,138',
-          data: categories.weatherCount,
-        },
-        {
-          label: 'Politics',
-          color: '255,114,24',
-          data: categories.polCount,
-        },
-        {
-          label: 'Business & Finance',
-          color: '106,125,143',
-          data: categories.busFinCount,
-        },
-        {
-          label: 'Disaster & Accident',
-          color: '6,255,0',
-          data: categories.disAccCount,
-        },
-        {
-          label: 'Entertainment & Arts',
-          color: '232,105,144',
-          data: categories.entArtCount,
-        },
-        {
-          label: 'Law & Government',
-          color: '113,95,127',
-          data: categories.lawGovCount,
-        },
-        {
-          label: 'Science & Technology',
-          color: '40,127,0',
-          data: categories.sciTechCount,
-        },
-      ]),
-    };
-    const categoriesPieData = {
-      labels: [
-        'Crime',
-        'Culture',
-        'Economy',
-        'Environment',
-        'Health',
-        'Lifestyle',
-        'Nation',
-        'Politics',
-        'Sports',
-        'Weather',
-        'Business & Finance',
-        'Disaster & Accident',
-        'Entertainment & Arts',
-        'Law & Government',
-        'Science & Technology',
-      ],
-      datasets: [{
-        data: [
-          categories.crimeCount.reduce((a, b) => (a + b), 0),
-          categories.cultureCount.reduce((a, b) => (a + b), 0),
-          categories.econCount.reduce((a, b) => (a + b), 0),
-          categories.envCount.reduce((a, b) => (a + b), 0),
-          categories.healthCount.reduce((a, b) => (a + b), 0),
-          categories.lifeCount.reduce((a, b) => (a + b), 0),
-          categories.nationCount.reduce((a, b) => (a + b), 0),
-          categories.polCount.reduce((a, b) => (a + b), 0),
-          categories.sportsCount.reduce((a, b) => (a + b), 0),
-          categories.weatherCount.reduce((a, b) => (a + b), 0),
-          categories.busFinCount.reduce((a, b) => (a + b), 0),
-          categories.disAccCount.reduce((a, b) => (a + b), 0),
-          categories.entArtCount.reduce((a, b) => (a + b), 0),
-          categories.lawGovCount.reduce((a, b) => (a + b), 0),
-          categories.sciTechCount.reduce((a, b) => (a + b), 0),
-        ],
-        backgroundColor: [
-          '#EA5F48',
-          '#29C7CA',
-          '#AE12FF',
-          '#79FF3B',
-          '#FF3F35',
-          '#FFFD00',
-          '#247DE8',
-          '#873C0D',
-          '#FF2B8A',
-          '#FF7218',
-          '#6A7D8F',
-          '#06FF00',
-          '#E86990',
-          '#715F7F',
-          '#287F00',
-        ],
-      }],
-    };
-    const categoriesBarData = {
-      type: 'horizontalBar',
-      labels: [
-        'Crime',
-        'Culture',
-        'Economy',
-        'Environment',
-        'Health',
-        'Lifestyle',
-        'Nation',
-        'Politics',
-        'Sports',
-        'Weather',
-        'Business & Finance',
-        'Disaster & Accident',
-        'Entertainment & Arts',
-        'Law & Government',
-        'Science & Technology',
-      ],
-      datasets: [
-        {
-          label: 'Category',
-          backgroundColor: [
-            'rgba(255,99,132,0.2)',
-          ],
-          borderColor: [
-            'rgba(255,99,132,1)',
-          ],
-          hoverBackgroundColor: [
-            'rgba(255,99,132,0.4)',
-          ],
-          hoverBorderColor: [
-            'rgba(255,99,132,1)',
-          ],
-          borderWidth: 1,
-          barThickness: 1,
-          data: [
-            categories.econCount.reduce((a, b) => (a + b), 0),
-            categories.lifeCount.reduce((a, b) => (a + b), 0),
-            categories.sportsCount.reduce((a, b) => (a + b), 0),
-            categories.polCount.reduce((a, b) => (a + b), 0),
-            categories.healthCount.reduce((a, b) => (a + b), 0),
-            categories.crimeCount.reduce((a, b) => (a + b), 0),
-            categories.weatherCount.reduce((a, b) => (a + b), 0),
-            categories.cultureCount.reduce((a, b) => (a + b), 0),
-            categories.nationCount.reduce((a, b) => (a + b), 0),
-            categories.envCount.reduce((a, b) => (a + b), 0),
-            categories.busFinCount.reduce((a, b) => (a + b), 0),
-            categories.disAccCount.reduce((a, b) => (a + b), 0),
-            categories.entArtCount.reduce((a, b) => (a + b), 0),
-            categories.lawGovCount.reduce((a, b) => (a + b), 0),
-            categories.sciTechCount.reduce((a, b) => (a + b), 0),
-          ],
-        },
-      ],
-    };
-    const peopleBarData = {
-      type: 'horizontalBar',
-      labels: topPeople.map(({ person }) => person),
-      datasets: [
-        {
-          label: 'Person',
-          backgroundColor: [
-            'rgba(255,99,132,0.2)',
-          ],
-          borderColor: [
-            'rgba(255,99,132,1)',
-          ],
-          hoverBackgroundColor: [
-            'rgba(255,99,132,0.4)',
-          ],
-          hoverBorderColor: [
-            'rgba(255,99,132,1)',
-          ],
-          borderWidth: 1,
-          barThickness: 1,
-          data: topPeople.map(({ count }) => count),
-        },
-      ],
-    };
-    const locationsBarData = {
-      type: 'horizontalBar',
-      labels: topLocations.map(({ location }) => location),
-      datasets: [
-        {
-          label: 'Location',
-          backgroundColor: [
-            'rgba(255,99,132,0.2)',
-          ],
-          borderColor: [
-            'rgba(255,99,132,1)',
-          ],
-          hoverBackgroundColor: [
-            'rgba(255,99,132,0.4)',
-          ],
-          hoverBorderColor: [
-            'rgba(255,99,132,1)',
-          ],
-          borderWidth: 1,
-          barThickness: 1,
-          data: topPeople.map(({ count }) => count),
-        },
-      ],
-    };
-    const orgsBarData = {
-      type: 'horizontalBar',
-      labels: topOrgs.map(({ organization }) => organization),
-      datasets: [
-        {
-          label: 'Organization',
-          backgroundColor: [
-            'rgba(255,99,132,0.2)',
-          ],
-          borderColor: [
-            'rgba(255,99,132,1)',
-          ],
-          hoverBackgroundColor: [
-            'rgba(255,99,132,0.4)',
-          ],
-          hoverBorderColor: [
-            'rgba(255,99,132,1)',
-          ],
-          borderWidth: 1,
-          barThickness: 1,
-          data: topPeople.map(({ count }) => count),
-        },
-      ],
-    };
 
     return (
       <div>
         {!isModalOpen && !isFocused ? (
-          <Button
-            content="Insights"
-            icon="bar chart"
-            labelPosition="left"
+					<Button
+					content="Insights"
+					icon="bar chart"
+					labelPosition="left"
             onClick={() => {
-              this.props.openModal();
+							this.props.openModal();
               this.props.fetchTopInsights(ids, 'people', 10);
               this.props.fetchTopInsights(ids, 'organizations', 10);
               this.props.fetchTopInsights(ids, 'locations', 10);
@@ -388,51 +189,28 @@ class Insights extends Component {
         <Modal
           open={isModalOpen}
           onClose={this.props.closeModal}
-          closeOnDimmerClick
+					closeOnDimmerClick
+					style={{
+						minHeight: 613.13
+					}}
         >
-          <Modal.Header>Insights</Modal.Header>
+					<Label as="a" color="teal" size="huge" ribbon>Insights</Label>
           <Modal.Content scrolling>
-            <Header as="h2" className="insight-header">Sentiment</Header>
-            <Line data={sentimentLineData} />
-            <Pie data={sentimentPieData} />
-
-            <Divider />
-
-            <Header as="h2" className="insight-header">Categories</Header>
-            <Line data={categoriesLineData} />
-            <Pie data={categoriesPieData} />
-            <HorizontalBar data={categoriesBarData} />
-
-            <Divider />
-
-            <Header as="h2">Word Cloud</Header>
-            <div className="word-cloud">
-              <WordCloud
-                font="lato"
-                width={700}
-                height={500}
-                // padding={(word) => word.value / 10}
-                data={topKeywords.map(({ keyword, count }) => ({
-                  text: keyword,
-                  value: count,
-                }))}
-                fontSizeMapper={(word) => Math.log2(word.value) * 10}
-                rotate={(word) => word.value % 360}
-              />
-            </div>
-
-            top 10
-            <HorizontalBar data={peopleBarData} />
-            <HorizontalBar data={orgsBarData} />
-            <HorizontalBar data={locationsBarData} />
-
+						<InsightMenu
+							isModalOpen={isModalOpen}
+							isFocused={isFocused}
+							sentiment={sentiment}
+							categories={categories}
+							wordCloud={topKeywords.map(({ keyword, count }) => ({
+								text: keyword,
+								value: count,
+							}))}
+							topPeople={topPeople}
+							topOrgs={topOrgs}
+							topLocations={topLocations}
+							closeModal={this.props.closeModal}
+						/>
           </Modal.Content>
-          <Modal.Actions>
-            <Button
-              onClick={this.props.closeModal}
-              content="Close"
-            />
-          </Modal.Actions>
         </Modal>
       </div>
     );

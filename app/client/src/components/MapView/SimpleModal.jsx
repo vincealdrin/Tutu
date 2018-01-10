@@ -14,6 +14,7 @@ import {
 import { Tooltip } from 'react-tippy';
 import Tags from './Tags';
 import Carousel from './Carousel';
+import RelatedArticles from './RelatedArticles';
 import Reactions from './Reactions';
 import './styles.css';
 
@@ -153,47 +154,13 @@ class SimpleModal extends Component {
           <div className="carousel-container">
             <Carousel content={summary} />
           </div>
-          <Accordion style={{ margin: '1rem 0' }}>
-            <Accordion.Title active={activeIndex === 0} index={0} onClick={this.showRelatedArticles}>
-              <Icon name="dropdown" />
-              Related Stories
-            </Accordion.Title>
-            <Accordion.Content active={activeIndex === 0} index={0}>
-              <List divided relaxed>
-                {relatedArticles.length
-                  ? relatedArticles.map((related) => (
-                    <List.Item>
-                      <List.Header
-                        as="a"
-                        color="blue"
-                        href={related.url}
-                        target="_blank"
-                      >
-                        {related.title}
-                      </List.Header>
-                    </List.Item>
-                  ))
-                  : <span className="no-info">No related articles found</span>
-                }
-              </List>
-            </Accordion.Content>
-          </Accordion>
+          <RelatedArticles content={relatedArticles} />
           <div className="extras">
             <Reactions
               reactions={reactions}
               status={reactionStatus}
               updateReaction={(reaction) => updateReaction(id, reaction)}
             />
-            <Button
-              as="a"
-              className="read-more-button"
-              color="blue"
-              target="_blank"
-              href={url}
-              circular
-            >
-              Read More
-            </Button>
           </div>
         </Modal.Content>
       </Modal>

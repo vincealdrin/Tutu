@@ -5,3 +5,25 @@
 .word-cloud > * {
 	margin: auto;
 }
+
+.chartjs-render-monitor {
+	margin: 1.4rem 0;
+}
+
+.ui.dimmer {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.ui.header.insight-menu-name {
+	padding: 1rem;
+	font-weight: normal;
+}
+
+.ui.huge.ribbon {
+	top: 1rem;
+	left: -1.7rem;
+}
+
+.ui.segment.insight-menu-item {
+	padding: 4rem;
+}

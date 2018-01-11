@@ -10,6 +10,7 @@ const {
   getFaviconUrl,
   PH_TIMEZONE,
   getDomainOnly,
+  cloudScrape,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -35,8 +36,15 @@ module.exports = (conn, io) => {
       //     isVerified: true,
       //   });
       // }
+      let body;
 
-      const cheerioDoc = cheerio.load(await rp(validUrl));
+      try {
+        body = await rp(validUrl);
+      } catch (e) {
+        body = await cloudScrape(validUrl);
+      }
+
+      const cheerioDoc = cheerio.load(body);
       const brand = getSourceBrand(cheerioDoc) || getDomainOnly(validUrl);
       const title = getTitle(cheerioDoc);
       const faviconUrl = getFaviconUrl(cheerioDoc, validUrl);
@@ -59,6 +67,7 @@ module.exports = (conn, io) => {
           sourceHasAboutPage: (hasAboutPage && aboutUsUrl) ? 1 : 0,
           sourceHasContactPage: (hasContactPage && contactUsUrl) ? 1 : 0,
           url: validUrl,
+          body,
         },
         json: true,
       });

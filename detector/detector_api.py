@@ -144,8 +144,8 @@ clf.fit(x, y)
 def predict():
     info = request.json
 
-    a = Article(info['url'])
-    a.download()
+    a = Article('')
+    a.set_html(info['body'])
     a.parse()
 
     sentiment = SentimentIntensityAnalyzer().polarity_scores(a.text)

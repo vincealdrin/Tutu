@@ -88,12 +88,14 @@ def insert_log(sourceId, log_type, status, runTime, info):
         'db':
         'tutu',
         'table':
-        'articles'
+        'crawlerLogs'
     }).map(r.row['storage_engine']['disk']['space_usage']['data_bytes']
            .default(0)).sum().div(MB).div(MB).run(conn)
 
+    print(logs_mb_size)
     if logs_mb_size > THRESHOLD:
         r.table('crawlerLogs').delete().run(conn)
+        print('LOGS DELETED')
 
     # DAYS = 1
     # HOURS = 1

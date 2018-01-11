@@ -5,6 +5,7 @@ const { parseString } = require('xml2js');
 const r = require('rethinkdb');
 const rp = require('request-promise');
 const parseDomain = require('parse-domain');
+const cloudscraper = require('cloudscraper');
 
 const awisClient = awis({
   key: process.env.AMAZON_ACCESS_KEY,
@@ -180,6 +181,16 @@ module.exports.getAboutContactUrl = ($, baseUrl) => {
     return { error: 'Source Error' };
   }
 };
+
+module.exports.cloudScrape = (url) => new Promise((resolve, reject) => {
+  cloudscraper.get(url, (error, response, body) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(body);
+    }
+  });
+});
 
 const mapLocation = (loc) => {
   const coords = loc('location')('position').toGeojson()('coordinates');

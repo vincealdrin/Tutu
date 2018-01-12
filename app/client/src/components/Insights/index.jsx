@@ -55,107 +55,14 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   closeModal,
 }, dispatch);
 
-const InsightMenuItem = ({
-	icon,
-	header,
-	desc
-}) => (
-	<Segment raised textAlign="center" className="insight-menu-item">
-		<Icon name={icon} color="grey" size="big" />
-		<Header className="insight-menu-name">{header}</Header>
-		<p>{desc}</p>
-	</Segment>
-)
-
-const InsightMenu = ({
-		closeModal,
-		sentiment,
-		categories,
-		wordCloud,
-		topPeople,
-		topLocations,
-		topOrgs
-	}) => (
-		<div>
-			<Grid>
-				<Grid.Row columns={2}>
-				<Grid.Column>
-					<Modal
-						trigger={
-							<Segment raised textAlign="center" className="insight-menu-item">
-								<Icon name="smile" color="grey" size="big" />
-								<Header className="insight-menu-name">Sentiments</Header>
-								<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sed ex, ullam beatae quo dolore reiciendis nulla ratione earum dolor pariatur quibusdam animi eius!</p>
-							</Segment>
-					}>
-						<Label as="a" color="teal" size="huge" ribbon>Sentiments</Label>
-						<Button icon="close" content="CLOSE" floated="right" basic onClick={closeModal} />
-						<Modal.Content scrolling>
-							<SentimentCharts sentiment={sentiment} />
-						</Modal.Content>
-					</Modal>
-				</Grid.Column>
-				<Grid.Column>
-					<Modal
-						trigger={
-							<Segment raised textAlign="center" className="insight-menu-item">
-								<Icon name="tags" color="grey" size="big" />
-								<Header className="insight-menu-name">Categories</Header>
-								<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sed ex, ullam beatae quo dolore reiciendis nulla ratione earum dolor pariatur quibusdam animi eius!</p>
-							</Segment>
-						}>
-						<Label as="a" color="teal" size="huge" ribbon>Categories</Label>
-						<Button icon="close" content="CLOSE" floated="right" basic onClick={closeModal} />
-						<Modal.Content scrolling>
-							<CategoriesCharts categories={categories} />
-						</Modal.Content>
-					</Modal>
-				</Grid.Column>
-			</Grid.Row>
-			<Grid.Row columns={2}>
-				<Grid.Column>
-					<Modal
-						trigger={
-							<Segment raised textAlign="center" className="insight-menu-item">
-								<Icon name="cloud" color="grey" size="big" />
-								<Header className="insight-menu-name">Word Cloud</Header>
-								<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sed ex, ullam beatae quo dolore reiciendis nulla ratione earum dolor pariatur quibusdam animi eius!</p>
-							</Segment>
-						}>
-							<Label as="a" color="teal" size="huge" ribbon>WordCloud</Label>
-							<Button icon="close" content="CLOSE" floated="right" basic onClick={closeModal} />>
-							<Modal.Content scrolling>
-								<InsightWordCloud wordCloud={wordCloud} />
-							</Modal.Content>
-						</Modal>
-				</Grid.Column>
-				<Grid.Column>
-					<Modal
-						trigger={
-							<Segment raised textAlign="center" className="insight-menu-item">
-								<Icon name="ordered list" color="grey" size="big" />
-								<Header className="insight-menu-name">Top Ten</Header>
-								<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sed ex, ullam beatae quo dolore reiciendis nulla ratione earum dolor pariatur quibusdam animi eius!</p>
-							</Segment>
-					}>
-						<Label as="a" color="teal" size="huge" ribbon>Top Ten</Label>
-						<Button icon="close" content="CLOSE" floated="right" basic onClick={closeModal} />
-						<Modal.Content scrolling>
-							<TopTen
-								topPeople={topPeople}
-								topOrgs={topOrgs}
-								topLocations={topLocations}
-							/>
-						</Modal.Content>
-					</Modal>
-				</Grid.Column>
-			</Grid.Row>
-		</Grid>
-	</div>
-	)
-
 class Insights extends Component {
+	state = {
+		activeCard: 'mainMenu',
+		labelDesc: 'Insights'
+	};
+
   render() {
+		const { activeCard, labelDesc } = this.state;
     const {
       ids,
       sentiment,
@@ -187,34 +94,150 @@ class Insights extends Component {
           />
         ) : null}
         <Modal
-          open={isModalOpen}
-          onClose={this.props.closeModal}
-					closeOnDimmerClick
-					style={{
-						minHeight: 613.13
+					open={isModalOpen}
+          onClose={() => {
+						this.props.closeModal;
+						this.setState({ activeCard: 'mainMenu' });
 					}}
+					closeOnDimmerClick
         >
-					<Label as="a" color="teal" size="huge" ribbon>Insights</Label>
+					<Label as="a" color="teal" size="huge" ribbon>{labelDesc}</Label>
+					<Button
+						as="a"
+						icon={activeCard === 'mainMenu' ? 'close' : 'long arrow left'}
+						floated="right"
+						color="red"
+						basic
+						content={activeCard === 'mainMenu' ? 'CLOSE' : 'BACK'}
+						onClick={() => {activeCard === 'mainMenu'
+							? (
+								this.props.closeModal()
+							)
+							: (
+								this.setState({ activeCard: 'mainMenu', labelDesc: 'Insights' })
+							)
+						}}
+						/>
           <Modal.Content scrolling>
 						<InsightMenu
-							isModalOpen={isModalOpen}
-							isFocused={isFocused}
+							theState={this}
+							labelDesc={labelDesc}
+							activeCard={activeCard}
 							sentiment={sentiment}
 							categories={categories}
-							wordCloud={topKeywords.map(({ keyword, count }) => ({
-								text: keyword,
-								value: count,
-							}))}
+							wordCloud={topKeywords}
 							topPeople={topPeople}
-							topOrgs={topOrgs}
 							topLocations={topLocations}
-							closeModal={this.props.closeModal}
+							topOrgs={topOrgs}
 						/>
           </Modal.Content>
         </Modal>
       </div>
     );
   }
+}
+
+const InsightMenuItemSegments = ({
+	icon,
+	header,
+	desc,
+	theState
+}) => (
+	<Segment
+		raised
+		textAlign="center"
+		className="insight-menu-item"
+		onClick={() => theState.setState({
+			activeCard: header,
+			labelDesc: header
+		})}
+	>
+		<Icon name={icon} color="grey" size="big" />
+		<Header className="insight-menu-name">{header}</Header>
+		<p>{desc}</p>
+	</Segment>
+)
+
+const InsightMenu = ({
+	theState,
+	labelDesc,
+	activeCard,
+	sentiment,
+	categories,
+	wordCloud,
+	topPeople,
+	topLocations,
+	topOrgs
+}) => {
+	let insightMenuItem;
+	switch (activeCard) {
+		case 'Sentiments' : {
+			insightMenuItem = <SentimentCharts sentiment={sentiment} />
+			break;
+		}
+		case 'Categories' : {
+			insightMenuItem = <CategoriesCharts categories={categories} />
+			break;
+		}
+		case 'WordCloud' : {
+			insightMenuItem = <InsightWordCloud wordCloud={wordCloud} />
+			break;
+		}
+		case 'Top Ten' : {
+			insightMenuItem = <TopTen
+				topPeople={topPeople}
+				topOrgs={topOrgs}
+				topLocations={topLocations}
+			/>
+			break;
+		}
+		case 'mainMenu' : {
+			insightMenuItem = (<div>
+				<Grid>
+					<Grid.Row columns={2}>
+					<Grid.Column>
+						<InsightMenuItemSegments
+							icon="smile"
+							header="Sentiments"
+							desc="This is supposed to be a long description but I made it short"
+							theState={theState}
+						/>
+					</Grid.Column>
+					<Grid.Column>
+						<InsightMenuItemSegments
+							icon="tags"
+							header="Categories"
+							desc="This is supposed to be a long description but I made it short"
+							theState={theState}
+						/>
+					</Grid.Column>
+					</Grid.Row>
+					<Grid.Row columns={2}>
+						<Grid.Column>
+							<InsightMenuItemSegments
+							icon="cloud"
+							header="WordCloud"
+							desc="This is supposed to be a long description but I made it short"
+							theState={theState}
+						/>
+						</Grid.Column>
+						<Grid.Column>
+							<InsightMenuItemSegments
+							icon="ordered list"
+							header="Top Ten"
+							desc="This is supposed to be a long description but I made it short"
+							theState={theState}
+						/>
+						</Grid.Column>
+					</Grid.Row>
+				</Grid>
+			</div>)
+		}
+		default: {
+			<p>NONE</p>
+		}
+	}
+	return insightMenuItem;
 }
 
 export default connect(

@@ -89,6 +89,10 @@ class AppSidebar extends Component {
               <Icon name="globe" color="grey" />
               <span className={`sidebar-text ${isWideClass}`}>Map Themes</span>
             </Link>
+						<Link to="/sources" onClick={this.beVisible}>
+              <Icon name="list ul" color="grey" />
+              <span className={`sidebar-text ${isWideClass}`}>Sources</span>
+            </Link>
           </div>
           <div className="popular">
             <span className={`label ${isWideClass}`}>POPULAR</span>

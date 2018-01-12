@@ -8,9 +8,11 @@ const {
   getSourceBrand,
   getAlexaRank,
   getSocialScore,
-  putHttpUrl,
   getUpdatedFields,
   PH_TIMEZONE,
+  getTitle,
+  getFaviconUrl,
+  getDomainOnly,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -67,50 +69,71 @@ module.exports = (conn, io) => {
       const uuid = await r.uuid(url).run(conn);
       const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
       const matchedSource = await r.table('sources').get(uuid).run(conn);
-      const matchedFakeSource = await r.table('fakeSources').get(uuid).run(conn);
 
       if (matchedPending) {
         return next({
           status: 400,
-          message: 'Source is already in the list of pending sources',
+          message: `${url} already exists in the list of pending sources`,
         });
       }
 
       if (matchedSource) {
         return next({
           status: 400,
-          message: 'Source is already in the list of reliable sources',
+          message: `${url} already exists in the list of ${matchedSource.isReliable ? 'reliable' : 'unreliable'} sources`,
         });
       }
 
-      if (matchedFakeSource) {
-        return next({
-          status: 400,
-          message: 'Source is already in the list of fake sources',
-        });
-      }
-
-      const validUrl = putHttpUrl(url);
-      const cheerioDoc = cheerio.load(await rp(validUrl));
-      const brand = getSourceBrand(cheerioDoc) || validUrl;
-      const socialScore = await getSocialScore(validUrl);
-      const { countryRank, worldRank, sourceUrl } = await getAlexaRank(validUrl);
-      const sourceCleanUrl = putHttpUrl(cleanUrl(sourceUrl));
-      const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, sourceCleanUrl);
+      const cheerioDoc = cheerio.load(await rp(url));
+      const brand = getSourceBrand(cheerioDoc) || getDomainOnly(url);
+      const title = getTitle(cheerioDoc);
+      // const socialScore = await getSocialScore(url);
+      // const { countryRank, worldRank, sourceUrl } = await getAlexaRank(url);
+      const faviconUrl = getFaviconUrl(cheerioDoc, url);
+      const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, url);
       const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
       const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);
+
+      const {
+        reliable,
+        sourceUrl,
+        pct,
+        sourcePct,
+        contentPct,
+        socialScore,
+        countryRank,
+        worldRank,
+      } = await rp('http://localhost:5001/predict', {
+        method: 'POST',
+        body: {
+          sourceHasAboutPage: (hasAboutPage && aboutUsUrl) ? 1 : 0,
+          sourceHasContactPage: (hasContactPage && contactUsUrl) ? 1 : 0,
+          url,
+        },
+        json: true,
+      });
+      const isReliablePred = Boolean(reliable);
+      const sourceCleanUrl = cleanUrl(sourceUrl);
 
       const pendingSourceInfo = {
         ...pendingSource,
         id: await r.uuid(sourceCleanUrl).run(conn),
         url: sourceCleanUrl,
         timestamp: r.now().inTimezone(PH_TIMEZONE),
+        prediction: {
+          isReliable: isReliablePred,
+          pct,
+          sourcePct,
+          contentPct,
+        },
         socialScore,
         countryRank,
         worldRank,
         brand,
-        hasAboutPage,
-        hasContactPage,
+        faviconUrl,
+        aboutUsUrl,
+        contactUsUrl,
+        title,
       };
       const { changes } = await r.table(tbl)
         .insert(pendingSourceInfo, { returnChanges: true })
@@ -221,16 +244,16 @@ module.exports = (conn, io) => {
 
       const pendingSource = changes[0].old_val;
 
-      delete pendingSource.isReliable;
+      delete pendingSource.isReliablePred;
 
       const newSource = {
         ...pendingSource,
+        isReliable,
         verifiedByUserId: req.user.id,
         timestamp: r.now().inTimezone(PH_TIMEZONE),
       };
 
-      const table = isReliable ? 'sources' : 'fakeSources';
-      const { changes: insertedVals } = await r.table(table)
+      const { changes: insertedVals } = await r.table('sources')
         .insert(newSource, { returnChanges: true })
         .run(conn);
       const insertedVal = insertedVals[0].new_val;
@@ -239,11 +262,9 @@ module.exports = (conn, io) => {
         userId: req.user.id,
         type: 'verify',
         timestamp: insertedVal.timestamp,
-        verified: {
-          id: newSource.id,
-          table,
-        },
+        sourceId: newSource.id,
         table: tbl,
+        isReliable,
       }).run(conn);
 
       res.json(insertedVal);

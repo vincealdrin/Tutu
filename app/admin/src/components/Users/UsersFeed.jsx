@@ -64,12 +64,12 @@ class UsersFeed extends Component {
           const {
             sources = [],
             deleted = [],
+            source = {},
             table,
             timestamp,
             type,
             user,
             isReliable,
-            verifiedSource,
           } = item;
 
           return (
@@ -100,10 +100,9 @@ class UsersFeed extends Component {
                   ))}
                   {type === 'verify' ? (
                     <p>
-                      <a href={`http://${verifiedSource.url}`} target="_blank" >
-                        {verifiedSource.brand}
-                      </a> source
-                      {verifiedSource.brand} inserted in {verifiedSource.table}&#39; table
+                      <a href={`http://${source.url}`} target="_blank" >
+                        {source.brand}
+                      </a> is verified to be a {isReliable ? 'reliable' : 'not reliable'} source
                     </p>
                   ) : null}
                 </Feed.Extra>

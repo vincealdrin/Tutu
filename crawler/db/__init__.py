@@ -16,15 +16,6 @@ def get_uuid(text):
     return r.uuid(text).run(conn)
 
 
-def insert_fake_article(article, tbl='fakeArticles'):
-    article = {
-        **article,
-        'timestamp': r.expr(datetime.now(r.make_timezone(PH_TIMEZONE))),
-    }
-
-    r.table(tbl).insert(article).run(conn)
-
-
 def insert_article(article, tbl='articles'):
     # article = {
     #     **article,
@@ -101,8 +92,10 @@ def insert_log(sourceId, log_type, status, runTime, info):
     }).map(r.row['storage_engine']['disk']['space_usage']['data_bytes']
            .default(0)).sum().div(MB).div(MB).run(conn)
 
+    print(logs_mb_size)
     if logs_mb_size > THRESHOLD:
         r.table('crawlerLogs').delete().run(conn)
+        print('LOGS DELETED')
 
     # DAYS = 1
     # HOURS = 1
@@ -184,16 +177,18 @@ def get_provinces():
             }).without({ 'right': True, 'left': True }).run(conn))
 
 
-def get_sources(order_by='timestamp', desc=False, table='sources'):
+def get_sources(order_by='timestamp', desc=False, isReliable=True, tbl='sources'):
+    query = r.table(tbl).filter(r.row['isReliable'].eq(isReliable))
+
     if desc:
-        return list(r.table(table).order_by(r.desc(order_by)).run(conn))
-    return list(r.table(table).order_by(order_by).run(conn))
+        return list(query.order_by(r.desc(order_by)).run(conn))
+    return list(query.order_by(order_by).run(conn))
 
 
-def get_rand_sources(not_sources=[], count=1, table='sources'):
+def get_rand_sources(not_sources=[], count=1, isReliable=True, tbl='sources'):
     return list(
-        r.table(table)
-        .filter(lambda source: (~r.expr(not_sources).contains(source['id'])))
+        r.table(tbl)
+        .filter(lambda source: r.not_(r.expr(not_sources).contains(source['id'])).and_(r.row['isReliable'].eq(isReliable)))
         .sample(count).run(conn))
 
 

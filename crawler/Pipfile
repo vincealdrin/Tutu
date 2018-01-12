@@ -18,7 +18,7 @@ fake-useragent = "*"
 scikit-learn = "*"
 numpy = "*"
 scipy = "*"
-socketIO-client = "*"
+socketio-client = "*"
 rethinkdb = "*"
 sumy = "*"
 matplotlib = "*"
@@ -34,7 +34,9 @@ stop-words = "*"
 concepts = "*"
 proxybroker = "*"
 asyncio = "*"
-similar_text = "*"
+similar-text = "*"
+dateguesser = {git = "https://github.com/ColCarroll/date_guesser"}
+date_guesser = {git = "https://github.com/ColCarroll/date_guesser"}
 
 
 [requires]

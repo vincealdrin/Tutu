@@ -54,6 +54,8 @@ class DataTable extends PureComponent {
       defaultSearchFilter,
       columns = [],
       data = [],
+      hideAddBtn = false,
+      hideDeleteBtn = false,
       totalCount,
       label,
       deleteLabel,
@@ -80,69 +82,70 @@ class DataTable extends PureComponent {
         <Table.Header fullWidth>
           <Table.Row>
             <Table.HeaderCell colSpan="5">
-              <Button
-                labelPosition="left"
-                size="small"
-                icon={isDeleting ? 'cancel' : 'trash'}
-                content={isDeleting ? 'Cancel ' : `Delete ${deleteLabel || label}`}
-                onClick={() => {
-                  if (isDeleting) {
-                    this.cancelDelete();
-                    this.clearDeletionList();
-                  } else {
-                    this.enableDelete();
-                  }
-                }}
-                disabled={isAdding}
-                secondary
-              />
-              {!isDeleting
-                ? (
-                  <Modal
-                    trigger={
-                      <Button
-                        labelPosition="left"
-                        size="small"
-                        onClick={this.enableAdd}
-                        icon="add"
-                        content={`Add ${label}`}
-                        primary
-                      />
-                    }
-                    open={isAdding}
-                  >
-                    <Modal.Header>Add {label}</Modal.Header>
-                    <Modal.Content scrolling>
-                      <Modal.Description>
-                        {addModalContent}
-                      </Modal.Description>
-                    </Modal.Content>
-                    <Modal.Actions>
-                      {addModalActions(this.cancelAdd)}
-                    </Modal.Actions>
-                  </Modal>
-                )
-                : (
-                  <Button
-                    labelPosition="left"
-                    size="small"
-                    icon="trash"
-                    content="Delete Selected"
-                    color="red"
-                    onClick={async () => {
-                      await onDeleteSelected(deletionList);
+              {!hideDeleteBtn ? (
+                <Button
+                  labelPosition="left"
+                  size="small"
+                  icon={isDeleting ? 'cancel' : 'trash'}
+                  content={isDeleting ? 'Cancel ' : `Delete ${deleteLabel || label}`}
+                  onClick={() => {
+                    if (isDeleting) {
                       this.cancelDelete();
-
-                      if (totalCount - deletionList.length > 0 && totalPages !== 1) {
-                        this.setState({ currentPage: 1 }, () => {
-                          this.debouncedOnPaginate(0, limit, searchFilter, search);
-                        });
-                      }
-
                       this.clearDeletionList();
-                    }}
-                  />
-                )}
+                    } else {
+                      this.enableDelete();
+                    }
+                  }}
+                  disabled={isAdding}
+                  secondary
+                />
+            ) : null}
+              {!isDeleting && !hideAddBtn ? (
+                <Modal
+                  trigger={
+                    <Button
+                      labelPosition="left"
+                      size="small"
+                      onClick={this.enableAdd}
+                      icon="add"
+                      content={`Add ${label}`}
+                      primary
+                    />
+                    }
+                  open={isAdding}
+                >
+                  <Modal.Header>Add {label}</Modal.Header>
+                  <Modal.Content scrolling>
+                    <Modal.Description>
+                      {addModalContent}
+                    </Modal.Description>
+                  </Modal.Content>
+                  <Modal.Actions>
+                    {addModalActions(this.cancelAdd)}
+                  </Modal.Actions>
+                </Modal>
+                ) : null}
+              {isDeleting && !hideDeleteBtn ? (
+                <Button
+                  labelPosition="left"
+                  size="small"
+                  icon="trash"
+                  content="Delete Selected"
+                  color="red"
+                  onClick={async () => {
+                    await onDeleteSelected(deletionList);
+                    this.cancelDelete();
+
+                    if (totalCount - deletionList.length > 0 && totalPages !== 1) {
+                      this.setState({ currentPage: 1 }, () => {
+                        this.debouncedOnPaginate(0, limit, searchFilter, search);
+                      });
+                    }
+
+                    this.clearDeletionList();
+                  }}
+                />
+                ) : null}
               <div style={searchContainerStyle}>
                 <Input
                   icon="search"
@@ -166,16 +169,18 @@ class DataTable extends PureComponent {
           <Table.Row>
             {this.state.isDeleting ? (
               <Table.HeaderCell>
-                <Checkbox
-                  onClick={() => {
+                {data.length ? (
+                  <Checkbox
+                    onClick={() => {
                     if (deletionList.length === data.length) {
                       this.clearDeletionList();
                     } else {
                       this.appendAllDeletion(data.map((d) => d.id));
                     }
                   }}
-                  checked={deletionList.length === data.length}
-                />
+                    checked={deletionList.length === data.length && deletionList.length}
+                  />
+                ) : '[Empty]'}
               </Table.HeaderCell>
             ) : null}
             {columns.map(({ text }) => (
@@ -203,9 +208,11 @@ class DataTable extends PureComponent {
                     />
                   </Table.Cell>
                 ) : null}
-                {columns.map(({ key, wrapper }) => (
+                {columns.map(({ key, wrapper, accessor }) => (
                   <Table.Cell key={shortid.generate()}>
-                    {wrapper ? wrapper(datum[key]) : datum[key]}
+                    {wrapper
+                      ? wrapper(datum[accessor || key])
+                      : datum[accessor || key]}
                   </Table.Cell>
                 ))}
                 <Table.Cell>

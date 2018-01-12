@@ -5,6 +5,7 @@ const { parseString } = require('xml2js');
 const r = require('rethinkdb');
 const rp = require('request-promise');
 const parseDomain = require('parse-domain');
+const cloudscraper = require('cloudscraper');
 
 const awisClient = awis({
   key: process.env.AMAZON_ACCESS_KEY,
@@ -21,11 +22,6 @@ module.exports.getDomain = (url) => {
   const { domain, tld } = parseDomain(url);
   return `${domain}.${tld}`;
 };
-module.exports.putHttpUrl = (url) => (/^https?:\/\//.test(url) ? url : `http://${url}`);
-module.exports.cleanUrl = (dirtyUrl) => dirtyUrl
-  .replace('www.', '')
-  .replace(/\/$/, '')
-  .replace(/https?:\/\//, '');
 
 module.exports.getUpdatedFields = (changes) =>
   changes.map((change) => {
@@ -60,10 +56,10 @@ module.exports.getAlexaRank = async (url) => {
 
   const info = {
     sourceUrl: res.ALEXA.SD ? res.ALEXA.SD[0].POPULARITY[0].$.URL : url,
-    countryRank: res.ALEXA.SD && res.ALEXA.SD[0].POPULARITY
+    worldRank: res.ALEXA.SD && res.ALEXA.SD[0].POPULARITY
       ? parseInt(res.ALEXA.SD[0].POPULARITY[0].$.TEXT)
       : 0,
-    worldRank: res.ALEXA.SD && res.ALEXA.SD[0].COUNTRY
+    countryRank: res.ALEXA.SD && res.ALEXA.SD[0].COUNTRY
       ? parseInt(res.ALEXA.SD[0].COUNTRY[0].$.RANK)
       : 0,
   };
@@ -93,7 +89,7 @@ module.exports.getSocialScore = async (url) => {
   return redScore + suScore + liScore + fbScore + pinScore;
 };
 
-module.exports.getTitle = ($) => $('title').text();
+module.exports.getTitle = ($) => $('title').text() || '';
 
 module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, reject) => {
   awisClient({
@@ -106,25 +102,41 @@ module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, re
   });
 });
 
+module.exports.getDomainOnly = (url) => url
+  .replace(/https?:\/\//, '')
+  .split('.')
+  .slice(0, -1)
+  .join('.')
+  .toUpperCase();
+
 module.exports.getSourceBrand = ($) => {
   const brand = $('meta[property="og:site_name"]').attr('content');
 
   return _.trim(brand);
 };
 
-const cleanUrl = (dirtyUrl = '', baseUrl) => {
+const cleanUrl = (dirtyUrl = '', baseUrl = '') => {
   let url = dirtyUrl;
 
   if (dirtyUrl.substring(0, 2) === '//') {
     url = `http:${dirtyUrl}`;
   } else if (dirtyUrl[0] === '/') {
     url = baseUrl + dirtyUrl;
-  } else if (dirtyUrl && !/^https?:\/\//.test(dirtyUrl)) {
-    url = `http://${dirtyUrl}`;
+  }
+
+  url = url
+    .replace('www.', '')
+    .replace(/\/$/, '')
+    .replace(/^(https:\/\/)/, 'http://');
+
+  if (url && !/^http:\/\//.test(url)) {
+    url = `http://${url}`;
   }
 
   return url;
 };
+
+module.exports.cleanUrl = cleanUrl;
 
 module.exports.getFaviconUrl = ($, baseUrl) => {
   const url = $('link[rel="shortcut icon"]').attr('href');
@@ -169,6 +181,16 @@ module.exports.getAboutContactUrl = ($, baseUrl) => {
     return { error: 'Source Error' };
   }
 };
+
+module.exports.cloudScrape = (url) => new Promise((resolve, reject) => {
+  cloudscraper.get(url, (error, response, body) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(body);
+    }
+  });
+});
 
 const mapLocation = (loc) => {
   const coords = loc('location')('position').toGeojson()('coordinates');

@@ -1,24 +1,19 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
-const _ = require('lodash');
 const cheerio = require('cheerio');
 const rp = require('request-promise');
 const {
   getAboutContactUrl,
   getFaviconUrl,
-  getSourceInfo,
   getSourceBrand,
   getTitle,
   getSocialScore,
   cleanUrl,
   PH_TIMEZONE,
-  putHttpUrl,
   getUpdatedFields,
+  getAlexaRank,
+  getDomainOnly,
 } = require('../../utils');
-
-const responseGroups = ['RelatedLinks', 'Categories', 'Rank', 'ContactInfo', 'RankByCountry',
-  'UsageStats', 'Speed', 'Language', 'OwnedDomains', 'LinksInCount',
-  'SiteData', 'AdultContent'];
 
 module.exports = (conn, io) => {
   const tbl = 'sources';
@@ -29,12 +24,14 @@ module.exports = (conn, io) => {
       limit = 15,
       filter = '',
       search = '',
+      isReliable = true,
     } = req.query;
     const parsedPage = parseInt(page);
     const parsedLimit = parseInt(limit);
+    const parsedIsReliable = JSON.parse(isReliable);
 
     try {
-      let query = r.table(tbl);
+      let query = r.table(tbl).filter(r.row('isReliable').eq(parsedIsReliable));
 
       if (filter && search) {
         query = query.filter((source) => source(filter).match(`(?i)${search}`));
@@ -50,6 +47,8 @@ module.exports = (conn, io) => {
           timestamp: r.row('left')('timestamp'),
           url: r.row('left')('url'),
           id: r.row('left')('id'),
+          contactUsUrl: r.row('left')('contactUsUrl'),
+          aboutUsUrl: r.row('left')('aboutUsUrl'),
           verifiedBy: r.row('right')('name'),
         })
         .run(conn);
@@ -75,15 +74,18 @@ module.exports = (conn, io) => {
   });
 
   router.post('/', async (req, res, next) => {
-    const sources = req.body;
+    const {
+      urls,
+      isReliable,
+    } = req.body;
 
     try {
-      const sourcesWithId = await Promise.all(sources.map(async (source) => {
+      const sourcesWithId = await Promise.all(urls.map(async (source) => {
         const uuid = await r.uuid(cleanUrl(source)).run(conn);
 
         return {
           id: uuid,
-          url: putHttpUrl(source),
+          url: cleanUrl(source),
         };
       }));
       const uuids = sourcesWithId.map((source) => source.id);
@@ -97,25 +99,14 @@ module.exports = (conn, io) => {
         .pluck('id', 'url')
         .run(conn);
       const matchedSources = await sourceCursor.toArray();
-      const fakeCursor = await r.table('fakeSources')
-        .getAll(r.args(uuids))
-        .pluck('id', 'url')
-        .run(conn);
-      const matchedFakes = await fakeCursor.toArray();
 
-      if (matchedPendings.length || matchedSources.length || matchedFakes.length) {
+      if (matchedPendings.length || matchedSources.length) {
         const errorMessage = [];
 
         sourcesWithId.forEach((source) => {
           const foundSource = matchedSources.find((ms) => ms.id === source.id);
           if (foundSource) {
-            errorMessage.push(`${foundSource.url} already exists in the list of reliable sources`);
-            return;
-          }
-
-          const foundFake = matchedFakes.find((mf) => mf.id === source.id);
-          if (foundFake) {
-            errorMessage.push(`${foundFake.url} already exists in the list of fake sources`);
+            errorMessage.push(`${foundSource.url} already exists in the list of ${foundSource.isReliable ? 'reliable' : 'unreliable'} sources`);
             return;
           }
 
@@ -134,66 +125,24 @@ module.exports = (conn, io) => {
       const sourcesInfo = await Promise.all(sourcesWithId.map(async (source) => {
         const cheerioDoc = cheerio.load(await rp(source.url));
         const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, source.url);
-        const faviconUrl = getFaviconUrl(cheerioDoc);
-        const infoPromise = await getSourceInfo(source.url, responseGroups);
+        const faviconUrl = getFaviconUrl(cheerioDoc, source.url);
+        const title = getTitle(cheerioDoc);
+        const { countryRank, worldRank, sourceUrl } = await getAlexaRank(source.url);
+        const sourceCleanUrl = cleanUrl(sourceUrl);
         const socialScore = await getSocialScore(source.url);
+        const brand = getSourceBrand(cheerioDoc) || getDomainOnly(source.url);
 
-        const info = await infoPromise;
-        const brand = getSourceBrand(cheerioDoc) || source.url;
-
-        delete info.contactInfo;
-        const subdomains = _.get(info, 'trafficData.contributingSubdomains.contributingSubdomain') || [];
-        const mappedSubdomains = Array.isArray(subdomains)
-          ? subdomains.map((subdomain) => ({
-            url: subdomain.dataUrl,
-            pageViews: {
-              perUser: parseFloat((_.get(subdomain, 'pageViews.perUser') || '0.0')),
-              percentage: parseFloat((_.get(subdomain, 'pageViews.percentage') || '0.0').replace('%', '')),
-            },
-            reach: parseFloat((_.get(subdomain, 'reach.percentage') || '0.0').replace('%', '')),
-            timeRange: parseInt(_.get(subdomain, 'timeRange.months') || '0'),
-          }))
-          : {
-            url: subdomains.dataUrl,
-            pageViews: {
-              perUser: parseFloat((_.get(subdomains, 'pageViews.perUser') || '0.0')),
-              percentage: parseFloat((_.get(subdomains, 'pageViews.percentage') || '0.0').replace('%', '')),
-            },
-            reach: parseFloat((_.get(subdomains, 'reach.percentage') || '0.0').replace('%', '')),
-            timeRange: parseInt(_.get(subdomains, 'timeRange.months') || '0'),
-          };
 
         return {
           ...source,
+          url: sourceCleanUrl,
           verifiedByUserId: req.user.id,
-          url: _.get(info, 'contentData.dataUrl', ''),
-          title: _.get(info, 'contentData.siteData.title', ''),
-          description: _.get(info, 'contentData.siteData.description', ''),
-          rank: parseInt(_.get(info, 'trafficData.rank') || '0'),
-          linksInCount: parseInt(_.get(info, 'contentData.linksInCount') || '0'),
-          categories: {
-            path: _.get(info, 'related.categories.categoryData.absolutePath', ''),
-            title: _.get(info, 'related.categories.categoryData.title', ''),
-          },
-          relatedLinks: (_.get(info, 'related.relatedLinks.relatedLink') || []).map((related) => ({
-            ...related,
-            url: related.dataUrl,
-          })),
-          speed: {
-            medianLoadTime: parseInt(_.get(info, 'contentData.speed.medianLoadTime') || '0'),
-            percentile: parseInt(_.get(info, 'contentData.speed.percentile') || '0'),
-          },
-          rankByCountry: (_.get(info, 'trafficData.rankByCountry.country') || []).map((country) => ({
-            code: country.code,
-            contribution: {
-              pageViews: parseFloat((_.get(country, 'contribution.pageViews') || '0.0').replace('%', '')),
-              users: parseFloat((_.get(country, 'contribution.users') || '0.0').replace('%', '')),
-            },
-            rank: parseInt(_.get(country, 'rank') || '0'),
-          })),
-          subdomains: mappedSubdomains,
           timestamp: r.now().inTimezone(PH_TIMEZONE),
+          title,
+          isReliable,
           socialScore,
+          countryRank,
+          worldRank,
           faviconUrl,
           aboutUsUrl,
           contactUsUrl,

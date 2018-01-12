@@ -9,13 +9,13 @@ module.exports = (conn, io) => {
   router.get('/logs', async (req, res, next) => {
     try {
       const date = new Date();
-      date.setDate(date.getDate() - 7);
+      date.setDate(date.getDate() - 31);
 
       const cursor = await r.table(tbl)
-        .filter(r.row('timestamp').ge(date))
-        .limit(30)
+        .filter(r.row('timestamp').date().ge(date))
         .eqJoin(r.row('sourceId'), r.table('sources'))
         .orderBy(r.desc(r.row('left')('timestamp')))
+        .limit(50)
         .map(mapLog)
         .run(conn);
       const sources = await cursor.toArray();

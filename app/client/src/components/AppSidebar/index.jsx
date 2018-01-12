@@ -62,31 +62,31 @@ class AppSidebar extends Component {
           <div className="side-menu">
             <span className={`label ${isWideClass}`}>MENU</span>
             <Link to="/popular" onClick={this.beVisible}>
-              <Icon name="newspaper" color="grey" />
+              <Icon name="newspaper" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Popular News</span>
             </Link>
             <Link to="/recent" onClick={this.beVisible}>
-              <Icon name="plus square outline" color="grey" />
+              <Icon name="plus square outline" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Recent Articles</span>
             </Link>
             <Link to="/preferences" onClick={this.beVisible}>
-              <Icon name="cogs" color="grey" />
+              <Icon name="cogs" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Preferences</span>
             </Link>
             <Link to="/categories" onClick={this.beVisible}>
-              <Icon name="tags" color="grey" />
+              <Icon name="tags" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Categories</span>
             </Link>
             <Link to="/about" onClick={this.beVisible}>
-              <Icon name="browser" color="grey" />
+              <Icon name="browser" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>About</span>
             </Link>
             <Link to="/submit" onClick={this.beVisible}>
-              <Icon name="send outline" color="grey" />
+              <Icon name="send outline" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Submit</span>
             </Link>
             <Link to="/themes" onClick={this.beVisible}>
-              <Icon name="globe" color="grey" />
+              <Icon name="globe" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Map Themes</span>
             </Link>
 						<Link to="/sources" onClick={this.beVisible}>

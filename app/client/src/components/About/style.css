@@ -5,8 +5,9 @@
 .tutu-description {
   font-size: 1;
   font-style: italic;
-  font-weight: 100;
-  color: #767676;
+  font-weight: 300;
+  color: #444;
+  text-align: justify;
 }
 
 .social-media {

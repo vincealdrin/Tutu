@@ -66,8 +66,9 @@ export default (state = initialState, action) => {
 export const fetchFakeSources = (page, limit, filter, search) =>
   httpThunk(FETCH_FAKE_SOURCES, async () => {
     try {
-      const { data: fakeSources, status, headers } = await axios.get('/fakeSources', {
+      const { data: fakeSources, status, headers } = await axios.get('/sources', {
         params: {
+          isReliable: false,
           page,
           limit,
           filter,
@@ -91,7 +92,10 @@ export const addFakeSources = () => httpThunk(ADD_FAKE_SOURCES, async (getState)
   const urls = Object.values(form.fakeSources.values);
 
   try {
-    const { data: newFakeSources, status } = await axios.post('/fakeSources', urls);
+    const { data: newFakeSources, status } = await axios.post('/sources', {
+      isReliable: false,
+      urls,
+    });
 
     return {
       newFakeSources,
@@ -106,7 +110,7 @@ export const updateFakeSource = (sourceId, source, isIdChanged = false) => async
   dispatch({ type: UPDATE_FAKE_SOURCE, statusText: 'pending' });
 
   try {
-    const endpoint = `/fakeSources/${sourceId}`;
+    const endpoint = `/sources/${sourceId}`;
     const path = isIdChanged ? `${endpoint}?isIdChanged=true` : endpoint;
     const updatedSource = await axios.put(path, source);
 
@@ -127,7 +131,7 @@ export const updateFakeSource = (sourceId, source, isIdChanged = false) => async
 
 export const deleteFakeSources = (ids) => httpThunk(DELETE_FAKE_SOURCES, async () => {
   try {
-    const { status } = await axios.delete('/fakeSources', {
+    const { status } = await axios.delete('/sources', {
       data: {
         ids: ids.join(),
       },

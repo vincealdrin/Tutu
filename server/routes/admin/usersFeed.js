@@ -47,11 +47,14 @@ module.exports = (conn, io) => {
             timestamp: item('timestamp'),
             user: r.table('users').get(item('userId')).getField('name'),
             type: item('type'),
-            isReliable: item('verified')('table').eq('sources'),
-            verifiedSource: r.table(item('verified')('table'))
-              .get(item('verified')('id'))
-              .pluck('brand', 'url')
-              .default({ brand: '', url: '' }),
+            source: r.table('sources')
+              .get(item('sourceId'))
+              .pluck('brand', 'url', 'isReliable')
+              .default({
+                brand: '',
+                url: '',
+                isReliable: false,
+              }),
           }
         ))
         .run(conn);

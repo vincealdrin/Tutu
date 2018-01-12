@@ -8,3 +8,4 @@
 .row { align-items: flex-start !important; }
 .article-item { padding: 0 !important; }
 .article-info { height: 100%; }
+.article-info p { text-align: justify; } 

@@ -18,20 +18,13 @@ const CarouselSlide = ({
   index,
   activeIndex,
 }) => (
-  <li
-      className={
-        index === activeIndex
-          ?
-          'carousel-slide carousel-slide-active'
-          :
-          'carousel-slide'
-      }
-    >
-				<List ordered>
-					{console.log(slide)}
-					{slide}
-				</List>
-    </li>
+	<div className={index === activeIndex ? 'carousel-slide carousel-slide-active' : 'carousel-slide'}>
+	<List ordered>
+			{slide.map((cont) => (
+				<List.Item className="carousel-slide-content">{cont}</List.Item>
+			))}
+		</List>
+	</div>
 );
 
 const CarouselSummaryNumber = ({
@@ -39,29 +32,25 @@ const CarouselSummaryNumber = ({
   activeIndex,
 }) => (
   <li
-      className={
+    className={
         index === activeIndex
           ?
           'carousel-slide carousel-slide-active'
           :
           'carousel-slide'
       }
-    >
-      <p className="carousel-slide-content article-tags">
-        Summary {index + 1}
-      </p>
-    </li>
+  />
 );
 
-class Carousel extends Component {
+class SourcesCarousel extends Component {
   state = {
     activeIndex: 0,
   };
 
   goToPreviousSlide = () => {
     let { activeIndex } = this.state;
-    const { content = [] } = this.props;
-    const summaryLength = content.length;
+    const { reliableContent } = this.props;
+    const summaryLength = reliableContent.length;
 
     this.setState({
       activeIndex: activeIndex < 1 ? activeIndex = summaryLength - 1 : activeIndex - 1,
@@ -70,8 +59,8 @@ class Carousel extends Component {
 
   goToNextSlide = () => {
     let { activeIndex } = this.state;
-    const { content } = this.props;
-    const summaryLength = content.length - 1;
+    const { reliableContent } = this.props;
+    const summaryLength = reliableContent.length - 1;
 
     this.setState({
       activeIndex: activeIndex === summaryLength ? activeIndex = 0 : activeIndex + 1,
@@ -79,31 +68,40 @@ class Carousel extends Component {
   }
 
   render() {
-    const { content = [] } = this.props;
+    const {
+			activeItem,
+			reliableContent = [],
+			unreliableContent = []
+		} = this.props;
     const { activeIndex } = this.state;
 
     return (
       <div className="carousel">
         <ul className="carousel-slides">
-					{content.map((rawr) => (
-						<CarouselSlide
-						activeIndex={activeIndex}
-						slide={rawr}
-					/>
-					))}
+					{activeItem === 'reliable' ? (
+						reliableContent.map((content, index) => (
+							<CarouselSlide
+								key={shortid.generate()}
+								index={index}
+								activeIndex={activeIndex}
+								slide={content}
+							/>
+						))
+					) : (
+						unreliableContent.map((content, index) => (
+							<CarouselSlide
+								key={shortid.generate()}
+								index={index}
+								activeIndex={activeIndex}
+								slide={content}
+							/>
+						))
+					)
+					}
         </ul>
 
         <div className="carousel-arrows">
           <CarouselArrow onClick={this.goToPreviousSlide} direction="left" />
-          <ul className="carousel-slides">
-            {content.map((sum, index) => (
-              <CarouselSummaryNumber
-                key={shortid.generate()}
-                index={index}
-                activeIndex={activeIndex}
-              />
-            ))}
-          </ul>
           <CarouselArrow onClick={this.goToNextSlide} direction="right" />
         </div>
       </div>
@@ -111,4 +109,4 @@ class Carousel extends Component {
   }
 }
 
-export default Carousel;
+export default SourcesCarousel;

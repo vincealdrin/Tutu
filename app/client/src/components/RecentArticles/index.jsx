@@ -1,5 +1,14 @@
 import React, { Component } from 'react';
-import { Grid, Image, Header, Divider, Label, Segment, Button, Dimmer } from 'semantic-ui-react';
+import {
+	Grid,
+	Image,
+	Header,
+	Divider,
+	Label,
+	Segment,
+	Button,
+	Dimmer,
+	Loader } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
@@ -49,7 +58,7 @@ class RecentArticles extends Component {
         <Segment>
 					{fetchStatus.pending ? (
 						<Dimmer active inverted>
-							<Header as="h4">Loading article...</Header>
+							<Loader inverted content="Loading articles..." />
 						</Dimmer>
 					) : null}
           <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Recent Articles</Label>

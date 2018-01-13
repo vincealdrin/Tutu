@@ -254,7 +254,7 @@ module.exports = (conn, io) => {
       };
 
       const { changes: insertedVals } = await r.table('sources')
-        .insert(newSource, { returnChanges: true })
+        .insert(newSource, { returnChanges: true, conflict: 'update' })
         .run(conn);
       const insertedVal = insertedVals[0].new_val;
 

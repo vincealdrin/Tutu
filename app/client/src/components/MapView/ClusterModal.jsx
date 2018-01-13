@@ -126,7 +126,7 @@ class ClusterModal extends Component {
                 </Grid.Column>
                 <Grid.Column width={5}>
                   <div className="news-summary">
-                    <Carousel content={summary} />
+                    {summary}
                   </div>
                   <div className="related-stories">
                     <RelatedArticles content={relatedArticles} />

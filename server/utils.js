@@ -236,7 +236,7 @@ module.exports.mapArticleInfo = (catsFilterLength = 2) => (article) => ({
   organizations: article('organizations'),
   publishDate: article('publishDate'),
   sentiment: getSentiment(article('sentiment')),
-  summary: article('summary'),
+  summary: article('summary').nth(0),
   relatedArticles: article('relatedArticles'),
   // locations: article('locations').map((location) => r.branch(
   //   location('found').eq('location'),

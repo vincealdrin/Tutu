@@ -77,7 +77,6 @@ module.exports = (conn, io) => {
         id: await r.uuid(sourceUrl).run(conn),
         url: cleanUrl(sourceUrl),
         timestamp: r.now().inTimezone(PH_TIMEZONE),
-        isVerified: false,
         brand,
         isReliablePred,
         aboutUsUrl,
@@ -87,10 +86,9 @@ module.exports = (conn, io) => {
         worldRank,
         faviconUrl,
         title,
-      }).run(conn);
+      }, { conflict: 'update' }).run(conn);
 
       res.json({
-        isVerified: false,
         isReliable: isReliablePred,
         pct,
         sourcePct,

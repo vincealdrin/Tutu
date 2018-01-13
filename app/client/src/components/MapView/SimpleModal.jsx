@@ -152,7 +152,7 @@ class SimpleModal extends Component {
           </p>
           <Label as="a" href={`http://${sourceUrl}`} target="_blank" circular style={{ marginBottom: '0.6rem' }}>{source}</Label>
           <div className="carousel-container">
-            <Carousel content={summary} />
+            {summary}
           </div>
           <RelatedArticles content={relatedArticles} />
           <div className="extras">

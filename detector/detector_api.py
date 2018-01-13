@@ -20,6 +20,7 @@ from fake_useragent import UserAgent
 from requests import get
 from lxml import etree
 from flask import Flask, request, jsonify
+from urllib.parse import urlparse
 
 SHARED_COUNT_API_KEY = os.environ.get('SHARED_COUNT_API_KEY')
 PROXY_IP = os.environ.get('PROXY_IP')
@@ -163,7 +164,7 @@ def predict():
 
     world_rank = 0
     country_rank = 0
-    domain = info['url']
+    domain = info['url'].replace(urlparse(info['url']).path, '')
     for x in tree.xpath('/ALEXA/SD/POPULARITY'):
         world_rank = int(x.get('TEXT')) if x.get('TEXT') else 0
         domain = x.get('URL') if x.get('URL') else ''
@@ -183,8 +184,8 @@ def predict():
         'sourceHasAboutPage': info['sourceHasAboutPage'],
         'sourceHasContactPage': info['sourceHasContactPage'],
         'sourceSocialScore': source_soc_score,
-        'sourceCountryRank': country_rank,
-        'sourceWorldRank': world_rank,
+        'sourceCountryRank':  999999999 if country_rank == 0 else country_rank,
+        'sourceWorldRank': 999999999 if world_rank == 0 else world_rank,
     })
     print(domain)
     test = pd.DataFrame(
@@ -197,8 +198,8 @@ def predict():
             'sourceHasContactPage': info['sourceHasContactPage'],
             'sentiment': sent_val,
             'sourceSocialScore': source_soc_score,
-            'sourceCountryRank': country_rank,
-            'sourceWorldRank': world_rank,
+            'sourceCountryRank':  999999999 if country_rank == 0 else country_rank,
+            'sourceWorldRank': 999999999 if world_rank == 0 else world_rank,
         },
         index=[0])
     body_test = test.body.values

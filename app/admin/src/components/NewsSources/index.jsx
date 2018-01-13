@@ -48,10 +48,9 @@ const pendingColumns = [
     text: 'Brand',
   },
   {
-    key: 'isReliable',
-    accessor: (val) => val.prediction.isReliable,
-    wrapper: (val) => (val ? 'Yes' : 'No'),
-    text: 'Reliable',
+    key: 'isReliablePred',
+    wrapper: (val) => (val ? 'Reliable' : 'Unreliable'),
+    text: 'Prediction',
   },
   {
     key: 'timestamp',
@@ -200,7 +199,7 @@ class Sources extends Component {
                       />
                       <Button
                         color="red"
-                        content="Not Reliable"
+                        content="Unreliable"
                         onClick={() => this.props.verifyPendingSource(id, false)}
                       />
                     </div>

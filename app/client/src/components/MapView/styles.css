@@ -289,8 +289,7 @@
 .carousel-slide {
   display: none;
   max-width: 400px;
-  margin: auto;
-  text-align: center;
+  margin: 0 0 2rem;
   list-style: none;
 }
 
@@ -308,10 +307,4 @@
 .carousel-slide-content {
   /* margin-bottom: 1.6rem !important; */
   margin: auto;
-}
-
-.carousel-arrows {
-  display: flex;
-  justify-content: space-between;
-  align-content: center;
 }

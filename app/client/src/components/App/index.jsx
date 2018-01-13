@@ -13,9 +13,9 @@ import Filter from '../Filter';
 import About from '../About';
 import Categories from '../Categories';
 import Submit from '../Submit';
+import Sources from '../Sources';
 import Insights from '../Insights';
 import MapThemes from '../MapThemes';
-import Counter from '../Counter';
 import './styles.css';
 
 axios.defaults.baseURL = '/api/exposed';
@@ -25,7 +25,7 @@ const App = () => (
     <main className="app-container">
       <Switch>
         <Route
-          path="/(popular|recent|preferences|about|categories|submit|themes)?"
+          path="/(popular|recent|preferences|about|categories|submit|themes|sources)?"
           component={MapView}
           exact
         />
@@ -43,6 +43,7 @@ const App = () => (
         <Route path="(.*)/submit" component={Submit} exact />
         <Route path="(.*)/categories" component={Categories} exact />
         <Route path="(.*)/themes" component={MapThemes} exact />
+        <Route path="(.*)/sources" component={Sources} exact />
         <Redirect to="/" />
       </Switch>
     </AppSidebar>

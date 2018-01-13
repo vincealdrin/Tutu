@@ -11,7 +11,7 @@ from requests.exceptions import Timeout
 # start CoreNLP server
 # java -mx4g -cp "*" --add-modules java.xml.bind edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
 
-non_org = ['Purok']
+non_org = ['Purok', 'CNN']
 non_person = ['Brgy']
 def get_entities(text):
     sttok = CoreNLPTokenizer(url='http://localhost:9000')

@@ -157,13 +157,13 @@ def predict():
     else:
         sent_val = 2
 
-    xml_str = get('http://data.alexa.com/data?cli=10&url=' + a.url)
+    xml_str = get('http://data.alexa.com/data?cli=10&url=' + info['url'])
     tree = etree.fromstring(xml_str.text.encode('utf-8'))
     etree.strip_tags(tree, etree.Comment)
 
     world_rank = 0
     country_rank = 0
-    domain = a.url
+    domain = info['url']
     for x in tree.xpath('/ALEXA/SD/POPULARITY'):
         world_rank = int(x.get('TEXT')) if x.get('TEXT') else 0
         domain = x.get('URL') if x.get('URL') else ''

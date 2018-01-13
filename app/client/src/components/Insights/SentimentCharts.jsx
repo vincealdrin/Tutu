@@ -4,12 +4,16 @@ import { Line, Pie } from 'react-chartjs-2';
 import { getLineDataset } from '../../utils';
 
 class SentimentCharts extends Component {
-	render() {
-		const {
-			sentiment = [],
-		} = this.props;
+  componentDidMount() {
+    this.props.fetchSentimentInsights();
+  }
 
-		const sentimentLineData = {
+  render() {
+    const {
+      sentiment = [],
+    } = this.props;
+
+    const sentimentLineData = {
       labels: sentiment.labels,
       datasets: getLineDataset([
         {
@@ -28,8 +32,8 @@ class SentimentCharts extends Component {
           data: sentiment.negCount,
         },
       ]),
-		};
-		const sentimentPieData = {
+    };
+    const sentimentPieData = {
       labels: [
         'Positive',
         'Neutral',
@@ -49,13 +53,13 @@ class SentimentCharts extends Component {
       }],
     };
 
-		return (
-			<div>
-				<Line data={sentimentLineData} />
-				<Pie data={sentimentPieData} />
-			</div>
-		)
-	}
+    return (
+      <div>
+        <Line data={sentimentLineData} />
+        <Pie data={sentimentPieData} />
+      </div>
+    );
+  }
 }
 
 export default SentimentCharts;

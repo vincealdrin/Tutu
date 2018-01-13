@@ -26,5 +26,6 @@
   "emmet.triggerExpansionOnTab": true,
   "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
   "stylelint.enable": true,
-  "files.insertFinalNewline": true
+  "files.insertFinalNewline": true,
+  "editor.tabSize": 2
 }

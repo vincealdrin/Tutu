@@ -4,12 +4,17 @@ import { HorizontalBar, Bar, Line, Pie } from 'react-chartjs-2';
 import { getLineDataset } from '../../utils';
 
 class CategoriesCharts extends Component {
-	render() {
-		const {
-			categories = [],
-		} = this.props;
+  componentDidMount() {
+    console.log(this.props);
+    this.props.fetchCategoriesInsights();
+  }
 
-		const categoriesLineData = {
+  render() {
+    const {
+      categories = [],
+    } = this.props;
+
+    const categoriesLineData = {
       labels: categories.labels,
       datasets: getLineDataset([
         {
@@ -41,11 +46,6 @@ class CategoriesCharts extends Component {
           label: 'Lifestyle',
           color: '255,253,0',
           data: categories.lifeCount,
-        },
-        {
-          label: 'Nation',
-          color: '36,125,232',
-          data: categories.nationCount,
         },
         {
           label: 'Sports',
@@ -97,7 +97,6 @@ class CategoriesCharts extends Component {
         'Environment',
         'Health',
         'Lifestyle',
-        'Nation',
         'Politics',
         'Sports',
         'Weather',
@@ -115,7 +114,6 @@ class CategoriesCharts extends Component {
           categories.envCount.reduce((a, b) => (a + b), 0),
           categories.healthCount.reduce((a, b) => (a + b), 0),
           categories.lifeCount.reduce((a, b) => (a + b), 0),
-          categories.nationCount.reduce((a, b) => (a + b), 0),
           categories.polCount.reduce((a, b) => (a + b), 0),
           categories.sportsCount.reduce((a, b) => (a + b), 0),
           categories.weatherCount.reduce((a, b) => (a + b), 0),
@@ -153,7 +151,6 @@ class CategoriesCharts extends Component {
         'Environment',
         'Health',
         'Lifestyle',
-        'Nation',
         'Politics',
         'Sports',
         'Weather',
@@ -189,7 +186,6 @@ class CategoriesCharts extends Component {
             categories.crimeCount.reduce((a, b) => (a + b), 0),
             categories.weatherCount.reduce((a, b) => (a + b), 0),
             categories.cultureCount.reduce((a, b) => (a + b), 0),
-            categories.nationCount.reduce((a, b) => (a + b), 0),
             categories.envCount.reduce((a, b) => (a + b), 0),
             categories.busFinCount.reduce((a, b) => (a + b), 0),
             categories.disAccCount.reduce((a, b) => (a + b), 0),
@@ -201,14 +197,14 @@ class CategoriesCharts extends Component {
       ],
     };
 
-		return (
-			<div>
-				<Line data={categoriesLineData} />
-				<Pie data={categoriesPieData} />
-				<HorizontalBar data={categoriesBarData} />
-			</div>
-		)
-	}
+    return (
+      <div>
+        <Line data={categoriesLineData} />
+        <Pie data={categoriesPieData} />
+        <HorizontalBar data={categoriesBarData} />
+      </div>
+    );
+  }
 }
 
 export default CategoriesCharts;

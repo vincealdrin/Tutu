@@ -16,7 +16,6 @@ import SentimentCharts from './SentimentCharts';
 import CategoriesCharts from './CategoriesCharts';
 import InsightWordCloud from './InsightWordCloud';
 import TopTen from './TopTen';
-import { getLineDataset } from '../../utils';
 import './styles.css';
 
 const mapStateToProps = ({
@@ -56,188 +55,158 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 }, dispatch);
 
 class Insights extends Component {
-	state = {
-		activeCard: 'mainMenu',
-		labelDesc: 'Insights'
-	};
+  state = {
+    activeCard: 'mainMenu',
+    labelDesc: 'Insights',
+  };
 
-  render() {
-		const { activeCard, labelDesc } = this.state;
+  renderSegment = (icon, header, desc) => (
+    <Segment
+      raised
+      textAlign="center"
+      className="insight-menu-item"
+      onClick={() => this.setState({
+        activeCard: header,
+        labelDesc: header,
+      })}
+    >
+      <Icon name={icon} color="grey" size="big" />
+      <Header className="insight-menu-name">{header}</Header>
+      <p>{desc}</p>
+    </Segment>
+  )
+
+  renderCharts = () => {
     const {
-      ids,
       sentiment,
       categories,
       topKeywords,
       topPeople,
-      topLocations,
       topOrgs,
-      isModalOpen,
-      isFocused,
+      topLocations,
+      ids,
     } = this.props;
+
+    switch (this.state.activeCard) {
+      case 'Sentiments':
+        return (
+          <SentimentCharts
+            sentiment={sentiment}
+            fetchSentimentInsights={() => this.props.fetchSentimentInsights(ids)}
+          />
+        );
+      case 'Categories':
+        return (
+          <CategoriesCharts
+            categories={categories}
+            fetchCategoriesInsights={() => this.props.fetchCategoriesInsights(ids)}
+          />
+        );
+      case 'WordCloud':
+        return (
+          <InsightWordCloud
+            wordCloud={topKeywords.map(({ keyword, count }) => ({
+              text: keyword,
+              value: count,
+            }))}
+            fetchWordCloud={(count = 200) => this.props.fetchTopInsights(ids, 'keywords', count)}
+          />
+        );
+      case 'Top Ten':
+        return (
+          <TopTen
+            topPeople={topPeople}
+            topOrgs={topOrgs}
+            topLocations={topLocations}
+            fetchTopInsights={(field, count = 10) => this.props.fetchTopInsights(ids, field, count)}
+          />
+        );
+      case 'mainMenu':
+        return (
+          <div>
+            <Grid>
+              <Grid.Row columns={2}>
+                <Grid.Column>
+                  {this.renderSegment(
+                    'smile',
+                    'Sentiments',
+                    'This is supposed to be a long description but I made it short',
+                  )}
+                </Grid.Column>
+                <Grid.Column>
+                  {this.renderSegment(
+                    'tags',
+                    'Categories',
+                    'This is supposed to be a long description but I made it short',
+                  )}
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row columns={2}>
+                <Grid.Column>
+                  {this.renderSegment(
+                    'cloud',
+                    'WordCloud',
+                    'This is supposed to be a long description but I made it short',
+                  )}
+                </Grid.Column>
+                <Grid.Column>
+                  {this.renderSegment(
+                    'ordered list',
+                    'Top Ten',
+                    'This is supposed to be a long description but I made it short',
+                  )}
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </div>
+        );
+      default:
+        return <p>NONE</p>;
+    }
+  }
+
+  render() {
+    const { activeCard, labelDesc } = this.state;
+    const { isModalOpen, isFocused } = this.props;
 
     return (
       <div>
         {!isModalOpen && !isFocused ? (
-					<Button
-					content="Insights"
-					icon="bar chart"
-					labelPosition="left"
-            onClick={() => {
-							this.props.openModal();
-              this.props.fetchTopInsights(ids, 'people', 10);
-              this.props.fetchTopInsights(ids, 'organizations', 10);
-              this.props.fetchTopInsights(ids, 'locations', 10);
-              this.props.fetchTopInsights(ids, 'keywords', 300);
-              this.props.fetchSentimentInsights(ids);
-              this.props.fetchCategoriesInsights(ids);
-            }}
+          <Button
+            content="Insights"
+            icon="bar chart"
+            labelPosition="left"
+            onClick={this.props.openModal}
           />
         ) : null}
         <Modal
-					open={isModalOpen}
+          open={isModalOpen}
           onClose={() => {
-						this.props.closeModal;
-						this.setState({ activeCard: 'mainMenu' });
-					}}
-					closeOnDimmerClick
+            this.props.closeModal();
+            this.setState({ activeCard: 'mainMenu' });
+          }}
+          closeOnDimmerClick
         >
-					<Label as="a" color="teal" size="huge" ribbon>{labelDesc}</Label>
-					<Button
-						as="a"
-						icon={activeCard === 'mainMenu' ? 'close' : 'long arrow left'}
-						floated="right"
-						color="red"
-						basic
-						content={activeCard === 'mainMenu' ? 'CLOSE' : 'BACK'}
-						onClick={() => {activeCard === 'mainMenu'
-							? (
-								this.props.closeModal()
-							)
-							: (
-								this.setState({ activeCard: 'mainMenu', labelDesc: 'Insights' })
-							)
-						}}
-						/>
+          <Label as="a" color="teal" size="huge" ribbon>{labelDesc}</Label>
+          <Button
+            as="a"
+            icon={activeCard === 'mainMenu' ? 'close' : 'long arrow left'}
+            floated="right"
+            color="red"
+            basic
+            content={activeCard === 'mainMenu' ? 'CLOSE' : 'BACK'}
+            onClick={() => (activeCard === 'mainMenu'
+              ? this.props.closeModal()
+              : this.setState({ activeCard: 'mainMenu', labelDesc: 'Insights' }))
+            }
+          />
           <Modal.Content scrolling>
-						<InsightMenu
-							theState={this}
-							labelDesc={labelDesc}
-							activeCard={activeCard}
-							sentiment={sentiment}
-							categories={categories}
-							wordCloud={topKeywords}
-							topPeople={topPeople}
-							topLocations={topLocations}
-							topOrgs={topOrgs}
-						/>
+            {this.renderCharts()}
           </Modal.Content>
         </Modal>
       </div>
     );
   }
-}
-
-const InsightMenuItemSegments = ({
-	icon,
-	header,
-	desc,
-	theState
-}) => (
-	<Segment
-		raised
-		textAlign="center"
-		className="insight-menu-item"
-		onClick={() => theState.setState({
-			activeCard: header,
-			labelDesc: header
-		})}
-	>
-		<Icon name={icon} color="grey" size="big" />
-		<Header className="insight-menu-name">{header}</Header>
-		<p>{desc}</p>
-	</Segment>
-)
-
-const InsightMenu = ({
-	theState,
-	labelDesc,
-	activeCard,
-	sentiment,
-	categories,
-	wordCloud,
-	topPeople,
-	topLocations,
-	topOrgs
-}) => {
-	let insightMenuItem;
-	switch (activeCard) {
-		case 'Sentiments' : {
-			insightMenuItem = <SentimentCharts sentiment={sentiment} />
-			break;
-		}
-		case 'Categories' : {
-			insightMenuItem = <CategoriesCharts categories={categories} />
-			break;
-		}
-		case 'WordCloud' : {
-			insightMenuItem = <InsightWordCloud wordCloud={wordCloud} />
-			break;
-		}
-		case 'Top Ten' : {
-			insightMenuItem = <TopTen
-				topPeople={topPeople}
-				topOrgs={topOrgs}
-				topLocations={topLocations}
-			/>
-			break;
-		}
-		case 'mainMenu' : {
-			insightMenuItem = (<div>
-				<Grid>
-					<Grid.Row columns={2}>
-					<Grid.Column>
-						<InsightMenuItemSegments
-							icon="smile"
-							header="Sentiments"
-							desc="This is supposed to be a long description but I made it short"
-							theState={theState}
-						/>
-					</Grid.Column>
-					<Grid.Column>
-						<InsightMenuItemSegments
-							icon="tags"
-							header="Categories"
-							desc="This is supposed to be a long description but I made it short"
-							theState={theState}
-						/>
-					</Grid.Column>
-					</Grid.Row>
-					<Grid.Row columns={2}>
-						<Grid.Column>
-							<InsightMenuItemSegments
-							icon="cloud"
-							header="WordCloud"
-							desc="This is supposed to be a long description but I made it short"
-							theState={theState}
-						/>
-						</Grid.Column>
-						<Grid.Column>
-							<InsightMenuItemSegments
-							icon="ordered list"
-							header="Top Ten"
-							desc="This is supposed to be a long description but I made it short"
-							theState={theState}
-						/>
-						</Grid.Column>
-					</Grid.Row>
-				</Grid>
-			</div>)
-		}
-		default: {
-			<p>NONE</p>
-		}
-	}
-	return insightMenuItem;
 }
 
 export default connect(

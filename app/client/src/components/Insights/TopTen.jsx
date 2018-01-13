@@ -4,48 +4,45 @@ import { HorizontalBar } from 'react-chartjs-2';
 import { getLineDataset } from '../../utils';
 
 const ActiveMenuItem = ({
-	activeItem,
-	peopleBarData,
-	orgsBarData,
-	locationsBarData
-	}) => {
-	let theItem;
-	switch (activeItem) {
-		case 'people': {
-			theItem = <HorizontalBar data={peopleBarData} />
-			break;
-		}
-		case 'orgs': {
-			theItem = <HorizontalBar data={orgsBarData} />
-			break;
-		}
-		case 'locations': {
-			theItem = <HorizontalBar data={locationsBarData} />
-			break;
-		}
-		default:
-			<p>No Item</p>
-	}
-	return (
-	<div>
-		{theItem}
-	</div>
-	)
-}
+  activeItem,
+  peopleBarData,
+  orgsBarData,
+  locationsBarData,
+}) => {
+  switch (activeItem) {
+    case 'people': {
+      return <HorizontalBar data={peopleBarData} />;
+    }
+    case 'orgs': {
+      return <HorizontalBar data={orgsBarData} />;
+    }
+    case 'locations': {
+      return <HorizontalBar data={locationsBarData} />;
+    }
+    default:
+      return <p>No Item</p>;
+  }
+};
 
 class TopTen extends Component {
-	state = { activeItem: 'people' };
+  state = { activeItem: 'people' };
 
-	changeItem = (_, { name }) => this.setState({ activeItem: name });
-	render() {
-		const { activeItem } = this.state;
-		const {
-			topPeople = [],
-			topLocations = [],
-			topOrgs = []
-		} = this.props;
+  componentDidMount() {
+    this.props.fetchTopInsights('people');
+    this.props.fetchTopInsights('organizations');
+    this.props.fetchTopInsights('locations');
+  }
 
-		const peopleBarData = {
+  changeItem = (_, { name }) => this.setState({ activeItem: name });
+  render() {
+    const { activeItem } = this.state;
+    const {
+      topPeople = [],
+      topLocations = [],
+      topOrgs = [],
+    } = this.props;
+
+    const peopleBarData = {
       type: 'horizontalBar',
       labels: topPeople.map(({ person }) => person),
       datasets: [
@@ -118,22 +115,22 @@ class TopTen extends Component {
       ],
     };
 
-		return (
-			<div>
-				<Menu pointing secondary>
-					<Menu.Item name="people" active={activeItem === 'people'} onClick={this.changeItem} />
-					<Menu.Item name="orgs" active={activeItem === 'orgs'} onClick={this.changeItem} />
-					<Menu.Item name="locations" active={activeItem === 'locations'} onClick={this.changeItem} />
-				</Menu>
-				<ActiveMenuItem
-					activeItem={activeItem}
-					peopleBarData={peopleBarData}
-					orgsBarData={orgsBarData}
-					locationsBarData={locationsBarData}
-				/>
-			</div>
-		)
-	}
+    return (
+      <div>
+        <Menu pointing secondary>
+          <Menu.Item name="people" active={activeItem === 'people'} onClick={this.changeItem} />
+          <Menu.Item name="orgs" active={activeItem === 'orgs'} onClick={this.changeItem} />
+          <Menu.Item name="locations" active={activeItem === 'locations'} onClick={this.changeItem} />
+        </Menu>
+        <ActiveMenuItem
+          activeItem={activeItem}
+          peopleBarData={peopleBarData}
+          orgsBarData={orgsBarData}
+          locationsBarData={locationsBarData}
+        />
+      </div>
+    );
+  }
 }
 
 export default TopTen;

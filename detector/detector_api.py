@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import LinearSVC
+from sklearn.svm import SVC, LinearSVC
 from sklearn.metrics import f1_score, accuracy_score, recall_score, precision_score
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
@@ -21,6 +21,7 @@ from requests import get
 from lxml import etree
 from flask import Flask, request, jsonify
 from urllib.parse import urlparse
+import numpy as np
 
 SHARED_COUNT_API_KEY = os.environ.get('SHARED_COUNT_API_KEY')
 PROXY_IP = os.environ.get('PROXY_IP')
@@ -74,6 +75,8 @@ print(real_df.shape)
 print(fake_df.shape)
 df = pd.concat([real_df, fake_df])
 df['bodyLength'] = df['body'].apply(lambda body: len(body.split()))
+# df['sourceHasImptPage'] = np.where((df['sourceHasContactPage'] | df['sourceHasAboutPage']), 1, 0)
+
 other_df = df.drop(
     [
         'reliable',
@@ -82,15 +85,17 @@ other_df = df.drop(
         'hasTopImage',
         'socialScore',
         'sentiment',
-        # 'sourceSocialScore',
+        'sourceSocialScore',
         'bodyLength',
-        # 'sourceHasContactPage',
-        # 'sourceHasAboutPage',
-        'sourceCountryRank',
+        'sourceHasContactPage',
+        'sourceHasAboutPage',
+        # 'sourceCountryRank',
         # 'sourceWorldRank',
     ],
     axis=1)
+
 print(other_df.columns.values)
+print(other_df.tail())
 X_body = df.body.values
 y = df.reliable.values
 
@@ -102,7 +107,7 @@ tfidf = TfidfVectorizer(
     token_pattern=r'(?ui)\b\w*[a-z]{2}\w*\b',
     stop_words=STOP_WORDS,
     ngram_range=(1, 2),
-    max_df=0.90,
+    max_df=0.85,
     min_df=0.01)
 
 X_body_tfidf = tfidf.fit_transform(X_body)
@@ -111,7 +116,7 @@ title_tfidf = TfidfVectorizer(
     token_pattern=r'(?ui)\b\w*[a-z]{2}\w*\b',
     stop_words=STOP_WORDS,
     ngram_range=(1, 3),
-    max_df=0.90,
+    max_df=0.85,
     min_df=0.01)
 X_title_tfidf = title_tfidf.fit_transform(X_title)
 
@@ -131,6 +136,9 @@ lr_content_clf.fit(x_content, y)
 knn_clf = KNeighborsClassifier()
 knn_clf.fit(x, y)
 
+svc_clf = SVC(probability=True)
+svc_clf.fit(x, y)
+
 lsvc_clf = LinearSVC()
 lsvc_clf.fit(x, y)
 
@@ -148,6 +156,9 @@ def predict():
     a = Article('')
     a.set_html(info['body'])
     a.parse()
+
+    if len(a.text.split()) < 50:
+        return 'Please enter a valid article url from the source', 400
 
     sentiment = SentimentIntensityAnalyzer().polarity_scores(a.text)
 
@@ -194,8 +205,7 @@ def predict():
             'body': body,
             'hasTopImage': 1 if a.top_image else 0,
             'bodyLength': len(body.split()),
-            'sourceHasAboutPage': info['sourceHasAboutPage'],
-            'sourceHasContactPage': info['sourceHasContactPage'],
+            # 'sourceHasImptPage': 1 if info['sourceHasAboutPage'] or info['sourceHasContactPage'] else 0,
             'sentiment': sent_val,
             'sourceSocialScore': source_soc_score,
             'sourceCountryRank':  999999999 if country_rank == 0 else country_rank,
@@ -211,11 +221,11 @@ def predict():
             'body',
             'hasTopImage',
             'sentiment',
-            # 'sourceSocialScore',
+            'sourceSocialScore',
             'bodyLength',
             # 'sourceHasContactPage',
             # 'sourceHasAboutPage',
-            'sourceCountryRank',
+            # 'sourceCountryRank',
             # 'sourceWorldRank',
         ],
         axis=1)
@@ -236,8 +246,10 @@ def predict():
     lr_content_proba = lr_content_clf.predict_proba(test_content_df)[0]
 
     knn_pred = knn_clf.predict(test_df)[0]
-    lsvc_pred = lsvc_clf.predict(test_df)[0]
-    result = nb_pred + lr_pred + knn_pred
+    svc_pred = svc_clf.predict(test_df)[0]
+    svc_proba = svc_clf.predict_proba(test_df)[0]
+
+    result = svc_pred + lr_pred + knn_pred
     prediction = result > 1
 
     print('nb')
@@ -248,8 +260,12 @@ def predict():
     print(lr_pred)
     print(lr_proba)
 
+    print('svc')
+    print(svc_pred)
+    print(svc_proba)
+
     print('lsvc')
-    print(lsvc_pred)
+    print(lsvc_clf.predict(test_df)[0])
 
     print('knn')
     print(knn_pred)
@@ -258,6 +274,7 @@ def predict():
     # print('Prediction: ' + 'reliable' if pred else 'not reliable')
 
     return jsonify({
+        'overallPred': bool(prediction),
         'reliable': bool(lr_pred),
         'pct': lr_proba[1] * 100,
         'sourcePct': lr_source_proba[1] * 100,

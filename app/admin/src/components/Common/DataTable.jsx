@@ -121,7 +121,7 @@ class DataTable extends PureComponent {
                     </Modal.Description>
                   </Modal.Content>
                   <Modal.Actions>
-                    {addModalActions(this.cancelAdd)}
+                    {addModalActions && addModalActions(this.cancelAdd)}
                   </Modal.Actions>
                 </Modal>
                 ) : null}

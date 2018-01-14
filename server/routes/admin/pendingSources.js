@@ -254,14 +254,14 @@ module.exports = (conn, io) => {
       };
 
       const { changes: insertedVals } = await r.table('sources')
-        .insert(newSource, { returnChanges: true, conflict: 'update' })
+        .insert(newSource, { returnChanges: true, conflict: 'replace' })
         .run(conn);
       const insertedVal = insertedVals[0].new_val;
 
       await r.table('usersFeed').insert({
         userId: req.user.id,
         type: 'verify',
-        timestamp: insertedVal.timestamp,
+        timestamp: r.expr(insertedVal.timestamp).inTimezone(PH_TIMEZONE),
         sourceId: newSource.id,
         table: tbl,
         isReliable,

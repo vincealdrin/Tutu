@@ -47,10 +47,6 @@ initDb((conn) => {
     console.log(`${socket.id} has connected`);
   });
 
-  ioClient.on('connection', (socket) => {
-    // console.log(`${socket.id} has connected`);
-  });
-
   startIoAdmin(io, conn);
   startIoClient(ioClient, conn);
 

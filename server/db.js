@@ -30,6 +30,7 @@ module.exports = async (cb) => {
       'provinces',
       'crawlerLogs',
       'usersFeed',
+      'visitors',
     ];
 
     r.dbCreate(DB_NAME).run(conn, async (err) => {

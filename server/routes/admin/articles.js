@@ -5,19 +5,41 @@ module.exports = (conn, io) => {
   const tbl = 'articles';
 
   router.get('/', async (req, res, next) => {
-    const { page = 0, limit = 20 } = req.query;
+    const {
+      page = 0,
+      limit = 15,
+      filter = '',
+      search = '',
+    } = req.query;
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
 
     try {
-      const cursor = await r.table(tbl)
-        .skip(page * limit)
-        .limit(limit)
-        .orderBy(r.desc('timestamp'))
-        .run(conn);
-      const articles = await cursor.toArray();
+      let query = r.table(tbl);
 
-      // const totalCount = await query.count().run(conn);
+      if (filter && search) {
+        query = query.filter((source) => source(filter).match(`(?i)${search}`));
+      }
+
+      const totalCount = await query.count().run(conn);
+      const cursor = await query
+        .orderBy(r.desc('timestamp'))
+        .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
+        .eqJoin('sourceId', r.table('sources'))
+        .map({
+          timestamp: r.row('left')('timestamp'),
+          id: r.row('left')('id'),
+          publishDate: r.row('left')('publishDate'),
+          title: r.row('left')('title'),
+          url: r.row('left')('url'),
+          authors: r.row('left')('authors'),
+          sourceUrl: r.row('right')('url'),
+        })
+        .run(conn);
+      const users = await cursor.toArray();
+
       res.setHeader('X-Total-Count', totalCount);
-      return res.json(articles);
+      res.json(users);
     } catch (e) {
       next(e);
     }

@@ -2,6 +2,7 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
+const requestIp = require('request-ip');
 const {
   cleanUrl,
   getAboutContactUrl,
@@ -61,6 +62,7 @@ module.exports = (conn, io) => {
         socialScore,
         countryRank,
         worldRank,
+        overallPred,
       } = await rp('http://localhost:5001/predict', {
         method: 'POST',
         body: {
@@ -71,12 +73,15 @@ module.exports = (conn, io) => {
         },
         json: true,
       });
-      const isReliablePred = Boolean(reliable);
+      const isReliablePred = Boolean(overallPred);
+      const ipAddress = requestIp.getClientIp(req);
+      const id = await r.uuid(sourceUrl).run(conn);
 
       await r.table('pendingSources').insert({
-        id: await r.uuid(sourceUrl).run(conn),
         url: cleanUrl(sourceUrl),
         timestamp: r.now().inTimezone(PH_TIMEZONE),
+        senderIpAddresses: [ipAddress],
+        id,
         brand,
         isReliablePred,
         aboutUsUrl,
@@ -88,15 +93,27 @@ module.exports = (conn, io) => {
         title,
       }, { conflict: 'update' }).run(conn);
 
+      await r.table('pendingSources').get(id).update({
+        sendersIpAddress: r.branch(
+          r.row('sendersIpAddress').contains(ipAddress),
+          r.row('sendersIpAddress'),
+          r.row('sendersIpAddress').append(ipAddress)
+        ),
+      }).run(conn);
+
       res.json({
-        isReliable: isReliablePred,
+        isReliable: Boolean(reliable),
         pct,
         sourcePct,
         contentPct,
         brand,
+        overallPred,
       });
     } catch (e) {
-      next(e);
+      next({
+        status: e.statusCode,
+        message: e.error || e.message,
+      });
     }
   });
 

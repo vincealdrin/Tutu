@@ -1,16 +1,14 @@
 import axios from 'axios';
-import { updateCrudStatus, crudStatus } from '../utils';
+import { updateCrudStatus, crudStatus, httpThunk } from '../utils';
 
 export const FETCH_ARTICLES = 'articles/FETCH_ARTICLES';
-export const CREATE_ARTICLE = 'articles/CREATE_ARTICLE';
 export const UPDATE_ARTICLE = 'articles/UPDATE_ARTICLE';
-export const DELETE_ARTICLES = 'articles/DELETE_ARTICLE';
-export const DECREMENT = 'articles/DECREMENT';
+export const DELETE_ARTICLES = 'articles/DELETE_SOURCE';
 
 const initialState = {
   articles: [],
+  totalCount: 0,
   fetchStatus: crudStatus,
-  createStatus: crudStatus,
   updateStatus: crudStatus,
   deleteStatus: crudStatus,
 };
@@ -22,34 +20,25 @@ export default (state = initialState, action) => {
         ...state,
         articles: action.articles || state.articles,
         fetchStatus: updateCrudStatus(action),
-      };
-    case CREATE_ARTICLE:
-      return {
-        ...state,
-        articles: [
-          ...action.articles,
-          action.newArticle,
-        ],
-        totalCount: action.statusText === 'success'
-          ? state.totalCount + action.articles.length
-          : state.totalCount,
-        createStatus: updateCrudStatus(action),
+        totalCount: action.totalCount || state.totalCount,
       };
     case UPDATE_ARTICLE:
       return {
         ...state,
-        articles: state.articles.map((article) => {
-          if (article.id === action.articleId) {
-            return action.updateArticle;
+        articles: state.articles.map((source) => {
+          if (source.id === action.sourceId) {
+            return action.updatedArticle;
           }
-          return article;
+          return source;
         }),
         updateStatus: updateCrudStatus(action),
       };
     case DELETE_ARTICLES:
       return {
         ...state,
-        articles: state.articles.filter((article) => action.deletedIds.includes(article.id)),
+        articles: action.statusText === 'success'
+          ? state.articles.filter((user) => !action.deletedIds.includes(user.id))
+          : state.articles,
         totalCount: action.statusText === 'success'
           ? state.totalCount - action.deletedIds.length
           : state.totalCount,
@@ -60,88 +49,65 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchArticles = () => async (dispatch) => {
-  dispatch({ type: FETCH_ARTICLES, statusText: 'pending' });
+export const fetchArticles = (page, limit, filter, search) =>
+  httpThunk(FETCH_ARTICLES, async () => {
+    try {
+      const { data: articles, status, headers } = await axios.get('/articles', {
+        params: {
+          page,
+          limit,
+          filter,
+          search,
+        },
+      });
 
-  try {
-    const articles = await axios.get('a');
+      return {
+        totalCount: parseInt(headers['x-total-count'], 10),
+        articles,
+        status,
+      };
+    } catch (e) {
+      return e;
+    }
+  });
 
-    dispatch({
-      type: FETCH_ARTICLES,
-      statusText: 'success',
-      articles,
-    });
-  } catch (e) {
-    dispatch({
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMessage: e.response.data.message,
-      type: FETCH_ARTICLES,
-    });
-  }
-};
 
-export const createArticle = (article) => async (dispatch) => {
-  dispatch({ type: CREATE_ARTICLE, statusText: 'pending' });
-
-  try {
-    const id = await axios.post('a', article);
-
-    dispatch({
-      type: CREATE_ARTICLE,
-      statusText: 'success',
-      newArticle: { ...article, id },
-    });
-  } catch (e) {
-    dispatch({
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMessage: e.response.data.message,
-      type: CREATE_ARTICLE,
-    });
-  }
-};
-
-export const updateArticle = (articleId, article, isIdChanged = false) => async (dispatch) => {
+export const updateArticle = (sourceId, source, isIdChanged = false) => async (dispatch) => {
   dispatch({ type: UPDATE_ARTICLE, statusText: 'pending' });
 
   try {
-    const endpoint = `/articles/${articleId}`;
+    const endpoint = `/articles/${sourceId}`;
     const path = isIdChanged ? `${endpoint}?isIdChanged=true` : endpoint;
-    const updatedArticle = await axios.put(path, article);
+    const updatedSource = await axios.put(path, source);
 
     dispatch({
       type: UPDATE_ARTICLE,
       statusText: 'success',
-      updatedArticle,
+      updatedSource,
     });
   } catch (e) {
     dispatch({
+      type: UPDATE_ARTICLE,
       statusText: 'error',
       status: e.response ? e.response.status : 500,
       errorMessage: e.response.data.message,
-      type: UPDATE_ARTICLE,
     });
   }
 };
 
-export const deleteArticles = (ids) => async (dispatch) => {
-  dispatch({ type: DELETE_ARTICLES, statusText: 'pending' });
-
+export const deleteArticles = (ids) => httpThunk(DELETE_ARTICLES, async () => {
   try {
-    await axios.put('/articles/', ids);
+    const { status } = await axios.delete('/articles', {
+      data: {
+        ids: ids.join(),
+      },
+    });
 
-    dispatch({
-      type: DELETE_ARTICLES,
-      statusText: 'success',
+    return {
       deletedIds: ids,
-    });
+      status,
+    };
   } catch (e) {
-    dispatch({
-      statusText: 'error',
-      status: e.response ? e.response.status : 500,
-      errorMessage: e.response.data.message,
-      type: DELETE_ARTICLES,
-    });
+    return e;
   }
-};
+});

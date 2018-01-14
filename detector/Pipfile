@@ -19,9 +19,10 @@ matplotlib = "*"
 htmldate = "*"
 requests = "*"
 python-dotenv = "*"
-pandas-ml = "*"
-flask = "*"
+pandas_ml = "*"
+Flask = "*"
 fake-useragent = "*"
+pythonwhois = "*"
 
 
 [dev-packages]

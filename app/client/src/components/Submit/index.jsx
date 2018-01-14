@@ -7,7 +7,9 @@ import './styles.css';
 class Submit extends Component {
   state = {
     submitStatus: '',
+    errorMessage: '',
     result: {
+      overallPred: false,
       isReliable: false,
       isVerified: false,
       result: 0,
@@ -28,6 +30,7 @@ class Submit extends Component {
           sourcePct,
           contentPct,
           pct,
+          overallPred,
         },
       } = await axios.get('/submit', {
         params: { url: this.state.url },
@@ -40,17 +43,21 @@ class Submit extends Component {
           pct,
           sourcePct,
           contentPct,
+          overallPred,
         },
         submitStatus: 'success',
+        errorMessage: '',
       });
     } catch (e) {
-      console.log(e);
-      this.setState({ submitStatus: 'error' });
+      this.setState({
+        submitStatus: 'error',
+        errorMessage: e.response.data.message,
+      });
     }
   }
 
   render() {
-    const { submitStatus, result } = this.state;
+    const { submitStatus, result, errorMessage } = this.state;
     return (
       <div>
         <Segment>
@@ -86,6 +93,10 @@ class Submit extends Component {
                   <span>
                     Result:
                     <ul>
+                      <li>overall prediction: {result.overallPred ? 'RELIABLE' : 'NOT RELIABLE'}</li>
+                      <li />
+                      <li />
+                      <li />
                       <li>prediction: {result.isReliable ? 'RELIABLE' : 'NOT RELIABLE'}</li>
                       <li>reliability ({result.pct.toFixed(2)}%)</li>
                       <li />
@@ -96,7 +107,7 @@ class Submit extends Component {
                     <p> {result.isVerified ? 'verified by journalists' : 'not verified by journalists tho'}</p>
                   </span>
                 ) : ''}
-                {submitStatus === 'error' ? 'error' : ''}
+                {submitStatus === 'error' ? errorMessage : ''}
               </Message.Header>
             </Message>
           </div>

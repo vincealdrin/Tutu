@@ -1,4 +1,4 @@
-const cheerio = require('cheerio');
+const whois = require('whois-json');
 const awis = require('awis');
 const _ = require('lodash');
 const { parseString } = require('xml2js');
@@ -67,6 +67,22 @@ module.exports.getAlexaRank = async (url) => {
   return info;
 };
 
+module.exports.getDomainCreationDate = (url) => new Promise((resolve, reject) => {
+  const validUrl = url
+    .replace(/https?:\/\//, '')
+    .replace(/\/$/, '')
+    .replace('www.', '');
+  console.log(validUrl);
+
+  whois(validUrl, (err, data) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(data.creationDate);
+    }
+  });
+});
+
 module.exports.getSocialScore = async (url) => {
   const reddit = await rp(`https://www.reddit.com/api/info.json?url=${url}`, {
     json: true,
@@ -124,10 +140,7 @@ const cleanUrl = (dirtyUrl = '', baseUrl = '') => {
     url = baseUrl + dirtyUrl;
   }
 
-  url = url
-    .replace('www.', '')
-    .replace(/\/$/, '')
-    .replace(/^(https:\/\/)/, 'http://');
+  url = url.replace('www.', '').replace(/^(https:\/\/)/, 'http://');
 
   if (url && !/^http:\/\//.test(url)) {
     url = `http://${url}`;
@@ -148,13 +161,13 @@ module.exports.getAboutContactUrl = ($, baseUrl) => {
   try {
     let aboutUsUrl = cleanUrl($('a:contains("About")')
       .filter(function() {
-        return (/about ?(us)?/i).test($(this).text());
+        return (/about(-|\s)?(us)?/i).test($(this).text());
       })
       .attr('href'), baseUrl);
 
     const contactUsUrl = cleanUrl($('a:contains("Contact")')
       .filter(function() {
-        return (/contact ?(us)?/i).test($(this).text());
+        return (/contact(-|\s)?(us)?/i).test($(this).text());
       })
       .attr('href'), baseUrl);
 

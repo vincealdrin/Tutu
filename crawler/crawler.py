@@ -400,7 +400,7 @@ while True:
                     'id': url_uuid,
                     'url': clean_url,
                     'sourceId': news_source['id'],
-                    'title': title.encode('ascii', 'ignore').decode('utf-8'),
+                    'title': title,
                     'authors': article.authors,
                     'body': body,
                     'publishDate': publish_date,

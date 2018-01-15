@@ -83,7 +83,7 @@ def insert_log(sourceId, log_type, status, runTime, info):
     }).run(conn)
 
     MB = 1024
-    THRESHOLD = 10
+    THRESHOLD = 100
     logs_mb_size = r.db('rethinkdb').table('stats').filter({
         'db':
         'tutu',

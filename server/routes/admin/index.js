@@ -5,6 +5,7 @@ const articles = require('./articles');
 const users = require('./users');
 const usersFeed = require('./usersFeed');
 const crawler = require('./crawler');
+const dashboard = require('./dashboard');
 
 
 module.exports = (conn, io) => {
@@ -14,6 +15,7 @@ module.exports = (conn, io) => {
   router.use('/users', users(conn, io));
   router.use('/usersFeed', usersFeed(conn, io));
   router.use('/crawler', crawler(conn, io));
+  router.use('/dashboard', dashboard(conn, io));
 
   return router;
 };

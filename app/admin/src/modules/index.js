@@ -10,6 +10,7 @@ import pendingSources from './pendingSources';
 import fakeSources from './fakeSources';
 import articles from './articles';
 import crawler from './crawler';
+import dashboard from './dashboard';
 import user, { LOGOUT } from './user';
 
 const socket = io.connect('/');
@@ -25,6 +26,7 @@ const appReducer = combineReducers({
   fakeSources,
   articles,
   crawler,
+  dashboard,
   user,
 });
 const rootReducer = (state, action) => {

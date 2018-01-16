@@ -83,7 +83,7 @@ def insert_log(sourceId, log_type, status, runTime, info):
     }).run(conn)
 
     MB = 1024
-    THRESHOLD = 100
+    THRESHOLD = 50
     logs_mb_size = r.db('rethinkdb').table('stats').filter({
         'db':
         'tutu',
@@ -92,7 +92,7 @@ def insert_log(sourceId, log_type, status, runTime, info):
     }).map(r.row['storage_engine']['disk']['space_usage']['data_bytes']
            .default(0)).sum().div(MB).div(MB).run(conn)
 
-    print(logs_mb_size)
+    print('Logs MB size: '+str(logs_mb_size))
     if logs_mb_size > THRESHOLD:
         r.table('crawlerLogs').delete().run(conn)
         print('LOGS DELETED')

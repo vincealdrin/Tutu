@@ -68,7 +68,6 @@ module.exports.getDomainCreationDate = (url) => new Promise((resolve, reject) =>
     .replace(/https?:\/\//, '')
     .replace(/\/$/, '')
     .replace('www.', '');
-  console.log(validUrl);
 
   whois(validUrl, (err, data) => {
     if (err) {
@@ -207,14 +206,14 @@ module.exports.cloudScrape = (url) => new Promise((resolve, reject) => {
 
 const mapLocation = (loc) => {
   const coords = loc('location')('position').toGeojson()('coordinates');
-  const address = r.branch(
-    loc('found').eq('location'),
-    loc('location')('formattedAddress'),
-    loc('province')('name').add(', Philippines')
-  );
+  // const address = r.branch(
+  //   loc('found').eq('location'),
+  //   loc('location')('formattedAddress'),
+  //   loc('province')('name').add(', Philippines')
+  // );
 
   return {
-    address,
+    // address,
     lng: coords.nth(0),
     lat: coords.nth(1),
   };

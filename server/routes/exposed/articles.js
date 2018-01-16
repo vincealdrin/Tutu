@@ -53,18 +53,25 @@ module.exports = (conn, io) => {
       if (timeWindow) {
         const [start, end] = timeWindow.split(',');
         const selectedDate = new Date(JSON.parse(date));
+        const parsedStart = parseInt(start);
+        const parsedEnd = parseInt(end);
 
-        const startDate = new Date(selectedDate.getTime());
-        startDate.setDate(selectedDate.getDate() - parseInt(start));
-        const endDate = new Date(selectedDate.getTime());
-        endDate.setDate(selectedDate.getDate() - parseInt(end));
+        if (start === 0 && end === 0) {
+          query = query.filter((article) =>
+            article('publishDate').date().eq(r.now().inTimezone(PH_TIMEZONE).date()));
+        } else {
+          const startDate = new Date(selectedDate.getTime());
+          startDate.setDate(selectedDate.getDate() - parsedStart);
+          const endDate = new Date(selectedDate.getTime());
+          endDate.setDate(selectedDate.getDate() - parsedEnd);
 
-        query = query.filter((article) => article('publishDate').date().during(
-          r.time(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate(), PH_TIMEZONE),
-          r.time(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate(), PH_TIMEZONE), {
-            rightBound: 'closed',
-          }
-        ));
+          query = query.filter((article) => article('publishDate').date().during(
+            r.time(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate(), PH_TIMEZONE),
+            r.time(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate(), PH_TIMEZONE), {
+              rightBound: 'closed',
+            }
+          ));
+        }
       }
 
       if (keywords) {
@@ -247,7 +254,7 @@ module.exports = (conn, io) => {
   router.get('/popular', async (req, res, next) => {
     try {
       const {
-        limit = 15,
+        limit = '15',
       } = req.query;
       const lastWk = new Date();
       lastWk.setDate(lastWk.getDate() - 7);
@@ -257,7 +264,7 @@ module.exports = (conn, io) => {
         .eqJoin(r.row('sourceId'), r.table('sources'))
         .orderBy(r.desc(r.row('left')('popularity')('totalScore')))
         .map(mapSideArticle)
-        .slice(0, limit);
+        .slice(0, parseInt(limit));
       const totalCount = query.count().run(conn);
       const cursor = await query.run(conn);
       const articles = await cursor.toArray();
@@ -271,21 +278,16 @@ module.exports = (conn, io) => {
 
   router.get('/recent', async (req, res, next) => {
     try {
-      const {
-        limit = 15,
-      } = req.query;
-      const lastWk = new Date();
-      lastWk.setDate(lastWk.getDate() - 7);
+      const { limit = '15' } = req.query;
 
-      const query = r.table(tbl).filter(r.row('timestamp').date().ge(lastWk));
-      const totalCount = await query.count().run(conn);
-      const cursor = await query
-        .orderBy(r.desc('timestamp'))
+      const totalCount = await r.table('articles').count().run(conn);
+      const query = await r.table('articles')
         .eqJoin('sourceId', r.table('sources'))
-        .map(mapSideArticle)
+        .orderBy(r.desc(r.row('left')('timestamp')))
         .limit(parseInt(limit))
+        .map(mapSideArticle)
         .run(conn);
-      const articles = await cursor.toArray();
+      const articles = await query.toArray();
 
       res.setHeader('X-Total-Count', totalCount);
       return res.json(articles);

@@ -31,6 +31,8 @@ module.exports = async (cb) => {
       'crawlerLogs',
       'usersFeed',
       'visitors',
+      'errorArticles',
+      // 'errorSources',
     ];
 
     r.dbCreate(DB_NAME).run(conn, async (err) => {

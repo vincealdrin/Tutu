@@ -20,7 +20,7 @@ from random import randrange
 from urllib.parse import urldefrag, urlparse
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
-from db import get_locations, get_provinces, get_one, insert_article, insert_log, get_uuid, get_rand_sources, get_sources
+from db import get_locations, get_provinces, get_one, insert_article, insert_log, get_uuid, get_rand_sources, get_sources, insert_item
 from utils import PH_TIMEZONE, search_locations, search_authors, get_publish_date, sleep, get_popularity, get_proxy
 from aylien import categorize, get_rate_limits
 from nlp import get_entities, summarize2
@@ -110,25 +110,25 @@ while True:
                                   float(time.clock() - src_start_time), {
                                       'errorMessage': 'ZERO ARTICLES'
                                   })
-            sleep(slp_time)
             continue
 
         # shuffle(source.articles)
         for article in source.articles:
-            start_time = time.clock()
-
-            sleep(slp_time)
-
             if PY_ENV == 'development':
                 print(article.url)
 
-            defragged_url = urldefrag(article.url).url
-            qs_idx = defragged_url.find('?')
-            clean_url = defragged_url[:qs_idx if qs_idx != -1 else None]
-            clean_url = clean_url.replace('https',
-                                          'http').replace('www.', '').replace(
-                                              'beta.', '')
+            clean_url = article.url
+            clean_url = re.sub(r'^(https?:\/\/)', '', clean_url)
+            clean_url = re.sub(r'(?=\/?(#\w*)).+', '', clean_url)
+            clean_url = 'http://' + re.sub(r'(?=\/?\?).+', '', clean_url)
+
             url_uuid = get_uuid(clean_url)
+
+            if get_one(url_uuid, 'errorArticles') or get_one(url_uuid, 'articles'):
+                continue
+
+            start_time = time.clock()
+            sleep(slp_time)
 
             insert_log(source_id, 'articleCrawl', 'pending', float(slp_time), {
                 'articleUrl': article.url
@@ -145,19 +145,7 @@ while True:
                         'articleUrl': article.url,
                         'errorMessage': 'NOT AN ARTICLE PAGE',
                     })
-                continue
-
-            existing_article = get_one(url_uuid, 'articles')
-            if existing_article:
-                if PY_ENV == 'development':
-                    print('\n(EXISTING URL) Skipped: ' + str(article.url))
-                    print(' -- ' + existing_article['id'] + '\n')
-                insert_log(source_id, 'articleCrawl', 'error',
-                           float(time.clock() - start_time), {
-                               'articleUrl': article.url,
-                               'errorMessage': 'EXISTING URL'
-                           })
-                slp_time = 0
+                insert_item({'id': url_uuid}, 'errorArticles')
                 continue
 
             try:
@@ -192,6 +180,7 @@ while True:
                             'articleTitle': title,
                             'errorMessage': 'CAN\'T PARSE BODY',
                         })
+                    insert_item({'id': url_uuid}, 'errorArticles')
                     continue
 
                 pattern = re.compile(source.brand, re.IGNORECASE)
@@ -210,6 +199,7 @@ while True:
                                 'articleTitle': title,
                                 'errorMessage': 'NOT ENGLISH',
                             })
+                        insert_item({'id': url_uuid}, 'errorArticles')
                         continue
                 except Exception:
                     if PY_ENV == 'development':
@@ -222,6 +212,7 @@ while True:
                             'articleTitle': title,
                             'errorMessage': 'NOT ENGLISH',
                         })
+                    insert_item({'id': url_uuid}, 'errorArticles')
                     continue
 
                 if len(body.split()) < 100:
@@ -235,6 +226,7 @@ while True:
                             'articleTitle': title,
                             'errorMessage': 'SHORT CONTENT',
                         })
+                    insert_item({'id': url_uuid}, 'errorArticles')
                     continue
 
                 if source.brand in body:
@@ -248,6 +240,7 @@ while True:
                             'articleTitle': title,
                             'errorMessage': 'SOURCE IS IN BODY',
                         })
+                    insert_item({'id': url_uuid}, 'errorArticles')
                     continue
 
                 if not body:
@@ -261,6 +254,7 @@ while True:
                             'articleTitle': title,
                             'errorMessage': 'NO TEXT',
                         })
+                    insert_item({'id': url_uuid}, 'errorArticles')
                     continue
 
                 combined_body = body + ' ' + article.text + ' ' + title + ' ' + urlparse(
@@ -288,6 +282,7 @@ while True:
                                 'articleTitle': title,
                                 'errorMessage': 'HAS OTHER COUNTRY BUT NO PH'
                             })
+                        insert_item({'id': url_uuid}, 'errorArticles')
                         continue
 
                 if not matched_locations:
@@ -302,6 +297,7 @@ while True:
                                 'articleTitle': title,
                                 'errorMessage': 'CAN\'T FIND LOCATION'
                             })
+                        insert_item({'id': url_uuid}, 'errorArticles')
                         continue
 
                 publish_date = get_publish_date(article.html)
@@ -318,6 +314,7 @@ while True:
                             'articleTitle': title,
                             'errorMessage': 'PUBLISH DATE NOT IN RANGE'
                         })
+                    insert_item({'id': url_uuid}, 'errorArticles')
                     continue
 
                 if (not publish_date):
@@ -331,6 +328,7 @@ while True:
                             'articleTitle': title,
                             'errorMessage': 'CAN\'T FIND PUBLISH DATE'
                         })
+                    insert_item({'id': url_uuid}, 'errorArticles')
                     continue
 
                 publish_date = r.expr(publish_date)
@@ -347,6 +345,7 @@ while True:
                             'articleTitle': title,
                             'errorMessage': 'TEXT IS TOO LONG'
                         })
+                    insert_item({'id': url_uuid}, 'errorArticles')
                     continue
 
                 # summary_sentences = summarize2(body)
@@ -398,7 +397,7 @@ while True:
 
                 new_article = {
                     'id': url_uuid,
-                    'url': clean_url,
+                    'url': article.url,
                     'sourceId': news_source['id'],
                     'title': title,
                     'authors': article.authors,

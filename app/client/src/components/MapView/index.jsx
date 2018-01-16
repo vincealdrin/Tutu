@@ -28,6 +28,7 @@ import ClusterMarker from './ClusterMarker';
 import ClusterModal from './ClusterModal';
 import SimpleModal from './SimpleModal';
 import mapStyle from './mapStyle.json';
+import TutuLogo from '../../assets/logo/tutu-logo.svg';
 import './styles.css';
 
 const mapStateToProps = ({
@@ -170,7 +171,8 @@ class MapView extends Component {
                   key={shortid.generate()}
                   article={article}
                   lng={lng}
-                  lat={lat}
+									lat={lat}
+									image={TutuLogo}
                 />
               );
             }

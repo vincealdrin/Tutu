@@ -91,7 +91,13 @@ class SimpleModal extends Component {
         dimmer
       >
         {status.success ? (
-          <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
+					<Label
+						color={colors[Math.floor(Math.random() * colors.length)]}
+						ribbon
+						className="news-label simple-modal-label"
+					>
+						{source.length > 40 ? `${source.substring(0, 37)} ...` : source}
+					</Label>
         ) : null}
         <Modal.Content scrolling>
           {status.pending ? (

@@ -54,8 +54,8 @@
   align-items: center;
   height: 100vh;
   background-color: #fff;
-  box-shadow: -3px 0 1rem -3px rgba(0,0,0,0.2);
-  transition: all 0.4s cubic-bezier(0.56, 0.21, 0.38, 1.55);
+  box-shadow: -3px 0 1rem -3px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.62, 0.04, 0.35, 0.96);
 }
 
 .sidebar-text {

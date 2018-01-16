@@ -78,7 +78,13 @@ class ClusterModal extends Component {
             <Segment key={shortid.generate()} raised className="modal-article-container">
               <Grid columns={2}>
                 <Grid.Column width={11} style={{ position: 'relative' }}>
-                  <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
+                  <Label
+										color={colors[Math.floor(Math.random() * colors.length)]}
+										ribbon
+										className="news-label"
+									>
+										{source.length > 50 ? `${source.substring(0, 47)} ...` : source}
+									</Label>
                   <div className="image-tag-title-container">
                     <div className="top-image">
                       <Image src={topImageUrl || newsPlaceholder} />

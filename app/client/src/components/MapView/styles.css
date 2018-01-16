@@ -135,9 +135,9 @@
 }
 
 .ui.list > .item > .header.related-articles {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .related-stories {
@@ -201,10 +201,14 @@
   align-items: flex-start;
 }
 
-.news-label {
-  position: absolute !important;
-  left: -1rem !important;
+.ui.label.news-label {
+  position: absolute;
+  left: -1rem;
   z-index: 1000;
+}
+
+.simple-modal-label {
+  top: 2rem;
 }
 
 .sentiment-list {

@@ -149,7 +149,7 @@ class Home extends Component {
           ],
           borderWidth: 1,
           barThickness: 1,
-          data: topPeople.map(({ count }) => count),
+          data: topLocations.map(({ count }) => count),
         },
       ],
     };
@@ -173,7 +173,7 @@ class Home extends Component {
           ],
           borderWidth: 1,
           barThickness: 1,
-          data: topPeople.map(({ count }) => count),
+          data: topOrgs.map(({ count }) => count),
         },
       ],
     };

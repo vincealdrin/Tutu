@@ -15,7 +15,8 @@ text_client3 = textapi.Client(AYLIEN_APP_ID3, AYLIEN_APP_KEY3)
 classes = [
     'Economy', 'Business & Finance', 'Lifestyle', 'Disaster & Accident',
     'Entertainment & Arts', 'Sports', 'Law & Government', 'Politics', 'Health',
-    'Science & Technology', 'Crime', 'Weather', 'Culture', #'Nation',
+    'Science & Technology', 'Crime', 'Weather',
+    'Culture', #'Nation',
     'Environment'
 ]
 

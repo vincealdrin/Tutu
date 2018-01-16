@@ -254,17 +254,18 @@ module.exports = (conn, io) => {
   router.get('/popular', async (req, res, next) => {
     try {
       const {
-        limit = '15',
+        limit = '20',
       } = req.query;
-      const lastWk = new Date();
-      lastWk.setDate(lastWk.getDate() - 7);
+      const now = new Date();
+      now.setDate(now.getDate() - 3);
 
-      const query = await r.table(tbl).filter((article) => article('publishDate').date().ge(lastWk)
-        .and(article('popularity')('totalScore').gt(0)))
+      const query = await r.table(tbl).filter((article) =>
+        article('publishDate').date().ge(r.expr(now).inTimezone(PH_TIMEZONE))
+          .and(article('popularity')('totalScore').gt(0)))
         .eqJoin(r.row('sourceId'), r.table('sources'))
         .orderBy(r.desc(r.row('left')('popularity')('totalScore')))
         .map(mapSideArticle)
-        .slice(0, parseInt(limit));
+        .limit(parseInt(limit));
       const totalCount = query.count().run(conn);
       const cursor = await query.run(conn);
       const articles = await cursor.toArray();
@@ -278,7 +279,7 @@ module.exports = (conn, io) => {
 
   router.get('/recent', async (req, res, next) => {
     try {
-      const { limit = '15' } = req.query;
+      const { limit = '20' } = req.query;
 
       const totalCount = await r.table('articles').count().run(conn);
       const query = await r.table('articles')

@@ -57,7 +57,6 @@ const categoriesOptions = [
   { key: 'Health', text: 'Health', value: 'Health' },
   { key: 'Law & Government', text: 'Law & Government', value: 'Law & Government' },
   { key: 'Lifestyle', text: 'Lifestyle', value: 'Lifestyle' },
-  { key: 'Nation', text: 'Nation', value: 'Nation' },
   { key: 'Politics', text: 'Politics', value: 'Politics' },
   { key: 'Science & Technology', text: 'Science & Technology', value: 'Science & Technology' },
   { key: 'Sports', text: 'Sports', value: 'Sports' },

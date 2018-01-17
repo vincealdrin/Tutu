@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const natural = require('natural');
+const _ = require('lodash');
 const requestIp = require('request-ip');
 const {
   mapArticle,
@@ -53,18 +54,25 @@ module.exports = (conn, io) => {
       if (timeWindow) {
         const [start, end] = timeWindow.split(',');
         const selectedDate = new Date(JSON.parse(date));
+        const parsedStart = parseInt(start);
+        const parsedEnd = parseInt(end);
 
-        const startDate = new Date(selectedDate.getTime());
-        startDate.setDate(selectedDate.getDate() - parseInt(start));
-        const endDate = new Date(selectedDate.getTime());
-        endDate.setDate(selectedDate.getDate() - parseInt(end));
+        if (start === 0 && end === 0) {
+          query = query.filter((article) =>
+            article('publishDate').date().eq(r.now().inTimezone(PH_TIMEZONE).date()));
+        } else {
+          const startDate = new Date(selectedDate.getTime());
+          startDate.setDate(selectedDate.getDate() - parsedStart);
+          const endDate = new Date(selectedDate.getTime());
+          endDate.setDate(selectedDate.getDate() - parsedEnd);
 
-        query = query.filter((article) => article('publishDate').date().during(
-          r.time(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate(), PH_TIMEZONE),
-          r.time(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate(), PH_TIMEZONE), {
-            rightBound: 'closed',
-          }
-        ));
+          query = query.filter((article) => article('publishDate').date().during(
+            r.time(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate(), PH_TIMEZONE),
+            r.time(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate(), PH_TIMEZONE), {
+              rightBound: 'closed',
+            }
+          ));
+        }
       }
 
       if (keywords) {
@@ -247,17 +255,18 @@ module.exports = (conn, io) => {
   router.get('/popular', async (req, res, next) => {
     try {
       const {
-        limit = 15,
+        limit = '20',
       } = req.query;
-      const lastWk = new Date();
-      lastWk.setDate(lastWk.getDate() - 7);
+      const now = new Date();
+      now.setDate(now.getDate() - 3);
 
-      const query = await r.table(tbl).filter((article) => article('publishDate').date().ge(lastWk)
-        .and(article('popularity')('totalScore').gt(0)))
+      const query = await r.table(tbl).filter((article) =>
+        article('publishDate').date().ge(r.expr(now).inTimezone(PH_TIMEZONE))
+          .and(article('popularity')('totalScore').gt(0)))
         .eqJoin(r.row('sourceId'), r.table('sources'))
         .orderBy(r.desc(r.row('left')('popularity')('totalScore')))
         .map(mapSideArticle)
-        .slice(0, limit);
+        .limit(parseInt(limit));
       const totalCount = query.count().run(conn);
       const cursor = await query.run(conn);
       const articles = await cursor.toArray();
@@ -271,21 +280,16 @@ module.exports = (conn, io) => {
 
   router.get('/recent', async (req, res, next) => {
     try {
-      const {
-        limit = 15,
-      } = req.query;
-      const lastWk = new Date();
-      lastWk.setDate(lastWk.getDate() - 7);
+      const { limit = '20' } = req.query;
 
-      const query = r.table(tbl).filter(r.row('timestamp').date().ge(lastWk));
-      const totalCount = await query.count().run(conn);
-      const cursor = await query
-        .orderBy(r.desc('timestamp'))
+      const totalCount = await r.table('articles').count().run(conn);
+      const query = await r.table('articles')
         .eqJoin('sourceId', r.table('sources'))
-        .map(mapSideArticle)
+        .orderBy(r.desc(r.row('left')('timestamp')))
         .limit(parseInt(limit))
+        .map(mapSideArticle)
         .run(conn);
-      const articles = await cursor.toArray();
+      const articles = await query.toArray();
 
       res.setHeader('X-Total-Count', totalCount);
       return res.json(articles);
@@ -357,7 +361,7 @@ module.exports = (conn, io) => {
 
       if (existingReact) {
         return next({
-          message: `You already reacted "${existingReact.reaction}"`,
+          message: `You already reacted "${_.capitalize(existingReact.reaction)}"`,
           status: 400,
         });
       }

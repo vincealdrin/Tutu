@@ -59,17 +59,16 @@ class SimpleMarker extends PureComponent {
             x: spring(10, config),
           }}
         >
-          {(v) =>
-            (
-              <div>
-                <Icon
-                  color="red"
-                  name="marker"
-                  size={$hover ? 'huge' : 'big'}
-                  className={`marker ${$hover ? 'hovered' : ''}`}
-                  style={toCSS(v.translateX)}
-								/>
-              </div>
+          {(v) => (
+            <div>
+              <Icon
+                color="red"
+                name="marker"
+                size={$hover ? 'huge' : 'big'}
+                className={`marker ${$hover ? 'hovered' : ''}`}
+                style={toCSS(v.translateX)}
+              />
+            </div>
             )
           }
         </Motion>

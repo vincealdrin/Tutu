@@ -5,6 +5,7 @@ const { parseString } = require('xml2js');
 const r = require('rethinkdb');
 const rp = require('request-promise');
 const parseDomain = require('parse-domain');
+const { URL } = require('url');
 const cloudscraper = require('cloudscraper');
 
 const awisClient = awis({
@@ -17,11 +18,6 @@ const WEEK_IN_SEC = 604800;
 
 module.exports.PH_TIMEZONE = PH_TIMEZONE;
 module.exports.WEEK_IN_SEC = WEEK_IN_SEC;
-
-module.exports.getDomain = (url) => {
-  const { domain, tld } = parseDomain(url);
-  return `${domain}.${tld}`;
-};
 
 module.exports.getUpdatedFields = (changes) =>
   changes.map((change) => {
@@ -72,7 +68,6 @@ module.exports.getDomainCreationDate = (url) => new Promise((resolve, reject) =>
     .replace(/https?:\/\//, '')
     .replace(/\/$/, '')
     .replace('www.', '');
-  console.log(validUrl);
 
   whois(validUrl, (err, data) => {
     if (err) {
@@ -151,6 +146,10 @@ const cleanUrl = (dirtyUrl = '', baseUrl = '') => {
 
 module.exports.cleanUrl = cleanUrl;
 
+module.exports.removeUrlPath = (url) => `http://${cleanUrl(url)
+  .replace(/^(https?:\/\/)/, '')
+  .replace(/(?=\/).+/, '')}`;
+
 module.exports.getFaviconUrl = ($, baseUrl) => {
   const url = $('link[rel="shortcut icon"]').attr('href');
 
@@ -207,14 +206,14 @@ module.exports.cloudScrape = (url) => new Promise((resolve, reject) => {
 
 const mapLocation = (loc) => {
   const coords = loc('location')('position').toGeojson()('coordinates');
-  const address = r.branch(
-    loc('found').eq('location'),
-    loc('location')('formattedAddress'),
-    loc('province')('name').add(', Philippines')
-  );
+  // const address = r.branch(
+  //   loc('found').eq('location'),
+  //   loc('location')('formattedAddress'),
+  //   loc('province')('name').add(', Philippines')
+  // );
 
   return {
-    address,
+    // address,
     lng: coords.nth(0),
     lat: coords.nth(1),
   };
@@ -257,7 +256,13 @@ module.exports.mapArticleInfo = (catsFilterLength = 2) => (article) => ({
   //   location('province')('name').add(', Philippines')
   // )),
   categories: getCategoriesField(article, catsFilterLength),
-  reactions: article('reactions').group('reaction').count().ungroup(),
+  reactions: article('reactions')
+    .group('reaction')
+    .count()
+    .ungroup()
+    .map((group) => [group('group'), group('reduction')])
+    .coerceTo('object')
+  ,
 });
 
 module.exports.mapArticle = (bounds) => (join) => {

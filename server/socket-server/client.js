@@ -3,7 +3,7 @@ const { mapFeedArticle, PH_TIMEZONE } = require('../utils');
 
 module.exports = (io, conn) => {
   io.on('connection', async (socket) => {
-    const ip = socket.request.connection.remoteAddress;
+    const ip = socket.handshake.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
     const userAgent = socket.request.headers['user-agent'];
     const id = await r.uuid(ip);
     const matchedVisitor = await r.table('visitors').get(id).run(conn);

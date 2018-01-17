@@ -12,6 +12,7 @@ const {
   PH_TIMEZONE,
   getDomainOnly,
   cloudScrape,
+  removeUrlPath,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -19,11 +20,11 @@ module.exports = (conn, io) => {
     try {
       const { url } = req.query;
       const validUrl = cleanUrl(url);
-      // const domain = getDomain(url);
-      // const uuid = await r.uuid(domain).run(conn);
+      const domain = removeUrlPath(url);
+      const uuid = await r.uuid(domain).run(conn);
       // const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
-      // const matchedSource = await r.table('sources').get(uuid).run(conn);
-
+      const matchedSource = await r.table('sources').get(uuid).run(conn);
+      console.log(matchedSource);
       // if (matchedPending) {
       //   return res.json({
       //     isReliable: matchedPending.isReliable,
@@ -31,12 +32,12 @@ module.exports = (conn, io) => {
       //   });
       // }
 
-      // if (matchedSource) {
-      //   return res.json({
-      //     isReliable: matchedSource.isReliable,
-      //     isVerified: true,
-      //   });
-      // }
+      if (matchedSource) {
+        return res.json({
+          isReliable: matchedSource.isReliable,
+          isVerified: true,
+        });
+      }
       let body;
 
       try {
@@ -102,6 +103,7 @@ module.exports = (conn, io) => {
       }).run(conn);
 
       res.json({
+        isVerified: false,
         isReliable: Boolean(reliable),
         pct,
         sourcePct,

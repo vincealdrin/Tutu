@@ -1,14 +1,43 @@
 import React, { Component } from 'react';
-import { List, Image, Label, Dimmer, Modal, Segment, Grid, Header, Button } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import {
+  List,
+  Image,
+  Label,
+  Dimmer,
+  Modal,
+  Segment,
+  Grid,
+  Header,
+} from 'semantic-ui-react';
 import shortid from 'shortid';
 import RelatedArticles from './RelatedArticles';
-import Carousel from './Carousel';
+import { removeFocused, fetchFocusedClusterInfo } from '../../modules/mapArticles';
 import Tags from './Tags';
 import Reactions from './Reactions';
 import Pagination from './Pagination';
 import newsPlaceholder from '../../assets/placeholder/news-placeholder.png';
 import './styles.css';
-import { crudStatus } from '../../utils';
+
+const mapStateToProps = ({
+  mapArticles: {
+    focusedOn,
+    clusterStatus,
+    focusedClusterInfo,
+    focusedClusterArticles,
+  },
+}) => ({
+  isOpen: focusedOn === 'cluster' && !clusterStatus.cancelled,
+  status: clusterStatus,
+  articles: focusedClusterInfo,
+  totalCount: focusedClusterArticles.length,
+});
+
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  removeFocused,
+  fetchFocusedClusterInfo,
+}, dispatch);
 
 class ClusterModal extends Component {
   state = {
@@ -33,21 +62,18 @@ class ClusterModal extends Component {
     const {
       articles,
       totalCount,
-      open,
-      removeFocused,
-      updateReaction,
+      isOpen,
       status,
-      fetchArticles,
-      reactionStatus,
-      reactionId,
     } = this.props;
-    const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
 
     return (
       <Modal
         className="modal-container"
-        open={open}
-        onClose={removeFocused}
+        open={isOpen}
+        onClose={() => {
+          this.props.removeFocused();
+          this.setState({ currentPage: 1 });
+        }}
         closeOnDimmerClick
         dimmer
       >
@@ -79,12 +105,15 @@ class ClusterModal extends Component {
               <Grid columns={2}>
                 <Grid.Column width={11} style={{ position: 'relative' }}>
                   <Label
-										color={colors[Math.floor(Math.random() * colors.length)]}
-										ribbon
-										className="news-label"
-									>
-										{source.length > 50 ? `${source.substring(0, 47)} ...` : source}
-									</Label>
+                    as="a"
+                    target="__blank"
+                    className="news-label"
+                    color="green"
+                    href={sourceUrl}
+                    ribbon
+                  >
+                    {source}
+                  </Label>
                   <div className="image-tag-title-container">
                     <div className="top-image">
                       <Image src={topImageUrl || newsPlaceholder} />
@@ -124,8 +153,7 @@ class ClusterModal extends Component {
                       </List>
                       <Reactions
                         reactions={reactions}
-                        status={reactionId === id ? reactionStatus : crudStatus}
-                        updateReaction={(reaction) => updateReaction(id, reaction)}
+                        id={id}
                       />
                     </div>
                   </div>
@@ -143,13 +171,13 @@ class ClusterModal extends Component {
             ))}
         </Modal.Content>
         <Modal.Actions>
-          {((open && status.success) || articles.length) && totalCount > limit ? (
+          {((isOpen && status.success) || articles.length) && totalCount > limit ? (
             <Pagination
               currentPage={currentPage || 1}
               totalPages={Math.ceil((totalCount || limit) / limit) || 1}
               onChange={(page) => {
                 this.setState({ currentPage: page });
-                fetchArticles(null, page - 1, limit);
+                this.props.fetchFocusedClusterInfo(null, page - 1, limit);
               }}
             />
           ) : null}
@@ -159,4 +187,8 @@ class ClusterModal extends Component {
   }
 }
 
-export default ClusterModal;
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ClusterModal);
+

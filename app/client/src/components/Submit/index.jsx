@@ -57,7 +57,12 @@ class Submit extends Component {
   }
 
   render() {
-    const { submitStatus, result, errorMessage } = this.state;
+    const {
+      submitStatus,
+      result,
+      errorMessage,
+    } = this.state;
+
     return (
       <div>
         <Segment>
@@ -91,22 +96,31 @@ class Submit extends Component {
                 {submitStatus === 'pending' ? 'please wait...' : ''}
                 {submitStatus === 'success' ? (
                   <span>
-                    Result:
-                    <ul>
-                      <li>overall prediction: {result.overallPred ? 'RELIABLE' : 'NOT RELIABLE'}</li>
-                      <li />
-                      <li />
-                      <li />
-                      <li>prediction: {result.isReliable ? 'RELIABLE' : 'NOT RELIABLE'}</li>
-                      <li>reliability ({result.pct.toFixed(2)}%)</li>
-                      <li />
-                      <li>source reliability ({result.sourcePct.toFixed(2)}%)</li>
-                      <li>content reliability ({result.contentPct.toFixed(2)}%)</li>
-                    </ul>
+                    {!result.isVerified
+                      ? (
+                        <div>
+                          Result:
+                          <ul>
+                            <li>overall prediction: {result.overallPred ? 'RELIABLE' : 'NOT RELIABLE'}</li>
+                            <li />
+                            <li />
+                            <li />
+                            <li>prediction: {result.isReliable ? 'RELIABLE' : 'NOT RELIABLE'}</li>
+                            <li>reliability ({result.pct.toFixed(2)}%)</li>
+                            <li />
+                            <li>source reliability ({result.sourcePct.toFixed(2)}%)</li>
+                            <li>content reliability ({result.contentPct.toFixed(2)}%)</li>
+                          </ul>
+                        </div>
+                      )
+                      : (
+                        <h4>{result.isReliable ? 'RELIABLE' : 'NOT RELIABLE'}</h4>
+                      )}
 
-                    <p> {result.isVerified ? 'verified by journalists' : 'not verified by journalists tho'}</p>
+                    <p> {result.isVerified ? 'verified by a journalist' : 'not verified by a journalist tho'}</p>
                   </span>
                 ) : ''}
+
                 {submitStatus === 'error' ? errorMessage : ''}
               </Message.Header>
             </Message>

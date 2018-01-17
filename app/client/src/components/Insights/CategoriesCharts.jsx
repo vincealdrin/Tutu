@@ -162,7 +162,7 @@ class CategoriesCharts extends Component {
       ],
       datasets: [
         {
-          label: 'Category',
+          label: 'Count',
           backgroundColor: [
             'rgba(255,99,132,0.2)',
           ],

@@ -1,16 +1,23 @@
 import React from 'react';
 import { Grid, Statistic, Icon, Segment } from 'semantic-ui-react';
 
-const Statistics = ({ views, articles, sources }) => (
-  <Grid columns={3}>
+const Statistics = ({
+  visitors,
+  articles,
+  pendingSources,
+  legitimateSources,
+  illegitimateSources,
+
+}) => (
+  <Grid columns={5}>
     <Grid.Column>
       <Segment>
         <Statistic size="tiny">
           <Statistic.Value>
             <Icon name="eye" />
-              84
+            {visitors}
           </Statistic.Value>
-          <Statistic.Label>Views</Statistic.Label>
+          <Statistic.Label>Unique Visitors</Statistic.Label>
         </Statistic>
       </Segment>
     </Grid.Column>
@@ -19,7 +26,7 @@ const Statistics = ({ views, articles, sources }) => (
         <Statistic size="tiny">
           <Statistic.Value>
             <Icon name="newspaper" />
-              10,312
+            {articles}
           </Statistic.Value>
           <Statistic.Label>News Articles</Statistic.Label>
         </Statistic>
@@ -30,9 +37,31 @@ const Statistics = ({ views, articles, sources }) => (
         <Statistic size="tiny">
           <Statistic.Value>
             <Icon name="world" />
-                      298
+            {pendingSources}
           </Statistic.Value>
-          <Statistic.Label>News Site Sources</Statistic.Label>
+          <Statistic.Label>Pending Sources</Statistic.Label>
+        </Statistic>
+      </Segment>
+    </Grid.Column>
+    <Grid.Column>
+      <Segment>
+        <Statistic size="tiny">
+          <Statistic.Value>
+            <Icon name="world" />
+            {legitimateSources}
+          </Statistic.Value>
+          <Statistic.Label>Legitimate Sources</Statistic.Label>
+        </Statistic>
+      </Segment>
+    </Grid.Column>
+    <Grid.Column>
+      <Segment>
+        <Statistic size="tiny">
+          <Statistic.Value>
+            <Icon name="world" />
+            {illegitimateSources}
+          </Statistic.Value>
+          <Statistic.Label>Illegitimate Sources</Statistic.Label>
         </Statistic>
       </Segment>
     </Grid.Column>

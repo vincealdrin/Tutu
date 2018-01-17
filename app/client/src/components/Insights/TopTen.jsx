@@ -47,7 +47,7 @@ class TopTen extends Component {
       labels: topPeople.map(({ person }) => person),
       datasets: [
         {
-          label: 'Person',
+          label: 'Count',
           backgroundColor: [
             'rgba(255,99,132,0.2)',
           ],
@@ -68,10 +68,10 @@ class TopTen extends Component {
     };
     const locationsBarData = {
       type: 'horizontalBar',
-      labels: topLocations.map(({ location }) => location),
+      labels: topLocations.map(({ location }) => location.replace(', Philippines', '')),
       datasets: [
         {
-          label: 'Location',
+          label: 'Count',
           backgroundColor: [
             'rgba(255,99,132,0.2)',
           ],
@@ -86,7 +86,7 @@ class TopTen extends Component {
           ],
           borderWidth: 1,
           barThickness: 1,
-          data: topPeople.map(({ count }) => count),
+          data: topLocations.map(({ count }) => count),
         },
       ],
     };
@@ -95,7 +95,7 @@ class TopTen extends Component {
       labels: topOrgs.map(({ organization }) => organization),
       datasets: [
         {
-          label: 'Organization',
+          label: 'Count',
           backgroundColor: [
             'rgba(255,99,132,0.2)',
           ],
@@ -110,7 +110,7 @@ class TopTen extends Component {
           ],
           borderWidth: 1,
           barThickness: 1,
-          data: topPeople.map(({ count }) => count),
+          data: topOrgs.map(({ count }) => count),
         },
       ],
     };

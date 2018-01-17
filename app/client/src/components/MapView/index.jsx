@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import GoogleMapReact from 'google-map-react';
 import shortid from 'shortid';
 import { NProgress } from 'redux-nprogress';
+import { Icon, Input, Button } from 'semantic-ui-react';
 import {
   fetchArticles,
   fetchFocusedInfo,
@@ -62,12 +63,16 @@ const mapOption = {
 };
 
 class MapView extends Component {
+  state = { currentPosition: null }
+
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(({ coords }) => {
-      this.props.updateMapState({
-        lat: coords.latitude,
-        lng: coords.longitude,
-      }, 11);
+      this.setState({
+        currentPosition: {
+          lat: coords.latitude,
+          lng: coords.longitude,
+        },
+      });
     });
   }
 
@@ -77,6 +82,7 @@ class MapView extends Component {
     marginBounds,
   }) => {
     this.props.updateFilterMapState(center, zoom, marginBounds);
+    this.props.updateMapState(center, zoom, marginBounds);
     this.props.fetchArticles(center, zoom, marginBounds);
   }
 
@@ -94,15 +100,33 @@ class MapView extends Component {
       clusters,
       mapState,
     } = this.props;
+    const {
+      currentPosition,
+    } = this.state;
 
     return (
       <div className="map-container">
         <NProgress />
         <ClusterModal />
         <SimpleModal />
+        <Input className="search-box" icon>
+          <input id="searchBoxInput" placeholder="Search places" />
+          <Icon name="search" />
+        </Input>
+        {currentPosition ? (
+          <Button
+            className="current-loc"
+            icon="home"
+            onClick={() => {
+              this.props.updateMapState(currentPosition, 12);
+            }}
+            circular
+          />
+        ) : null}
+
         <GoogleMapReact
           defaultZoom={DEFAULT_ZOOM}
-          bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
+          bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds', libraries: 'places' }}
           options={mapOption}
           // defaultCenter={mapState.center}
           center={mapState.center}
@@ -111,6 +135,20 @@ class MapView extends Component {
           margin={[MARGIN_TOP, MARGIN_RIGHT, MARGIN_BOTTOM, MARGIN_LEFT]}
           onChange={this._onChange}
           onChildClick={this._onChildClick}
+          onGoogleApiLoaded={({ maps }) => {
+            const input = document.getElementById('searchBoxInput');
+            const searchBox = new maps.places.SearchBox(input);
+
+            searchBox.addListener('places_changed', () => {
+              const places = searchBox.getPlaces();
+
+              this.props.updateMapState({
+                lat: places[0].geometry.location.lat(),
+                lng: places[0].geometry.location.lng(),
+              }, 12);
+            });
+          }}
+          yesIWantToUseGoogleMapApiInternals
         >
           {clusters.map(({
               wx: lng, wy: lat, numPoints, points,

@@ -308,3 +308,17 @@
   /* margin-bottom: 1.6rem !important; */
   margin: auto;
 }
+
+.search-box {
+  position: fixed !important;
+  z-index: 1000;
+  width: 250px;
+  margin: 11.85px 0 0 11.85px;
+}
+
+.current-loc {
+  position: fixed !important;
+  top: 11.85px;
+  left: 273.7px;
+  z-index: 1000;
+}

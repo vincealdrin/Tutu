@@ -203,8 +203,18 @@
 
 .ui.label.news-label {
   position: absolute;
-  left: -1rem;
+  left: 0;
   z-index: 1000;
+  max-width: 250px;
+  min-width: 0 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.7s cubic-bezier(0.62, 0.04, 0.35, 0.96);
+}
+
+.ui.label.news-label:hover {
+  max-width: 100%;
 }
 
 .simple-modal-label {

@@ -1,28 +1,43 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import {
   List,
-  Image,
   Dimmer,
   Label,
   Modal,
-  Accordion,
-  Icon,
   Grid,
   Header,
-  Button,
 } from 'semantic-ui-react';
-import { Tooltip } from 'react-tippy';
 import Tags from './Tags';
-import Carousel from './Carousel';
 import RelatedArticles from './RelatedArticles';
 import Reactions from './Reactions';
+import {
+  removeFocused,
+  updateReaction,
+} from '../../modules/mapArticles';
 import './styles.css';
 
-class SimpleModal extends Component {
-  state = {
-    activeIndex: 0,
-  };
+const mapStateToProps = ({
+  mapArticles: {
+    infoStatus,
+    focusedInfo,
+    focusedOn,
+    reactionStatus,
+  },
+}) => ({
+  reactionStatus,
+  isOpen: focusedOn === 'simple' && !infoStatus.cancelled,
+  article: focusedInfo,
+  status: infoStatus,
+});
 
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  removeFocused,
+  updateReaction,
+}, dispatch);
+
+class SimpleModal extends Component {
   getSentimentColor = (sentiment) => {
     if (sentiment === 'Positive') {
       return 'green';
@@ -35,20 +50,9 @@ class SimpleModal extends Component {
     return '';
   }
 
-  showRelatedArticles = (_, titleProps) => {
-    const { index } = titleProps;
-    const { activeIndex } = this.state;
-    const newIndex = activeIndex === index ? -1 : index;
-
-    this.setState({ activeIndex: newIndex });
-  }
-
   render() {
     const {
-      activeIndex,
-    } = this.state;
-    const {
-      open,
+      isOpen,
       article: {
         sentiment,
         summary,
@@ -74,24 +78,30 @@ class SimpleModal extends Component {
         people = [],
         relatedArticles = [],
       },
-      removeFocused,
-      updateReaction,
       status,
       reactionStatus,
     } = this.props;
-    const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
 
     return (
       <Modal
         className="modal-container"
         size="tiny"
-        open={open}
-        onClose={removeFocused}
+        open={isOpen}
+        onClose={this.props.removeFocused}
         closeOnDimmerClick
         dimmer
       >
         {status.success ? (
-          <Label color={colors[Math.floor(Math.random() * colors.length)]} ribbon className="news-label">{source}</Label>
+          <Label
+            as="a"
+            target="_blank"
+            className="news-label"
+            color="green"
+            href={sourceUrl}
+            ribbon
+          >
+            {source}
+          </Label>
         ) : null}
         <Modal.Content scrolling>
           {status.pending ? (
@@ -150,7 +160,6 @@ class SimpleModal extends Component {
             {new Date(publishDate).toDateString()}
             &nbsp;{status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
           </p>
-          <Label as="a" href={`http://${sourceUrl}`} target="_blank" circular style={{ marginBottom: '0.6rem' }}>{source}</Label>
           <div className="carousel-container">
             {summary}
           </div>
@@ -158,8 +167,8 @@ class SimpleModal extends Component {
           <div className="extras">
             <Reactions
               reactions={reactions}
+              updateReaction={(reaction) => this.props.updateReaction(id, reaction)}
               status={reactionStatus}
-              updateReaction={(reaction) => updateReaction(id, reaction)}
             />
           </div>
         </Modal.Content>
@@ -168,4 +177,8 @@ class SimpleModal extends Component {
   }
 }
 
-export default SimpleModal;
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SimpleModal);
+

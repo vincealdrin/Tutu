@@ -108,7 +108,7 @@ class ClusterModal extends Component {
                     as="a"
                     target="__blank"
                     className="news-label"
-                    color="green"
+                    color="orange"
                     href={sourceUrl}
                     ribbon
                   >

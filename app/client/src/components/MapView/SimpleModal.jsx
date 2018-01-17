@@ -89,7 +89,7 @@ class SimpleModal extends Component {
             as="a"
             target="_blank"
             className="news-label"
-            color="green"
+            color="orange"
             href={sourceUrl}
             ribbon
           >

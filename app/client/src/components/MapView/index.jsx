@@ -7,10 +7,8 @@ import { NProgress } from 'redux-nprogress';
 import {
   fetchArticles,
   fetchFocusedInfo,
-  removeFocused,
   updateMapState,
   fetchFocusedClusterInfo,
-  updateReaction,
   updateFilterMapState,
 } from '../../modules/mapArticles';
 import SimpleMarker from './SimpleMarker';
@@ -32,45 +30,25 @@ import './styles.css';
 
 const mapStateToProps = ({
   mapArticles: {
-    clusterStatus,
     articles,
     clusters,
     mapState,
-    relatedArticles,
-    infoStatus,
-    focusedInfo,
-    focusedClusterInfo,
     filterMapState,
-    focusedOn,
-    focusedClusterArticles,
-    reactionStatus,
-    reactionId,
   },
 }) => ({
   // mapState: map.viewport.toJS(),
   mapState,
   articles,
   clusters,
-  relatedArticles,
-  infoStatus,
-  clusterStatus,
   filterMapState,
-  focusedInfo,
-  focusedClusterInfo,
-  focusedClusterArticles,
-  focusedOn,
-  reactionStatus,
-  reactionId,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchArticles,
   fetchFocusedInfo,
-  removeFocused,
   updateFilterMapState,
   updateMapState,
   fetchFocusedClusterInfo,
-  updateReaction,
 }, dispatch);
 
 const mapOption = {
@@ -115,38 +93,13 @@ class MapView extends Component {
       articles,
       clusters,
       mapState,
-      infoStatus,
-      clusterStatus,
-      focusedClusterInfo,
-      focusedOn,
-      focusedInfo,
-      focusedClusterArticles,
-      reactionStatus,
-      reactionId,
     } = this.props;
 
     return (
       <div className="map-container">
         <NProgress />
-        <ClusterModal
-          open={focusedOn === 'cluster' && !clusterStatus.cancelled}
-          articles={focusedClusterInfo}
-          fetchArticles={this.props.fetchFocusedClusterInfo}
-          removeFocused={this.props.removeFocused}
-          updateReaction={this.props.updateReaction}
-          status={clusterStatus}
-          totalCount={focusedClusterArticles.length}
-          reactionStatus={reactionStatus}
-          reactionId={reactionId}
-        />
-        <SimpleModal
-          open={focusedOn === 'simple' && !infoStatus.cancelled}
-          article={focusedInfo}
-          removeFocused={this.props.removeFocused}
-          updateReaction={this.props.updateReaction}
-          reactionStatus={reactionStatus}
-          status={infoStatus}
-        />
+        <ClusterModal />
+        <SimpleModal />
         <GoogleMapReact
           defaultZoom={DEFAULT_ZOOM}
           bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds' }}
@@ -158,7 +111,6 @@ class MapView extends Component {
           margin={[MARGIN_TOP, MARGIN_RIGHT, MARGIN_BOTTOM, MARGIN_LEFT]}
           onChange={this._onChange}
           onChildClick={this._onChildClick}
-          reactionStatus={reactionStatus}
         >
           {clusters.map(({
               wx: lng, wy: lat, numPoints, points,

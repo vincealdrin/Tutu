@@ -256,7 +256,13 @@ module.exports.mapArticleInfo = (catsFilterLength = 2) => (article) => ({
   //   location('province')('name').add(', Philippines')
   // )),
   categories: getCategoriesField(article, catsFilterLength),
-  reactions: article('reactions').group('reaction').count().ungroup(),
+  reactions: article('reactions')
+    .group('reaction')
+    .count()
+    .ungroup()
+    .map((group) => [group('group'), group('reduction')])
+    .coerceTo('object')
+  ,
 });
 
 module.exports.mapArticle = (bounds) => (join) => {

@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const natural = require('natural');
+const _ = require('lodash');
 const requestIp = require('request-ip');
 const {
   mapArticle,
@@ -360,7 +361,7 @@ module.exports = (conn, io) => {
 
       if (existingReact) {
         return next({
-          message: `You already reacted "${existingReact.reaction}"`,
+          message: `You already reacted "${_.capitalize(existingReact.reaction)}"`,
           status: 400,
         });
       }

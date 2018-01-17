@@ -13,11 +13,7 @@ import {
 } from 'semantic-ui-react';
 import shortid from 'shortid';
 import RelatedArticles from './RelatedArticles';
-import {
-  removeFocused,
-  updateReaction,
-  fetchFocusedClusterInfo,
-} from '../../modules/mapArticles';
+import { removeFocused, fetchFocusedClusterInfo } from '../../modules/mapArticles';
 import Tags from './Tags';
 import Reactions from './Reactions';
 import Pagination from './Pagination';
@@ -40,7 +36,6 @@ const mapStateToProps = ({
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   removeFocused,
-  updateReaction,
   fetchFocusedClusterInfo,
 }, dispatch);
 
@@ -158,7 +153,7 @@ class ClusterModal extends Component {
                       </List>
                       <Reactions
                         reactions={reactions}
-                        updateReaction={(reaction, cb) => updateReaction(id, reaction, cb)}
+                        id={id}
                       />
                     </div>
                   </div>

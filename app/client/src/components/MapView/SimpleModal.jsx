@@ -12,10 +12,7 @@ import {
 import Tags from './Tags';
 import RelatedArticles from './RelatedArticles';
 import Reactions from './Reactions';
-import {
-  removeFocused,
-  updateReaction,
-} from '../../modules/mapArticles';
+import { removeFocused } from '../../modules/mapArticles';
 import './styles.css';
 
 const mapStateToProps = ({
@@ -23,10 +20,8 @@ const mapStateToProps = ({
     infoStatus,
     focusedInfo,
     focusedOn,
-    reactionStatus,
   },
 }) => ({
-  reactionStatus,
   isOpen: focusedOn === 'simple' && !infoStatus.cancelled,
   article: focusedInfo,
   status: infoStatus,
@@ -34,7 +29,6 @@ const mapStateToProps = ({
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   removeFocused,
-  updateReaction,
 }, dispatch);
 
 class SimpleModal extends Component {
@@ -79,7 +73,6 @@ class SimpleModal extends Component {
         relatedArticles = [],
       },
       status,
-      reactionStatus,
     } = this.props;
 
     return (
@@ -165,11 +158,12 @@ class SimpleModal extends Component {
           </div>
           <RelatedArticles content={relatedArticles} />
           <div className="extras">
-            <Reactions
-              reactions={reactions}
-              updateReaction={(reaction) => this.props.updateReaction(id, reaction)}
-              status={reactionStatus}
-            />
+            {!status.pending && status.success ? (
+              <Reactions
+                reactions={reactions}
+                id={id}
+              />
+            ) : null}
           </div>
         </Modal.Content>
       </Modal>

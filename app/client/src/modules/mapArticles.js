@@ -18,9 +18,7 @@ export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
 export const FETCH_FOCUSED_INFO = 'mapArticles/FETCH_FOCUSED_INFO';
 export const FETCH_CLUSTER_INFO = 'mapArticles/FETCH_CLUSTER_INFO';
 export const REMOVE_FOCUSED = 'mapArticles/REMOVE_FOCUSED';
-export const UPDATE_REACTION = 'mapArticles/UPDATE_REACTION';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
-export const SET_REACTION_ID = 'mapArticles/SET_REACTION_ID';
 export const UPDATE_FILTER_MAP_STATE = 'mapArticles/UPDATE_FILTER_MAP_STATE';
 
 const initialState = {
@@ -30,8 +28,6 @@ const initialState = {
   fetchStatus: crudStatus,
   infoStatus: crudStatus,
   clusterStatus: crudStatus,
-  reactionStatus: crudStatus,
-  reactionId: '',
   focusedInfo: {},
   focusedClusterInfo: [],
   focusedClusterArticles: [],
@@ -72,23 +68,8 @@ export default (state = initialState, action) => {
     case FETCH_FOCUSED_INFO:
       return {
         ...state,
-        focusedInfo: action.focusedInfo ?
-          {
-            ...action.focusedInfo,
-            reactions: {
-              happy: 0,
-              sad: 0,
-              afraid: 0,
-              amused: 0,
-              angry: 0,
-              inspired: 0,
-              ...Object.keys(groupBy(action.focusedInfo.reactions, 'group'))
-                .reduce((prev, next) => ({
-                  ...prev,
-                  [next]: groupBy(action.focusedInfo.reactions, 'group')[next][0].reduction,
-                }), {}),
-            },
-          }
+        focusedInfo: action.focusedInfo
+          ? action.focusedInfo
           : state.focusedInfo,
         focusedOn: 'simple',
         infoStatus: updateCrudStatus(action),
@@ -97,25 +78,9 @@ export default (state = initialState, action) => {
     case FETCH_CLUSTER_INFO:
       return {
         ...state,
-        focusedClusterInfo: action.focusedClusterInfo ?
-          action.focusedClusterInfo.map((cluster) => {
-            const groupReactions = groupBy(cluster.reactions, 'group');
-            return {
-              ...cluster,
-              reactions: {
-                happy: 0,
-                sad: 0,
-                afraid: 0,
-                amused: 0,
-                angry: 0,
-                inspired: 0,
-                ...Object.keys(groupReactions).reduce((prev, next) => ({
-                  ...prev,
-                  [next]: groupReactions[next][0].reduction,
-                }), {}),
-              },
-            };
-          }) : state.focusedClusterInfo,
+        focusedClusterInfo: action.focusedClusterInfo
+          ? action.focusedClusterInfo
+          : state.focusedClusterInfo,
         focusedOn: 'cluster',
         clusterStatus: updateCrudStatus(action),
         focusedClusterArticles: action.focusedClusterArticles || state.focusedClusterArticles,
@@ -131,36 +96,6 @@ export default (state = initialState, action) => {
         infoStatus: crudStatus,
         clusterStatus: crudStatus,
         reactionStatus: crudStatus,
-      };
-    case SET_REACTION_ID:
-      return {
-        ...state,
-        reactionId: action.id,
-      };
-    case UPDATE_REACTION:
-      return {
-        ...state,
-        focusedInfo: state.focusedOn === 'simple' ? {
-          ...state.focusedInfo,
-          reactions: {
-            ...state.focusedInfo.reactions,
-            [action.reaction]: state.focusedInfo.reactions[action.reaction] + 1,
-          },
-        } : state.focusedInfo,
-        focusedClusterInfo: state.focusedOn === 'cluster' ?
-          state.focusedClusterInfo.map((article) => {
-            if (article.id === action.id) {
-              return {
-                ...article,
-                reactions: {
-                  ...article.reactions,
-                  [action.reaction]: article.reactions[action.reaction] + 1,
-                },
-              };
-            }
-            return article;
-          }) : state.focusedClusterInfo,
-        reactionStatus: updateCrudStatus(action),
       };
     default:
       return state;
@@ -368,25 +303,6 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
       focusedClusterSource = null;
 
       return payload;
-    } catch (e) {
-      return e;
-    }
-  });
-
-export const updateReaction = (id, reaction) =>
-  httpThunk(UPDATE_REACTION, async (_, dispatch) => {
-    try {
-      dispatch({ type: SET_REACTION_ID, id });
-      const { status } = await axios.put('/articles/reactions', {
-        id,
-        reaction,
-      });
-
-      return {
-        id,
-        reaction,
-        status,
-      };
     } catch (e) {
       return e;
     }

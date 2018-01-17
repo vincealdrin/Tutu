@@ -84,23 +84,23 @@ class UsersFeed extends Component {
                   <Feed.Date content={timeago().format(timestamp)} />
                 </Feed.Summary>
                 <Feed.Extra>
-                  {sources.map((source, i) => (
+                  {sources.map((src, i) => (
                     <span>
-                      <a href={`http://${source.url}`} target="_blank" >
-                        {source.brand}
+                      <a href={src.url} target="_blank" >
+                        {src.brand}
                       </a>{i === sources.length - 1 ? null : ', '}
                     </span>
                   ))}
                   {deleted.map((deletedSource, i) => (
                     <span>
-                      <a href={`http://${deletedSource.url}`} target="_blank" >
+                      <a href={deletedSource.url} target="_blank" >
                         {deletedSource.brand}
                       </a>{i === deleted.length - 1 ? null : ', '}
                     </span>
                   ))}
                   {type === 'verify' ? (
                     <p>
-                      <a href={`http://${source.url}`} target="_blank" >
+                      <a href={source.url} target="_blank" >
                         {source.brand}
                       </a> is verified to be a {isReliable ? 'reliable' : 'not reliable'} source
                     </p>

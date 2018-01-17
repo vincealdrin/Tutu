@@ -47,6 +47,7 @@ count = 0
 slp_time = 0
 crawled_sources = []
 last_proxy = ''
+repeat_categorize = True
 
 while True:
     # news_sources = get_rand_sources(not_sources=crawled_sources)
@@ -158,16 +159,19 @@ while True:
                 if len(title_split) != 1:
                     title = title_split[0].strip()
 
-                categories, body = categorize(article.url)
+                while repeat_categorize:
+                    categories, body = categorize(article.url)
 
-                if categories == 'API LIMIT':
-                    print('REACHED AYLIEN LIMIT')
-                    insert_log(source_id, 'articleCrawl', 'error',
-                               float(time.clock() - start_time), {
-                                   'errorMessage': 'REACHED AYLIEN LIMIT (1 HOUR SLEEP)',
-                               })
-                    sleep(3600)
-                    continue
+                    if categories == 'API LIMIT':
+                        print('REACHED AYLIEN LIMIT')
+                        insert_log(source_id, 'articleCrawl', 'error',
+                                float(time.clock() - start_time), {
+                                    'errorMessage': 'REACHED AYLIEN LIMIT (1 HOUR SLEEP)',
+                                })
+                        repeat_categorize = True
+                        sleep(3600)
+                    else:
+                        repeat_categorize = False
 
                 if categories is None and body is None:
                     if PY_ENV == 'development':

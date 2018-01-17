@@ -13,7 +13,7 @@ import Filter from '../Filter';
 import About from '../About';
 import Categories from '../Categories';
 import Submit from '../Submit';
-import Sources from '../Sources';
+import SourcesList from '../SourcesList';
 import Insights from '../Insights';
 import MapThemes from '../MapThemes';
 import './styles.css';
@@ -43,7 +43,7 @@ const App = () => (
         <Route path="(.*)/submit" component={Submit} exact />
         <Route path="(.*)/categories" component={Categories} exact />
         <Route path="(.*)/themes" component={MapThemes} exact />
-        <Route path="(.*)/sources" component={Sources} exact />
+        <Route path="(.*)/sources" component={SourcesList} exact />
         <Redirect to="/" />
       </Switch>
     </AppSidebar>

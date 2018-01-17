@@ -160,7 +160,7 @@ class MapView extends Component {
                   key={shortid.generate()}
                   article={article}
                   lng={lng}
-                  lat={lat}
+									lat={lat}
                 />
               );
             }

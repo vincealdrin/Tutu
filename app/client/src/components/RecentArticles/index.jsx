@@ -12,6 +12,7 @@ import {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
+import moment from 'moment';
 import { addRecentArticle, fetchRecentArticles } from '../../modules/recentArticles';
 import { fetchFocusedInfo } from '../../modules/mapArticles';
 import newsPlaceholder from '../../assets/placeholder/news-placeholder.png';
@@ -55,7 +56,7 @@ class RecentArticles extends Component {
 
     return (
       <div>
-        <Segment>
+        <Segment className="segment-container">
           {fetchStatus.pending ? (
             <Dimmer active inverted>
               <Loader inverted content="Loading recent articles..." />
@@ -82,8 +83,8 @@ class RecentArticles extends Component {
                     <Grid.Column width={10} className="article-info">
                       <Header color="blue" as="a" href={article.url} className="article-title" target="_blank">{article.title}</Header>
                       <br />
-                      <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a> | <span>{new Date(article.publishDate).toLocaleDateString()}</span>
-                      <p> {article.summary[0]} </p>
+                      <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a> <span className="source-name"> —  {moment(article.timestamp).fromNow()}</span>
+                      <p>{article.summary}</p>
                     </Grid.Column>
                   </Grid.Row>
                 </Grid>

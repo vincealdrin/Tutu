@@ -13,7 +13,7 @@ const ActiveMenuItem = ({
     case 'people': {
       return <HorizontalBar data={peopleBarData} />;
     }
-    case 'orgs': {
+    case 'organizations': {
       return <HorizontalBar data={orgsBarData} />;
     }
     case 'locations': {
@@ -119,7 +119,7 @@ class TopTen extends Component {
       <div>
         <Menu pointing secondary>
           <Menu.Item name="people" active={activeItem === 'people'} onClick={this.changeItem} />
-          <Menu.Item name="orgs" active={activeItem === 'orgs'} onClick={this.changeItem} />
+          <Menu.Item name="organizations" active={activeItem === 'organizations'} onClick={this.changeItem} />
           <Menu.Item name="locations" active={activeItem === 'locations'} onClick={this.changeItem} />
         </Menu>
         <ActiveMenuItem

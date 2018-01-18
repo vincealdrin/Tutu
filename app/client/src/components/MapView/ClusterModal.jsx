@@ -12,6 +12,7 @@ import {
   Header,
 } from 'semantic-ui-react';
 import shortid from 'shortid';
+import moment from 'moment';
 import RelatedArticles from './RelatedArticles';
 import { removeFocused, fetchFocusedClusterInfo } from '../../modules/mapArticles';
 import Tags from './Tags';
@@ -19,6 +20,7 @@ import Reactions from './Reactions';
 import Pagination from './Pagination';
 import newsPlaceholder from '../../assets/placeholder/news-placeholder.png';
 import './styles.css';
+import { DATE_FORMAT } from '../../constants';
 
 const mapStateToProps = ({
   mapArticles: {
@@ -112,14 +114,14 @@ class ClusterModal extends Component {
                     href={sourceUrl}
                     ribbon
                   >
-                    {source}
+                    <div className="news-label-name">{source}</div>
                   </Label>
                   <div className="image-tag-title-container">
                     <div className="top-image">
                       <Image src={topImageUrl || newsPlaceholder} />
                       <Header as="a" href={url} color="blue" className="news-title" target="_blank">{title}</Header>
                       <p className="article-date">
-                        {new Date(publishDate).toDateString()} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
+                        {moment(publishDate).format(DATE_FORMAT)} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
                       </p>
                     </div>
                     <div className="tags">

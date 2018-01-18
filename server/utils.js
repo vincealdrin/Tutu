@@ -135,7 +135,10 @@ const cleanUrl = (dirtyUrl = '', baseUrl = '') => {
     url = baseUrl + dirtyUrl;
   }
 
-  url = url.replace('www.', '').replace(/^(https:\/\/)/, 'http://');
+  url = url
+    .replace('www.', '')
+    .replace(/^(https:\/\/)/, 'http://')
+    .replace(/\/$/, '');
 
   if (url && !/^http:\/\//.test(url)) {
     url = `http://${url}`;
@@ -282,21 +285,6 @@ module.exports.mapArticle = (bounds) => (join) => {
   } else {
     article.locations = join('left')('locations').map(mapLocation);
   }
-
-  return article;
-};
-
-module.exports.mapSideArticle = (join) => {
-  const article = {
-    id: join('left')('id'),
-    url: join('left')('url'),
-    title: join('left')('title'),
-    publishDate: join('left')('publishDate'),
-    summary: join('left')('summary'),
-    topImageUrl: join('left')('topImageUrl'),
-    source: join('right')('brand'),
-    sourceUrl: join('right')('url'),
-  };
 
   return article;
 };

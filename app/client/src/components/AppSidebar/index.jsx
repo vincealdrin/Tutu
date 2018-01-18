@@ -73,23 +73,23 @@ class AppSidebar extends Component {
               <Icon name="cogs" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Preferences</span>
             </Link>
-            <Link to="/categories" onClick={this.beVisible}>
+            {/* <Link to="/categories" onClick={this.beVisible}>
               <Icon name="tags" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Categories</span>
-            </Link>
-            <Link to="/about" onClick={this.beVisible}>
-              <Icon name="browser" color="darkgrey" />
-              <span className={`sidebar-text ${isWideClass}`}>About</span>
-            </Link>
+            </Link> */}
             <Link to="/submit" onClick={this.beVisible}>
               <Icon name="send outline" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Submit</span>
             </Link>
-            <Link to="/themes" onClick={this.beVisible}>
+            <Link to="/about" onClick={this.beVisible}>
+              <Icon name="marker" color="darkgrey" />
+              <span className={`sidebar-text ${isWideClass}`}>About</span>
+            </Link>
+            {/* <Link to="/themes" onClick={this.beVisible}>
               <Icon name="globe" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Map Themes</span>
-            </Link>
-						<Link to="/sources" onClick={this.beVisible}>
+            </Link> */}
+            <Link to="/sources" onClick={this.beVisible}>
               <Icon name="list ul" color="grey" />
               <span className={`sidebar-text ${isWideClass}`}>Sources</span>
             </Link>

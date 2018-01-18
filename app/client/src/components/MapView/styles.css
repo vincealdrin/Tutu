@@ -81,7 +81,7 @@
   left: -27px !important;
 }
 
-.marker {
+.simple-marker-icon {
   position: absolute;
   bottom: 1px;
   left: -13.5px;
@@ -135,9 +135,9 @@
 }
 
 .ui.list > .item > .header.related-articles {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .related-stories {
@@ -201,24 +201,17 @@
   align-items: flex-start;
 }
 
-.ui.label.news-label {
-  position: absolute;
-  left: 0;
+.news-label {
+  position: absolute !important;
+  left: -1rem !important;
   z-index: 1000;
-  max-width: 250px;
-  min-width: 0 !important;
+}
+
+.news-label-name {
+  max-width: 115px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transition: all 0.7s cubic-bezier(0.62, 0.04, 0.35, 0.96);
-}
-
-.ui.label.news-label:hover {
-  max-width: 100%;
-}
-
-.simple-modal-label {
-  top: 2rem;
 }
 
 .sentiment-list {

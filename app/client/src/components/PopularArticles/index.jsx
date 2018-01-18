@@ -12,10 +12,12 @@ import {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
+import moment from 'moment';
 import { fetchPopularArticles } from '../../modules/popularArticles';
 import { fetchFocusedInfo } from '../../modules/mapArticles';
 import newsPlaceholder from '../../assets/placeholder/news-placeholder.png';
 import './styles.css';
+import { DATE_FORMAT } from '../../constants';
 
 const mapStateToProps = ({
   popularArticles: {
@@ -41,8 +43,8 @@ class PopularArticles extends Component {
     const { articles, fetchStatus } = this.props;
 
     return (
-      <div className="popular-section-container">
-        <Segment>
+      <div>
+        <Segment className="segment-container">
           {fetchStatus.pending ? (
             <Dimmer active inverted>
               <Loader inverted content="Loading popular articles..." />
@@ -69,14 +71,14 @@ class PopularArticles extends Component {
                     <Grid.Column width={10} className="article-info">
                       <Header color="blue" as="a" href={article.url} className="article-title" target="_blank">{article.title}</Header>
                       <br />
-                      <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a>
-                      <p> {article.summary[0]} </p>
+                      <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a><span className="source-name"> —  {moment(article.publishDate).format(DATE_FORMAT)}</span>
+                      <p>{article.summary}</p>
                     </Grid.Column>
                   </Grid.Row>
                 </Grid>
                 <Divider section />
               </div>
-                ))}
+            ))}
           </div>
         </Segment>
       </div>

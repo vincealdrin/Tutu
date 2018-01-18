@@ -116,7 +116,7 @@ class MapView extends Component {
         {currentPosition ? (
           <Button
             className="current-loc"
-            icon="home"
+            icon="crosshairs"
             onClick={() => {
               this.props.updateMapState(currentPosition, 12);
             }}
@@ -160,7 +160,7 @@ class MapView extends Component {
                   key={shortid.generate()}
                   article={article}
                   lng={lng}
-									lat={lat}
+                  lat={lat}
                 />
               );
             }

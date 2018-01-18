@@ -57,7 +57,6 @@ export const fetchPopularArticles = (limit) => async (dispatch) => {
   }
 };
 
-
 export const addRecentArticle = (newArticle) => (dispatch) => {
   dispatch({
     type: ADD_POPULAR_ARTICLE,

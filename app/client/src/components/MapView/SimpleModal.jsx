@@ -9,11 +9,13 @@ import {
   Grid,
   Header,
 } from 'semantic-ui-react';
+import moment from 'moment';
 import Tags from './Tags';
 import RelatedArticles from './RelatedArticles';
 import Reactions from './Reactions';
 import { removeFocused } from '../../modules/mapArticles';
 import './styles.css';
+import { DATE_FORMAT } from '../../constants';
 
 const mapStateToProps = ({
   mapArticles: {
@@ -85,18 +87,17 @@ class SimpleModal extends Component {
         dimmer
       >
         {status.success ? (
-					<p className="try-this">
-						<Label
-							as="a"
-							target="_blank"
-							className="news-label"
-							color="orange"
-							href={sourceUrl}
-							ribbon
-						>
-							{source}
-						</Label>
-					</p>
+          <Label
+            as="a"
+            target="_blank"
+            className="news-label"
+            color="orange"
+            href={sourceUrl}
+            title={sourceUrl}
+            ribbon
+          >
+            <div className="news-label-name">{source}</div>
+          </Label>
         ) : null}
         <Modal.Content scrolling>
           {status.pending ? (
@@ -152,7 +153,7 @@ class SimpleModal extends Component {
           </Grid>
           <Header as="a" color="blue" href={url} target="_blank">{title}</Header>
           <p className="article-date">
-            {new Date(publishDate).toDateString()}
+            {moment(publishDate).format(DATE_FORMAT)}
             &nbsp;{status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
           </p>
           <div className="carousel-container">

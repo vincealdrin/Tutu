@@ -2,7 +2,6 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
-const requestIp = require('request-ip');
 const {
   cleanUrl,
   getAboutContactUrl,
@@ -24,7 +23,7 @@ module.exports = (conn, io) => {
       const uuid = await r.uuid(domain).run(conn);
       // const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
       const matchedSource = await r.table('sources').get(uuid).run(conn);
-      console.log(matchedSource);
+
       // if (matchedPending) {
       //   return res.json({
       //     isReliable: matchedPending.isReliable,
@@ -75,7 +74,7 @@ module.exports = (conn, io) => {
         json: true,
       });
       const isReliablePred = Boolean(overallPred);
-      const ipAddress = requestIp.getClientIp(req);
+      const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
       const id = await r.uuid(sourceUrl).run(conn);
 
       await r.table('pendingSources').insert({

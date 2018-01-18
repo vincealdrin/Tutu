@@ -2,9 +2,11 @@ import React, { PureComponent } from 'react';
 import { Header, Grid, Image, Icon, Label } from 'semantic-ui-react';
 import { Motion, spring } from 'react-motion';
 import { Tooltip } from 'react-tippy';
+import moment from 'moment';
 import './styles.css';
 import TutuLogo from '../../assets/logo/tutu-logo.svg';
 import { fetchRelatedArticles } from '../../modules/mapArticles';
+import { DATE_FORMAT } from '../../constants';
 
 const config = { stiffness: 140, damping: 14 };
 const toCSS = (translateX) => ({ transform: `translateX: ${translateX}px` });
@@ -17,8 +19,8 @@ class SimpleMarker extends PureComponent {
         title,
         source,
         publishDate,
-			},
-			image,
+      },
+      image,
       $hover,
     } = this.props;
 
@@ -35,7 +37,7 @@ class SimpleMarker extends PureComponent {
                 </Grid.Column>
                 <Grid.Column width={9} className="marker-title-column">
                   <Header as="a" color="blue" target="_blank" className="simple-marker-title">{title}</Header>
-                  <p className="article-date">{new Date(publishDate).toDateString()}</p>
+                  <p className="article-date">{moment(publishDate).format(DATE_FORMAT)}</p>
                   <Label as="a" circular className="source-label">{source}</Label>
                 </Grid.Column>
               </Grid.Row>
@@ -63,7 +65,7 @@ class SimpleMarker extends PureComponent {
             <div>
               <Icon
                 color="red"
-                name="marker"
+                name="simple-marker-icon"
                 size={$hover ? 'huge' : 'big'}
                 className={`marker ${$hover ? 'hovered' : ''}`}
                 style={toCSS(v.translateX)}

@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { List, Image, Label, Grid } from 'semantic-ui-react';
 import shortid from 'shortid';
+import moment from 'moment';
 import { Tooltip } from 'react-tippy';
 import './styles.css';
+import { DATE_FORMAT } from '../../constants';
 
 class ClusterMarker extends Component {
   render() {
@@ -24,7 +26,7 @@ class ClusterMarker extends Component {
                       <div>
                         <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
                         <List.Description className="article-date">
-                          {new Date(article.publishDate).toDateString()}
+                          {moment(article.publishDate).format(DATE_FORMAT)}
                         </List.Description>
                         <Label as="a" circular className="source-label">{article.source}</Label>
                       </div>

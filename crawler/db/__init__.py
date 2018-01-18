@@ -185,10 +185,10 @@ def get_sources(order_by='timestamp', desc=False, isReliable=True, tbl='sources'
     return list(query.order_by(order_by).run(conn))
 
 
-def get_rand_sources(not_sources=[], count=1, isReliable=True, tbl='sources'):
+def get_rand_sources(filter_sources=[], count=1, isReliable=True, tbl='sources'):
     return list(
         r.table(tbl)
-        .filter(lambda source: r.not_(r.expr(not_sources).contains(source['id'])).and_(r.row['isReliable'].eq(isReliable)))
+        .filter(lambda source: r.not_(r.expr(filter_sources).contains(source['id'])).and_(source['isReliable'].eq(isReliable)))
         .sample(count).run(conn))
 
 

@@ -1,5 +1,5 @@
 .scrollable-section {
-  height: 90vh;
+  height: 96%;
   padding-top: 2rem;
   overflow-x: hidden;
   overflow-y: auto;
@@ -15,32 +15,15 @@
   font-size: 1.141592654rem;
 }
 
-.no-article-container {
-	display: flex;
-	height: 90vh;
-	text-align: center;
-  color: #767676;
-}
-
-.no-article-emoji-container {
-	margin: auto;
-}
-
-.ui.header.no-article-emoji {
-	font-size: 2rem;
-	padding: 2rem;
-}
-
-.no-article-desc {
-	font-size: 1.1rem;
-	letter-spacing: 3px;
-}
-
 .row { align-items: flex-start !important; }
 .article-item { padding: 0 !important; }
-
+/*
 @media screen and (min-width: 1367px) {
   .scrollable-section {
     height: 100vh;
   }
+} */
+
+.segment-container {
+  height: 100vh;
 }

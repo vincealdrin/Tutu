@@ -47,11 +47,10 @@ count = 0
 slp_time = 0
 crawled_sources = []
 last_proxy = ''
-repeat_categorize = True
 
 while True:
     # news_sources = get_rand_sources(not_sources=crawled_sources)
-    news_sources = get_sources('timestamp')
+    news_sources = get_rand_sources(crawled_sources)
 
     for news_source in news_sources:
         print('Crawled Sources: ' + str(crawled_sources))
@@ -80,7 +79,7 @@ while True:
             config.proxies = proxy
 
         try:
-            source = newspaper.build('http://' + url, config=config)
+            source = newspaper.build(url, config=config)
         except Exception as e:
             if PY_ENV == 'development':
                 print('(SOURCE ERROR) Source Skipped\n')
@@ -115,11 +114,14 @@ while True:
 
         # shuffle(source.articles)
         for article in source.articles:
+            repeat_categorize = True
+
             if PY_ENV == 'development':
                 print(article.url)
 
             clean_url = article.url
             clean_url = re.sub(r'^(https?:\/\/)', '', clean_url)
+            clean_url = re.sub('www.', '', clean_url)
             clean_url = re.sub(r'(?=\/?(#\w*)).+', '', clean_url)
             clean_url = 'http://' + re.sub(r'(?=\/?\?).+', '', clean_url)
 
@@ -464,7 +466,7 @@ while True:
                        'articlesCrawledCount': src_art_count,
                    })
 
-        # crawled_sources.append(source_id)
+        crawled_sources.append(source_id)
 
         if PY_ENV == 'development':
             print('\n' + source.domain + ' done!')

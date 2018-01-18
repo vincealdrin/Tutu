@@ -1,5 +1,7 @@
 import axios from 'axios';
+import moment from 'moment';
 import { crudStatus, updateCrudStatus, httpThunk } from '../utils';
+import { DATE_FORMAT } from '../constants';
 
 export const OPEN_MODAL = 'insights/OPEN_MODAL';
 export const CLOSE_MODAL = 'insights/CLOSE_MODAL';
@@ -61,7 +63,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         sentiment: action.insights ? {
-          labels: action.insights.map((insight) => new Date(insight.date).toLocaleDateString()),
+          labels: action.insights.map((insight) => moment(insight.date).format(DATE_FORMAT)),
           posCount: action.insights
             .map((insight) => insight.sentiment.pos),
           neuCount: action.insights
@@ -75,7 +77,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         categories: action.insights ? {
-          labels: action.insights.map((insight) => new Date(insight.date).toLocaleDateString()),
+          labels: action.insights.map((insight) => moment(insight.date).format(DATE_FORMAT)),
           econCount: action.insights
             .map((insight) => insight.categories.Economy),
           lifeCount: action.insights

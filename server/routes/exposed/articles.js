@@ -2,7 +2,6 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 const natural = require('natural');
 const _ = require('lodash');
-const requestIp = require('request-ip');
 const {
   mapArticle,
   mapArticleInfo,
@@ -59,14 +58,17 @@ module.exports = (conn, io) => {
 
         if (start === 0 && end === 0) {
           query = query.filter((article) =>
-            article('publishDate').date().eq(r.now().inTimezone(PH_TIMEZONE).date()));
+            article('publishDate')
+              .inTimezone(PH_TIMEZONE)
+              .date()
+              .eq(r.now().inTimezone(PH_TIMEZONE).date()));
         } else {
           const startDate = new Date(selectedDate.getTime());
           startDate.setDate(selectedDate.getDate() - parsedStart);
           const endDate = new Date(selectedDate.getTime());
           endDate.setDate(selectedDate.getDate() - parsedEnd);
 
-          query = query.filter((article) => article('publishDate').date().during(
+          query = query.filter((article) => article('publishDate').inTimezone(PH_TIMEZONE).date().during(
             r.time(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate(), PH_TIMEZONE),
             r.time(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate(), PH_TIMEZONE), {
               rightBound: 'closed',
@@ -265,7 +267,16 @@ module.exports = (conn, io) => {
           .and(article('popularity')('totalScore').gt(0)))
         .eqJoin(r.row('sourceId'), r.table('sources'))
         .orderBy(r.desc(r.row('left')('popularity')('totalScore')))
-        .map(mapSideArticle)
+        .map((join) => ({
+          id: join('left')('id'),
+          url: join('left')('url'),
+          title: join('left')('title'),
+          publishDate: join('left')('publishDate'),
+          summary: join('left')('summary').nth(0),
+          topImageUrl: join('left')('topImageUrl'),
+          source: join('right')('brand'),
+          sourceUrl: join('right')('url'),
+        }))
         .limit(parseInt(limit));
       const totalCount = query.count().run(conn);
       const cursor = await query.run(conn);
@@ -287,7 +298,16 @@ module.exports = (conn, io) => {
         .eqJoin('sourceId', r.table('sources'))
         .orderBy(r.desc(r.row('left')('timestamp')))
         .limit(parseInt(limit))
-        .map(mapSideArticle)
+        .map((join) => ({
+          id: join('left')('id'),
+          url: join('left')('url'),
+          title: join('left')('title'),
+          timestamp: join('left')('timestamp'),
+          summary: join('left')('summary').nth(0),
+          topImageUrl: join('left')('topImageUrl'),
+          source: join('right')('brand'),
+          sourceUrl: join('right')('url'),
+        }))
         .run(conn);
       const articles = await query.toArray();
 
@@ -352,7 +372,7 @@ module.exports = (conn, io) => {
         });
       }
 
-      const ip = requestIp.getClientIp(req);
+      const ip = req.headers['x-real-ip'] || req.connection.remoteAddress;
       const existingReact = await r.table('articles').get(id)('reactions')
         .filter((react) => react('ip').eq(ip))
         .nth(0)

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import shortid from 'shortid';
+import moment from 'moment';
 import { Accordion, Icon, List, Label } from 'semantic-ui-react';
+import { DATE_FORMAT } from '../../constants';
 
 class RelatedArticles extends Component {
   state = {
@@ -41,7 +42,7 @@ class RelatedArticles extends Component {
                   </List.Header>
                   <List.Description>
                     <p className="article-date">
-                      {new Date(relatedArticle.publishDate).toDateString()}
+                      {moment(relatedArticle.publishDate).format(DATE_FORMAT)}
                     </p>
                   </List.Description>
                 </List.Item>

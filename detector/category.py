@@ -42,7 +42,7 @@ df = pd.concat([
 
 
 X_train, X_test, y_train, y_test = train_test_split(
-    df.body.values, df.category.values, test_size=0.2, random_state=123)
+    df.body.values, df.category.values, test_size=0.05, random_state=123)
 
 text_clf = Pipeline([
     ('tfidf',

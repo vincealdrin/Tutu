@@ -35,6 +35,7 @@ app.use(compression({
 app.use(passport.initialize());
 
 app.use(cors({ exposedHeaders: 'X-Total-Count' }));
+app.set('trust proxy', true);
 // app.use(express.static(path.resolve(__dirname, '..', 'app', 'client', 'build')));
 
 const isProduction = process.env.NODE_ENV === 'production';

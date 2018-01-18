@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Icon, Header, Image } from 'semantic-ui-react';
+import { Icon, Header, Image, Dimmer, List, Divider } from 'semantic-ui-react';
 import tutuLogo from '../../assets/logo/tutu-logo.png';
 import './style.css';
 
@@ -15,9 +15,15 @@ class AppSidebar extends Component {
   beVisible = () => this.setState({ visible: true })
   toggleVisibility = () => this.setState({ visible: !this.state.visible })
 
+  openHelp = () => this.setState({ active: true })
+  closeHelp = () => this.setState({ active: false })
+
   render() {
-    const { isWide } = this.state;
-    const { visible } = this.state;
+    const {
+      isWide,
+      visible,
+      active } = this.state;
+
     const isWideClass = isWide ? 'show' : 'hide';
     let isVisible;
     let isIconVisible;
@@ -25,9 +31,6 @@ class AppSidebar extends Component {
     if (window.location.pathname === '/') {
       isVisible = `${visible ? 'hidden' : 'full'}`;
       isIconVisible = `${visible ? 'left' : 'right'}`;
-    } else if (window.location.pathname === '/submit' || window.location.pathname === '/about') {
-      isVisible = `${visible ? 'full thin-component' : 'hidden'}`;
-      isIconVisible = `${visible ? 'right' : 'left'}`;
     } else {
       isVisible = `${visible ? 'full' : 'hidden'}`;
       isIconVisible = `${visible ? 'right' : 'left'}`;
@@ -88,11 +91,60 @@ class AppSidebar extends Component {
             {/* <Link to="/themes" onClick={this.beVisible}>
               <Icon name="globe" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Map Themes</span>
+<<<<<<< HEAD
+            </Link>
+=======
             </Link> */}
+>>>>>>> 16ef9e701a8482af022fc06850249efd49508fa9
             <Link to="/sources" onClick={this.beVisible}>
               <Icon name="list ul" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Sources</span>
             </Link>
+            <div 
+              onMouseDown={this.openHelp}
+              className="help-button"
+            >
+              <Icon name="help circle outline" color="darkgrey" />
+              <span className={`sidebar-text ${isWideClass}`}>Help</span>
+              <Dimmer
+                onMouseUp={this.closeHelp}
+                active={active}
+                page
+              >
+              <Header as="h2" inverted>Legends:</Header>
+              <Divider inverted />
+              <List relaxed="very">
+                <List.Item>
+                  <List.Icon name="newspaper" size="big" />
+                  <List.Content>Take a look at the popular news</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="plus square outline" size="big" />
+                  <List.Content>Take a look at the recently added news</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="cogs" size="big" />
+                  <List.Content>Prefer something you prefer</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="send outline" size="big" />
+                  <List.Content>Submit an article to be evaluated by TUTÛ Evaluator</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="list ul" size="big" />
+                  <List.Content>Take a look at the sources in our archives</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="marker" size="big" />
+                  <List.Content>Display a single article</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="dot circle outline" size="big" />
+                  <List.Content>Display a cluster of articles in a region</List.Content>
+                </List.Item>
+              </List>
+              </Dimmer>
+            </div>
           </div>
           <div className="popular">
             <span className={`label ${isWideClass}`}>POPULAR</span>

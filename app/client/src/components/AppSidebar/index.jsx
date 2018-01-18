@@ -82,7 +82,7 @@ class AppSidebar extends Component {
               <span className={`sidebar-text ${isWideClass}`}>Submit</span>
             </Link>
             <Link to="/about" onClick={this.beVisible}>
-              <Icon name="marker" color="darkgrey" />
+              <Icon name="browser" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>About</span>
             </Link>
             {/* <Link to="/themes" onClick={this.beVisible}>
@@ -90,7 +90,7 @@ class AppSidebar extends Component {
               <span className={`sidebar-text ${isWideClass}`}>Map Themes</span>
             </Link> */}
             <Link to="/sources" onClick={this.beVisible}>
-              <Icon name="list ul" color="grey" />
+              <Icon name="list ul" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Sources</span>
             </Link>
           </div>

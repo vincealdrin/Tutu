@@ -85,16 +85,18 @@ class SimpleModal extends Component {
         dimmer
       >
         {status.success ? (
-          <Label
-            as="a"
-            target="_blank"
-            className="news-label"
-            color="orange"
-            href={sourceUrl}
-            ribbon
-          >
-            {source}
-          </Label>
+					<p className="try-this">
+						<Label
+							as="a"
+							target="_blank"
+							className="news-label"
+							color="orange"
+							href={sourceUrl}
+							ribbon
+						>
+							{source}
+						</Label>
+					</p>
         ) : null}
         <Modal.Content scrolling>
           {status.pending ? (

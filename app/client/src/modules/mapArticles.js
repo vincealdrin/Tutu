@@ -1,7 +1,6 @@
 import axios from 'axios';
 import supercluster from 'points-cluster';
 import flattenDeep from 'lodash/flattenDeep';
-import groupBy from 'lodash/groupBy';
 import {
   crudStatus,
   updateCrudStatus,
@@ -48,6 +47,8 @@ export default (state = initialState, action) => {
     case TOGGLE_SOURCES:
       return {
         ...state,
+        clusters: [],
+        articles: [],
         isSourcesLegit: !state.isSourcesLegit,
       };
     case FETCH_ARTICLES:

@@ -3,7 +3,8 @@ import GoogleMapReact from 'google-map-react';
 import shortid from 'shortid';
 import SimpleMarker from './SimpleMarker';
 import ClusterMarker from './ClusterMarker';
-import mapStyle from './mapStyle.json';
+import legitMapStyle from './legitMapStyle.json';
+import illegitimateMapStyle from './illegitimateMapStyle.json';
 import {
   MARGIN_TOP,
   MARGIN_RIGHT,
@@ -15,16 +16,6 @@ import {
   MIN_ZOOM,
 } from '../../constants';
 
-const mapOption = {
-  zoomControl: false,
-  fullscreenControl: false,
-  minZoomOverride: true,
-  minZoom: MIN_ZOOM,
-  maxZoom: MAX_ZOOM,
-  styles: mapStyle,
-  gestureHandling: 'greedy',
-};
-
 class Map extends PureComponent {
   render() {
     const {
@@ -34,7 +25,18 @@ class Map extends PureComponent {
       onChange,
       onChildClick,
       updateMapState,
+      isLegit,
     } = this.props;
+
+    const mapOption = {
+      zoomControl: false,
+      fullscreenControl: false,
+      minZoomOverride: true,
+      minZoom: MIN_ZOOM,
+      maxZoom: MAX_ZOOM,
+      styles: isLegit ? legitMapStyle : illegitimateMapStyle,
+      gestureHandling: 'greedy',
+    };
 
     return (
       <GoogleMapReact
@@ -77,6 +79,7 @@ class Map extends PureComponent {
                 article={article}
                 lng={lng}
                 lat={lat}
+                isLegit={isLegit}
               />
             );
           }
@@ -89,6 +92,7 @@ class Map extends PureComponent {
               count={numPoints}
               lng={lng}
               lat={lat}
+              isLegit={isLegit}
             />
           );
         })}

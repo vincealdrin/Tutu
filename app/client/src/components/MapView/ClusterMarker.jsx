@@ -8,7 +8,12 @@ import { DATE_FORMAT } from '../../constants';
 
 class ClusterMarker extends Component {
   render() {
-    const { count, articles, $hover } = this.props;
+    const {
+      count,
+      articles,
+      $hover,
+      isLegit,
+    } = this.props;
 
     return (
       <Tooltip
@@ -42,8 +47,11 @@ class ClusterMarker extends Component {
         animateFill={false}
         sticky
       >
-        <div className="cluster-marker-container" style={$hover ? { zIndex: 10000 } : {}}>
-          <div className={`cluster-marker-container-radiant ${$hover ? 'cluster-marker-container-hovered' : ''}`} />
+        <div
+          className={`cluster-marker-container ${isLegit ? '' : 'cluster-marker-container-illegitimate'}`}
+          style={$hover ? { zIndex: 10000 } : null}
+        >
+          <div className={`cluster-marker-container-radiant ${isLegit ? '' : 'cluster-marker-container-illegitimate'} ${$hover ? 'cluster-marker-container-hovered' : ''}`} />
           <p>{count}</p>
         </div>
       </Tooltip>

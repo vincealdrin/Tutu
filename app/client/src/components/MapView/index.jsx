@@ -8,6 +8,7 @@ import {
   fetchFocusedInfo,
   updateMapState,
   fetchFocusedClusterInfo,
+  toggleSourcesType,
 } from '../../modules/mapArticles';
 import ClusterModal from './ClusterModal';
 import Insights from '../Insights';
@@ -22,6 +23,7 @@ const mapStateToProps = ({
     clusters,
     mapState,
     filterMapState,
+    isSourcesLegit,
   },
 }) => ({
   // mapState: map.viewport.toJS(),
@@ -29,6 +31,7 @@ const mapStateToProps = ({
   articles,
   clusters,
   filterMapState,
+  isSourcesLegit,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -36,6 +39,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchFocusedInfo,
   updateMapState,
   fetchFocusedClusterInfo,
+  toggleSourcesType,
 }, dispatch);
 
 
@@ -55,24 +59,6 @@ class MapView extends Component {
         },
       });
     });
-  }
-
-  expandSidebar = () => this.setState({ isSidebarWiden: true })
-  shrinkSidebar = () => this.setState({ isSidebarWiden: false })
-  showSidebarContent = () => this.setState({ isSidebarVisible: true })
-  toggleSidebarContent = () => this.setState({ isSidebarVisible: !this.state.isSidebarVisible })
-
-  _onChange = ({ center, zoom, marginBounds }) => {
-    this.props.updateMapState(center, zoom, marginBounds);
-    this.props.fetchBoundArticles();
-  }
-
-  _onChildClick = (_, childProps) => {
-    if (childProps.articles) {
-      this.props.fetchFocusedClusterInfo(childProps.articles);
-    } else {
-      this.props.fetchFocusedInfo(childProps.article);
-    }
   }
 
   getTopBtnClassName = () => {
@@ -96,11 +82,31 @@ class MapView extends Component {
     return '';
   }
 
+  expandSidebar = () => this.setState({ isSidebarWiden: true })
+  shrinkSidebar = () => this.setState({ isSidebarWiden: false })
+  showSidebarContent = () => this.setState({ isSidebarVisible: true })
+  toggleSidebarContent = () => this.setState({ isSidebarVisible: !this.state.isSidebarVisible })
+
+  _onChange = ({ center, zoom, marginBounds }) => {
+    this.props.updateMapState(center, zoom, marginBounds);
+
+    this.props.fetchBoundArticles();
+  }
+
+  _onChildClick = (_, childProps) => {
+    if (childProps.articles) {
+      this.props.fetchFocusedClusterInfo(childProps.articles);
+    } else {
+      this.props.fetchFocusedInfo(childProps.article);
+    }
+  }
+
   render() {
     const {
       articles,
       clusters,
       mapState,
+      isSourcesLegit,
     } = this.props;
     const {
       currentPosition,
@@ -110,11 +116,16 @@ class MapView extends Component {
 
     return (
       <div className="map-container">
-        <div className={`map-top-buttons ${this.getTopBtnClassName()}`} >
+        <div className={`map-top-buttons ${this.getTopBtnClassName()}`}>
           <Button
-            content="Go to legitimate news"
+            content={`Switch to ${isSourcesLegit ? 'illegitimate' : 'legitimate'} sources`}
+            color={`${isSourcesLegit ? 'red' : 'green'}`}
             icon="newspaper"
             labelPosition="left"
+            onClick={() => {
+              this.props.toggleSourcesType();
+              this.props.fetchBoundArticles();
+            }}
           />
           <Insights />
         </div>
@@ -151,6 +162,7 @@ class MapView extends Component {
           updateMapState={this.props.updateMapState}
           onChange={this._onChange}
           onChildClick={this._onChildClick}
+          isLegit={isSourcesLegit}
         />
       </div>
     );

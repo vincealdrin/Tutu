@@ -34,6 +34,10 @@
   transform-origin: center;
 }
 
+.cluster-marker-container-illegitimate {
+  border: 5px solid #1b272b;
+}
+
 .map-container {
   width: 100%;
   height: 100%;
@@ -135,9 +139,9 @@
 }
 
 .ui.list > .item > .header.related-articles {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .related-stories {

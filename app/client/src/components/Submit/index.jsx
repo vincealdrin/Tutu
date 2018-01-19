@@ -1,25 +1,35 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Segment, Label, Header, Input, Button, Message } from 'semantic-ui-react';
+import {
+  Segment,
+  Label,
+  Header,
+  Input,
+  Button,
+  Message,
+  Checkbox,
+} from 'semantic-ui-react';
 import './styles.css';
 
 class Submit extends Component {
   state = {
     submitStatus: '',
     errorMessage: '',
+    submitSource: true,
     result: {
       overallPred: false,
-      isReliable: false,
+      isReliable: true,
       isVerified: false,
       result: 0,
       sourceResult: 0,
       contentResult: 0,
+      sourceUrl: '',
     },
     url: '',
   };
 
   submit = async () => {
+    const { url, submitSource } = this.state;
     this.setState({ submitStatus: 'pending' });
 
     try {
@@ -31,9 +41,13 @@ class Submit extends Component {
           contentPct,
           pct,
           overallPred,
+          sourceUrl,
         },
       } = await axios.get('/submit', {
-        params: { url: this.state.url },
+        params: {
+          submit: submitSource,
+          url,
+        },
       });
 
       this.setState({
@@ -44,11 +58,13 @@ class Submit extends Component {
           sourcePct,
           contentPct,
           overallPred,
+          sourceUrl,
         },
         submitStatus: 'success',
         errorMessage: '',
       });
     } catch (e) {
+      console.log(e.response.data.message);
       this.setState({
         submitStatus: 'error',
         errorMessage: e.response.data.message,
@@ -61,6 +77,7 @@ class Submit extends Component {
       submitStatus,
       result,
       errorMessage,
+      submitSource,
     } = this.state;
 
     return (
@@ -69,17 +86,25 @@ class Submit extends Component {
           <Label as="a" color="orange" ribbon style={{ marginBottom: '1rem' }}>Submit</Label>
           <div className="scrollable-section about-section-info">
             <Header as="h2" style={{ marginBottom: 32 }}>
-              Are we missing a source?
+              Analyze Source's Legitimacy
             </Header>
 
             <p className="tutu-description" >
-              Please insert an Article URL to be checked by the fake news checker
+              Please insert any Article URL from the source to be analyze by our trained model
             </p>
 
             <Input
               placeholder="Article URL"
               className="submit-field"
               onChange={(_, { value }) => this.setState({ url: value })}
+            />
+
+            <Checkbox
+              label="Submit source to be verified by journalists"
+              onChange={() => {
+                this.setState({ submitSource: !submitSource });
+              }}
+              checked={submitSource}
             />
 
             <Button
@@ -91,7 +116,9 @@ class Submit extends Component {
               Submit
             </Button>
 
-            <Message info>
+            <h5>Our analyzer accuracy improves everytime you submit a source</h5>
+
+            <Message color={result.isReliable ? 'green' : 'red'} info>
               <Message.Header>
                 {submitStatus === 'pending' ? 'please wait...' : ''}
                 {submitStatus === 'success' ? (
@@ -101,27 +128,31 @@ class Submit extends Component {
                         <div>
                           Result:
                           <ul>
-                            <li>overall prediction: {result.overallPred ? 'RELIABLE' : 'NOT RELIABLE'}</li>
+                            {/* <li>overall prediction: {result.overallPred ? 'RELIABLE' : 'NOT RELIABLE'}</li>
                             <li />
                             <li />
+                            <li /> */}
+                            <li>Source: <a href={result.sourceUrl} target="__blank">{result.sourceUrl}</a></li>
+                            <li>Prediction: {result.isReliable ? 'LEGITIMATE' : 'ILLEGITIMATE'}</li>
+                            <li>Legitimacy score: ({result.pct.toFixed(2)}%)</li>
                             <li />
-                            <li>prediction: {result.isReliable ? 'RELIABLE' : 'NOT RELIABLE'}</li>
-                            <li>reliability ({result.pct.toFixed(2)}%)</li>
-                            <li />
-                            <li>source reliability ({result.sourcePct.toFixed(2)}%)</li>
-                            <li>content reliability ({result.contentPct.toFixed(2)}%)</li>
+                            <li>Source Legitimacy Score: ({result.sourcePct.toFixed(2)}%)</li>
+                            <li>Content Legitimacy Score: ({result.contentPct.toFixed(2)}%)</li>
                           </ul>
                         </div>
                       )
                       : (
-                        <h4>{result.isReliable ? 'RELIABLE' : 'NOT RELIABLE'}</h4>
+                        <div>
+                          <a href={result.sourceUrl} target="__blank">{result.sourceUrl}</a>
+                          <br />is {result.isReliable ? 'a LEGITIMATE' : 'an ILLEGITIMATE'} SOURCE
+                        </div>
                       )}
 
-                    <p> {result.isVerified ? 'verified by a journalist' : 'not verified by a journalist tho'}</p>
+                    <h4> {result.isVerified ? 'This result was verified by a journalist' : 'NOTE: This result was not verified by a journalist and it might not be accurate'}</h4>
                   </span>
                 ) : ''}
 
-                {submitStatus === 'error' ? errorMessage : ''}
+                {submitStatus === 'error' ? errorMessage.code || errorMessage : ''}
               </Message.Header>
             </Message>
           </div>

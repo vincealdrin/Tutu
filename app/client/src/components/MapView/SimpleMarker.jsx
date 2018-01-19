@@ -5,7 +5,6 @@ import { Tooltip } from 'react-tippy';
 import moment from 'moment';
 import './styles.css';
 import TutuLogo from '../../assets/logo/tutu-logo.svg';
-import { fetchRelatedArticles } from '../../modules/mapArticles';
 import { DATE_FORMAT } from '../../constants';
 
 const config = { stiffness: 140, damping: 14 };
@@ -20,7 +19,7 @@ class SimpleMarker extends PureComponent {
         source,
         publishDate,
       },
-      image,
+      isLegit,
       $hover,
     } = this.props;
 
@@ -64,7 +63,7 @@ class SimpleMarker extends PureComponent {
           {(v) => (
             <div>
               <Icon
-                color="red"
+                color={isLegit ? 'red' : 'black'}
                 name="simple-marker-icon"
                 size={$hover ? 'huge' : 'big'}
                 className={`marker ${$hover ? 'hovered' : ''}`}

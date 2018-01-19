@@ -6,7 +6,6 @@ const {
   mapArticle,
   mapArticleInfo,
   PH_TIMEZONE,
-  mapSideArticle,
   getCategoriesField,
   mapRelatedArticles,
 } = require('../../utils');
@@ -51,32 +50,28 @@ module.exports = (conn, io) => {
 
       let query = await r.table(tbl).getIntersecting(bounds, {
         index: 'positions',
-      });
+      }).distinct();
 
-      if (timeWindow) {
-        const [start, end] = timeWindow.split(',');
-        const selectedDate = new Date(JSON.parse(date));
-        const parsedStart = parseInt(start);
-        const parsedEnd = parseInt(end);
+      const [start, end] = timeWindow.split(',');
+      const selectedDate = new Date(JSON.parse(date));
+      const parsedStart = parseInt(start);
+      const parsedEnd = parseInt(end);
 
-        if (start === 0 && end === 0) {
-          query = query.filter((article) =>
-            article('publishDate')
-              .inTimezone(PH_TIMEZONE)
-              .date()
-              .eq(r.now().inTimezone(PH_TIMEZONE).date()));
-        } else {
-          const startDate = new Date(selectedDate.getTime());
-          startDate.setDate(selectedDate.getDate() - parsedStart);
-          const endDate = new Date(selectedDate.getTime());
-          endDate.setDate(selectedDate.getDate() - parsedEnd);
+      if (!parsedStart && !parsedEnd) {
+        query = query.filter((article) =>
+          article('publishDate').date()
+            .eq(r.expr(selectedDate).inTimezone(PH_TIMEZONE).date()));
+      } else {
+        const startDate = new Date(selectedDate.getTime());
+        startDate.setDate(selectedDate.getDate() - parsedStart);
+        const endDate = new Date(selectedDate.getTime());
+        endDate.setDate(selectedDate.getDate() - parsedEnd);
 
-          query = query.filter(r.row('publishDate').during(
-            r.now().inTimezone(PH_TIMEZONE).sub(start * SECONDS_IN_DAYS),
-            r.now().inTimezone(PH_TIMEZONE).add(end * SECONDS_IN_DAYS),
-            { rightBound: 'closed' }
-          ));
-        }
+        query = query.filter(r.row('publishDate').date().during(
+          r.expr(startDate).inTimezone(PH_TIMEZONE).date(),
+          r.expr(endDate).inTimezone(PH_TIMEZONE).date(),
+          { rightBound: 'closed' }
+        ));
       }
 
       if (keywords) {
@@ -115,60 +110,62 @@ module.exports = (conn, io) => {
         const topCount = parseInt(top);
 
         if (socials[0] === 'all') {
-          query = query.filter((article) => article('left')('popularity')('totalScore').gt(0));
+          query = query.filter((article) => article('popularity')('totalScore').gt(0));
         } else {
           switch (socials.length) {
           case 2:
-            query = query.filter((article) => article('left')('popularity')(socials[0]).gt(0)
-              .or(article('left')('popularity')(socials[1]).gt(0)));
+            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+              .or(article('popularity')(socials[1]).gt(0)));
             break;
           case 3:
-            query = query.filter((article) => article('left')('popularity')(socials[0]).gt(0)
-              .or(article('left')('popularity')(socials[1]).gt(0))
-              .or(article('left')('popularity')(socials[2]).gt(0)));
+            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+              .or(article('popularity')(socials[1]).gt(0))
+              .or(article('popularity')(socials[2]).gt(0)));
             break;
           case 4:
-            query = query.filter((article) => article('left')('popularity')(socials[0]).gt(0)
-              .or(article('left')('popularity')(socials[1]).gt(0))
-              .or(article('left')('popularity')(socials[2]).gt(0))
-              .or(article('left')('popularity')(socials[3]).gt(0)));
+            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+              .or(article('popularity')(socials[1]).gt(0))
+              .or(article('popularity')(socials[2]).gt(0))
+              .or(article('popularity')(socials[3]).gt(0)));
             break;
           case 5:
-            query = query.filter((article) => article('left')('popularity')(socials[0]).gt(0)
-              .or(article('left')('popularity')(socials[1]).gt(0))
-              .or(article('left')('popularity')(socials[2]).gt(0))
-              .or(article('left')('popularity')(socials[3]).gt(0))
-              .or(article('left')('popularity')(socials[4]).gt(0)));
+            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+              .or(article('popularity')(socials[1]).gt(0))
+              .or(article('popularity')(socials[2]).gt(0))
+              .or(article('popularity')(socials[3]).gt(0))
+              .or(article('popularity')(socials[4]).gt(0)));
             break;
           default:
-            query = query.filter((article) => article('left')('popularity')(socials[0]).gt(0));
+            query = query.filter((article) => article('popularity')(socials[0]).gt(0));
           }
 
           if (socials[0] === 'all') {
-            query = query.orderBy(r.desc(r.row('left')('popularity')('totalScore')));
+            query = query.orderBy(r.desc(r.row('popularity')('totalScore')));
           } else {
-            query = query.orderBy(r.desc(r.row('left')('popularity')(socials[0])));
+            query = query.orderBy(r.desc(r.row('popularity')(socials[0])));
           }
 
           if (socials[1]) {
-            query = query.orderBy(r.desc(r.row('left')('popularity')(socials[1])));
+            query = query.orderBy(r.desc(r.row('popularity')(socials[1])));
           }
           if (socials[2]) {
-            query = query.orderBy(r.desc(r.row('left')('popularity')(socials[2])));
+            query = query.orderBy(r.desc(r.row('popularity')(socials[2])));
           }
           if (socials[3]) {
-            query = query.orderBy(r.desc(r.row('left')('popularity')(socials[3])));
+            query = query.orderBy(r.desc(r.row('popularity')(socials[3])));
           }
           if (socials[4]) {
-            query = query.orderBy(r.desc(r.row('left')('popularity')(socials[4])));
+            query = query.orderBy(r.desc(r.row('popularity')(socials[4])));
           }
         }
 
         query = query.slice(0, topCount);
       }
 
+      query = query.eqJoin('sourceId', r.table('sources'));
+
       if (sources) {
-        query = query.filter((article) => article('right')('url')
+        query = query.filter((article) => article('right')('brand')
           .match(`(?i)${sources.replace(',', '|')}`));
       }
 
@@ -177,7 +174,6 @@ module.exports = (conn, io) => {
       }
 
       const cursor = await query
-        .eqJoin('sourceId', r.table('sources'))
         .filter(r.row('right')('isReliable').eq(legitimate === 'yes'))
         .map(mapArticle(bounds))
         .run(conn);

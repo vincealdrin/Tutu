@@ -17,7 +17,7 @@ const {
 module.exports = (conn, io) => {
   router.get('/', async (req, res, next) => {
     try {
-      const { url } = req.query;
+      const { url, submit = 'yes' } = req.query;
       const domain = cleanUrl(removeUrlPath(url));
       const uuid = await r.uuid(domain).run(conn);
       // const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
@@ -30,15 +30,15 @@ module.exports = (conn, io) => {
       //   });
       // }
 
+      // if (matchedSource) {
+      //   return res.json({
+      //     isReliable: matchedSource.isReliable,
+      //     sourceUrl: matchedSource.url,
+      //     isVerified: true,
+      //   });
+      // }
 
-      if (matchedSource) {
-        return res.json({
-          isReliable: matchedSource.isReliable,
-          isVerified: true,
-        });
-      }
       let body;
-
       try {
         body = await rp(url);
       } catch (e) {
@@ -82,12 +82,13 @@ module.exports = (conn, io) => {
       });
       const isReliablePred = Boolean(overallPred);
       const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-      const id = await r.uuid(sourceUrl).run(conn);
+      const cleanedSrcUrl = cleanUrl(sourceUrl);
+      const id = await r.uuid(cleanedSrcUrl).run(conn);
 
       await r.table('pendingSources').insert({
-        url: cleanUrl(sourceUrl),
+        url: cleanedSrcUrl,
         timestamp: r.now().inTimezone(PH_TIMEZONE),
-        senderIpAddresses: [ipAddress],
+        senderIpAddress: ipAddress,
         id,
         brand,
         isReliablePred,
@@ -100,15 +101,18 @@ module.exports = (conn, io) => {
         title,
       }, { conflict: 'update' }).run(conn);
 
-      await r.table('pendingSources').get(id).update({
-        sendersIpAddress: r.branch(
-          r.row('sendersIpAddress').contains(ipAddress),
-          r.row('sendersIpAddress'),
-          r.row('sendersIpAddress').append(ipAddress)
-        ),
-      }).run(conn);
+      if (submit === 'yes') {
+        await r.table('pendingSources').get(id).update({
+          sendersIpAddress: r.branch(
+            r.row('sendersIpAddress').contains(ipAddress),
+            r.row('sendersIpAddress'),
+            r.row('sendersIpAddress').append(ipAddress)
+          ),
+        }).run(conn);
+      }
 
       res.json({
+        sourceUrl: cleanedSrcUrl,
         isVerified: false,
         isReliable: Boolean(reliable),
         pct,

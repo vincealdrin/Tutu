@@ -122,36 +122,34 @@ class Insights extends Component {
       case 'mainMenu':
         return (
           <div>
-            <Grid>
-              <Grid.Row columns={2}>
+            <Grid columns={2} stackable>
                 <Grid.Column>
                   {this.renderSegment(
                     'smile',
                     'Sentiments',
-                    'This is supposed to be a long description but I made it short',
+                    'Look at the inclination of people\'s opinions on a certain article either positive, neutral or negative',
                   )}
                 </Grid.Column>
                 <Grid.Column>
                   {this.renderSegment(
                     'tags',
                     'Categories',
-                    'This is supposed to be a long description but I made it short',
+                    'Look at the total number of articles per category on a specific date.',
                   )}
                 </Grid.Column>
-              </Grid.Row>
               <Grid.Row columns={2}>
                 <Grid.Column>
                   {this.renderSegment(
                     'cloud',
                     'WordCloud',
-                    'This is supposed to be a long description but I made it short',
+                    'Look at the most widely used words. The importance of a word is shown with size or color',
                   )}
                 </Grid.Column>
                 <Grid.Column>
                   {this.renderSegment(
                     'ordered list',
                     'Top Ten',
-                    'This is supposed to be a long description but I made it short',
+                    'Look at the most occuring personalities, organizations and locations.',
                   )}
                 </Grid.Column>
               </Grid.Row>
@@ -183,13 +181,12 @@ class Insights extends Component {
           }}
           closeOnDimmerClick
         >
-          <Label as="a" color="teal" size="huge" ribbon>{labelDesc}</Label>
+          <Label as="a" color="teal" size="large" ribbon>{labelDesc}</Label>
           <Button
             as="a"
             icon={activeCard === 'mainMenu' ? 'close' : 'long arrow left'}
             floated="right"
-            color="red"
-            basic
+            color="white"
             content={activeCard === 'mainMenu' ? 'CLOSE' : 'BACK'}
             onClick={() => (activeCard === 'mainMenu'
               ? this.props.closeModal()

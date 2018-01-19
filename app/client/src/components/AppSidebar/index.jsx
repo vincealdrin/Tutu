@@ -1,6 +1,14 @@
 import React from 'react';
 import { Link, Route, Switch, Redirect } from 'react-router-dom';
-import { Icon, Header, Image, Button } from 'semantic-ui-react';
+import {
+  Icon,
+  Header,
+  Image,
+  Dimmer,
+  List,
+  Divider,
+  Modal,
+} from 'semantic-ui-react';
 import RecentArticles from '../RecentArticles';
 import PopularArticles from '../PopularArticles';
 import Filter from '../Filter';
@@ -27,17 +35,14 @@ const AppSidebar = ({
   toggleSidebarContent,
 }) => {
   const isWideClass = isWide ? 'show' : 'hide';
-  let visibleClass;
+  let visibleClassName;
   let isIconVisible;
 
   if (window.location.pathname === '/') {
-    visibleClass = `${isVisible ? 'hidden' : 'full'}`;
+    visibleClassName = `${isVisible ? 'hidden' : 'full'}`;
     isIconVisible = `${isVisible ? 'left' : 'right'}`;
-  } else if (window.location.pathname === '/submit' || window.location.pathname === '/about') {
-    visibleClass = `${isVisible ? 'full thin-component' : 'hidden'}`;
-    isIconVisible = `${isVisible ? 'right' : 'left'}`;
   } else {
-    visibleClass = `${isVisible ? 'full' : 'hidden'}`;
+    visibleClassName = `${isVisible ? 'full' : 'hidden'}`;
     isIconVisible = `${isVisible ? 'right' : 'left'}`;
   }
 
@@ -47,7 +52,7 @@ const AppSidebar = ({
         <div className="article-display-button" onClick={toggleSidebarContent}>
           <Icon name={`angle ${isIconVisible}`} size="large" />
         </div>
-        <div className={`side-menu-item-container ${visibleClass}`}>
+        <div className={`side-menu-item-container ${visibleClassName}`}>
           <Switch>
             <Route path="/" component={PopularArticles} exact />
             <Route path="(.*)/popular" component={PopularArticles} exact />
@@ -93,8 +98,8 @@ const AppSidebar = ({
               <span className={`sidebar-text ${isWideClass}`}>Categories</span>
             </Link> */}
           <Link to="/submit" onClick={showSidebarContent}>
-            <Icon name="send outline" color="darkgrey" />
-            <span className={`sidebar-text ${isWideClass}`}>Submit</span>
+            <Icon name="legal" color="darkgrey" />
+            <span className={`sidebar-text ${isWideClass}`}>Analyze</span>
           </Link>
           <Link to="/about" onClick={showSidebarContent}>
             <Icon name="browser" color="darkgrey" />
@@ -104,17 +109,61 @@ const AppSidebar = ({
               <Icon name="globe" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Map Themes</span>
             </Link> */}
-          <Link to="/sources" onClick={showSidebarContent}>
+          {/* <Link to="/sources" onClick={showSidebarContent}>
             <Icon name="list ul" color="darkgrey" />
             <span className={`sidebar-text ${isWideClass}`}>Sources</span>
-          </Link>
+          </Link> */}
+          <Modal
+            trigger={
+              <div className="help-button" >
+                <Icon name="help circle outline" color="darkgrey" />
+                <span className={`sidebar-text ${isWideClass}`}>Help</span>
+              </div>
+            }
+            size="tiny"
+            basic
+          >
+            <Header as="h2" inverted>Legends:</Header>
+            <Modal.Content>
+              <List relaxed="very">
+                <List.Item>
+                  <List.Icon name="newspaper" size="big" />
+                  <List.Content>Take a look at the popular news</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="plus square outline" size="big" />
+                  <List.Content>Take a look at the recently added news</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="cogs" size="big" />
+                  <List.Content>Prefer something you prefer</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="send outline" size="big" />
+                  <List.Content>Submit an article to be evaluated by TUTÛ Evaluator</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="list ul" size="big" />
+                  <List.Content>Take a look at the sources in our archives</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="marker" size="big" />
+                  <List.Content>Display a single article</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="dot circle outline" size="big" />
+                  <List.Content>Display a cluster of articles in a region</List.Content>
+                </List.Item>
+              </List>
+            </Modal.Content>
+          </Modal>
         </div>
-        <div className="popular">
+        {/* <div className="popular">
           <span className={`label ${isWideClass}`}>POPULAR</span>
         </div>
         <div className="top-places">
           {isWide ? <span className="label">TOP PLACES</span> : null}
-        </div>
+        </div> */}
       </div>
     </div>
   );

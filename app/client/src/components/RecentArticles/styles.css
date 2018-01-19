@@ -1,4 +1,4 @@
-.scrollable-section {
+.rec-scrollable-section {
   height: 96%;
   padding-top: 2rem;
   overflow-x: hidden;
@@ -24,6 +24,8 @@
   }
 } */
 
-.segment-container {
+.rec-segment-container {
   height: 100vh;
+  padding-right: 0;
+  margin-right: 0;
 }

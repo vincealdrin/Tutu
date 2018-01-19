@@ -16,7 +16,7 @@ def get_uuid(text):
     return r.uuid(text).run(conn)
 
 
-def insert_article(article, tbl='articles'):
+def insert_article(article, reliable=True):
     # article = {
     #     **article,
     #     # 'id': r.expr(article['id']),
@@ -26,23 +26,26 @@ def insert_article(article, tbl='articles'):
     # }
     article['timestamp'] = r.expr(datetime.now(r.make_timezone(PH_TIMEZONE)))
 
-    rel_articles = r.table(tbl).filter(lambda doc:
-        doc['id'].ne(article['id']) & doc['publishDate'].date().during(
+    rel_articles = r.table('articles').eq_join('sourceId', r.table('sources')).filter(lambda doc:
+        doc['left']['id'].ne(article['id']) & doc['left']['publishDate'].date().during(
             r.time(article['publishDate'].year(), article['publishDate'].month(), article['publishDate'].day(), PH_TIMEZONE).sub(TWO_DAYS_IN_SEC),
             r.time(article['publishDate'].year(), article['publishDate'].month(), article['publishDate'].day(), PH_TIMEZONE).add(TWO_DAYS_IN_SEC),
             right_bound='closed'
         ).and_(
             r.expr(article['categories']).slice(0, 2).get_field('label').contains(
-                lambda label: doc['categories'].slice(0, 2).get_field('label').contains(label)).and_(
-                    r.or_(
-                        # r.expr(article['topics']['common']).contains(lambda keyword:
-                        #     doc['topics']['common'].coerce_to('string').match(keyword)),
-                    r.expr(article['people']).contains(lambda person:
-                        doc['people'].coerce_to('string').match(person)),
-                    r.expr(article['organizations']).contains(lambda org:
-                        doc['organizations'].coerce_to('string').match(org))
-                    ))
-        )).order_by(r.desc('publishDate')).slice(0, 10).pluck('title', 'id').run(conn)
+                lambda label: doc['left']['categories'].slice(0, 2).get_field('label').contains(label)).and_(
+                        r.or_(
+                            # r.expr(article['topics']['common']).contains(lambda keyword:
+                            #     doc['left']['topics']['common'].coerce_to('string').match(keyword)),
+                        r.expr(article['people']).contains(lambda person:
+                            doc['left']['people'].coerce_to('string').match(person)),
+                        r.expr(article['organizations']).contains(lambda org:
+                            doc['left']['organizations'].coerce_to('string').match(org))
+                        ))
+        ).and_(doc['right']['isReliable'].eq(reliable))).order_by(r.desc('publishDate')).slice(0, 10).map(lambda join: {
+            'id': join['left']['id'],
+            'title': join['left']['title'],
+        }).run(conn)
 
     # print([rel['title'] for rel in rel_articles])
 
@@ -61,7 +64,7 @@ def insert_article(article, tbl='articles'):
 
     # print(article)
 
-    r.table(tbl).get_all(r.args(rel_ids)).update(lambda doc:
+    r.table('articles').get_all(r.args(rel_ids)).update(lambda doc:
         r.branch(
             doc['relatedArticles'].contains(article['id']),
             {'relatedArticles': doc['relatedArticles']},
@@ -69,7 +72,7 @@ def insert_article(article, tbl='articles'):
         )
     ).run(conn)
 
-    r.table(tbl).insert(article).run(conn)
+    r.table('articles').insert(article).run(conn)
 
 
 def insert_log(sourceId, log_type, status, runTime, info):
@@ -92,7 +95,7 @@ def insert_log(sourceId, log_type, status, runTime, info):
     }).map(r.row['storage_engine']['disk']['space_usage']['data_bytes']
            .default(0)).sum().div(MB).div(MB).run(conn)
 
-    print('Logs MB size: '+str(logs_mb_size))
+    # print('Logs MB size: '+str(logs_mb_size))
     if logs_mb_size > THRESHOLD:
         r.table('crawlerLogs').delete().run(conn)
         print('LOGS DELETED')
@@ -177,7 +180,10 @@ def get_provinces():
             }).without({ 'right': True, 'left': True }).run(conn))
 
 
-def get_sources(order_by='timestamp', desc=False, isReliable=True, tbl='sources'):
+def get_sources(order_by='timestamp',
+                desc=False,
+                isReliable=True,
+                tbl='sources'):
     query = r.table(tbl).filter(r.row['isReliable'].eq(isReliable))
 
     if desc:
@@ -185,7 +191,10 @@ def get_sources(order_by='timestamp', desc=False, isReliable=True, tbl='sources'
     return list(query.order_by(order_by).run(conn))
 
 
-def get_rand_sources(filter_sources=[], count=1, isReliable=True, tbl='sources'):
+def get_rand_sources(filter_sources=[],
+                     count=1,
+                     isReliable=True,
+                     tbl='sources'):
     return list(
         r.table(tbl)
         .filter(lambda source: r.not_(r.expr(filter_sources).contains(source['id'])).and_(source['isReliable'].eq(isReliable)))

@@ -44,7 +44,7 @@ class PopularArticles extends Component {
 
     return (
       <div>
-        <Segment className="segment-container">
+        <Segment className="pop-segment-container">
           {fetchStatus.pending ? (
             <Dimmer active inverted>
               <Loader inverted content="Loading popular articles..." />
@@ -53,7 +53,7 @@ class PopularArticles extends Component {
           {!fetchStatus.pending ? (
             <Label as="a" color="red" ribbon style={{ marginBottom: '1rem' }}>Popular Articles</Label>
           ) : null}
-          <div className="scrollable-section">
+          <div className="pop-scrollable-section">
             {articles.map((article) => (
               <div key={shortid.generate()}>
                 <Grid>

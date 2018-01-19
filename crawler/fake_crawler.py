@@ -15,7 +15,6 @@ import json
 import time
 from datetime import datetime
 import re
-import langdetect
 from random import randrange
 from urllib.parse import urldefrag, urlparse
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
@@ -50,7 +49,7 @@ last_proxy = ''
 
 while True:
     # news_sources = get_rand_sources(not_sources=crawled_sources)
-    news_sources = get_rand_sources(crawled_sources)
+    news_sources = get_rand_sources(crawled_sources, 1, isReliable=False)
 
     for news_source in news_sources:
         print('Crawled Sources: ' + str(crawled_sources))
@@ -169,7 +168,7 @@ while True:
                     title = title_split[0].strip()
 
                 while repeat_categorize:
-                    categories, body = categorize(article.url)
+                    categories, body = categorize(article.url, True)
 
                     if categories == 'API LIMIT':
                         print('REACHED AYLIEN LIMIT')
@@ -200,35 +199,6 @@ while True:
 
                 pattern = re.compile(source.brand, re.IGNORECASE)
                 body = pattern.sub('', body)
-
-                try:
-                    # if langdetect.detect(body) != 'en' or langdetect.detect(title) != 'en':
-                    if langdetect.detect(body) != 'en':
-                        if PY_ENV == 'development':
-                            print('\n(NOT ENGLISH) Skipped: ' +
-                                  str(article.url) + '\n')
-                        slp_time = insert_log(
-                            source_id, 'articleCrawl', 'error',
-                            float(time.clock() - start_time), {
-                                'articleUrl': article.url,
-                                'articleTitle': title,
-                                'errorMessage': 'NOT ENGLISH',
-                            })
-                        insert_item({'id': article.id}, 'errorArticles')
-                        continue
-                except Exception:
-                    if PY_ENV == 'development':
-                        print('\n(NOT ENGLISH) Skipped: ' + str(article.url) +
-                              '\n')
-                    slp_time = insert_log(
-                        source_id, 'articleCrawl', 'error',
-                        float(time.clock() - start_time), {
-                            'articleUrl': article.url,
-                            'articleTitle': title,
-                            'errorMessage': 'NOT ENGLISH',
-                        })
-                    insert_item({'id': article.id}, 'errorArticles')
-                    continue
 
                 if len(body.split()) < 100:
                     if PY_ENV == 'development':
@@ -317,7 +287,7 @@ while True:
 
                 publish_date = get_publish_date(article.html)
 
-                if publish_date.year < 2017 or publish_date.replace(tzinfo=None) > datetime.now():
+                if publish_date.year < 2014 or publish_date.replace(tzinfo=None) > datetime.now():
                     if PY_ENV == 'development':
                         print('\n(PUBLISH DATE NOT IN RANGE) Skipped: ' +
                               str(article.url) + '\n')
@@ -431,15 +401,10 @@ while True:
                     'relatedArticles': []
                 }
 
-                insert_article(new_article)
+                insert_article(new_article, False)
                 count += 1
                 src_art_count += 1
                 runtime = float(time.clock() - start_time)
-
-                # rate_limits = get_rate_limits()
-                # aylien_status = rate_limits[0]
-                # aylien_status2 = rate_limits[1]
-                # aylien_status3 = rate_limits[2]
 
                 if PY_ENV == 'development':
                     print(
@@ -449,11 +414,6 @@ while True:
                         ml['location']['formattedAddress']
                         for ml in matched_locations
                     ]))
-                    # print('AYLIEN REMAINING CALL: [' +
-                    #       str(aylien_status['remaining']) + ', ' +
-                    #       str(aylien_status2['remaining']) + ', ' + str(
-                    #           aylien_status3['remaining']) + '] -- ' + str(
-                    #               '%.2f' % runtime + 's scraping runtime'))
 
                 slp_time = insert_log(source_id, 'articleCrawl', 'success',
                                       float(time.clock() - start_time), {

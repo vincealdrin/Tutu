@@ -18,8 +18,7 @@ module.exports = (conn, io) => {
   router.get('/', async (req, res, next) => {
     try {
       const { url } = req.query;
-      const validUrl = cleanUrl(url);
-      const domain = removeUrlPath(url);
+      const domain = cleanUrl(removeUrlPath(url));
       const uuid = await r.uuid(domain).run(conn);
       // const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
       const matchedSource = await r.table('sources').get(uuid).run(conn);
@@ -31,6 +30,7 @@ module.exports = (conn, io) => {
       //   });
       // }
 
+
       if (matchedSource) {
         return res.json({
           isReliable: matchedSource.isReliable,
@@ -40,16 +40,23 @@ module.exports = (conn, io) => {
       let body;
 
       try {
-        body = await rp(validUrl);
+        body = await rp(url);
       } catch (e) {
-        body = await cloudScrape(validUrl);
+        try {
+          body = await cloudScrape(url);
+        } catch (err) {
+          return next({
+            status: 500,
+            message: 'Can\'t access the article url, please try again later',
+          });
+        }
       }
 
       const cheerioDoc = cheerio.load(body);
-      const brand = getSourceBrand(cheerioDoc) || getDomainOnly(validUrl);
+      const brand = getSourceBrand(cheerioDoc) || getDomainOnly(url);
       const title = getTitle(cheerioDoc);
-      const faviconUrl = getFaviconUrl(cheerioDoc, validUrl);
-      const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, validUrl);
+      const faviconUrl = getFaviconUrl(cheerioDoc, url);
+      const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, url);
       const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
       const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);
 
@@ -68,7 +75,7 @@ module.exports = (conn, io) => {
         body: {
           sourceHasAboutPage: (hasAboutPage && aboutUsUrl) ? 1 : 0,
           sourceHasContactPage: (hasContactPage && contactUsUrl) ? 1 : 0,
-          url: validUrl,
+          url,
           body,
         },
         json: true,
@@ -121,13 +128,20 @@ module.exports = (conn, io) => {
   router.get('/meta', async (req, res, next) => {
     try {
       const { url } = req.query;
-      const cheerioDoc = cheerio.load(await rp(url));
-      const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, url);
+      try {
+        const cheerioDoc = cheerio.load(await rp(url));
+        const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, url);
 
-      res.json({
-        aboutUsUrl,
-        contactUsUrl,
-      });
+        res.json({
+          aboutUsUrl,
+          contactUsUrl,
+        });
+      } catch (e) {
+        return res.json({
+          aboutUsUrl: '',
+          contactUsUrl: '',
+        });
+      }
     } catch (e) {
       next(e);
     }

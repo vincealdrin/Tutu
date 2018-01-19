@@ -56,7 +56,7 @@ class RecentArticles extends Component {
 
     return (
       <div>
-        <Segment className="segment-container">
+        <Segment className="rec-segment-container">
           {fetchStatus.pending ? (
             <Dimmer active inverted>
               <Loader inverted content="Loading recent articles..." />
@@ -65,7 +65,7 @@ class RecentArticles extends Component {
           {!fetchStatus.pending ? (
             <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Recent Articles</Label>
           ) : null }
-          <div className="scrollable-section">
+          <div className="rec-scrollable-section">
             {articles.map((article) => (
               <div key={shortid.generate()}>
                 <Grid>

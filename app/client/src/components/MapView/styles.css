@@ -329,3 +329,23 @@
   left: 273.7px;
   z-index: 1000;
 }
+
+.map-top-buttons {
+  position: fixed;
+  top: 11.85px;
+  right: 85.5px;
+  z-index: 1000;
+  display: flex;
+}
+
+.adjust-top-buttons-visible {
+  right: 483.85px;
+}
+
+.adjust-top-buttons-widen {
+  right: 235.85px;
+}
+
+.adjust-top-buttons-widen-visible {
+  right: 635.85px;
+}

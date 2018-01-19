@@ -11,6 +11,8 @@ const {
   mapRelatedArticles,
 } = require('../../utils');
 
+const SECONDS_IN_DAYS = 86400;
+
 module.exports = (conn, io) => {
   const tbl = 'articles';
 
@@ -34,6 +36,7 @@ module.exports = (conn, io) => {
       date = new Date().toLocaleString(),
       popular = '',
       sentiment = '',
+      legitimate = 'yes',
     } = req.query;
     const bounds = r.polygon(
       [parseFloat(swLng), parseFloat(swLat)],
@@ -68,11 +71,10 @@ module.exports = (conn, io) => {
           const endDate = new Date(selectedDate.getTime());
           endDate.setDate(selectedDate.getDate() - parsedEnd);
 
-          query = query.filter((article) => article('publishDate').inTimezone(PH_TIMEZONE).date().during(
-            r.time(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate(), PH_TIMEZONE),
-            r.time(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate(), PH_TIMEZONE), {
-              rightBound: 'closed',
-            }
+          query = query.filter(r.row('publishDate').during(
+            r.now().inTimezone(PH_TIMEZONE).sub(start * SECONDS_IN_DAYS),
+            r.now().inTimezone(PH_TIMEZONE).add(end * SECONDS_IN_DAYS),
+            { rightBound: 'closed' }
           ));
         }
       }
@@ -106,8 +108,6 @@ module.exports = (conn, io) => {
             .and(article('sentiment')('compound').lt(-0.5)));
         }
       }
-
-      query = query.eqJoin('sourceId', r.table('sources'));
 
       if (popular) {
         const [socialNetworks, top] = popular.split('|');
@@ -167,7 +167,6 @@ module.exports = (conn, io) => {
         query = query.slice(0, topCount);
       }
 
-
       if (sources) {
         query = query.filter((article) => article('right')('url')
           .match(`(?i)${sources.replace(',', '|')}`));
@@ -178,7 +177,8 @@ module.exports = (conn, io) => {
       }
 
       const cursor = await query
-        .distinct()
+        .eqJoin('sourceId', r.table('sources'))
+        .filter(r.row('right')('isReliable').eq(legitimate === 'yes'))
         .map(mapArticle(bounds))
         .run(conn);
       const articles = await cursor.toArray();
@@ -262,11 +262,9 @@ module.exports = (conn, io) => {
       const now = new Date();
       now.setDate(now.getDate() - 3);
 
-      const query = await r.table(tbl).filter((article) =>
-        article('publishDate').date().ge(r.expr(now).inTimezone(PH_TIMEZONE))
-          .and(article('popularity')('totalScore').gt(0)))
+      const query = await r.table(tbl)
+        .orderBy({ index: r.desc('popularityScore') })
         .eqJoin(r.row('sourceId'), r.table('sources'))
-        .orderBy(r.desc(r.row('left')('popularity')('totalScore')))
         .map((join) => ({
           id: join('left')('id'),
           url: join('left')('url'),
@@ -295,8 +293,8 @@ module.exports = (conn, io) => {
 
       const totalCount = await r.table('articles').count().run(conn);
       const query = await r.table('articles')
+        .orderBy({ index: r.desc('timestamp') })
         .eqJoin('sourceId', r.table('sources'))
-        .orderBy(r.desc(r.row('left')('timestamp')))
         .limit(parseInt(limit))
         .map((join) => ({
           id: join('left')('id'),

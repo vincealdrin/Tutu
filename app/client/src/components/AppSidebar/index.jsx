@@ -1,109 +1,123 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Icon, Header, Image } from 'semantic-ui-react';
+import React from 'react';
+import { Link, Route, Switch, Redirect } from 'react-router-dom';
+import { Icon, Header, Image, Button } from 'semantic-ui-react';
+import RecentArticles from '../RecentArticles';
+import PopularArticles from '../PopularArticles';
+import Filter from '../Filter';
+import About from '../About';
+import Categories from '../Categories';
+import Submit from '../Submit';
+import SourcesList from '../SourcesList';
+import MapThemes from '../MapThemes';
 import tutuLogo from '../../assets/logo/tutu-logo.png';
 import './style.css';
 
-class AppSidebar extends Component {
-  state = {
-    visible: true,
-    isWide: false,
-  };
+// expandSidebar = () => setState({ isWide: true })
+// shrinkSidebar = () => setState({ isWide: false })
+// showSidebarContent = () => setState({ visible: true })
+// toggleVisibility = () => setState({ visible: !state.visible })
 
-  expandSidebar = () => this.setState({ isWide: true })
-  shrinkSidebar = () => this.setState({ isWide: false })
-  beVisible = () => this.setState({ visible: true })
-  toggleVisibility = () => this.setState({ visible: !this.state.visible })
 
-  render() {
-    const { isWide } = this.state;
-    const { visible } = this.state;
-    const isWideClass = isWide ? 'show' : 'hide';
-    let isVisible;
-    let isIconVisible;
+const AppSidebar = ({
+  isWide,
+  isVisible,
+  expandSidebar,
+  shrinkSidebar,
+  showSidebarContent,
+  toggleSidebarContent,
+}) => {
+  const isWideClass = isWide ? 'show' : 'hide';
+  let visibleClass;
+  let isIconVisible;
 
-    if (window.location.pathname === '/') {
-      isVisible = `${visible ? 'hidden' : 'full'}`;
-      isIconVisible = `${visible ? 'left' : 'right'}`;
-    } else if (window.location.pathname === '/submit' || window.location.pathname === '/about') {
-      isVisible = `${visible ? 'full thin-component' : 'hidden'}`;
-      isIconVisible = `${visible ? 'right' : 'left'}`;
-    } else {
-      isVisible = `${visible ? 'full' : 'hidden'}`;
-      isIconVisible = `${visible ? 'right' : 'left'}`;
-    }
+  if (window.location.pathname === '/') {
+    visibleClass = `${isVisible ? 'hidden' : 'full'}`;
+    isIconVisible = `${isVisible ? 'left' : 'right'}`;
+  } else if (window.location.pathname === '/submit' || window.location.pathname === '/about') {
+    visibleClass = `${isVisible ? 'full thin-component' : 'hidden'}`;
+    isIconVisible = `${isVisible ? 'right' : 'left'}`;
+  } else {
+    visibleClass = `${isVisible ? 'full' : 'hidden'}`;
+    isIconVisible = `${isVisible ? 'right' : 'left'}`;
+  }
 
-    return (
-      <div className="side-bar-container">
-
-        <div className="item-container">
-          <div className="top-buttons">
-            {this.props.topChildren}
-          </div>
-          <div className="article-display-button" onClick={this.toggleVisibility}>
-            <Icon name={`angle ${isIconVisible}`} size="large" />
-          </div>
-          <div className={`side-menu-item-container ${isVisible}`}>
-            {this.props.children}
-          </div>
+  return (
+    <div className="side-bar-container">
+      <div className="item-container">
+        <div className="article-display-button" onClick={toggleSidebarContent}>
+          <Icon name={`angle ${isIconVisible}`} size="large" />
         </div>
+        <div className={`side-menu-item-container ${visibleClass}`}>
+          <Switch>
+            <Route path="/" component={PopularArticles} exact />
+            <Route path="(.*)/popular" component={PopularArticles} exact />
+            <Route path="(.*)/recent" component={RecentArticles} exact />
+            <Route path="(.*)/preferences" component={Filter} exact />
+            <Route path="(.*)/about" component={About} exact />
+            <Route path="(.*)/submit" component={Submit} exact />
+            <Route path="(.*)/categories" component={Categories} exact />
+            <Route path="(.*)/themes" component={MapThemes} exact />
+            <Route path="(.*)/sources" component={SourcesList} exact />
+            <Redirect to="/" />
+          </Switch>
+        </div>
+      </div>
 
-        <div
-          className={`sidebar-container ${isWide ? 'wide' : 'thin'}`}
-          onMouseEnter={this.expandSidebar}
-          onMouseLeave={this.shrinkSidebar}
-        >
-          <div className="logo">
-            <Image src={tutuLogo} className="tutu-logo" />
-            <Link to="/">
-              <Header as="h2" className={`tutu-logo ${isWideClass}`}>TUTÛ</Header>
-            </Link>
-          </div>
-          <div className="side-menu">
-            <span className={`label ${isWideClass}`}>MENU</span>
-            <Link to="/popular" onClick={this.beVisible}>
-              <Icon name="newspaper" color="darkgrey" />
-              <span className={`sidebar-text ${isWideClass}`}>Popular News</span>
-            </Link>
-            <Link to="/recent" onClick={this.beVisible}>
-              <Icon name="plus square outline" color="darkgrey" />
-              <span className={`sidebar-text ${isWideClass}`}>Recent Articles</span>
-            </Link>
-            <Link to="/preferences" onClick={this.beVisible}>
-              <Icon name="cogs" color="darkgrey" />
-              <span className={`sidebar-text ${isWideClass}`}>Preferences</span>
-            </Link>
-            {/* <Link to="/categories" onClick={this.beVisible}>
+      <div
+        className={`sidebar-container ${isWide ? 'wide' : 'thin'}`}
+        onMouseEnter={expandSidebar}
+        onMouseLeave={shrinkSidebar}
+      >
+        <div className="logo">
+          <Image src={tutuLogo} className="tutu-logo" />
+          <Link to="/">
+            <Header as="h2" className={`tutu-logo ${isWideClass}`}>TUTÛ</Header>
+          </Link>
+        </div>
+        <div className="side-menu">
+          <span className={`label ${isWideClass}`}>MENU</span>
+          <Link to="/popular" onClick={showSidebarContent}>
+            <Icon name="newspaper" color="darkgrey" />
+            <span className={`sidebar-text ${isWideClass}`}>Popular News</span>
+          </Link>
+          <Link to="/recent" onClick={showSidebarContent}>
+            <Icon name="plus square outline" color="darkgrey" />
+            <span className={`sidebar-text ${isWideClass}`}>Recent Articles</span>
+          </Link>
+          <Link to="/preferences" onClick={showSidebarContent}>
+            <Icon name="cogs" color="darkgrey" />
+            <span className={`sidebar-text ${isWideClass}`}>Preferences</span>
+          </Link>
+          {/* <Link to="/categories" onClick={showSidebarContent}>
               <Icon name="tags" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Categories</span>
             </Link> */}
-            <Link to="/submit" onClick={this.beVisible}>
-              <Icon name="send outline" color="darkgrey" />
-              <span className={`sidebar-text ${isWideClass}`}>Submit</span>
-            </Link>
-            <Link to="/about" onClick={this.beVisible}>
-              <Icon name="browser" color="darkgrey" />
-              <span className={`sidebar-text ${isWideClass}`}>About</span>
-            </Link>
-            {/* <Link to="/themes" onClick={this.beVisible}>
+          <Link to="/submit" onClick={showSidebarContent}>
+            <Icon name="send outline" color="darkgrey" />
+            <span className={`sidebar-text ${isWideClass}`}>Submit</span>
+          </Link>
+          <Link to="/about" onClick={showSidebarContent}>
+            <Icon name="browser" color="darkgrey" />
+            <span className={`sidebar-text ${isWideClass}`}>About</span>
+          </Link>
+          {/* <Link to="/themes" onClick={showSidebarContent}>
               <Icon name="globe" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Map Themes</span>
             </Link> */}
-            <Link to="/sources" onClick={this.beVisible}>
-              <Icon name="list ul" color="darkgrey" />
-              <span className={`sidebar-text ${isWideClass}`}>Sources</span>
-            </Link>
-          </div>
-          <div className="popular">
-            <span className={`label ${isWideClass}`}>POPULAR</span>
-          </div>
-          <div className="top-places">
-            {isWide ? <span className="label">TOP PLACES</span> : null}
-          </div>
+          <Link to="/sources" onClick={showSidebarContent}>
+            <Icon name="list ul" color="darkgrey" />
+            <span className={`sidebar-text ${isWideClass}`}>Sources</span>
+          </Link>
+        </div>
+        <div className="popular">
+          <span className={`label ${isWideClass}`}>POPULAR</span>
+        </div>
+        <div className="top-places">
+          {isWide ? <span className="label">TOP PLACES</span> : null}
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default AppSidebar;

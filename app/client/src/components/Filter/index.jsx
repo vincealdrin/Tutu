@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Slider from 'rc-slider';
 import DatePicker from 'react-datepicker';
-import { fetchArticles } from '../../modules/mapArticles';
+import { fetchBoundArticles } from '../../modules/mapArticles';
 import {
   changeCategoriesFilter,
   changeKeywordsFilter,
@@ -25,10 +25,8 @@ import './styles.css';
 
 const mapStateToProps = ({
   filters,
-  mapArticles: { filterMapState },
 }) => ({
   filters,
-  filterMapState,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -42,7 +40,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   changePopularSocialsFilter,
   changePopularTopFilter,
   changeSentimentFilter,
-  fetchArticles,
+  fetchBoundArticles,
   changeDateFilter,
   clearFilters,
 }, dispatch);
@@ -80,10 +78,12 @@ const popularSocialOptions = [
 ];
 
 const popularTopOptions = [
+  { key: '10', text: '10', value: '10' },
+  { key: '30', text: '30', value: '30' },
+  { key: '50', text: '50', value: '50' },
   { key: '100', text: '100', value: '100' },
   { key: '300', text: '300', value: '300' },
   { key: '500', text: '500', value: '500' },
-  { key: '1000', text: '1000', value: '1000' },
 ];
 
 const FilterAlert = ({ action }) => (
@@ -105,10 +105,7 @@ class Filter extends Component {
   }
 
   render() {
-    const {
-      filters,
-      filterMapState: { center, zoom, bounds },
-    } = this.props;
+    const { filters } = this.props;
     const {
       keywords,
       sources,
@@ -123,9 +120,9 @@ class Filter extends Component {
     const endRange = 31 - timeWindow[1];
 
     return (
-      <Segment>
+      <Segment className="filter-segment-container">
         <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Preferences</Label>
-        <div className="scrollable-section filter-scrollable">
+        <div className="filter-scrollable">
           <Button.Group labeled icon>
             <Tooltip
               html={<FilterAlert action="save" />}
@@ -156,7 +153,7 @@ class Filter extends Component {
                 color="red"
                 onClick={() => {
                   this.props.clearFilters();
-                  this.props.fetchArticles(center, zoom, bounds);
+                  this.props.fetchBoundArticles();
                   localStorage.removeItem('filterSettings');
                 }}
               />
@@ -172,7 +169,7 @@ class Filter extends Component {
             value={keywords}
             onChange={(_, { value }) => {
               this.props.changeKeywordsFilter(value);
-              this.props.fetchArticles(center, zoom, bounds);
+              this.props.fetchBoundArticles();
             }}
             search
             selection
@@ -189,7 +186,7 @@ class Filter extends Component {
             options={categoriesOptions}
             onChange={(_, { value }) => {
               this.props.changeCategoriesFilter(value);
-              this.props.fetchArticles(center, zoom, bounds);
+              this.props.fetchBoundArticles();
             }}
             value={categories}
             search
@@ -208,7 +205,7 @@ class Filter extends Component {
             value={sources}
             onChange={(_, { value }) => {
               this.props.changeSourcesFilter(value);
-              this.props.fetchArticles(center, zoom, bounds);
+              this.props.fetchBoundArticles();
             }}
             search
             selection
@@ -227,7 +224,7 @@ class Filter extends Component {
                 maxDate={now}
                 onChange={(newDate) => {
                   this.props.changeDateFilter(newDate);
-                  this.props.fetchArticles(center, zoom, bounds);
+                  this.props.fetchBoundArticles();
                 }}
                 showMonthDropdown
                 showYearDropdown
@@ -242,7 +239,7 @@ class Filter extends Component {
             value={timeWindow}
             onChange={(value) => {
               this.props.changeTimeWindowFilter(value);
-              this.props.fetchArticles(center, zoom, bounds);
+              this.props.fetchBoundArticles();
             }}
           />
           <span className="timewindow-text">
@@ -258,7 +255,7 @@ class Filter extends Component {
             value={organizations}
             onChange={(_, { value }) => {
               this.props.changeOrganizationsFilter(value);
-              this.props.fetchArticles(center, zoom, bounds);
+              this.props.fetchBoundArticles();
             }}
             search
             selection
@@ -275,7 +272,7 @@ class Filter extends Component {
             value={people}
             onChange={(_, { value }) => {
               this.props.changePeopleFilter(value);
-              this.props.fetchArticles(center, zoom, bounds);
+              this.props.fetchBoundArticles();
             }}
             search
             selection
@@ -293,7 +290,7 @@ class Filter extends Component {
             options={sentimentsOptions}
             onChange={(_, { value }) => {
               this.props.changeSentimentFilter(value);
-              this.props.fetchArticles(center, zoom, bounds);
+              this.props.fetchBoundArticles();
             }}
             search
             upward
@@ -308,7 +305,7 @@ class Filter extends Component {
             value={limit}
             onChange={(value) => {
               this.props.changeLimitFilter(value);
-              this.props.fetchArticles(center, zoom, bounds);
+              this.props.fetchBoundArticles();
             }}
           />
           <Divider />
@@ -329,7 +326,7 @@ class Filter extends Component {
                 });
               }
               this.props.changePopularSocialsFilter(value);
-              this.props.fetchArticles(center, zoom, bounds);
+              this.props.fetchBoundArticles();
             }}
             upward
             search
@@ -346,7 +343,7 @@ class Filter extends Component {
             options={popularTopOptions}
             onChange={(_, { value }) => {
               this.props.changePopularTopFilter(value);
-              this.props.fetchArticles(center, zoom, bounds);
+              this.props.fetchBoundArticles();
             }}
             fluid
             upward

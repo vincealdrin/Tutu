@@ -73,6 +73,15 @@ def get_popularity(url):
         'pinterest': pin_score
     }
 
+def clean_url(url, protocol='http://'):
+    url = re.sub(r'^(https?:\/\/)', '', url)
+    url = re.sub('www.', '', url)
+    url = re.sub(r'(?=\/?(#\w*)).+', '', url)
+    url = re.sub(r'\/$', '', url)
+    url = protocol + re.sub(r'(?=\/?\?).+', '', url)
+
+    return url
+
 
 def get_publish_date(html):
     found_date = htmldate.find_date(html)

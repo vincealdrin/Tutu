@@ -19,7 +19,7 @@ export const FETCH_FOCUSED_INFO = 'mapArticles/FETCH_FOCUSED_INFO';
 export const FETCH_CLUSTER_INFO = 'mapArticles/FETCH_CLUSTER_INFO';
 export const REMOVE_FOCUSED = 'mapArticles/REMOVE_FOCUSED';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
-export const UPDATE_FILTER_MAP_STATE = 'mapArticles/UPDATE_FILTER_MAP_STATE';
+export const TOGGLE_SOURCES = 'mapArticles/TOGGLE_SOURCES';
 
 const initialState = {
   articles: [],
@@ -32,15 +32,12 @@ const initialState = {
   focusedClusterInfo: [],
   focusedClusterArticles: [],
   focusedOn: '',
-  filterMapState: {
-    zoom: DEFAULT_ZOOM,
-    center: {},
-    bounds: {},
-  },
   mapState: {
     zoom: DEFAULT_ZOOM,
     center: DEFAULT_CENTER,
+    bounds: {},
   },
+  isSourcesLegit: true,
 };
 let source;
 let focusedClusterSource;
@@ -48,6 +45,11 @@ let focusedInfoSource;
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case TOGGLE_SOURCES:
+      return {
+        ...state,
+        isSourcesLegit: !state.isSourcesLegit,
+      };
     case FETCH_ARTICLES:
       return {
         ...state,
@@ -59,11 +61,6 @@ export default (state = initialState, action) => {
       return {
         ...state,
         mapState: action.mapState,
-      };
-    case UPDATE_FILTER_MAP_STATE:
-      return {
-        ...state,
-        filterMapState: action.filterMapState,
       };
     case FETCH_FOCUSED_INFO:
       return {
@@ -125,17 +122,8 @@ export const updateMapState = (center, zoom, bounds) => ({
   },
 });
 
-export const updateFilterMapState = (center, zoom, bounds) => ({
-  type: UPDATE_FILTER_MAP_STATE,
-  filterMapState: {
-    center,
-    zoom,
-    bounds,
-  },
-});
-
-export const fetchArticles = (center, zoom, bounds) =>
-  httpThunk(FETCH_ARTICLES, async (getState, dispatch) => {
+export const fetchBoundArticles = () =>
+  httpThunk(FETCH_ARTICLES, async (getState) => {
     if (source) {
       source.cancel();
       // dispatch(endTask());
@@ -145,6 +133,14 @@ export const fetchArticles = (center, zoom, bounds) =>
     try {
       const {
         filters,
+        mapArticles: {
+          mapState: {
+            center,
+            zoom,
+            bounds,
+          },
+          isSourcesLegit,
+        },
       } = getState();
 
       const {
@@ -177,6 +173,7 @@ export const fetchArticles = (center, zoom, bounds) =>
           date: filters.date,
           timeWindow: `${31 - filters.timeWindow[0]},${31 - filters.timeWindow[1]}`,
           limit: filters.limit,
+          legitimate: isSourcesLegit ? 'yes' : 'no',
         },
         cancelToken: source.token,
       });
@@ -218,7 +215,7 @@ export const fetchArticles = (center, zoom, bounds) =>
   });
 
 export const fetchFocusedInfo = (article) =>
-  httpThunk(FETCH_FOCUSED_INFO, async (getState, dispatch) => {
+  httpThunk(FETCH_FOCUSED_INFO, async (getState) => {
     try {
       if (focusedInfoSource) {
         focusedInfoSource.cancel();
@@ -307,3 +304,5 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
       return e;
     }
   });
+
+export const toggleSourcesType = () => ({ type: TOGGLE_SOURCES });

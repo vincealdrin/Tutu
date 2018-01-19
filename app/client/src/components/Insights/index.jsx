@@ -31,10 +31,8 @@ const mapStateToProps = ({
   },
   mapArticles: {
     articles,
-    focusedOn,
   },
 }) => ({
-  isFocused: Boolean(focusedOn),
   ids: articles.map((article) => article.id).join(),
   sentiment,
   categories,
@@ -167,18 +165,16 @@ class Insights extends Component {
 
   render() {
     const { activeCard, labelDesc } = this.state;
-    const { isModalOpen, isFocused } = this.props;
+    const { isModalOpen } = this.props;
 
     return (
       <div>
-        {!isModalOpen && !isFocused ? (
-          <Button
-            content="Insights"
-            icon="bar chart"
-            labelPosition="left"
-            onClick={this.props.openModal}
-          />
-        ) : null}
+        <Button
+          content="Insights"
+          icon="bar chart"
+          labelPosition="left"
+          onClick={this.props.openModal}
+        />
         <Modal
           open={isModalOpen}
           onClose={() => {

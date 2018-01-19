@@ -1,32 +1,19 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import GoogleMapReact from 'google-map-react';
-import shortid from 'shortid';
 import { NProgress } from 'redux-nprogress';
 import { Icon, Input, Button } from 'semantic-ui-react';
 import {
-  fetchArticles,
+  fetchBoundArticles,
   fetchFocusedInfo,
   updateMapState,
   fetchFocusedClusterInfo,
-  updateFilterMapState,
 } from '../../modules/mapArticles';
-import SimpleMarker from './SimpleMarker';
-import {
-  MARGIN_TOP,
-  MARGIN_RIGHT,
-  MARGIN_BOTTOM,
-  MARGIN_LEFT,
-  HOVER_DISTANCE,
-  MAX_ZOOM,
-  MIN_ZOOM,
-  DEFAULT_ZOOM,
-} from '../../constants';
-import ClusterMarker from './ClusterMarker';
 import ClusterModal from './ClusterModal';
+import Insights from '../Insights';
+import AppSidebar from '../AppSidebar';
 import SimpleModal from './SimpleModal';
-import mapStyle from './mapStyle.json';
+import Map from './Map';
 import './styles.css';
 
 const mapStateToProps = ({
@@ -45,25 +32,19 @@ const mapStateToProps = ({
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
-  fetchArticles,
+  fetchBoundArticles,
   fetchFocusedInfo,
-  updateFilterMapState,
   updateMapState,
   fetchFocusedClusterInfo,
 }, dispatch);
 
-const mapOption = {
-  zoomControl: false,
-  fullscreenControl: false,
-  minZoomOverride: true,
-  minZoom: MIN_ZOOM,
-  maxZoom: MAX_ZOOM,
-  styles: mapStyle,
-  gestureHandling: 'greedy',
-};
 
 class MapView extends Component {
-  state = { currentPosition: null }
+  state = {
+    currentPosition: null,
+    isSidebarWiden: false,
+    isSidebarVisible: false,
+  }
 
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(({ coords }) => {
@@ -76,14 +57,14 @@ class MapView extends Component {
     });
   }
 
-  _onChange = ({
-    center,
-    zoom,
-    marginBounds,
-  }) => {
-    this.props.updateFilterMapState(center, zoom, marginBounds);
+  expandSidebar = () => this.setState({ isSidebarWiden: true })
+  shrinkSidebar = () => this.setState({ isSidebarWiden: false })
+  showSidebarContent = () => this.setState({ isSidebarVisible: true })
+  toggleSidebarContent = () => this.setState({ isSidebarVisible: !this.state.isSidebarVisible })
+
+  _onChange = ({ center, zoom, marginBounds }) => {
     this.props.updateMapState(center, zoom, marginBounds);
-    this.props.fetchArticles(center, zoom, marginBounds);
+    this.props.fetchBoundArticles();
   }
 
   _onChildClick = (_, childProps) => {
@@ -94,6 +75,27 @@ class MapView extends Component {
     }
   }
 
+  getTopBtnClassName = () => {
+    const {
+      isSidebarVisible,
+      isSidebarWiden,
+    } = this.state;
+
+    if (isSidebarVisible && isSidebarWiden) {
+      return 'adjust-top-buttons-widen-visible';
+    }
+
+    if (isSidebarVisible) {
+      return 'adjust-top-buttons-visible';
+    }
+
+    if (isSidebarWiden) {
+      return 'adjust-top-buttons-widen';
+    }
+
+    return '';
+  }
+
   render() {
     const {
       articles,
@@ -102,13 +104,31 @@ class MapView extends Component {
     } = this.props;
     const {
       currentPosition,
+      isSidebarVisible,
+      isSidebarWiden,
     } = this.state;
 
     return (
       <div className="map-container">
+        <div className={`map-top-buttons ${this.getTopBtnClassName()}`} >
+          <Button
+            content="Go to legitimate news"
+            icon="newspaper"
+            labelPosition="left"
+          />
+          <Insights />
+        </div>
         <NProgress />
         <ClusterModal />
         <SimpleModal />
+        <AppSidebar
+          isWide={isSidebarWiden}
+          isVisible={isSidebarVisible}
+          showSidebarContent={this.showSidebarContent}
+          toggleSidebarContent={this.toggleSidebarContent}
+          expandSidebar={this.expandSidebar}
+          shrinkSidebar={this.shrinkSidebar}
+        />
         <Input className="search-box" icon>
           <input id="searchBoxInput" placeholder="Search places" />
           <Icon name="search" />
@@ -124,59 +144,14 @@ class MapView extends Component {
           />
         ) : null}
 
-        <GoogleMapReact
-          defaultZoom={DEFAULT_ZOOM}
-          bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds', libraries: 'places' }}
-          options={mapOption}
-          // defaultCenter={mapState.center}
-          center={mapState.center}
-          zoom={mapState.zoom}
-          hoverDistance={HOVER_DISTANCE}
-          margin={[MARGIN_TOP, MARGIN_RIGHT, MARGIN_BOTTOM, MARGIN_LEFT]}
+        <Map
+          mapState={mapState}
+          clusters={clusters}
+          articles={articles}
+          updateMapState={this.props.updateMapState}
           onChange={this._onChange}
           onChildClick={this._onChildClick}
-          onGoogleApiLoaded={({ maps }) => {
-            const input = document.getElementById('searchBoxInput');
-            const searchBox = new maps.places.SearchBox(input);
-
-            searchBox.addListener('places_changed', () => {
-              const places = searchBox.getPlaces();
-
-              this.props.updateMapState({
-                lat: places[0].geometry.location.lat(),
-                lng: places[0].geometry.location.lng(),
-              }, 12);
-            });
-          }}
-          yesIWantToUseGoogleMapApiInternals
-        >
-          {clusters.map(({
-              wx: lng, wy: lat, numPoints, points,
-            }) => {
-            if (numPoints === 1) {
-              const article = articles[points[0].id];
-              return (
-                <SimpleMarker
-                  key={shortid.generate()}
-                  article={article}
-                  lng={lng}
-                  lat={lat}
-                />
-              );
-            }
-
-            const ids = points.map((point) => point.id);
-            return (
-              <ClusterMarker
-                key={shortid.generate()}
-                articles={articles.filter((_, i) => ids.includes(i))}
-                count={numPoints}
-                lng={lng}
-                lat={lat}
-              />
-            );
-          })}
-        </GoogleMapReact>
+        />
       </div>
     );
   }

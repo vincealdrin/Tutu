@@ -4,8 +4,7 @@ const _ = require('lodash');
 const { parseString } = require('xml2js');
 const r = require('rethinkdb');
 const rp = require('request-promise');
-const parseDomain = require('parse-domain');
-const { URL } = require('url');
+const randomUserAgent = require('random-useragent');
 const cloudscraper = require('cloudscraper');
 
 const awisClient = awis({
@@ -198,7 +197,20 @@ module.exports.getAboutContactUrl = ($, baseUrl) => {
 };
 
 module.exports.cloudScrape = (url) => new Promise((resolve, reject) => {
-  cloudscraper.get(url, (error, response, body) => {
+  const proxies = [
+    process.env.PROXY_IP,
+    process.env.PROXY_IP2,
+  ];
+  const proxy = `http://${proxies[_.random(0, 1)]}`;
+
+  cloudscraper.request({
+    method: 'GET',
+    headers: {
+      'User-Agent': randomUserAgent.getRandom(),
+    },
+    proxy,
+    url,
+  }, (error, response, body) => {
     if (error) {
       reject(error);
     } else {

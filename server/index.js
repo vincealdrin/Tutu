@@ -43,6 +43,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 if (isProduction) {
   app.use(errorhandler());
 }
+
 initDb((conn) => {
   io.sockets.on('connection', (socket) => {
     console.log(`${socket.id} has connected`);

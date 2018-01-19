@@ -79,6 +79,33 @@ module.exports = async (cb) => {
       }
 
       try {
+        await r.table('articles').wait();
+        await r.table('articles').indexCreate('locationPublishDate', (article) => [
+          article('locations')('location')('position'),
+          article('publishDate'),
+        ], { geo: true, multi: true }).run(conn);
+        console.log('locationPublishDate index created on articles table');
+      } catch (e) {
+        console.log('locationPublishDate index already exists on articles table');
+      }
+
+      try {
+        await r.table('articles').wait();
+        await r.table('articles').indexCreate('popularityScore', r.row('popularity')('totalScore')).run(conn);
+        console.log('popularityScore index created on articles table');
+      } catch (e) {
+        console.log('popularityScore index already exists on articles table');
+      }
+
+      try {
+        await r.table('articles').wait();
+        await r.table('articles').indexCreate('timestamp', r.row('timestamp')).run(conn);
+        console.log('timestamp index created on articles table');
+      } catch (e) {
+        console.log('timestamp index already exists on articles table');
+      }
+
+      try {
         await r.table('crawlerLogs').wait();
         await r.table('crawlerLogs')
           .indexCreate('status', (article) => article('timestamp').date())

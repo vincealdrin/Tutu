@@ -124,8 +124,7 @@ class Insights extends Component {
       case 'mainMenu':
         return (
           <div>
-            <Grid>
-              <Grid.Row columns={2}>
+            <Grid columns={2} stackable>
                 <Grid.Column>
                   {this.renderSegment(
                     'smile',
@@ -140,7 +139,6 @@ class Insights extends Component {
                     'Look at the total number of articles per category on a specific date.',
                   )}
                 </Grid.Column>
-              </Grid.Row>
               <Grid.Row columns={2}>
                 <Grid.Column>
                   {this.renderSegment(
@@ -187,13 +185,12 @@ class Insights extends Component {
           }}
           closeOnDimmerClick
         >
-          <Label as="a" color="teal" size="huge" ribbon>{labelDesc}</Label>
+          <Label as="a" color="teal" size="large" ribbon>{labelDesc}</Label>
           <Button
             as="a"
             icon={activeCard === 'mainMenu' ? 'close' : 'long arrow left'}
             floated="right"
-            color="red"
-            basic
+            color="white"
             content={activeCard === 'mainMenu' ? 'CLOSE' : 'BACK'}
             onClick={() => (activeCard === 'mainMenu'
               ? this.props.closeModal()

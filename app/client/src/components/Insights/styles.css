@@ -19,15 +19,21 @@
   font-weight: normal;
 }
 
-.ui.huge.ribbon {
+.ui.large.ribbon {
+  z-index: 999;
   top: 1rem;
-  left: -1.7rem;
+  left: -1.2rem;
 }
 
 .ui.segment.insight-menu-item {
-  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20%;
   cursor: pointer;
   transition: box-shadow 0.2s ease-in-out;
+  height: 250px;
 }
 
 .ui.segment.insight-menu-item:hover {
@@ -35,3 +41,4 @@
     0 4px 21px 0 rgba(34, 36, 38, 0.16),
     0 4px 27px 0 rgba(34, 36, 38, 0.16);
 }
+

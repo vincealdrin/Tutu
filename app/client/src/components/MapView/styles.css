@@ -43,13 +43,6 @@
   height: 100%;
 }
 
-.map-progress {
-  position: fixed !important;
-  z-index: 1000;
-  width: 100%;
-  margin-bottom: 0 !important;
-}
-
 /* radar pulse animation for cluster marker */
 @keyframes pulse {
   1% {
@@ -321,21 +314,21 @@
 }
 
 .search-box {
-  position: fixed !important;
+  position: absolute !important;
   z-index: 1000;
   width: 250px;
   margin: 11.85px 0 0 11.85px;
 }
 
 .current-loc {
-  position: fixed !important;
+  position: absolute !important;
   top: 11.85px;
   left: 273.7px;
   z-index: 1000;
 }
 
 .map-top-buttons {
-  position: fixed;
+  position: absolute;
   top: 11.85px;
   right: 85.5px;
   z-index: 1000;
@@ -352,4 +345,12 @@
 
 .adjust-top-buttons-widen-visible {
   right: 635.85px;
+}
+
+.src-type-message {
+  position: absolute !important;
+  bottom: -30px;
+  left: 50%;
+  z-index: 9999999;
+  transform: translateX(-50%);
 }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { NProgress } from 'redux-nprogress';
-import { Icon, Input, Button } from 'semantic-ui-react';
+import { Icon, Input, Button, Message } from 'semantic-ui-react';
 import {
   fetchBoundArticles,
   fetchFocusedInfo,
@@ -10,6 +10,8 @@ import {
   fetchFocusedClusterInfo,
   toggleSourcesType,
 } from '../../modules/mapArticles';
+import { fetchRecentArticles } from '../../modules/recentArticles';
+import { fetchPopularArticles } from '../../modules/popularArticles';
 import ClusterModal from './ClusterModal';
 import Insights from '../Insights';
 import AppSidebar from '../AppSidebar';
@@ -23,7 +25,7 @@ const mapStateToProps = ({
     clusters,
     mapState,
     filterMapState,
-    isSourcesLegit,
+    legitimate,
   },
 }) => ({
   // mapState: map.viewport.toJS(),
@@ -31,7 +33,7 @@ const mapStateToProps = ({
   articles,
   clusters,
   filterMapState,
-  isSourcesLegit,
+  legitimate,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -40,6 +42,8 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   updateMapState,
   fetchFocusedClusterInfo,
   toggleSourcesType,
+  fetchRecentArticles,
+  fetchPopularArticles,
 }, dispatch);
 
 
@@ -48,6 +52,7 @@ class MapView extends Component {
     currentPosition: null,
     isSidebarWiden: false,
     isSidebarVisible: false,
+    isMsgShown: true,
   }
 
   componentDidMount() {
@@ -86,6 +91,7 @@ class MapView extends Component {
   shrinkSidebar = () => this.setState({ isSidebarWiden: false })
   showSidebarContent = () => this.setState({ isSidebarVisible: true })
   toggleSidebarContent = () => this.setState({ isSidebarVisible: !this.state.isSidebarVisible })
+  closeMessage = () => this.setState({ isMsgShown: false })
 
   _onChange = ({ center, zoom, marginBounds }) => {
     this.props.updateMapState(center, zoom, marginBounds);
@@ -106,29 +112,44 @@ class MapView extends Component {
       articles,
       clusters,
       mapState,
-      isSourcesLegit,
+      legitimate,
     } = this.props;
     const {
       currentPosition,
       isSidebarVisible,
       isSidebarWiden,
+      isMsgShown,
     } = this.state;
 
     return (
       <div className="map-container">
         <div className={`map-top-buttons ${this.getTopBtnClassName()}`}>
           <Button
-            content={`Switch to ${isSourcesLegit ? 'illegitimate' : 'legitimate'} sources`}
-            color={`${isSourcesLegit ? 'red' : 'green'}`}
+            content={`${legitimate ? 'Illegitimate' : 'Legitimate'} Sources`}
+            color={`${legitimate ? 'red' : 'green'}`}
             icon="newspaper"
             labelPosition="left"
             onClick={() => {
+              this.setState({ isMsgShown: true });
               this.props.toggleSourcesType();
               this.props.fetchBoundArticles();
+
+              if (isSidebarVisible) {
+                this.props.fetchRecentArticles();
+                this.props.fetchPopularArticles();
+              }
             }}
           />
           <Insights />
         </div>
+        {isMsgShown ? (
+          <Message
+            header={`Map of ${legitimate ? 'Legitimate' : 'Illegitimate'} Sources`}
+            content={`Each marker contains news from ${legitimate ? 'legitimate' : 'illegitimate'} sources`}
+            className="src-type-message"
+            onDismiss={this.closeMessage}
+          />
+        ) : null}
         <NProgress />
         <ClusterModal />
         <SimpleModal />
@@ -162,7 +183,7 @@ class MapView extends Component {
           updateMapState={this.props.updateMapState}
           onChange={this._onChange}
           onChildClick={this._onChildClick}
-          isLegit={isSourcesLegit}
+          isLegit={legitimate}
         />
       </div>
     );

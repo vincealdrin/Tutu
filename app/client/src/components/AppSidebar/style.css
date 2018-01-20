@@ -63,7 +63,7 @@
   width: 225px;
 }
 
-.full { display: block; }
+.shown { display: block; }
 .hidden { display: none; }
 
 .logo {

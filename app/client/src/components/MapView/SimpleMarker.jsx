@@ -26,7 +26,6 @@ class SimpleMarker extends PureComponent {
     return (
       <Tooltip
         position="right-start"
-        distance={15}
         html={
           <div className="simple-marker">
             <Grid>
@@ -47,7 +46,7 @@ class SimpleMarker extends PureComponent {
           </div>
         }
         open={$hover}
-        arrow
+        animateFill={false}
         sticky
       >
         <Motion

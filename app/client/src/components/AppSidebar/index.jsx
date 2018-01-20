@@ -39,10 +39,10 @@ const AppSidebar = ({
   let isIconVisible;
 
   if (window.location.pathname === '/') {
-    visibleClassName = `${isVisible ? 'hidden' : 'full'}`;
-    isIconVisible = `${isVisible ? 'left' : 'right'}`;
+    visibleClassName = `${isVisible ? 'shown' : 'hidden'}`;
+    isIconVisible = `${isVisible ? 'right' : 'left'}`;
   } else {
-    visibleClassName = `${isVisible ? 'full' : 'hidden'}`;
+    visibleClassName = `${isVisible ? 'shown' : 'hidden'}`;
     isIconVisible = `${isVisible ? 'right' : 'left'}`;
   }
 
@@ -53,18 +53,20 @@ const AppSidebar = ({
           <Icon name={`angle ${isIconVisible}`} size="large" />
         </div>
         <div className={`side-menu-item-container ${visibleClassName}`}>
-          <Switch>
-            <Route path="/" component={PopularArticles} exact />
-            <Route path="(.*)/popular" component={PopularArticles} exact />
-            <Route path="(.*)/recent" component={RecentArticles} exact />
-            <Route path="(.*)/preferences" component={Filter} exact />
-            <Route path="(.*)/about" component={About} exact />
-            <Route path="(.*)/submit" component={Submit} exact />
-            <Route path="(.*)/categories" component={Categories} exact />
-            <Route path="(.*)/themes" component={MapThemes} exact />
-            <Route path="(.*)/sources" component={SourcesList} exact />
-            <Redirect to="/" />
-          </Switch>
+          {isVisible ? (
+            <Switch>
+              <Route path="/" component={PopularArticles} exact />
+              <Route path="(.*)/popular" component={PopularArticles} exact />
+              <Route path="(.*)/recent" component={RecentArticles} exact />
+              <Route path="(.*)/preferences" component={Filter} exact />
+              <Route path="(.*)/about" component={About} exact />
+              <Route path="(.*)/submit" component={Submit} exact />
+              <Route path="(.*)/categories" component={Categories} exact />
+              <Route path="(.*)/themes" component={MapThemes} exact />
+              <Route path="(.*)/sources" component={SourcesList} exact />
+              <Redirect to="/" />
+            </Switch>
+        ) : null}
         </div>
       </div>
 

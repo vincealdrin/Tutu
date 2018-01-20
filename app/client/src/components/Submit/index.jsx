@@ -64,7 +64,6 @@ class Submit extends Component {
         errorMessage: '',
       });
     } catch (e) {
-      console.log(e.response.data.message);
       this.setState({
         submitStatus: 'error',
         errorMessage: e.response.data.message,
@@ -86,7 +85,7 @@ class Submit extends Component {
           <Label as="a" color="orange" ribbon style={{ marginBottom: '1rem' }}>Submit</Label>
           <div className="scrollable-section about-section-info">
             <Header as="h2" style={{ marginBottom: 32 }}>
-              Analyze Source's Legitimacy
+              Analyze Source&#x27;s Credibility
             </Header>
 
             <p className="tutu-description" >
@@ -133,18 +132,18 @@ class Submit extends Component {
                             <li />
                             <li /> */}
                             <li>Source: <a href={result.sourceUrl} target="__blank">{result.sourceUrl}</a></li>
-                            <li>Prediction: {result.isReliable ? 'LEGITIMATE' : 'ILLEGITIMATE'}</li>
-                            <li>Legitimacy score: ({result.pct.toFixed(2)}%)</li>
+                            <li>Prediction: {result.isReliable ? 'CREDIBLE' : 'NOT CREDIBLE'}</li>
+                            <li>Credibility score: ({result.pct.toFixed(2)}%)</li>
                             <li />
-                            <li>Source Legitimacy Score: ({result.sourcePct.toFixed(2)}%)</li>
-                            <li>Content Legitimacy Score: ({result.contentPct.toFixed(2)}%)</li>
+                            <li>Source Credibility Score: ({result.sourcePct.toFixed(2)}%)</li>
+                            <li>Content Credibility Score: ({result.contentPct.toFixed(2)}%)</li>
                           </ul>
                         </div>
                       )
                       : (
                         <div>
                           <a href={result.sourceUrl} target="__blank">{result.sourceUrl}</a>
-                          <br />is {result.isReliable ? 'a LEGITIMATE' : 'an ILLEGITIMATE'} SOURCE
+                          <br />is a {result.isReliable ? 'CREDIBLE' : 'NOT CREDIBLE'} SOURCE
                         </div>
                       )}
 

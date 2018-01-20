@@ -21,8 +21,8 @@ const initialState = {
     visitors: 0,
     articles: 0,
     pendingSources: 0,
-    legitimateSources: 0,
-    illegitimateSources: 0,
+    credibleSources: 0,
+    notCredibleSources: 0,
   },
   sentiment: {
     labels: [],
@@ -71,8 +71,8 @@ export default (state = initialState, action) => {
           verifiedSources: {
             labels: action.sourcesSubmit.verifiedSources
               .map((vs) => moment(vs.date).format(DATE_FORMAT)),
-            legitimateCount: action.sourcesSubmit.verifiedSources.map((vs) => vs.legitimate),
-            illegitimateCount: action.sourcesSubmit.verifiedSources.map((vs) => vs.illegitimate),
+            credibleCount: action.sourcesSubmit.verifiedSources.map((vs) => vs.credible),
+            notCredibleCount: action.sourcesSubmit.verifiedSources.map((vs) => vs.notCredible),
           },
           pendingSources: {
             labels: action.sourcesSubmit.pendingSources

@@ -182,14 +182,14 @@ class Home extends Component {
       labels: sourcesSubmit.verifiedSources.labels,
       datasets: getLineDataset([
         {
-          label: 'Legitimate',
+          label: 'Credible',
           color: '41,199,202',
-          data: sourcesSubmit.verifiedSources.legitimateCount,
+          data: sourcesSubmit.verifiedSources.credibleCount,
         },
         {
-          label: 'Illegitimate',
+          label: 'Not Credible',
           color: '234,95,72',
-          data: sourcesSubmit.verifiedSources.illegitimateCount,
+          data: sourcesSubmit.verifiedSources.notCredibleCount,
         },
       ]),
     };
@@ -445,8 +445,8 @@ class Home extends Component {
               visitors={counts.visitors}
               articles={counts.articles}
               pendingSources={counts.pendingSources}
-              legitimateSources={counts.legitimateSources}
-              illegitimateSources={counts.illegitimateSources}
+              credibleSources={counts.credibleSources}
+              notCredibleSources={counts.notCredibleSources}
             />
             <Segment>
               <Label attached="top right">Articles</Label>

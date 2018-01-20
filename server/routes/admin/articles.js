@@ -91,10 +91,10 @@ module.exports = (conn, io) => {
   });
 
   router.delete('/', async (req, res, next) => {
-    const { ids = [] } = req.body;
+    const { ids = '' } = req.body;
 
     try {
-      await r.table(tbl).getAll(r.args(ids)).delete().run(conn);
+      await r.table(tbl).getAll(r.args(ids.split(','))).delete().run(conn);
 
       res.status(204).end();
     } catch (e) {

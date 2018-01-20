@@ -30,12 +30,14 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchRecentArticles = (limit, cb) => async (dispatch) => {
+export const fetchRecentArticles = (limit, cb) => async (dispatch, getState) => {
   dispatch({ type: FETCH_RECENT_ARTICLES, statusText: 'pending' });
 
   try {
+    const { mapArticles: { legitimate } } = getState();
     const { data: articles, headers, status } = await axios.get('/articles/recent', {
       params: {
+        legitimate: legitimate ? 'yes' : 'no',
         limit,
       },
     });

@@ -1,30 +1,13 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { HorizontalBar, Bar, Line } from 'react-chartjs-2';
-import { Sidebar, Segment, Grid, Label } from 'semantic-ui-react';
+import moment from 'moment';
+import { Line } from 'react-chartjs-2';
+import { Segment, Grid, Label } from 'semantic-ui-react';
 import { addLog, fetchLogs, fetchStats, incErrorCount, incSuccessCount } from '../../modules/crawler';
 import CrawlerFeed from './CrawlerFeed';
 import './styles.css';
-
-const data = {
-  type: 'horizontalBar',
-  labels: ['Business', 'Economy', 'Lifestyle',
-    'Entertainment', 'Sports', 'Government & Politics',
-    'Health', 'Science & Technology', 'Crime', 'Weather'],
-  datasets: [
-    {
-      label: 'Categories',
-      backgroundColor: 'rgba(255,99,132,0.2)',
-      borderColor: 'rgba(255,99,132,1)',
-      borderWidth: 1,
-      barThickness: 1,
-      hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-      hoverBorderColor: 'rgba(255,99,132,1)',
-      data: [65, 59, 80, 81, 56, 55, 40, 34, 45, 66, 77],
-    },
-  ],
-};
+import { DATE_FORMAT } from '../../constants';
 
 const mapStateToProps = ({
   crawler: {
@@ -59,7 +42,7 @@ class Crawler extends Component {
       let latest = labels[labels.length - 1];
 
       socket.on('crawlLog', (log) => {
-        const logDate = new Date(log.timestamp).toLocaleDateString();
+        const logDate = moment(log.timestamp).format(DATE_FORMAT);
 
         if (logDate !== latest) {
           latest = logDate;

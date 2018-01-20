@@ -1,6 +1,7 @@
 body {
   padding: 0 !important;
   margin: 0 !important;
+  overflow: hidden;
   font-family: 'lato', sans-serif;
   cursor: default;
   background: #f4f4f4;

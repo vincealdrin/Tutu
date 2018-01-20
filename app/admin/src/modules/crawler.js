@@ -1,5 +1,7 @@
 import axios from 'axios';
+import moment from 'moment';
 import { updateCrudStatus, crudStatus } from '../utils';
+import { DATE_FORMAT } from '../constants';
 
 export const FETCH_LOGS = 'crawler/FETCH_LOGS';
 export const ADD_LOG = 'crawler/ADD_LOG';
@@ -63,7 +65,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         stats: action.stats ? {
-          labels: action.stats.map((stat) => new Date(stat.date).toLocaleDateString()),
+          labels: action.stats.map((stat) => moment(stat.date).format(DATE_FORMAT)),
           successCounts: action.stats.map((stat) => stat.successCount),
           errorCounts: action.stats.map((stat) => stat.errorCount),
         } : state.stats,

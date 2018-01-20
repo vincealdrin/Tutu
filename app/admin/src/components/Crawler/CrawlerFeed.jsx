@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Feed, Icon } from 'semantic-ui-react';
-import timeago from 'timeago.js';
+import moment from 'moment';
 import shortid from 'shortid';
+import { DATE_FORMAT } from '../../constants';
 
 class CrawlerFeed extends Component {
   getLogAction = (log) => {
@@ -20,7 +21,7 @@ class CrawlerFeed extends Component {
             feedHtml: (
               <p>
                 {log.article.summary}<br />
-                <i>Publish date: {new Date(log.article.publishDate).toDateString()}</i>
+                <i>Publish date: {moment(log.article.publishDate).format(DATE_FORMAT)}</i>
               </p>
             ),
             actionMessage: 'Crawling was successful',
@@ -98,7 +99,7 @@ class CrawlerFeed extends Component {
               <Feed.Content>
                 <Feed.Summary>
                   {actionMessage}
-                  <Feed.Date>{timeago().format(log.timestamp)}</Feed.Date>
+                  <Feed.Date>{moment(log.timestamp).fromNow()}</Feed.Date>
                 </Feed.Summary>
                 <Feed.Extra>
                   {log.article && <a href={log.article.url} target="__blank">{log.article.title}</a>}

@@ -71,7 +71,7 @@ class PopularArticles extends Component {
                     <Grid.Column width={10} className="article-info">
                       <Header color="blue" as="a" href={article.url} className="article-title" target="_blank">{article.title}</Header>
                       <br />
-                      <a href={`http://${article.sourceUrl}`} target="_blank" className="source-name">{article.source}</a><span className="source-name"> —  {moment(article.publishDate).format(DATE_FORMAT)}</span>
+                      <a href={article.sourceUrl} target="_blank" className="source-name">{article.source}</a><span className="source-name"> —  {moment(article.publishDate).format(DATE_FORMAT)}</span>
                       <p>{article.summary}</p>
                     </Grid.Column>
                   </Grid.Row>

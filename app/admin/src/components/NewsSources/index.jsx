@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Segment, Grid, Label, Button } from 'semantic-ui-react';
+import moment from 'moment';
 import DataTable from '../Common/DataTable';
 import SourcesForm from './SourcesForm';
 import PendingSourcesForm from './PendingSourcesForm';
@@ -23,6 +24,7 @@ import {
   deleteFakeSources,
 } from '../../modules/fakeSources';
 import './styles.css';
+import { TIME_FORMAT } from '../../constants';
 
 const columns = [
   { key: 'brand', text: 'Brand' },
@@ -54,7 +56,7 @@ const pendingColumns = [
   },
   {
     key: 'timestamp',
-    wrapper: (val) => new Date(val).toLocaleString(),
+    wrapper: (val) => moment(val).format(TIME_FORMAT),
     text: 'Timestamp',
   },
 

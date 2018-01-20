@@ -26,26 +26,46 @@ def insert_article(article, reliable=True):
     # }
     article['timestamp'] = r.expr(datetime.now(r.make_timezone(PH_TIMEZONE)))
 
-    rel_articles = r.table('articles').eq_join('sourceId', r.table('sources')).filter(lambda doc:
-        doc['left']['id'].ne(article['id']) & doc['left']['publishDate'].date().during(
+    rel_articles = r.table('articles').filter(lambda doc:
+        doc['id'].ne(article['id']) & doc['publishDate'].date().during(
             r.time(article['publishDate'].year(), article['publishDate'].month(), article['publishDate'].day(), PH_TIMEZONE).sub(TWO_DAYS_IN_SEC),
             r.time(article['publishDate'].year(), article['publishDate'].month(), article['publishDate'].day(), PH_TIMEZONE).add(TWO_DAYS_IN_SEC),
             right_bound='closed'
         ).and_(
             r.expr(article['categories']).slice(0, 2).get_field('label').contains(
-                lambda label: doc['left']['categories'].slice(0, 2).get_field('label').contains(label)).and_(
+                lambda label: doc['categories'].slice(0, 2).get_field('label').contains(label)).and_(
                         r.or_(
                             # r.expr(article['topics']['common']).contains(lambda keyword:
-                            #     doc['left']['topics']['common'].coerce_to('string').match(keyword)),
+                            #     doc['topics']['common'].coerce_to('string').match(keyword)),
                         r.expr(article['people']).contains(lambda person:
-                            doc['left']['people'].coerce_to('string').match(person)),
+                            doc['people'].coerce_to('string').match(person)),
                         r.expr(article['organizations']).contains(lambda org:
-                            doc['left']['organizations'].coerce_to('string').match(org))
+                            doc['organizations'].coerce_to('string').match(org))
                         ))
-        ).and_(doc['right']['isReliable'].eq(reliable))).order_by(r.desc('publishDate')).slice(0, 10).map(lambda join: {
-            'id': join['left']['id'],
-            'title': join['left']['title'],
+        )).order_by(r.desc('publishDate')).slice(0, 10).map(lambda join: {
+            'id': join['id'],
+            'title': join['title'],
         }).run(conn)
+    # rel_articles = r.table('articles').eq_join('sourceId', r.table('sources')).filter(lambda doc:
+    #     doc['left']['id'].ne(article['id']) & doc['left']['publishDate'].date().during(
+    #         r.time(article['publishDate'].year(), article['publishDate'].month(), article['publishDate'].day(), PH_TIMEZONE).sub(TWO_DAYS_IN_SEC),
+    #         r.time(article['publishDate'].year(), article['publishDate'].month(), article['publishDate'].day(), PH_TIMEZONE).add(TWO_DAYS_IN_SEC),
+    #         right_bound='closed'
+    #     ).and_(
+    #         r.expr(article['categories']).slice(0, 2).get_field('label').contains(
+    #             lambda label: doc['left']['categories'].slice(0, 2).get_field('label').contains(label)).and_(
+    #                     r.or_(
+    #                         # r.expr(article['topics']['common']).contains(lambda keyword:
+    #                         #     doc['left']['topics']['common'].coerce_to('string').match(keyword)),
+    #                     r.expr(article['people']).contains(lambda person:
+    #                         doc['left']['people'].coerce_to('string').match(person)),
+    #                     r.expr(article['organizations']).contains(lambda org:
+    #                         doc['left']['organizations'].coerce_to('string').match(org))
+    #                     ))
+    #     ).and_(doc['right']['isReliable'].eq(reliable))).order_by(r.desc('publishDate')).slice(0, 10).map(lambda join: {
+    #         'id': join['left']['id'],
+    #         'title': join['left']['title'],
+    #     }).run(conn)
 
     # print([rel['title'] for rel in rel_articles])
 

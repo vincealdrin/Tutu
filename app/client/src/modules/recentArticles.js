@@ -34,10 +34,10 @@ export const fetchRecentArticles = (limit, cb) => async (dispatch, getState) => 
   dispatch({ type: FETCH_RECENT_ARTICLES, statusText: 'pending' });
 
   try {
-    const { mapArticles: { legitimate } } = getState();
+    const { mapArticles: { isCredible } } = getState();
     const { data: articles, headers, status } = await axios.get('/articles/recent', {
       params: {
-        legitimate: legitimate ? 'yes' : 'no',
+        isCredible: isCredible ? 'yes' : 'no',
         limit,
       },
     });

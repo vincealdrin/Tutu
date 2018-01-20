@@ -5,8 +5,8 @@ const Statistics = ({
   visitors,
   articles,
   pendingSources,
-  legitimateSources,
-  illegitimateSources,
+  credibleSources,
+  notCredibleSources,
 
 }) => (
   <Grid columns={5}>
@@ -48,9 +48,9 @@ const Statistics = ({
         <Statistic size="tiny">
           <Statistic.Value>
             <Icon name="world" />
-            {legitimateSources}
+            {credibleSources}
           </Statistic.Value>
-          <Statistic.Label>Legitimate Sources</Statistic.Label>
+          <Statistic.Label>Credible Sources</Statistic.Label>
         </Statistic>
       </Segment>
     </Grid.Column>
@@ -59,9 +59,9 @@ const Statistics = ({
         <Statistic size="tiny">
           <Statistic.Value>
             <Icon name="world" />
-            {illegitimateSources}
+            {notCredibleSources}
           </Statistic.Value>
-          <Statistic.Label>Illegitimate Sources</Statistic.Label>
+          <Statistic.Label>Not Credible Sources</Statistic.Label>
         </Statistic>
       </Segment>
     </Grid.Column>

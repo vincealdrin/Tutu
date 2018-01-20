@@ -10,11 +10,11 @@ module.exports = (conn, io) => {
         visitors: await r.table('visitors').count().run(conn),
         articles: await r.table('articles').count().run(conn),
         pendingSources: await r.table('pendingSources').count().run(conn),
-        legitimateSources: await r.table('sources')
+        credibleSources: await r.table('sources')
           .filter(r.row('isReliable').eq(true))
           .count()
           .run(conn),
-        illegitimateSources: await r.table('sources')
+        notCredibleSources: await r.table('sources')
           .filter(r.row('isReliable').eq(false))
           .count()
           .run(conn),
@@ -31,8 +31,8 @@ module.exports = (conn, io) => {
         .ungroup()
         .map((group) => ({
           date: group('group'),
-          legitimate: group('reduction').filter((source) => source('isReliable').eq(true)).count(),
-          illegitimate: group('reduction').filter((source) => source('isReliable').eq(false)).count(),
+          credible: group('reduction').filter((source) => source('isReliable').eq(true)).count(),
+          notCredible: group('reduction').filter((source) => source('isReliable').eq(false)).count(),
         }))
         .run(conn);
       const pendingSources = await r.table('pendingSources')
@@ -59,11 +59,11 @@ module.exports = (conn, io) => {
         visitors: await r.table('visitors').count().run(conn),
         articles: await r.table('articles').count().run(conn),
         pendingSources: await r.table('pendingSources').count().run(conn),
-        legitimateSources: await r.table('sources')
+        credibleSources: await r.table('sources')
           .filter(r.row('isReliable').eq(true))
           .count()
           .run(conn),
-        illegitimateSources: await r.table('sources')
+        notCredibleSources: await r.table('sources')
           .filter(r.row('isReliable').eq(false))
           .count()
           .run(conn),

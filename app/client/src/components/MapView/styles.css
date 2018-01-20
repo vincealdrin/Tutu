@@ -34,7 +34,7 @@
   transform-origin: center;
 }
 
-.cluster-marker-container-illegitimate {
+.cluster-marker-container-not-credible {
   border: 5px solid #1b272b;
 }
 
@@ -351,6 +351,6 @@
   position: absolute !important;
   bottom: -30px;
   left: 50%;
-  z-index: 9999999;
+  z-index: 100;
   transform: translateX(-50%);
 }

@@ -45,21 +45,12 @@ provinces = get_provinces()
 PY_ENV = os.environ.get('PY_ENV')
 count = 0
 slp_time = 0
-crawled_sources = []
 last_proxy = ''
 
 while True:
-    # news_sources = get_rand_sources(not_sources=crawled_sources)
-    news_sources = get_rand_sources(crawled_sources)
+    news_sources = get_rand_sources()
 
     for news_source in news_sources:
-        print('Crawled Sources: ' + str(crawled_sources))
-        if not news_sources:
-            if PY_ENV == 'development':
-                print('CRAWLED ALL SOURCES')
-            crawled_sources = []
-            continue
-
         src_start_time = time.clock()
         src_art_count = 0
 
@@ -474,8 +465,6 @@ while True:
                    float(time.clock() - src_start_time), {
                        'articlesCrawledCount': src_art_count,
                    })
-
-        crawled_sources.append(source_id)
 
         if PY_ENV == 'development':
             print('\n' + source.domain + ' done!')

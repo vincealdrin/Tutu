@@ -1,6 +1,7 @@
 .pop-scrollable-section {
   height: 96%;
-  padding-top: 2rem;
+  min-width: 288.42px;
+  padding: 2rem 14px;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -12,6 +13,6 @@
 
 .pop-segment-container {
   height: 100vh;
-  padding-right: 0;
+  padding-right: 1px !important;
   margin-right: 0;
 }

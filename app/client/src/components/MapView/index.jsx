@@ -25,7 +25,7 @@ const mapStateToProps = ({
     clusters,
     mapState,
     filterMapState,
-    legitimate,
+    isCredible,
   },
 }) => ({
   // mapState: map.viewport.toJS(),
@@ -33,7 +33,7 @@ const mapStateToProps = ({
   articles,
   clusters,
   filterMapState,
-  legitimate,
+  isCredible,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -112,7 +112,7 @@ class MapView extends Component {
       articles,
       clusters,
       mapState,
-      legitimate,
+      isCredible,
     } = this.props;
     const {
       currentPosition,
@@ -125,8 +125,8 @@ class MapView extends Component {
       <div className="map-container">
         <div className={`map-top-buttons ${this.getTopBtnClassName()}`}>
           <Button
-            content={`${legitimate ? 'Illegitimate' : 'Legitimate'} Sources`}
-            color={`${legitimate ? 'red' : 'green'}`}
+            content={`${isCredible ? 'Not Credible' : 'Credible'} Sources`}
+            color={`${isCredible ? 'red' : 'green'}`}
             icon="newspaper"
             labelPosition="left"
             onClick={() => {
@@ -144,8 +144,8 @@ class MapView extends Component {
         </div>
         {isMsgShown ? (
           <Message
-            header={`Map of ${legitimate ? 'Legitimate' : 'Illegitimate'} Sources`}
-            content={`Each marker contains news from ${legitimate ? 'legitimate' : 'illegitimate'} sources`}
+            header={`Map of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
+            content={`Each marker contains news from ${isCredible ? 'credible' : 'not credible'} sources`}
             className="src-type-message"
             onDismiss={this.closeMessage}
           />
@@ -183,7 +183,7 @@ class MapView extends Component {
           updateMapState={this.props.updateMapState}
           onChange={this._onChange}
           onChildClick={this._onChildClick}
-          isLegit={legitimate}
+          isCredible={isCredible}
         />
       </div>
     );

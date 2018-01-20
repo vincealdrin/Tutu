@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@mapbox/point-geometry@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@mapbox/point-geometry/-/point-geometry-0.1.0.tgz#8a83f9335c7860effa2eeeca254332aa0aeed8f2"
+
 JSONStream@^0.8.4:
   version "0.8.4"
   resolved "https://registry.yarnpkg.com/JSONStream/-/JSONStream-0.8.4.tgz#91657dfe6ff857483066132b4618b62e8f4887bd"
@@ -3166,13 +3170,13 @@ globjoin@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/globjoin/-/globjoin-0.1.4.tgz#2f4494ac8919e3767c5cbb691e9f463324285d43"
 
-google-map-react@^0.25.0:
-  version "0.25.0"
-  resolved "https://registry.yarnpkg.com/google-map-react/-/google-map-react-0.25.0.tgz#d76ff1ac6557fc1eadc47375fc7d9518ebcc50ed"
+google-map-react@^0.26.0:
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/google-map-react/-/google-map-react-0.26.0.tgz#b71bc2ccc18b5f5d3d50fe7ed04f384f7d0a3e4b"
   dependencies:
+    "@mapbox/point-geometry" "^0.1.0"
     eventemitter3 "^1.1.0"
     fbjs "^0.8.3"
-    point-geometry "0.0.0"
     scriptjs "^2.5.7"
 
 got@^5.0.0:
@@ -5223,10 +5227,6 @@ plur@^2.0.0, plur@^2.1.2:
 pluralize@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-7.0.0.tgz#298b89df8b93b0221dbf421ad2b1b1ea23fc6777"
-
-point-geometry@0.0.0:
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/point-geometry/-/point-geometry-0.0.0.tgz#6fcbcad7a803b6418247dd6e49c2853c584daff7"
 
 points-cluster@^0.1.4:
   version "0.1.4"

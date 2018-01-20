@@ -12,12 +12,12 @@ class ClusterMarker extends Component {
       count,
       articles,
       $hover,
-      isLegit,
+      isCredible,
     } = this.props;
 
     return (
       <Tooltip
-        position="right-start"
+        position="bottom-start"
         html={
           <List divided relaxed className="cluster-list-container">
             {articles.slice(0, 4).map((article) => (
@@ -48,10 +48,10 @@ class ClusterMarker extends Component {
         sticky
       >
         <div
-          className={`cluster-marker-container ${isLegit ? '' : 'cluster-marker-container-illegitimate'}`}
+          className={`cluster-marker-container ${isCredible ? '' : 'cluster-marker-container-not-credible'}`}
           style={$hover ? { zIndex: 10000 } : null}
         >
-          <div className={`cluster-marker-container-radiant ${isLegit ? '' : 'cluster-marker-container-illegitimate'} ${$hover ? 'cluster-marker-container-hovered' : ''}`} />
+          <div className={`cluster-marker-container-radiant ${isCredible ? '' : 'cluster-marker-container-not-credible'} ${$hover ? 'cluster-marker-container-hovered' : ''}`} />
           <p>{count}</p>
         </div>
       </Tooltip>

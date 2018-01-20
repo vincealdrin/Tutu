@@ -35,7 +35,7 @@ module.exports = (conn, io) => {
       date = new Date().toLocaleString(),
       popular = '',
       sentiment = '',
-      legitimate = 'yes',
+      isCredible = 'yes',
     } = req.query;
     const bounds = r.polygon(
       [parseFloat(swLng), parseFloat(swLat)],
@@ -174,7 +174,7 @@ module.exports = (conn, io) => {
       }
 
       const cursor = await query
-        .filter(r.row('right')('isReliable').eq(legitimate === 'yes'))
+        .filter(r.row('right')('isReliable').eq(isCredible === 'yes'))
         .map(mapArticle(bounds))
         .run(conn);
       const articles = await cursor.toArray();
@@ -190,7 +190,7 @@ module.exports = (conn, io) => {
     try {
       const {
         id,
-        legitRecStories = 'yes',
+        isCredible = 'yes',
       } = req.query;
       const articleInfo = await r.table(tbl)
         .get(id)
@@ -199,7 +199,7 @@ module.exports = (conn, io) => {
           relatedArticles: r.table(tbl)
             .getAll(r.args(article('relatedArticles')))
             .eqJoin('sourceId', r.table('sources'))
-            .filter((join) => join('right')('isReliable').eq(legitRecStories === 'yes'))
+            .filter((join) => join('right')('isReliable').eq(isCredible === 'yes'))
             .limit(5)
             .map(mapRelatedArticles)
             .coerceTo('array'),
@@ -222,7 +222,7 @@ module.exports = (conn, io) => {
     try {
       const {
         ids,
-        legitRecStories = 'yes',
+        isCredible = 'yes',
       } = req.query;
       const uuids = ids.split(',');
       const cursor = await r.table(tbl)
@@ -231,7 +231,7 @@ module.exports = (conn, io) => {
           relatedArticles: r.table(tbl)
             .getAll(r.args(article('relatedArticles')))
             .eqJoin('sourceId', r.table('sources'))
-            .filter((join) => join('right')('isReliable').eq(legitRecStories === 'yes'))
+            .filter((join) => join('right')('isReliable').eq(isCredible === 'yes'))
             .limit(5)
             .map(mapRelatedArticles)
             .coerceTo('array'),
@@ -258,15 +258,15 @@ module.exports = (conn, io) => {
     try {
       const {
         limit = '20',
-        legitimate = 'yes',
+        isCredible = 'yes',
       } = req.query;
 
       const query = await r.table(tbl)
         .orderBy({ index: r.desc('popularityScore') })
         .eqJoin(r.row('sourceId'), r.table('sources'))
-        .filter(r.row('right')('isReliable').eq(legitimate === 'yes')
+        .filter(r.row('right')('isReliable').eq(isCredible === 'yes')
           .and(r.row('left')('publishDate')
-            .ge(r.now().inTimezone(PH_TIMEZONE).sub(1 * DAY_IN_SECONDS))))
+            .ge(r.now().inTimezone(PH_TIMEZONE).sub(2 * DAY_IN_SECONDS))))
         .map((join) => ({
           id: join('left')('id'),
           url: join('left')('url'),
@@ -293,14 +293,14 @@ module.exports = (conn, io) => {
     try {
       const {
         limit = '20',
-        legitimate = 'yes',
+        isCredible = 'yes',
       } = req.query;
 
       const totalCount = await r.table('articles').count().run(conn);
       const query = await r.table('articles')
         .orderBy({ index: r.desc('timestamp') })
         .eqJoin('sourceId', r.table('sources'))
-        .filter(r.row('right')('isReliable').eq(legitimate === 'yes'))
+        .filter(r.row('right')('isReliable').eq(isCredible === 'yes'))
         .limit(parseInt(limit))
         .map((join) => ({
           id: join('left')('id'),

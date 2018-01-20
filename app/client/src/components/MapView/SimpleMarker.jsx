@@ -19,13 +19,13 @@ class SimpleMarker extends PureComponent {
         source,
         publishDate,
       },
-      isLegit,
+      isCredible,
       $hover,
     } = this.props;
 
     return (
       <Tooltip
-        position="right-start"
+        position="bottom-start"
         html={
           <div className="simple-marker">
             <Grid>
@@ -62,7 +62,7 @@ class SimpleMarker extends PureComponent {
           {(v) => (
             <div>
               <Icon
-                color={isLegit ? 'red' : 'black'}
+                color={isCredible ? 'red' : 'black'}
                 name="simple-marker-icon"
                 size={$hover ? 'huge' : 'big'}
                 className={`marker ${$hover ? 'hovered' : ''}`}

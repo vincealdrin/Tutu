@@ -280,6 +280,7 @@
 
 .image-tag-title-container {
   width: 100%;
+  height: 215px;
   display: flex;
 }
 
@@ -289,7 +290,9 @@
 
 .top-image {
   width: 100%;
-  height: 18 0px;
+  height: 100%;
+  background-position: center center;
+  background-size: cover;
 }
 
 .tags {
@@ -302,7 +305,7 @@
 
 .extras {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .no-info {

@@ -115,8 +115,7 @@ class ClusterModal extends PureComponent {
             relatedArticles = [],
           }) => (
             <Segment key={shortid.generate()} raised className="modal-article-container">
-              <Grid columns={2}>
-                <Grid.Column width={11} style={{ position: 'relative' }}>
+              <Grid columns={3} stackable>
                   <Label
                     as="a"
                     target="__blank"
@@ -127,6 +126,7 @@ class ClusterModal extends PureComponent {
                   >
                     <div className="news-label-name">{source}</div>
                   </Label>
+                <Grid.Column width={4} style={{ position: 'relative' }}>
                   <div className="image-tag-title-container">
                     <div className="top-image">
                       <Image
@@ -142,43 +142,45 @@ class ClusterModal extends PureComponent {
                         {moment(publishDate).format(DATE_FORMAT)} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
                       </p>
                     </div>
-                    <div className="tags">
-                      <List divided relaxed>
-                        <List.Item>
-                          <Label
-                            as="a"
-                            className="tag-label"
-                            color={this.getSentimentColor(sentiment)}
-                          >
-                              Sentiment
-                          </Label>
-                          <span className="article-tags">{sentiment}</span>
-                        </List.Item>
-                        <List.Item>
-                          <Label as="a" className="tag-label">Categories</Label>
-                          <Tags content={categories} />
-                        </List.Item>
-                        <List.Item>
-                          <Label as="a" className="tag-label">Keywords</Label>
-                          <Tags content={keywords} />
-                        </List.Item>
-                        <List.Item>
-                          <Label as="a" className="tag-label">Organizations</Label>
-                          <Tags content={organizations} />
-                        </List.Item>
-                        <List.Item>
-                          <Label as="a" className="tag-label">People</Label>
-                          <Tags content={people} />
-                        </List.Item>
-                      </List>
-                      <Reactions
-                        reactions={reactions}
-                        id={id}
-                      />
-                    </div>
                   </div>
                 </Grid.Column>
-                <Grid.Column width={5}>
+                <Grid.Column width={6}>
+                  <div className="tags">
+                    <List divided relaxed>
+                      <List.Item>
+                        <Label
+                          as="a"
+                          className="tag-label"
+                          color={this.getSentimentColor(sentiment)}
+                        >
+                            Sentiment
+                        </Label>
+                        <span className="article-tags">{sentiment}</span>
+                      </List.Item>
+                      <List.Item>
+                        <Label as="a" className="tag-label">Categories</Label>
+                        <Tags content={categories} />
+                      </List.Item>
+                      <List.Item>
+                        <Label as="a" className="tag-label">Keywords</Label>
+                        <Tags content={keywords} />
+                      </List.Item>
+                      <List.Item>
+                        <Label as="a" className="tag-label">Organizations</Label>
+                        <Tags content={organizations} />
+                      </List.Item>
+                      <List.Item>
+                        <Label as="a" className="tag-label">People</Label>
+                        <Tags content={people} />
+                      </List.Item>
+                    </List>
+                    <Reactions
+                      reactions={reactions}
+                      id={id}
+                    />
+                  </div>
+                </Grid.Column>
+                <Grid.Column width={6}>
                   <div className="news-summary">
                     {summary}
                   </div>

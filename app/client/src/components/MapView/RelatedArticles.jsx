@@ -38,12 +38,12 @@ class RelatedArticles extends Component {
                     className="related-articles"
                   >
                     {relatedArticle.title}
-                    <Label circular>{relatedArticle.source}</Label>
                   </List.Header>
                   <List.Description>
                     <p className="article-date">
                       {moment(relatedArticle.publishDate).format(DATE_FORMAT)}
                     </p>
+                    <Label circular className="related-source-label">{relatedArticle.source}</Label>
                   </List.Description>
                 </List.Item>
               ))

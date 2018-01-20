@@ -107,7 +107,7 @@ class Reactions extends Component {
         html={successMsg || errorMsg}
         position="top"
       >
-        <List horizontal>
+        <List horizontal className="reaction-container">
           <List.Item className="reactions">
             <Tooltip
               title="Happy"

@@ -118,7 +118,7 @@ class SimpleModal extends PureComponent {
               <Header as="h4">Loading article...</Header>
             </Dimmer>
           ) : null}
-          <Grid columns={2} style={{ marginBottom: '1rem' }}>
+          <Grid columns={2} style={{ marginBottom: '1rem' }} stackable>
             <Grid.Column width={7}>
               <div className="image-tag-title-container">
                 <div

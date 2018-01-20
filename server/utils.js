@@ -311,6 +311,7 @@ module.exports.mapFeedArticle = (join) => {
     topImageUrl: join('left')('new_val')('topImageUrl'),
     source: join('right')('brand'),
     sourceUrl: join('right')('url'),
+    legitimate: join('right')('isReliable'),
   };
 
   return {

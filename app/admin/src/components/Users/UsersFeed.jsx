@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Feed, Icon } from 'semantic-ui-react';
-import timeago from 'timeago.js';
 import shortid from 'shortid';
+import moment from 'moment';
 import { fetchUsersFeed, addFeedItem } from '../../modules/usersFeed';
+import { DATE_FORMAT, TIME_FORMAT } from '../../constants';
 
 const mapStateToProps = ({
   usersFeed: {
@@ -81,7 +82,7 @@ class UsersFeed extends Component {
                   {type === 'verify' && isReliable ? ' a RELIABLE' : null}
                   {type === 'verify' && !isReliable ? ' a NOT RELIABLE' : null}
                   &nbsp;source/s in {table}&#39; table
-                  <Feed.Date content={timeago().format(timestamp)} />
+                  <Feed.Date content={moment(timestamp).fromNow()} />
                 </Feed.Summary>
                 <Feed.Extra>
                   {sources.map((src, i) => (
@@ -109,7 +110,7 @@ class UsersFeed extends Component {
                 <Feed.Meta>
                   <Feed.Like>
                     <Icon name="time" />
-                    {new Date(timestamp).toLocaleString()}
+                    {moment(timestamp).format(TIME_FORMAT)}
                   </Feed.Like>
                 </Feed.Meta>
               </Feed.Content>

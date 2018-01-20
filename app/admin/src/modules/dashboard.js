@@ -1,5 +1,7 @@
 import axios from 'axios';
+import moment from 'moment';
 import { updateCrudStatus, crudStatus, httpThunk } from '../utils';
+import { DATE_FORMAT } from '../constants';
 
 export const FETCH_COUNTS = 'dashboard/FETCH_COUNTS';
 export const FETCH_SOURCES_SUBMIT = 'dashboard/FETCH_SOURCES_SUBMIT';
@@ -68,13 +70,13 @@ export default (state = initialState, action) => {
         sourcesSubmit: action.sourcesSubmit ? {
           verifiedSources: {
             labels: action.sourcesSubmit.verifiedSources
-              .map((vs) => new Date(vs.date).toLocaleDateString()),
+              .map((vs) => moment(vs.date).format(DATE_FORMAT)),
             legitimateCount: action.sourcesSubmit.verifiedSources.map((vs) => vs.legitimate),
             illegitimateCount: action.sourcesSubmit.verifiedSources.map((vs) => vs.illegitimate),
           },
           pendingSources: {
             labels: action.sourcesSubmit.pendingSources
-              .map((vs) => new Date(vs.date).toLocaleDateString()),
+              .map((vs) => moment(vs.date).format(DATE_FORMAT)),
             pendingCount: action.sourcesSubmit.pendingSources.map((ps) => ps.pending),
           },
         } : state.sourcesSubmit,
@@ -90,7 +92,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         sentiment: action.insights ? {
-          labels: action.insights.map((insight) => new Date(insight.date).toLocaleDateString()),
+          labels: action.insights.map((insight) => moment(insight.date).format(DATE_FORMAT)),
           posCount: action.insights
             .map((insight) => insight.sentiment.pos),
           neuCount: action.insights
@@ -104,7 +106,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         categories: action.insights ? {
-          labels: action.insights.map((insight) => new Date(insight.date).toLocaleDateString()),
+          labels: action.insights.map((insight) => moment(insight.date).format(DATE_FORMAT)),
           econCount: action.insights
             .map((insight) => insight.categories.Economy),
           lifeCount: action.insights

@@ -10,7 +10,7 @@ const {
   mapRelatedArticles,
 } = require('../../utils');
 
-const SECONDS_IN_DAYS = 86400;
+const DAY_IN_SECONDS = 86400;
 
 module.exports = (conn, io) => {
   const tbl = 'articles';
@@ -190,7 +190,7 @@ module.exports = (conn, io) => {
     try {
       const {
         id,
-        catsFilterLength,
+        legitRecStories = 'yes',
       } = req.query;
       const articleInfo = await r.table(tbl)
         .get(id)
@@ -199,6 +199,8 @@ module.exports = (conn, io) => {
           relatedArticles: r.table(tbl)
             .getAll(r.args(article('relatedArticles')))
             .eqJoin('sourceId', r.table('sources'))
+            .filter((join) => join('right')('isReliable').eq(legitRecStories === 'yes'))
+            .limit(5)
             .map(mapRelatedArticles)
             .coerceTo('array'),
         }))
@@ -220,7 +222,7 @@ module.exports = (conn, io) => {
     try {
       const {
         ids,
-        catsFilterLength,
+        legitRecStories = 'yes',
       } = req.query;
       const uuids = ids.split(',');
       const cursor = await r.table(tbl)
@@ -229,6 +231,8 @@ module.exports = (conn, io) => {
           relatedArticles: r.table(tbl)
             .getAll(r.args(article('relatedArticles')))
             .eqJoin('sourceId', r.table('sources'))
+            .filter((join) => join('right')('isReliable').eq(legitRecStories === 'yes'))
+            .limit(5)
             .map(mapRelatedArticles)
             .coerceTo('array'),
         }))
@@ -254,13 +258,15 @@ module.exports = (conn, io) => {
     try {
       const {
         limit = '20',
+        legitimate = 'yes',
       } = req.query;
-      const now = new Date();
-      now.setDate(now.getDate() - 3);
 
       const query = await r.table(tbl)
         .orderBy({ index: r.desc('popularityScore') })
         .eqJoin(r.row('sourceId'), r.table('sources'))
+        .filter(r.row('right')('isReliable').eq(legitimate === 'yes')
+          .and(r.row('left')('publishDate')
+            .ge(r.now().inTimezone(PH_TIMEZONE).sub(1 * DAY_IN_SECONDS))))
         .map((join) => ({
           id: join('left')('id'),
           url: join('left')('url'),
@@ -285,12 +291,16 @@ module.exports = (conn, io) => {
 
   router.get('/recent', async (req, res, next) => {
     try {
-      const { limit = '20' } = req.query;
+      const {
+        limit = '20',
+        legitimate = 'yes',
+      } = req.query;
 
       const totalCount = await r.table('articles').count().run(conn);
       const query = await r.table('articles')
         .orderBy({ index: r.desc('timestamp') })
         .eqJoin('sourceId', r.table('sources'))
+        .filter(r.row('right')('isReliable').eq(legitimate === 'yes'))
         .limit(parseInt(limit))
         .map((join) => ({
           id: join('left')('id'),

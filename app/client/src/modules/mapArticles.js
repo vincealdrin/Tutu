@@ -36,7 +36,7 @@ const initialState = {
     center: DEFAULT_CENTER,
     bounds: {},
   },
-  isSourcesLegit: true,
+  legitimate: true,
 };
 let source;
 let focusedClusterSource;
@@ -49,7 +49,7 @@ export default (state = initialState, action) => {
         ...state,
         clusters: [],
         articles: [],
-        isSourcesLegit: !state.isSourcesLegit,
+        legitimate: !state.legitimate,
       };
     case FETCH_ARTICLES:
       return {
@@ -140,7 +140,7 @@ export const fetchBoundArticles = () =>
             zoom,
             bounds,
           },
-          isSourcesLegit,
+          legitimate,
         },
       } = getState();
 
@@ -174,7 +174,7 @@ export const fetchBoundArticles = () =>
           date: filters.date,
           timeWindow: `${31 - filters.timeWindow[0]},${31 - filters.timeWindow[1]}`,
           limit: filters.limit,
-          legitimate: isSourcesLegit ? 'yes' : 'no',
+          legitimate: legitimate ? 'yes' : 'no',
         },
         cancelToken: source.token,
       });
@@ -228,6 +228,9 @@ export const fetchFocusedInfo = (article) =>
         filters: {
           categories,
         },
+        mapArticles: {
+          legitimate,
+        },
       } = getState();
       const {
         data: focusedInfo,
@@ -235,6 +238,7 @@ export const fetchFocusedInfo = (article) =>
       } = await axios.get('/articles/info', {
         params: {
           id: article.id,
+          legitRecStories: legitimate ? 'yes' : 'no',
           catsFilterLength: categories.length,
         },
         cancelToken: focusedInfoSource.token,
@@ -255,7 +259,7 @@ export const fetchFocusedInfo = (article) =>
   });
 
 export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
-  httpThunk(FETCH_CLUSTER_INFO, async (getState, dispatch) => {
+  httpThunk(FETCH_CLUSTER_INFO, async (getState) => {
     try {
       if (focusedClusterSource) {
         focusedClusterSource.cancel();
@@ -269,6 +273,7 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
         },
         mapArticles: {
           focusedClusterArticles,
+          legitimate,
         },
       } = getState();
       const sliceArticles = (focusedClusterArticles.length ? focusedClusterArticles : articles)
@@ -281,6 +286,7 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
       } = await axios.get('/articles/clusterInfo', {
         params: {
           catsFilterLength: categories.length,
+          legitRecStories: legitimate ? 'yes' : 'no',
           ids: sliceArticles.map((article) => article.id).join(),
         },
         cancelToken: focusedClusterSource.token,

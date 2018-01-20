@@ -100,6 +100,7 @@ while True:
 
             if get_one(url_uuid, 'errorArticles') or get_one(
                     url_uuid, 'articles'):
+                print('Skiped: ' + article.url)
                 error_articles.append(article.id)
 
             prev_uuid = url_uuid
@@ -317,7 +318,7 @@ while True:
 
                 publish_date = get_publish_date(article.html)
 
-                if publish_date.year < 2017 or publish_date.replace(tzinfo=None) > datetime.now():
+                if publish_date.year < 2017 or publish_date.replace(tzinfo=None).date() > datetime.now().date():
                     if PY_ENV == 'development':
                         print('\n(PUBLISH DATE NOT IN RANGE) Skipped: ' +
                               str(article.url) + '\n')
@@ -376,7 +377,7 @@ while True:
                     if author:
                         article.authors.append(author)
 
-                top_image = '' if re.match(
+                top_image = '' if re.search(
                     'favicon', article.top_image) else article.top_image
 
                 with open('../detector/tl_stopwords.txt', 'r') as f:

@@ -99,6 +99,7 @@ while True:
 
             if get_one(url_uuid, 'errorArticles') or get_one(
                     url_uuid, 'articles'):
+                print('Skiped: ' + article.url)
                 error_articles.append(article.id)
 
             prev_uuid = url_uuid
@@ -200,7 +201,7 @@ while True:
                 pattern = re.compile(source.brand, re.IGNORECASE)
                 body = pattern.sub('', body)
 
-                if len(body.split()) < 100:
+                if len(body.split()) < 50:
                     if PY_ENV == 'development':
                         print('\n(SHORT CONTENT) Skipped: ' +
                               str(article.url) + '\n')
@@ -270,20 +271,20 @@ while True:
                         insert_item({'id': article.id}, 'errorArticles')
                         continue
 
-                if not matched_locations:
-                    if not nation_pattern.search(combined_body):
-                        if PY_ENV == 'development':
-                            print('\n(CAN\'T FIND LOCATION) Skipped: ' +
-                                  str(article.url) + '\n')
-                        slp_time = insert_log(
-                            source_id, 'articleCrawl', 'error',
-                            float(time.clock() - start_time), {
-                                'articleUrl': article.url,
-                                'articleTitle': title,
-                                'errorMessage': 'CAN\'T FIND LOCATION'
-                            })
-                        insert_item({'id': article.id}, 'errorArticles')
-                        continue
+                # if not matched_locations:
+                #     if not nation_pattern.search(combined_body):
+                #         if PY_ENV == 'development':
+                #             print('\n(CAN\'T FIND LOCATION) Skipped: ' +
+                #                   str(article.url) + '\n')
+                #         slp_time = insert_log(
+                #             source_id, 'articleCrawl', 'error',
+                #             float(time.clock() - start_time), {
+                #                 'articleUrl': article.url,
+                #                 'articleTitle': title,
+                #                 'errorMessage': 'CAN\'T FIND LOCATION'
+                #             })
+                #         insert_item({'id': article.id}, 'errorArticles')
+                #         continue
 
                 publish_date = get_publish_date(article.html)
 
@@ -346,7 +347,7 @@ while True:
                     if author:
                         article.authors.append(author)
 
-                top_image = '' if re.match(
+                top_image = '' if re.search(
                     'favicon', article.top_image) else article.top_image
 
                 with open('../detector/tl_stopwords.txt', 'r') as f:

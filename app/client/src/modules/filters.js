@@ -24,7 +24,7 @@ export const filtersInitialState = {
     socials: [],
     top: 100,
   },
-  timeWindow: [24, 31],
+  timeWindow: [28, 31],
   date: moment(),
   limit: 1500,
 };

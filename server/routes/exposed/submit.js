@@ -30,13 +30,13 @@ module.exports = (conn, io) => {
       //   });
       // }
 
-      // if (matchedSource) {
-      //   return res.json({
-      //     isReliable: matchedSource.isReliable,
-      //     sourceUrl: matchedSource.url,
-      //     isVerified: true,
-      //   });
-      // }
+      if (matchedSource) {
+        return res.json({
+          isReliable: matchedSource.isReliable,
+          sourceUrl: matchedSource.url,
+          isVerified: true,
+        });
+      }
 
       let body;
       try {

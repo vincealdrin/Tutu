@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button } from 'semantic-ui-react';
-import { fetchArticles } from '../../modules/articles';
+import moment from 'moment';
+import {
+  fetchArticles,
+  deleteArticles,
+} from '../../modules/articles';
 import DataTable from '../Common/DataTable';
+import { DATE_FORMAT, TIME_FORMAT } from '../../constants';
 
 const columns = [
   { key: 'title', text: 'Title' },
@@ -32,7 +36,14 @@ const columns = [
     key: 'publishDate',
     text: 'Publish Date',
     wrapper: (val) => (
-      <span>{new Date(val).toLocaleDateString()}</span>
+      <span>{moment(val).format(DATE_FORMAT)}</span>
+    ),
+  },
+  {
+    key: 'timestamp',
+    text: 'Timestamp',
+    wrapper: (val) => (
+      <span>{moment(val).format(TIME_FORMAT)}</span>
     ),
   },
 ];
@@ -57,6 +68,7 @@ const mapStateToProps = ({
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchArticles,
+  deleteArticles,
 }, dispatch);
 
 class Articles extends Component {

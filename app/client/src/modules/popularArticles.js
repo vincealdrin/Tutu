@@ -30,12 +30,14 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchPopularArticles = (limit) => async (dispatch) => {
+export const fetchPopularArticles = (limit) => async (dispatch, getState) => {
   dispatch({ type: FETCH_POPULAR_ARTICLES, statusText: 'pending' });
 
   try {
+    const { mapArticles: { legitimate } } = getState();
     const { data: articles, headers, status } = await axios.get('/articles/popular', {
       params: {
+        legitimate: legitimate ? 'yes' : 'no',
         limit,
       },
     });

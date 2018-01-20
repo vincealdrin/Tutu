@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   Button,
   Grid,
@@ -8,14 +8,15 @@ import {
   Label,
   Segment,
   Dimmer,
-  Loader } from 'semantic-ui-react';
+  Loader,
+} from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import shortid from 'shortid';
 import moment from 'moment';
 import { fetchPopularArticles } from '../../modules/popularArticles';
 import { fetchFocusedInfo } from '../../modules/mapArticles';
-import newsPlaceholder from '../../assets/placeholder/news-placeholder.png';
+import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png';
 import './styles.css';
 import { DATE_FORMAT } from '../../constants';
 
@@ -34,13 +35,27 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchFocusedInfo,
 }, dispatch);
 
-class PopularArticles extends Component {
+class PopularArticles extends PureComponent {
+  state = {
+    brokenImgs: [],
+  };
+
   componentDidMount() {
     this.props.fetchPopularArticles();
   }
 
+  handleImgError = (id) => {
+    this.setState({
+      brokenImgs: [
+        ...this.state.brokenImgs,
+        id,
+      ],
+    });
+  }
+
   render() {
     const { articles, fetchStatus } = this.props;
+    const { brokenImgs } = this.state;
 
     return (
       <div>
@@ -59,7 +74,16 @@ class PopularArticles extends Component {
                 <Grid>
                   <Grid.Row className="article-item">
                     <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important', position: 'relative' }}>
-                      <Image src={article.topImageUrl ? article.topImageUrl : newsPlaceholder} href={article.url} target="_blank" />
+                      <Image
+                        src={
+                            brokenImgs.includes(article.id)
+                              ? topImgPlaceholder
+                              : article.topImageUrl || topImgPlaceholder
+                          }
+                        onError={() => this.handleImgError(article.id)}
+                        href={article.url}
+                        target="_blank"
+                      />
                       <Button
                         onClick={() => this.props.fetchFocusedInfo(article)}
                         content="View details"

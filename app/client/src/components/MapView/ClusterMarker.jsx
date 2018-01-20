@@ -1,12 +1,26 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { List, Image, Label, Grid } from 'semantic-ui-react';
 import shortid from 'shortid';
 import moment from 'moment';
 import { Tooltip } from 'react-tippy';
-import './styles.css';
+import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png';
 import { DATE_FORMAT } from '../../constants';
+import './styles.css';
 
-class ClusterMarker extends Component {
+class ClusterMarker extends PureComponent {
+  state = {
+    brokenImgs: [],
+  };
+
+  handleImgError = (id) => {
+    this.setState({
+      brokenImgs: [
+        ...this.state.brokenImgs,
+        id,
+      ],
+    });
+  }
+
   render() {
     const {
       count,
@@ -14,6 +28,7 @@ class ClusterMarker extends Component {
       $hover,
       isCredible,
     } = this.props;
+    const { brokenImgs } = this.state;
 
     return (
       <Tooltip
@@ -25,7 +40,16 @@ class ClusterMarker extends Component {
                 <Grid>
                   <Grid.Row columns={2}>
                     <Grid.Column width={7}>
-                      {$hover ? <Image src={article.topImageUrl} /> : null}
+                      {$hover ? (
+                        <Image
+                          src={
+                            brokenImgs.includes(article.id)
+                              ? topImgPlaceholder
+                              : article.topImageUrl || topImgPlaceholder
+                          }
+                          onError={() => this.handleImgError(article.id)}
+                        />
+                      ) : null}
                     </Grid.Column>
                     <Grid.Column width={9} className="marker-title-column">
                       <div>

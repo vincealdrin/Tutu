@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {
@@ -18,7 +18,7 @@ import { removeFocused, fetchFocusedClusterInfo } from '../../modules/mapArticle
 import Tags from './Tags';
 import Reactions from './Reactions';
 import Pagination from './Pagination';
-import newsPlaceholder from '../../assets/placeholder/news-placeholder.png';
+import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png';
 import './styles.css';
 import { DATE_FORMAT } from '../../constants';
 
@@ -41,11 +41,21 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchFocusedClusterInfo,
 }, dispatch);
 
-class ClusterModal extends Component {
+class ClusterModal extends PureComponent {
   state = {
     currentPage: 1,
     limit: 10,
+    brokenImgs: [],
   };
+
+  handleImgError = (id) => {
+    this.setState({
+      brokenImgs: [
+        ...this.state.brokenImgs,
+        id,
+      ],
+    });
+  }
 
   getSentimentColor = (sentiment) => {
     if (sentiment === 'Positive') {
@@ -58,15 +68,16 @@ class ClusterModal extends Component {
 
   render() {
     const {
-      currentPage,
-      limit,
-    } = this.state;
-    const {
       articles,
       totalCount,
       isOpen,
       status,
     } = this.props;
+    const {
+      currentPage,
+      limit,
+      brokenImgs,
+    } = this.state;
 
     return (
       <Modal
@@ -118,7 +129,14 @@ class ClusterModal extends Component {
                   </Label>
                   <div className="image-tag-title-container">
                     <div className="top-image">
-                      <Image src={topImageUrl || newsPlaceholder} />
+                      <Image
+                        src={
+                          brokenImgs.includes(id)
+                            ? topImgPlaceholder
+                            : topImageUrl || topImgPlaceholder
+                        }
+                        onError={() => this.handleImgError(id)}
+                      />
                       <Header as="a" href={url} color="blue" className="news-title" target="_blank">{title}</Header>
                       <p className="article-date">
                         {moment(publishDate).format(DATE_FORMAT)} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}

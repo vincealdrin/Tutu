@@ -39,7 +39,7 @@
     "redux-nprogress": "^1.0.2",
     "redux-thunk": "^2.2.0",
     "semantic-ui-css": "^2.2.12",
-    "semantic-ui-react": "^0.76.0",
+    "semantic-ui-react": "^0.77.2",
     "shortid": "^2.2.8",
     "socket.io-client": "^2.0.4"
   },

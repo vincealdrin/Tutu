@@ -1,5 +1,4 @@
 import React from 'react';
-import MediaQuery from 'react-responsive';
 import { Link, Route, Switch, Redirect } from 'react-router-dom';
 import {
   Icon,
@@ -21,6 +20,7 @@ import SourcesList from '../SourcesList';
 import MapThemes from '../MapThemes';
 import tutuLogo from '../../assets/logo/tutu-logo.png';
 import './style.css';
+import '../../index.css'
 
 // expandSidebar = () => setState({ isWide: true })
 // shrinkSidebar = () => setState({ isWide: false })
@@ -50,7 +50,7 @@ const AppSidebar = ({
 
   return (
     <div>
-      <MediaQuery query="(max-device-width: 812px)">
+      <div className="show-on-mobile">
         <Menu compact icon='labeled' borderless fixed="bottom" className="mobile-menu-container">
           <Menu.Item name='popular'>
             <Icon name='newspaper'/>
@@ -77,8 +77,8 @@ const AppSidebar = ({
             Help
           </Menu.Item>
         </Menu>
-      </MediaQuery>
-      <MediaQuery query="(min-device-width: 813px)">
+      </div>
+      <div className="hide-when-mobile">
         <div className="side-bar-container">
           <div className="item-container">
             <div className="article-display-button" onClick={toggleSidebarContent}>
@@ -200,7 +200,7 @@ const AppSidebar = ({
             </div> */}
           </div>
         </div>
-      </MediaQuery>
+      </div>
     </div>
   );
 };

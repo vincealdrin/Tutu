@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {
@@ -13,6 +13,7 @@ import moment from 'moment';
 import Tags from './Tags';
 import RelatedArticles from './RelatedArticles';
 import Reactions from './Reactions';
+import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png';
 import { removeFocused } from '../../modules/mapArticles';
 import './styles.css';
 import { DATE_FORMAT } from '../../constants';
@@ -33,7 +34,15 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   removeFocused,
 }, dispatch);
 
-class SimpleModal extends Component {
+class SimpleModal extends PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      topImgUrl: this.props.article.topImageUrl || topImgPlaceholder,
+    };
+  }
+
   getSentimentColor = (sentiment) => {
     if (sentiment === 'Positive') {
       return 'green';
@@ -44,6 +53,10 @@ class SimpleModal extends Component {
     }
 
     return '';
+  }
+
+  handleImgError = () => {
+    this.setState({ topImgUrl: topImgPlaceholder });
   }
 
   render() {
@@ -58,7 +71,6 @@ class SimpleModal extends Component {
         sourceUrl,
         url,
         id,
-        topImageUrl,
         reactions = {
           happy: 0,
           sad: 0,
@@ -76,6 +88,7 @@ class SimpleModal extends Component {
       },
       status,
     } = this.props;
+    const { topImgUrl } = this.state;
 
     return (
       <Modal
@@ -111,8 +124,13 @@ class SimpleModal extends Component {
                 <div
                   className="top-image"
                   style={{
-                    backgroundImage: `url(${topImageUrl})`
+                    width: 219.63,
+                    height: 294.84,
+                    backgroundImage: `url(${topImgUrl || topImgPlaceholder})`,
+                    backgroundPosition: 'center',
+                    backgroundSize: 'cover',
                   }}
+                  onError={this.handleImgError}
                 />
               </div>
             </Grid.Column>

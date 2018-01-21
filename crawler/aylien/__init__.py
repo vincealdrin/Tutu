@@ -13,7 +13,7 @@ FAKE_AYLIEN_APP_ID2 = os.environ.get('FAKE_AYLIEN_APP_ID2')
 FAKE_AYLIEN_APP_KEY2 = os.environ.get('FAKE_AYLIEN_APP_KEY2')
 FAKE_AYLIEN_APP_ID3 = os.environ.get('FAKE_AYLIEN_APP_ID3')
 FAKE_AYLIEN_APP_KEY3 = os.environ.get('FAKE_AYLIEN_APP_KEY3')
-print(os.environ)
+
 text_client = textapi.Client(AYLIEN_APP_ID, AYLIEN_APP_KEY)
 text_client2 = textapi.Client(AYLIEN_APP_ID2, AYLIEN_APP_KEY2)
 text_client3 = textapi.Client(AYLIEN_APP_ID3, AYLIEN_APP_KEY3)
@@ -94,5 +94,6 @@ def categorize(url, use_fake_keys=False):
 
         return categories, body
 
-    except Exception:
+    except Exception as e:
+        print(e)
         return 'API LIMIT', None

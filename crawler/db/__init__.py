@@ -211,13 +211,9 @@ def get_sources(order_by='timestamp',
     return list(query.order_by(order_by).run(conn))
 
 
-def get_rand_sources(filter_sources=[],
-                     count=1,
-                     isReliable=True,
-                     tbl='sources'):
+def get_rand_sources(count=1, isReliable=True, tbl='sources'):
     return list(
-        r.table(tbl)
-        .filter(lambda source: r.not_(r.expr(filter_sources).contains(source['id'])).and_(source['isReliable'].eq(isReliable)))
+        r.table(tbl).filter(r.row['isReliable'].eq(isReliable))
         .sample(count).run(conn))
 
 

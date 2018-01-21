@@ -100,9 +100,7 @@ const FilterAlert = ({ action }) => (
 const now = new Date();
 
 class Filter extends Component {
-  state = {
-    popularSocialOptions,
-  }
+  state = { popularSocialOptions }
 
   render() {
     const { filters } = this.props;

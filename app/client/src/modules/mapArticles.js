@@ -5,6 +5,7 @@ import {
   crudStatus,
   updateCrudStatus,
   httpThunk,
+  buildArticleQueryParams,
 } from '../utils';
 import {
   DEFAULT_ZOOM,
@@ -19,6 +20,7 @@ export const FETCH_CLUSTER_INFO = 'mapArticles/FETCH_CLUSTER_INFO';
 export const REMOVE_FOCUSED = 'mapArticles/REMOVE_FOCUSED';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
 export const TOGGLE_SOURCES = 'mapArticles/TOGGLE_SOURCES';
+export const CLEAR_STATE = 'mapArticles/CLEAR_STATE';
 
 const initialState = {
   articles: [],
@@ -42,8 +44,20 @@ let source;
 let focusedClusterSource;
 let focusedInfoSource;
 
+const articlesReducer = (state, action) => {
+  if (action.isMap || action.isNewQuery) {
+    return action.articles || state.articles;
+  }
+
+  return action.articles
+    ? [...state.articles, ...action.articles]
+    : state.articles;
+};
+
 export default (state = initialState, action) => {
   switch (action.type) {
+    case CLEAR_STATE:
+      return initialState;
     case TOGGLE_SOURCES:
       return {
         ...state,
@@ -54,8 +68,9 @@ export default (state = initialState, action) => {
     case FETCH_ARTICLES:
       return {
         ...state,
-        articles: action.articles || state.articles,
+        articles: articlesReducer(state, action),
         clusters: action.clusters || state.clusters,
+        totalCount: action.totalCount || state.totalCount,
         fetchStatus: updateCrudStatus(action),
       };
     case UPDATE_MAP_STATE:
@@ -123,17 +138,15 @@ export const updateMapState = (center, zoom, bounds) => ({
   },
 });
 
-export const fetchBoundArticles = () =>
+export const fetchArticles = (limit, page, cb, isNewQuery = false) =>
   httpThunk(FETCH_ARTICLES, async (getState) => {
     if (source) {
       source.cancel();
       // dispatch(endTask());
     }
     source = axios.CancelToken.source();
-
     try {
       const {
-        filters,
         mapArticles: {
           mapState: {
             center,
@@ -142,74 +155,68 @@ export const fetchBoundArticles = () =>
           },
           isCredible,
         },
+        router: { location },
+        filters,
       } = getState();
+      const isMap = location.pathname === '/';
+      const params = buildArticleQueryParams({
+        filters,
+        bounds,
+        isCredible,
+        limit,
+        page,
+        isMap,
+      });
 
-      const {
-        ne,
-        nw,
-        se,
-        sw,
-      } = bounds;
       const {
         data: articles,
         headers,
         status,
       } = await axios.get('/articles', {
-        params: {
-          neLng: ne.lng,
-          neLat: ne.lat,
-          nwLng: nw.lng,
-          nwLat: nw.lat,
-          seLng: se.lng,
-          seLat: se.lat,
-          swLng: sw.lng,
-          swLat: sw.lat,
-          keywords: filters.keywords.join(),
-          categories: filters.categories.join(),
-          sources: filters.sources.join(),
-          people: filters.people.join(),
-          orgs: filters.organizations.join(),
-          sentiment: filters.sentiment !== 'none' ? filters.sentiment : '',
-          popular: filters.popular.socials.length ? `${filters.popular.socials.join()}|${filters.popular.top}` : '',
-          date: filters.date,
-          timeWindow: `${31 - filters.timeWindow[0]},${31 - filters.timeWindow[1]}`,
-          limit: filters.limit,
-          isCredible: isCredible ? 'yes' : 'no',
-        },
         cancelToken: source.token,
+        params,
       });
 
-      const coords = flattenDeep(articles.map(({
-        locations,
-      }, index) =>
-        locations.map(({
-          lng,
-          lat,
-        }) => ({
-          id: index,
-          lng,
-          lat,
-        }))));
-      const cluster = supercluster(coords, {
-        minZoom: MIN_ZOOM,
-        maxZoom: MAX_ZOOM,
-        radius: 42,
-      });
-      const clusters = cluster({
-        center,
-        zoom,
-        bounds,
-      });
+      if (cb) cb();
+
+      const payload = {
+        totalCount: parseInt(headers['x-total-count'], 10),
+        articles,
+        status,
+        isMap,
+        isNewQuery,
+      };
+
+      if (isMap) {
+        const coords = flattenDeep(articles.map(({
+          locations,
+        }, index) =>
+          locations.map(({
+            lng,
+            lat,
+          }) => ({
+            id: index,
+            lng,
+            lat,
+          }))));
+
+        const cluster = supercluster(coords, {
+          minZoom: MIN_ZOOM,
+          maxZoom: MAX_ZOOM,
+          radius: 42,
+        });
+
+        payload.clusters = cluster({
+          center,
+          zoom,
+          bounds,
+        });
+      }
 
       // dispatch(updateMapState(center, zoom, bounds));
       source = null;
 
-      return {
-        totalCount: parseInt(headers['x-total-count'], 10),
-        clusters,
-        articles,
-        status,
-      };
+      return payload;
     } catch (e) {
       return e;
     }
@@ -313,3 +320,4 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
   });
 
 export const toggleSourcesType = () => ({ type: TOGGLE_SOURCES });
+export const clearState = () => ({ type: CLEAR_STATE });

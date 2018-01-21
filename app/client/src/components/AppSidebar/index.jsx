@@ -4,11 +4,9 @@ import {
   Icon,
   Header,
   Image,
-  Dimmer,
   List,
-  Divider,
   Modal,
-  Menu
+  Menu,
 } from 'semantic-ui-react';
 import RecentArticles from '../RecentArticles';
 import PopularArticles from '../PopularArticles';
@@ -35,6 +33,8 @@ const AppSidebar = ({
   shrinkSidebar,
   showSidebarContent,
   toggleSidebarContent,
+  fetchArticles,
+  hideCount,
 }) => {
   const isWideClass = isWide ? 'show' : 'hide';
   let visibleClassName;
@@ -56,24 +56,24 @@ const AppSidebar = ({
             <Icon name='newspaper'/>
             Popular 
           </Menu.Item>
-          <Menu.Item name='related'>
-            <Icon name='plus square outline'/>
-            Related 
+          <Menu.Item name="related">
+            <Icon name="plus square outline" />
+            Related
           </Menu.Item>
-          <Menu.Item name='preferences'>
-            <Icon name='cogs'/>
+          <Menu.Item name="preferences">
+            <Icon name="cogs" />
             Preferences
           </Menu.Item>
-          <Menu.Item name='analyze'>
-            <Icon name='legal'/>
+          <Menu.Item name="analyze">
+            <Icon name="legal" />
             Analyze
           </Menu.Item>
-          <Menu.Item name='about'>
-            <Icon name='browser'/>
+          <Menu.Item name="about">
+            <Icon name="browser" />
             About
           </Menu.Item>
-          <Menu.Item name='help'>
-            <Icon name='help circle outline'/>
+          <Menu.Item name="help">
+            <Icon name="help circle outline" />
             Help
           </Menu.Item>
         </Menu>
@@ -90,7 +90,17 @@ const AppSidebar = ({
                   <Route path="/" component={PopularArticles} exact />
                   <Route path="(.*)/popular" component={PopularArticles} exact />
                   <Route path="(.*)/recent" component={RecentArticles} exact />
-                  <Route path="(.*)/preferences" component={Filter} exact />
+                  <Route
+                    path="(.*)/preferences"
+                    component={(routeProps) => (
+                      <Filter
+                        {...routeProps}
+                        fetchArticles={fetchArticles}
+                        hideCount={hideCount}
+                      />
+                    )}
+                    exact
+                  />
                   <Route path="(.*)/about" component={About} exact />
                   <Route path="(.*)/submit" component={Submit} exact />
                   <Route path="(.*)/categories" component={Categories} exact />

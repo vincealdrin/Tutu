@@ -1,4 +1,4 @@
-import { Cancel } from 'axios';
+import axios, { Cancel } from 'axios';
 import { beginTask, endTask } from 'redux-nprogress';
 
 export const updateCrudStatus = (action) => ({
@@ -97,3 +97,89 @@ export const getLineDataset = (dataset) => dataset.map(({
   pointRadius: 1,
   pointHitRadius: 10,
 }));
+
+export const buildArticleQueryParams = ({
+  filters,
+  bounds,
+  isCredible,
+  isMap,
+  limit,
+  page,
+}) => {
+  const {
+    ne,
+    nw,
+    se,
+    sw,
+  } = bounds;
+  const params = {
+    keywords: filters.keywords.join(),
+    categories: filters.categories.join(),
+    sources: filters.sources.join(),
+    people: filters.people.join(),
+    orgs: filters.organizations.join(),
+    sentiment: filters.sentiment !== 'none' ? filters.sentiment : '',
+    popular: filters.popular.socials.length ? `${filters.popular.socials.join()}|${filters.popular.top}` : '',
+    date: filters.date,
+    timeWindow: `${31 - filters.timeWindow[0]},${31 - filters.timeWindow[1]}`,
+    isCredible: isCredible ? 'yes' : 'no',
+    limit: limit || filters.limit,
+    page,
+  };
+
+  if (isMap) {
+    params.neLng = ne.lng;
+    params.neLat = ne.lat;
+    params.nwLng = nw.lng;
+    params.nwLat = nw.lat;
+    params.seLng = se.lng;
+    params.seLat = se.lat;
+    params.swLng = sw.lng;
+    params.swLat = sw.lat;
+  }
+
+  return params;
+};
+
+export const requestInsights = async (insightType, state, extraParams = {}) => {
+  const {
+    mapArticles: {
+      articles,
+      mapState: {
+        bounds,
+      },
+      isCredible,
+    },
+    router: { location },
+    filters,
+  } = state;
+  const isMap = location.pathname === '/';
+
+  let ids;
+
+  if (isMap) {
+    ids = articles.map((article) => article.id);
+  }
+
+  const params = !isMap ? {
+    ...buildArticleQueryParams({
+      filters,
+      bounds,
+      isCredible,
+      extraParams,
+    }),
+    ...extraParams,
+  } : { ...extraParams };
+
+  const { data: insights, status } = await axios({
+    method: isMap ? 'POST' : 'GET',
+    url: `/insights/${insightType}`,
+    data: { ids },
+    params,
+  });
+
+  return {
+    insights,
+    status,
+  };
+};

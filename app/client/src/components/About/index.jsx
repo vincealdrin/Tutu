@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Segment, Label, Icon, Header, Divider, List } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
 import './style.css';
 
 class About extends Component {
@@ -32,16 +31,16 @@ class About extends Component {
             <section className="member-names">
               <List>
                 <List.Item>
-                  Vince Cabrera | <Link to="https://github.com/vincealdrin" target="_blank">github/vincealdrin</Link>
+                  Vince Cabrera | <a href="https://github.com/vincealdrin" target="_blank">github/vincealdrin</a>
                 </List.Item>
                 <List.Item>
-                  Francis Taberdo | <Link to="https://github.com/francistaberdo" target="_blank">github/francistaberdo</Link>
+                  Francis Taberdo | <a href="https://github.com/francistaberdo" target="_blank">github/francistaberdo</a>
                 </List.Item>
                 <List.Item>
-                  Iah Buenacosa | <Link to="https://github.com/iahello" target="_blank">github/iahello</Link>
+                  Iah Buenacosa | <a href="https://github.com/iahello" target="_blank">github/iahello</a>
                 </List.Item>
                 <List.Item>
-                  Gabriel Ocampo | <Link to="https://fb.com/gbrlbrrl" target="_blank">github/gbrlbrrl</Link>
+                  Gabriel Ocampo | <a href="https://fb.com/gbrlbrrl" target="_blank">github/gbrlbrrl</a>
                 </List.Item>
               </List>
             </section>

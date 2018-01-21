@@ -116,16 +116,16 @@ class ClusterModal extends PureComponent {
           }) => (
             <Segment key={shortid.generate()} raised className="modal-article-container">
               <Grid columns={3} stackable>
-                  <Label
-                    as="a"
-                    target="__blank"
-                    className="news-label"
-                    color="orange"
-                    href={sourceUrl}
-                    ribbon
-                  >
-                    <div className="news-label-name">{source}</div>
-                  </Label>
+                <Label
+                  as="a"
+                  target="_blank"
+                  className="news-label"
+                  color="orange"
+                  href={sourceUrl}
+                  ribbon
+                >
+                  <div className="news-label-name">{source}</div>
+                </Label>
                 <Grid.Column width={4} style={{ position: 'relative' }}>
                   <div className="image-tag-title-container">
                     <div className="top-image">

@@ -1,11 +1,18 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
-const { getCategoriesField } = require('../../utils');
+const {
+  buildArticlesQuery,
+  reduceCategoriesInsight,
+  mapCategoriesInsight,
+  mapSentimentInsight,
+  reduceSentimentInsight,
+} = require('../../utils');
 
 module.exports = (conn) => {
   router.post('/top', async (req, res, next) => {
     try {
-      const { ids, field, limit = '10' } = req.body;
+      const { ids } = req.body;
+      const { field, limit = '10' } = req.query;
       let fieldName = '';
 
       switch (field) {
@@ -29,7 +36,7 @@ module.exports = (conn) => {
       }
 
       const cursor = await r.table('articles')
-        .getAll(r.args(ids.split(',')))
+        .getAll(r.args(ids))
         // .limit(10)
         .getField(field)
         .reduce((left, right) => left.add(right))
@@ -58,29 +65,73 @@ module.exports = (conn) => {
     }
   });
 
-  router.post('/sentiment', async (req, res, next) => {
+  router.get('/top', async (req, res, next) => {
+    try {
+      const { field, limit } = req.query;
+      let fieldName = '';
+
+      switch (field) {
+      case 'locations':
+        fieldName = 'location';
+        break;
+      case 'people':
+        fieldName = 'person';
+        break;
+      case 'organizations':
+        fieldName = 'organization';
+        break;
+      case 'keywords':
+        fieldName = 'keyword';
+        break;
+      default:
+        return next({
+          status: 400,
+          message: 'Wrong field value',
+        });
+      }
+
+      const query = await buildArticlesQuery(req.query);
+      const metaInsights = await query
+        .zip()
+        .getField(field)
+        .reduce((left, right) => left.add(right))
+        .map((row) => r.object(fieldName, field === 'locations' ? (
+          r.branch(
+            row('found').eq('location'),
+            row('location')('formattedAddress'),
+            row('province')('name').add(', Philippines'),
+          )) : row))
+        .group(fieldName)
+        .ungroup()
+        .map(r.object(
+          fieldName,
+          r.row('group'),
+          'count',
+          r.row('reduction').count()
+        ))
+        .orderBy(r.desc('count'))
+        .limit(parseInt(limit))
+        .run(conn);
+
+      return res.json(metaInsights);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.post('/sentiments', async (req, res, next) => {
     try {
       const { ids } = req.body;
 
       const cursor = await r.table('articles')
-        .getAll(r.args(ids.split(',')))
+        .getAll(r.args(ids))
         .group(r.row('publishDate').date())
         .ungroup()
         .map((group) => ({
           date: group('group'),
           sentiment: group('reduction')
-            .map((article) => r.branch(
-              article('sentiment')('compound').ge(0.5),
-              { pos: 1, neu: 0, neg: 0 },
-              article('sentiment')('compound').le(-0.5),
-              { pos: 0, neu: 0, neg: 1 },
-              { pos: 0, neu: 1, neg: 0 }
-            ))
-            .reduce((left, right) => ({
-              pos: left('pos').add(right('pos')),
-              neu: left('neu').add(right('neu')),
-              neg: left('neg').add(right('neg')),
-            })),
+            .map(mapSentimentInsight)
+            .reduce(reduceSentimentInsight),
         }))
         .run(conn);
       const sentiment = await cursor.toArray();
@@ -91,56 +142,63 @@ module.exports = (conn) => {
     }
   });
 
+  router.get('/sentiments', async (req, res, next) => {
+    try {
+      const query = await buildArticlesQuery(req.query);
+      const sentInsights = await query
+        .group(r.row('left')('publishDate').date())
+        .ungroup()
+        .map((group) => ({
+          date: group('group'),
+          sentiment: group('reduction')
+            .map((join) => mapSentimentInsight(join('left')))
+            .reduce(reduceSentimentInsight),
+        }))
+        .run(conn);
+
+      return res.json(sentInsights);
+    } catch (e) {
+      next(e);
+    }
+  });
+
   router.post('/categories', async (req, res, next) => {
     try {
       const { ids } = req.body;
 
-      const cursor = await r.table('articles')
-        .getAll(r.args(ids.split(',')))
+      const catInsights = await r.table('articles')
+        .getAll(r.args(ids))
         .group(r.row('publishDate').date())
         .ungroup()
         .map((group) => ({
           date: group('group'),
           categories: group('reduction')
-            .map((article) => {
-              const categories = getCategoriesField(article);
-              return {
-                Economy: r.branch(categories.contains('Economy'), 1, 0),
-                Lifestyle: r.branch(categories.contains('Lifestyle'), 1, 0),
-                Sports: r.branch(categories.contains('Sports'), 1, 0),
-                Politics: r.branch(categories.contains('Politics'), 1, 0),
-                Health: r.branch(categories.contains('Health'), 1, 0),
-                Crime: r.branch(categories.contains('Crime'), 1, 0),
-                Weather: r.branch(categories.contains('Weather'), 1, 0),
-                Culture: r.branch(categories.contains('Culture'), 1, 0),
-                Environment: r.branch(categories.contains('Environment'), 1, 0),
-                'Business & Finance': r.branch(categories.contains('Business & Finance'), 1, 0),
-                'Disaster & Accident': r.branch(categories.contains('Disaster & Accident'), 1, 0),
-                'Entertainment & Arts': r.branch(categories.contains('Entertainment & Arts'), 1, 0),
-                'Law & Government': r.branch(categories.contains('Law & Government'), 1, 0),
-                'Science & Technology': r.branch(categories.contains('Science & Technology'), 1, 0),
-              };
-            })
-            .reduce((left, right) => ({
-              Economy: left('Economy').add(right('Economy')),
-              Lifestyle: left('Lifestyle').add(right('Lifestyle')),
-              Sports: left('Sports').add(right('Sports')),
-              Politics: left('Politics').add(right('Politics')),
-              Health: left('Health').add(right('Health')),
-              Crime: left('Crime').add(right('Crime')),
-              Weather: left('Weather').add(right('Weather')),
-              Culture: left('Culture').add(right('Culture')),
-              Environment: left('Environment').add(right('Environment')),
-              'Business & Finance': left('Business & Finance').add(right('Business & Finance')),
-              'Disaster & Accident': left('Disaster & Accident').add(right('Disaster & Accident')),
-              'Entertainment & Arts': left('Entertainment & Arts').add(right('Entertainment & Arts')),
-              'Law & Government': left('Law & Government').add(right('Law & Government')),
-              'Science & Technology': left('Science & Technology').add(right('Science & Technology')),
-            })),
+            .map(mapCategoriesInsight)
+            .reduce(reduceCategoriesInsight),
         }))
         .run(conn);
 
-      return res.json(cursor);
+      return res.json(catInsights);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/categories', async (req, res, next) => {
+    try {
+      const query = await buildArticlesQuery(req.query);
+      const catInsights = await query
+        .group(r.row('left')('publishDate').date())
+        .ungroup()
+        .map((group) => ({
+          date: group('group'),
+          categories: group('reduction')
+            .map((join) => mapCategoriesInsight(join('left')))
+            .reduce(reduceCategoriesInsight),
+        }))
+        .run(conn);
+
+      return res.json(catInsights);
     } catch (e) {
       next(e);
     }

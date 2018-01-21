@@ -4,11 +4,12 @@ import { bindActionCreators } from 'redux';
 import { NProgress } from 'redux-nprogress';
 import { Icon, Input, Button, Message } from 'semantic-ui-react';
 import {
-  fetchBoundArticles,
+  fetchArticles,
   fetchFocusedInfo,
   updateMapState,
   fetchFocusedClusterInfo,
   toggleSourcesType,
+  clearState,
 } from '../../modules/mapArticles';
 import { fetchRecentArticles } from '../../modules/recentArticles';
 import { fetchPopularArticles } from '../../modules/popularArticles';
@@ -18,35 +19,37 @@ import AppSidebar from '../AppSidebar';
 import SimpleModal from './SimpleModal';
 import Map from './Map';
 import './styles.css';
-import '../../index.css'
+import '../../index.css';
 
 const mapStateToProps = ({
   mapArticles: {
     articles,
     clusters,
     mapState,
-    filterMapState,
     isCredible,
+    focusedOn,
+    fetchStatus,
   },
 }) => ({
   // mapState: map.viewport.toJS(),
   mapState,
   articles,
   clusters,
-  filterMapState,
   isCredible,
+  focusedOn,
+  fetchStatus,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
-  fetchBoundArticles,
+  fetchArticles,
   fetchFocusedInfo,
   updateMapState,
   fetchFocusedClusterInfo,
   toggleSourcesType,
   fetchRecentArticles,
   fetchPopularArticles,
+  clearState,
 }, dispatch);
-
 
 class MapView extends Component {
   state = {
@@ -67,7 +70,7 @@ class MapView extends Component {
     });
   }
 
-  getTopBtnClassName = () => {
+  getBtnsClassName = () => {
     const {
       isSidebarVisible,
       isSidebarWiden,
@@ -97,7 +100,7 @@ class MapView extends Component {
   _onChange = ({ center, zoom, marginBounds }) => {
     this.props.updateMapState(center, zoom, marginBounds);
 
-    this.props.fetchBoundArticles();
+    this.props.fetchArticles();
   }
 
   _onChildClick = (_, childProps) => {
@@ -114,6 +117,9 @@ class MapView extends Component {
       clusters,
       mapState,
       isCredible,
+      focusedOn,
+      history: { location, push },
+      fetchStatus,
     } = this.props;
     const {
       currentPosition,
@@ -125,11 +131,12 @@ class MapView extends Component {
     return (
       <div className="map-container">
         <div className="show-on-mobile">
-          <Button size="large" circular color='red' icon='newspaper' className="fake-news-button-mobile" />
-          <Button size="large" circular color='default' icon='bar chart' className="insights-button-mobile" />
+          <Button size="large" circular color="red" icon="newspaper" className="fake-news-button-mobile" />
+          <Button size="large" circular color="default" icon="bar chart" className="insights-button-mobile" />
         </div>
         <div className="hide-when-mobile">
-          <div className={`map-top-buttons ${this.getTopBtnClassName()}`}>
+          <div className={`map-top-buttons ${this.getBtnsClassName()}`}>
+            {fetchStatus.success ? <Insights /> : null}
             <Button
               content={`${isCredible ? 'Not Credible' : 'Credible'} Sources`}
               color={`${isCredible ? 'red' : 'green'}`}
@@ -138,7 +145,7 @@ class MapView extends Component {
               onClick={() => {
                 this.setState({ isMsgShown: true });
                 this.props.toggleSourcesType();
-                this.props.fetchBoundArticles();
+                this.props.fetchArticles();
 
                 if (isSidebarVisible) {
                   this.props.fetchRecentArticles();
@@ -146,7 +153,17 @@ class MapView extends Component {
                 }
               }}
             />
-            <Insights />
+          </div>
+          <div className={`map-bot-buttons ${this.getBtnsClassName()}`}>
+            <Button
+              labelPosition="left"
+              content={location.pathname === '/' ? 'Grid View' : 'Map View'}
+              icon={location.pathname === '/' ? 'grid layout' : 'map'}
+              onClick={() => {
+                this.props.clearState();
+                push('/grid/');
+              }}
+            />
           </div>
           <Input className="search-box" icon>
             <input id="searchBoxInput" placeholder="Search places" />
@@ -163,25 +180,40 @@ class MapView extends Component {
             />
           ) : null}
         </div>
-          {isMsgShown ? (
-            <Message
-              header={`Map of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
-              content={`Each marker contains news from ${isCredible ? 'credible' : 'not credible'} sources`}
-              className="src-type-message"
-              onDismiss={this.closeMessage}
-            />
-          ) : null}
-          <NProgress />
-          <ClusterModal />
-          <SimpleModal />
-          <AppSidebar
-            isWide={isSidebarWiden}
-            isVisible={isSidebarVisible}
-            showSidebarContent={this.showSidebarContent}
-            toggleSidebarContent={this.toggleSidebarContent}
-            expandSidebar={this.expandSidebar}
-            shrinkSidebar={this.shrinkSidebar}
+        <Input className="search-box" icon>
+          <input id="searchBoxInput" placeholder="Search places" />
+          <Icon name="search" />
+        </Input>
+        {currentPosition ? (
+          <Button
+            className="current-loc"
+            icon="crosshairs"
+            onClick={() => {
+              this.props.updateMapState(currentPosition, 12);
+            }}
+            circular
           />
+          ) : null}
+        {isMsgShown ? (
+          <Message
+            header={`Map of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
+            content={`Each marker contains news from ${isCredible ? 'credible' : 'not credible'} sources`}
+            className="src-type-message"
+            onDismiss={this.closeMessage}
+          />
+          ) : null}
+        <NProgress />
+        {focusedOn === 'simple' ? <SimpleModal /> : null}
+        {focusedOn === 'cluster' ? <ClusterModal /> : null}
+        <AppSidebar
+          isWide={isSidebarWiden}
+          isVisible={isSidebarVisible}
+          showSidebarContent={this.showSidebarContent}
+          toggleSidebarContent={this.toggleSidebarContent}
+          expandSidebar={this.expandSidebar}
+          shrinkSidebar={this.shrinkSidebar}
+          fetchArticles={this.props.fetchArticles}
+        />
         <Map
           mapState={mapState}
           clusters={clusters}

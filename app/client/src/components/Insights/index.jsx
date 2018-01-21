@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Route, Switch, Redirect } from 'react-router-dom';
 import { Button, Modal, Header, Label, Grid, Segment, Icon } from 'semantic-ui-react';
-import { HorizontalBar, Bar, Line, Pie } from 'react-chartjs-2';
-import WordCloud from 'react-d3-cloud';
 import {
   fetchSentimentInsights,
   fetchTopInsights,
@@ -29,11 +26,7 @@ const mapStateToProps = ({
     fetchStatus,
     isModalOpen,
   },
-  mapArticles: {
-    articles,
-  },
 }) => ({
-  ids: articles.map((article) => article.id).join(),
   sentiment,
   categories,
   topPeople,
@@ -90,14 +83,14 @@ class Insights extends Component {
         return (
           <SentimentCharts
             sentiment={sentiment}
-            fetchSentimentInsights={() => this.props.fetchSentimentInsights(ids)}
+            fetchSentimentInsights={this.props.fetchSentimentInsights}
           />
         );
       case 'Categories':
         return (
           <CategoriesCharts
             categories={categories}
-            fetchCategoriesInsights={() => this.props.fetchCategoriesInsights(ids)}
+            fetchCategoriesInsights={this.props.fetchCategoriesInsights}
           />
         );
       case 'WordCloud':
@@ -107,7 +100,7 @@ class Insights extends Component {
               text: keyword,
               value: count,
             }))}
-            fetchWordCloud={(count = 200) => this.props.fetchTopInsights(ids, 'keywords', count)}
+            fetchWordCloud={(count = 200) => this.props.fetchTopInsights('keywords', count)}
           />
         );
       case 'Top Ten':
@@ -116,27 +109,27 @@ class Insights extends Component {
             topPeople={topPeople}
             topOrgs={topOrgs}
             topLocations={topLocations}
-            fetchTopInsights={(field, count = 10) => this.props.fetchTopInsights(ids, field, count)}
+            fetchTopInsights={(field, count = 10) => this.props.fetchTopInsights(field, count)}
           />
         );
       case 'mainMenu':
         return (
           <div>
             <Grid columns={2} stackable>
-                <Grid.Column>
-                  {this.renderSegment(
+              <Grid.Column>
+                {this.renderSegment(
                     'smile',
                     'Sentiments',
                     'Look at the inclination of people\'s opinions on a certain article either positive, neutral or negative',
                   )}
-                </Grid.Column>
-                <Grid.Column>
-                  {this.renderSegment(
-                    'tags',
-                    'Categories',
-                    'Look at the total number of articles per category on a specific date.',
-                  )}
-                </Grid.Column>
+              </Grid.Column>
+              <Grid.Column>
+                {this.renderSegment(
+                  'tags',
+                  'Categories',
+                  'Look at the total number of articles per category on a specific date.',
+                )}
+              </Grid.Column>
               <Grid.Row columns={2}>
                 <Grid.Column>
                   {this.renderSegment(

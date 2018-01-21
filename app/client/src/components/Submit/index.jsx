@@ -131,7 +131,7 @@ class Submit extends Component {
                             <li />
                             <li />
                             <li /> */}
-                            <li>Source: <a href={result.sourceUrl} target="__blank">{result.sourceUrl}</a></li>
+                            <li>Source: <a href={result.sourceUrl} target="_blank">{result.sourceUrl}</a></li>
                             <li>Prediction: {result.isReliable ? 'CREDIBLE' : 'NOT CREDIBLE'}</li>
                             <li>Credibility score: ({result.pct.toFixed(2)}%)</li>
                             <li />
@@ -142,7 +142,7 @@ class Submit extends Component {
                       )
                       : (
                         <div>
-                          <a href={result.sourceUrl} target="__blank">{result.sourceUrl}</a>
+                          <a href={result.sourceUrl} target="_blank">{result.sourceUrl}</a>
                           <br />is a {result.isReliable ? 'CREDIBLE' : 'NOT CREDIBLE'} SOURCE
                         </div>
                       )}

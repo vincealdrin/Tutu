@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Header } from 'semantic-ui-react';
 import { Line, Pie } from 'react-chartjs-2';
 import { getLineDataset } from '../../utils';
 

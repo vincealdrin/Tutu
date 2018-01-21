@@ -1,6 +1,6 @@
 import axios from 'axios';
 import moment from 'moment';
-import { crudStatus, updateCrudStatus, httpThunk } from '../utils';
+import { crudStatus, updateCrudStatus, httpThunk, requestInsights } from '../utils';
 import { DATE_FORMAT } from '../constants';
 
 export const OPEN_MODAL = 'insights/OPEN_MODAL';
@@ -140,7 +140,7 @@ export default (state = initialState, action) => {
   }
 };
 
-export const fetchTopInsights = (ids, field, limit) => {
+export const fetchTopInsights = (field, limit) => {
   let actionType = '';
 
   if (field === 'people') {
@@ -153,13 +153,9 @@ export const fetchTopInsights = (ids, field, limit) => {
     actionType = FETCH_TOP_KEYWORDS;
   }
 
-  return httpThunk(actionType, async () => {
+  return httpThunk(actionType, async (getState) => {
     try {
-      const { data: insights, status } = await axios.post('/insights/top', {
-        field,
-        limit,
-        ids,
-      });
+      const { insights, status } = await requestInsights('top', getState(), { field, limit });
 
       return {
         statusText: 'success',
@@ -173,13 +169,10 @@ export const fetchTopInsights = (ids, field, limit) => {
 };
 
 
-export const fetchSentimentInsights = (ids) =>
-  httpThunk(FETCH_SENTIMENT, async () => {
+export const fetchSentimentInsights = () =>
+  httpThunk(FETCH_SENTIMENT, async (getState) => {
     try {
-      const { data: insights, status } = await axios.post(
-        '/insights/sentiment',
-        { ids },
-      );
+      const { insights, status } = await requestInsights('sentiments', getState());
 
       return {
         statusText: 'success',
@@ -191,13 +184,10 @@ export const fetchSentimentInsights = (ids) =>
     }
   });
 
-export const fetchCategoriesInsights = (ids) =>
-  httpThunk(FETCH_CATEGORIES, async () => {
+export const fetchCategoriesInsights = () =>
+  httpThunk(FETCH_CATEGORIES, async (getState) => {
     try {
-      const { data: insights, status } = await axios.post(
-        '/insights/categories',
-        { ids },
-      );
+      const { insights, status } = await requestInsights('categories', getState());
 
       return {
         statusText: 'success',

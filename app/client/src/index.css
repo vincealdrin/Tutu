@@ -17,3 +17,12 @@ body {
   box-shadow: 0 0 10px #f25100, 0 0 5px #f25100 !important;
 }
 
+/* MOBILE CLASSES */
+
+.show-on-mobile { display: none; }
+
+@media (max-width: 815px) { 
+  .hide-when-mobile { display: none; }
+  .show-on-mobile { display: block; }
+}
+

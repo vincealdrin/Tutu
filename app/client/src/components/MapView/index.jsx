@@ -18,6 +18,7 @@ import AppSidebar from '../AppSidebar';
 import SimpleModal from './SimpleModal';
 import Map from './Map';
 import './styles.css';
+import '../../index.css'
 
 const mapStateToProps = ({
   mapArticles: {
@@ -123,59 +124,64 @@ class MapView extends Component {
 
     return (
       <div className="map-container">
-        <div className={`map-top-buttons ${this.getTopBtnClassName()}`}>
-          <Button
-            content={`${isCredible ? 'Not Credible' : 'Credible'} Sources`}
-            color={`${isCredible ? 'red' : 'green'}`}
-            icon="newspaper"
-            labelPosition="left"
-            onClick={() => {
-              this.setState({ isMsgShown: true });
-              this.props.toggleSourcesType();
-              this.props.fetchBoundArticles();
-
-              if (isSidebarVisible) {
-                this.props.fetchRecentArticles();
-                this.props.fetchPopularArticles();
-              }
-            }}
-          />
-          <Insights />
+        <div className="show-on-mobile">
+          <Button size="large" circular color='red' icon='newspaper' className="fake-news-button-mobile" />
+          <Button size="large" circular color='default' icon='bar chart' className="insights-button-mobile" />
         </div>
-        {isMsgShown ? (
-          <Message
-            header={`Map of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
-            content={`Each marker contains news from ${isCredible ? 'credible' : 'not credible'} sources`}
-            className="src-type-message"
-            onDismiss={this.closeMessage}
-          />
-        ) : null}
-        <NProgress />
-        <ClusterModal />
-        <SimpleModal />
-        <AppSidebar
-          isWide={isSidebarWiden}
-          isVisible={isSidebarVisible}
-          showSidebarContent={this.showSidebarContent}
-          toggleSidebarContent={this.toggleSidebarContent}
-          expandSidebar={this.expandSidebar}
-          shrinkSidebar={this.shrinkSidebar}
-        />
-        <Input className="search-box" icon>
-          <input id="searchBoxInput" placeholder="Search places" />
-          <Icon name="search" />
-        </Input>
-        {currentPosition ? (
-          <Button
-            className="current-loc"
-            icon="crosshairs"
-            onClick={() => {
-              this.props.updateMapState(currentPosition, 12);
-            }}
-            circular
-          />
-        ) : null}
+        <div className="hide-when-mobile">
+          <div className={`map-top-buttons ${this.getTopBtnClassName()}`}>
+            <Button
+              content={`${isCredible ? 'Not Credible' : 'Credible'} Sources`}
+              color={`${isCredible ? 'red' : 'green'}`}
+              icon="newspaper"
+              labelPosition="left"
+              onClick={() => {
+                this.setState({ isMsgShown: true });
+                this.props.toggleSourcesType();
+                this.props.fetchBoundArticles();
 
+                if (isSidebarVisible) {
+                  this.props.fetchRecentArticles();
+                  this.props.fetchPopularArticles();
+                }
+              }}
+            />
+            <Insights />
+          </div>
+          <Input className="search-box" icon>
+            <input id="searchBoxInput" placeholder="Search places" />
+            <Icon name="search" />
+          </Input>
+          {currentPosition ? (
+            <Button
+              className="current-loc"
+              icon="crosshairs"
+              onClick={() => {
+                this.props.updateMapState(currentPosition, 12);
+              }}
+              circular
+            />
+          ) : null}
+        </div>
+          {isMsgShown ? (
+            <Message
+              header={`Map of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
+              content={`Each marker contains news from ${isCredible ? 'credible' : 'not credible'} sources`}
+              className="src-type-message"
+              onDismiss={this.closeMessage}
+            />
+          ) : null}
+          <NProgress />
+          <ClusterModal />
+          <SimpleModal />
+          <AppSidebar
+            isWide={isSidebarWiden}
+            isVisible={isSidebarVisible}
+            showSidebarContent={this.showSidebarContent}
+            toggleSidebarContent={this.toggleSidebarContent}
+            expandSidebar={this.expandSidebar}
+            shrinkSidebar={this.shrinkSidebar}
+          />
         <Map
           mapState={mapState}
           clusters={clusters}

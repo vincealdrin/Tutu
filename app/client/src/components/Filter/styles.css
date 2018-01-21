@@ -60,3 +60,7 @@
 .react-datepicker__input-container {
   width: 100%;
 }
+
+.save-button-filter {
+  margin-right: 8px !important;
+}

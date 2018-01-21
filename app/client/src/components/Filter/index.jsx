@@ -132,10 +132,11 @@ class Filter extends Component {
               animation="scale"
             >
               <Button
+                className="save-button-filter"
                 icon="save"
                 content="Save"
                 labelPosition="left"
-                color="green"
+                color="blue"
                 onClick={() => localStorage.setItem('filterSettings', JSON.stringify(this.props.filters))}
               />
             </Tooltip>
@@ -150,7 +151,7 @@ class Filter extends Component {
                 icon="delete"
                 labelPosition="left"
                 content="Clear"
-                color="red"
+                color="default"
                 onClick={() => {
                   this.props.clearFilters();
                   this.props.fetchBoundArticles();

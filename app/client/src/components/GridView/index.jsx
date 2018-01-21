@@ -104,6 +104,7 @@ class GridView extends Component {
         {focusedOn === 'simple' ? <SimpleModal /> : null}
         <NProgress />
         <div className={`map-top-buttons ${this.getBtnsClassName()}`}>
+          <Insights />
           <Button
             content={`${isCredible ? 'Not Credible' : 'Credible'} Sources`}
             color={`${isCredible ? 'red' : 'green'}`}
@@ -122,7 +123,6 @@ class GridView extends Component {
               }
             }}
           />
-          <Insights />
         </div>
         <div className={`map-bot-buttons ${this.getBtnsClassName()}`}>
           <Button

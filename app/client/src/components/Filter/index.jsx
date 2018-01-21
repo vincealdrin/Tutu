@@ -134,11 +134,12 @@ class Filter extends Component {
               animation="scale"
             >
               <Button
+                className="save-button-filter"
                 icon="save"
                 content="Save"
                 labelPosition="left"
-                color="green"
                 onClick={() => localStorage.setItem('filterSettings', JSON.stringify(filters))}
+                color="blue"
               />
             </Tooltip>
             <Tooltip
@@ -152,7 +153,7 @@ class Filter extends Component {
                 icon="delete"
                 labelPosition="left"
                 content="Clear"
-                color="red"
+                color="default"
                 onClick={() => {
                   this.props.clearFilters();
                   fetchArticles();

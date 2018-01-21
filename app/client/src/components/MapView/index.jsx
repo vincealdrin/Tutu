@@ -19,6 +19,7 @@ import AppSidebar from '../AppSidebar';
 import SimpleModal from './SimpleModal';
 import Map from './Map';
 import './styles.css';
+import '../../index.css';
 
 const mapStateToProps = ({
   mapArticles: {
@@ -129,57 +130,56 @@ class MapView extends Component {
 
     return (
       <div className="map-container">
-        <div className={`map-top-buttons ${this.getBtnsClassName()}`}>
-          <Button
-            content={`${isCredible ? 'Not Credible' : 'Credible'} Sources`}
-            color={`${isCredible ? 'red' : 'green'}`}
-            icon="newspaper"
-            labelPosition="left"
-            onClick={() => {
-              this.setState({ isMsgShown: true });
-              this.props.toggleSourcesType();
-              this.props.fetchArticles();
-
-              if (isSidebarVisible) {
-                this.props.fetchRecentArticles();
-                this.props.fetchPopularArticles();
-              }
-            }}
-          />
-          {fetchStatus.success ? <Insights /> : null}
-
+        <div className="show-on-mobile">
+          <Button size="large" circular color="red" icon="newspaper" className="fake-news-button-mobile" />
+          <Button size="large" circular color="default" icon="bar chart" className="insights-button-mobile" />
         </div>
-        <div className={`map-bot-buttons ${this.getBtnsClassName()}`}>
-          <Button
-            labelPosition="left"
-            content={location.pathname === '/' ? 'Grid View' : 'Map View'}
-            icon={location.pathname === '/' ? 'grid layout' : 'map'}
-            onClick={() => {
-              this.props.clearState();
-              push('/grid/');
-            }}
-          />
+        <div className="hide-when-mobile">
+          <div className={`map-top-buttons ${this.getBtnsClassName()}`}>
+            {fetchStatus.success ? <Insights /> : null}
+            <Button
+              content={`${isCredible ? 'Not Credible' : 'Credible'} Sources`}
+              color={`${isCredible ? 'red' : 'green'}`}
+              icon="newspaper"
+              labelPosition="left"
+              onClick={() => {
+                this.setState({ isMsgShown: true });
+                this.props.toggleSourcesType();
+                this.props.fetchArticles();
+
+                if (isSidebarVisible) {
+                  this.props.fetchRecentArticles();
+                  this.props.fetchPopularArticles();
+                }
+              }}
+            />
+          </div>
+          <div className={`map-bot-buttons ${this.getBtnsClassName()}`}>
+            <Button
+              labelPosition="left"
+              content={location.pathname === '/' ? 'Grid View' : 'Map View'}
+              icon={location.pathname === '/' ? 'grid layout' : 'map'}
+              onClick={() => {
+                this.props.clearState();
+                push('/grid/');
+              }}
+            />
+          </div>
+          <Input className="search-box" icon>
+            <input id="searchBoxInput" placeholder="Search places" />
+            <Icon name="search" />
+          </Input>
+          {currentPosition ? (
+            <Button
+              className="current-loc"
+              icon="crosshairs"
+              onClick={() => {
+                this.props.updateMapState(currentPosition, 12);
+              }}
+              circular
+            />
+          ) : null}
         </div>
-        {isMsgShown ? (
-          <Message
-            header={`Map of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
-            content={`Each marker contains news from ${isCredible ? 'credible' : 'not credible'} sources`}
-            className="src-type-message"
-            onDismiss={this.closeMessage}
-          />
-        ) : null}
-        <NProgress />
-        {focusedOn === 'simple' ? <SimpleModal /> : null}
-        {focusedOn === 'cluster' ? <ClusterModal /> : null}
-        <AppSidebar
-          isWide={isSidebarWiden}
-          isVisible={isSidebarVisible}
-          showSidebarContent={this.showSidebarContent}
-          toggleSidebarContent={this.toggleSidebarContent}
-          expandSidebar={this.expandSidebar}
-          shrinkSidebar={this.shrinkSidebar}
-          fetchArticles={this.props.fetchArticles}
-        />
         <Input className="search-box" icon>
           <input id="searchBoxInput" placeholder="Search places" />
           <Icon name="search" />
@@ -193,8 +193,27 @@ class MapView extends Component {
             }}
             circular
           />
-        ) : null}
-
+          ) : null}
+        {isMsgShown ? (
+          <Message
+            header={`Map of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
+            content={`Each marker contains news from ${isCredible ? 'credible' : 'not credible'} sources`}
+            className="src-type-message"
+            onDismiss={this.closeMessage}
+          />
+          ) : null}
+        <NProgress />
+        {focusedOn === 'simple' ? <SimpleModal /> : null}
+        {focusedOn === 'cluster' ? <ClusterModal /> : null}
+        <AppSidebar
+          isWide={isSidebarWiden}
+          isVisible={isSidebarVisible}
+          showSidebarContent={this.showSidebarContent}
+          toggleSidebarContent={this.toggleSidebarContent}
+          expandSidebar={this.expandSidebar}
+          shrinkSidebar={this.shrinkSidebar}
+          fetchArticles={this.props.fetchArticles}
+        />
         <Map
           mapState={mapState}
           clusters={clusters}

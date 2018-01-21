@@ -387,9 +387,8 @@
   transform: translateX(-50%);
 }
 
-@media (max-height: 1024px) {
-  .src-type-message { bottom: 5%; }
-}
+@media (max-width: 815px) { .src-type-message { bottom: 5%; } }
+@media (max-width: 605px) { .src-type-message { bottom: 8%; } }
 
 .map-container {
   width: 100%;

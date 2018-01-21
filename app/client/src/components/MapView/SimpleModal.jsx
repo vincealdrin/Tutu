@@ -17,17 +17,21 @@ import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png'
 import { removeFocused } from '../../modules/mapArticles';
 import './styles.css';
 import { DATE_FORMAT } from '../../constants';
+import { getSentimentColor } from '../../utils';
+import CredibleArticles from './CredibleArticles';
 
 const mapStateToProps = ({
   mapArticles: {
     infoStatus,
     focusedInfo,
     focusedOn,
+    isCredible,
   },
 }) => ({
   isOpen: focusedOn === 'simple' && !infoStatus.cancelled,
   article: focusedInfo,
   status: infoStatus,
+  isCredible,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -36,17 +40,6 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 
 class SimpleModal extends PureComponent {
   state = { topImgUrl: '' };
-  getSentimentColor = (sentiment) => {
-    if (sentiment === 'Positive') {
-      return 'green';
-    } else if (sentiment === 'Neutral') {
-      return 'grey';
-    } else if (sentiment === 'Negative') {
-      return 'red';
-    }
-
-    return '';
-  }
 
   handleImgError = () => {
     this.setState({ topImgUrl: topImgPlaceholder });
@@ -81,6 +74,7 @@ class SimpleModal extends PureComponent {
         relatedArticles = [],
       },
       status,
+      isCredible,
     } = this.props;
     const { topImgUrl } = this.state;
 
@@ -107,6 +101,7 @@ class SimpleModal extends PureComponent {
           </Label>
         ) : null}
         <Modal.Content scrolling>
+          {!isCredible ? <CredibleArticles id={id} /> : null}
           {status.pending ? (
             <Dimmer active inverted>
               <Header as="h4">Loading article...</Header>
@@ -134,7 +129,7 @@ class SimpleModal extends PureComponent {
                   <Label
                     as="a"
                     className="tag-label"
-                    color={this.getSentimentColor(sentiment)}
+                    color={getSentimentColor(sentiment)}
                   >
                       Sentiment
                   </Label>

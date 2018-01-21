@@ -215,35 +215,30 @@ module.exports = (conn, io) => {
   router.get('/related', async (req, res, next) => {
     try {
       const {
-        title,
-        topics,
-        people,
-        orgs,
-        categories,
+        id,
+        isCredible = 'yes',
+        limit = '5',
+        page,
       } = req.query;
-      const catsArr = categories.split(',');
-      const cursor = await r.table('articles').filter((article) =>
-        article('publishDate').date()
-          .during(
-            r.time(article('publishDate').year(), article('publishDate').month(), article('publishDate').day().sub(7), PH_TIMEZONE),
-            r.time(article('publishDate').year(), article('publishDate').month(), article('publishDate').day().add(7), PH_TIMEZONE), {
-              rightBound: 'closed',
-            }
-          )
-          .and(article('categories')
-            .orderBy(r.desc((category) => category('score')))
-            .slice(0, catsArr.length)
-            .concatMap((c) => [c('label')])
-            .eq(r.expr(catsArr))
-            .and(article('topics')('common').match(`(?i)${topics.replace(',', '|')}`))
-            .and(article('people').contains((person) => person.match(`(?i)${people.replace(',', '|')}`))
-              .or(article('organizations').contains((org) => org.match(`(?i)${orgs.replace(',', '|')}`))))))
-        .pluck('title', 'url')
+      const parsedLimit = parseInt(limit);
+      const relArticlesIds = await r.table(tbl)
+        .get(id)
+        .getField('relatedArticles')
         .run(conn);
-      const articles = await cursor.toArray();
-      const relatedArticles = articles
-        .filter((article) => natural.DiceCoefficient(title, article.title) > 0.40)
-        .slice(0, 5);
+      const cursor = await r.table(tbl)
+        .getAll(r.args(relArticlesIds))
+        .eqJoin('sourceId', r.table('sources'))
+        .filter(r.row('right')('isReliable').eq(isCredible === 'yes'))
+        .limit(parsedLimit)
+        .map((join) => ({
+          title: join('left')('title'),
+          url: join('left')('url'),
+          publishDate: join('left')('publishDate'),
+          source: join('right')('brand'),
+          sourceUrl: join('right')('url'),
+        }))
+        .run(conn);
+      const relatedArticles = await cursor.toArray();
 
       res.json(relatedArticles);
     } catch (e) {

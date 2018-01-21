@@ -183,3 +183,12 @@ export const requestInsights = async (insightType, state, extraParams = {}) => {
     status,
   };
 };
+
+export const getSentimentColor = (sentiment) => {
+  if (sentiment === 'Positive') {
+    return 'green';
+  } else if (sentiment === 'Neutral') {
+    return 'grey';
+  }
+  return 'red';
+};

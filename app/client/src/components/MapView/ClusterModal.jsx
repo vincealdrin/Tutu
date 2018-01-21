@@ -2,25 +2,25 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {
-  List,
-  Image,
-  Label,
   Dimmer,
   Modal,
+  Header,
+  List,
+  Label,
   Segment,
   Grid,
-  Header,
 } from 'semantic-ui-react';
-import shortid from 'shortid';
 import moment from 'moment';
-import RelatedArticles from './RelatedArticles';
 import { removeFocused, fetchFocusedClusterInfo } from '../../modules/mapArticles';
+import Pagination from './Pagination';
+import './styles.css';
 import Tags from './Tags';
 import Reactions from './Reactions';
-import Pagination from './Pagination';
-import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png';
-import './styles.css';
+import RelatedArticles from './RelatedArticles';
 import { DATE_FORMAT } from '../../constants';
+import { getSentimentColor } from '../../utils';
+import ImagePlaceholder from '../Common/ImagePlaceholder';
+import CredibleArticles from './CredibleArticles';
 
 const mapStateToProps = ({
   mapArticles: {
@@ -28,12 +28,14 @@ const mapStateToProps = ({
     clusterStatus,
     focusedClusterInfo,
     focusedClusterArticles,
+    isCredible,
   },
 }) => ({
   isOpen: focusedOn === 'cluster' && !clusterStatus.cancelled,
   status: clusterStatus,
   articles: focusedClusterInfo,
   totalCount: focusedClusterArticles.length,
+  isCredible,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -45,26 +47,7 @@ class ClusterModal extends PureComponent {
   state = {
     currentPage: 1,
     limit: 10,
-    brokenImgs: [],
   };
-
-  handleImgError = (id) => {
-    this.setState({
-      brokenImgs: [
-        ...this.state.brokenImgs,
-        id,
-      ],
-    });
-  }
-
-  getSentimentColor = (sentiment) => {
-    if (sentiment === 'Positive') {
-      return 'green';
-    } else if (sentiment === 'Neutral') {
-      return 'grey';
-    }
-    return 'red';
-  }
 
   render() {
     const {
@@ -72,11 +55,11 @@ class ClusterModal extends PureComponent {
       totalCount,
       isOpen,
       status,
+      isCredible,
     } = this.props;
     const {
       currentPage,
       limit,
-      brokenImgs,
     } = this.state;
 
     return (
@@ -96,50 +79,30 @@ class ClusterModal extends PureComponent {
               <Header as="h4">Loading articles...</Header>
             </Dimmer>
           ) : null}
-          {articles.map(({
-            sentiment,
-            summary,
-            title,
-            publishDate,
-            source,
-            sourceUrl,
-            id,
-            url,
-            topImageUrl,
-            reactions,
-            authors = [],
-            categories = [],
-            keywords = [],
-            organizations = [],
-            people = [],
-            relatedArticles = [],
-          }) => (
-            <Segment key={shortid.generate()} raised className="modal-article-container">
+          {articles.map((article) => (
+            <Segment
+              className="modal-article-container"
+              raised
+            >
               <Grid columns={3} stackable>
                 <Label
                   as="a"
                   target="_blank"
                   className="news-label"
                   color="orange"
-                  href={sourceUrl}
+                  href={article.sourceUrl}
                   ribbon
                 >
-                  <div className="news-label-name">{source}</div>
+                  <div className="news-label-name">{article.source}</div>
                 </Label>
+                {!isCredible ? <CredibleArticles id={article.id} /> : null}
                 <Grid.Column width={4} style={{ position: 'relative' }}>
                   <div className="image-tag-title-container">
                     <div className="top-image">
-                      <Image
-                        src={
-                          brokenImgs.includes(id)
-                            ? topImgPlaceholder
-                            : topImageUrl || topImgPlaceholder
-                        }
-                        onError={() => this.handleImgError(id)}
-                      />
-                      <Header as="a" href={url} color="blue" className="news-title" target="_blank">{title}</Header>
+                      <ImagePlaceholder src={article.topImageUrl} />
+                      <Header as="a" href={article.url} color="blue" className="news-title" target="_blank">{article.title}</Header>
                       <p className="article-date">
-                        {moment(publishDate).format(DATE_FORMAT)} {status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}
+                        {moment(article.publishDate).format(DATE_FORMAT)} {article.authors.length > 0 ? ` | ${article.authors.join(', ')}` : ''}
                       </p>
                     </div>
                   </div>
@@ -151,46 +114,46 @@ class ClusterModal extends PureComponent {
                         <Label
                           as="a"
                           className="tag-label"
-                          color={this.getSentimentColor(sentiment)}
+                          color={getSentimentColor(article.sentiment)}
                         >
-                            Sentiment
+                          Sentiment
                         </Label>
-                        <span className="article-tags">{sentiment}</span>
+                        <span className="article-tags">{article.sentiment}</span>
                       </List.Item>
                       <List.Item>
                         <Label as="a" className="tag-label">Categories</Label>
-                        <Tags content={categories} />
+                        <Tags content={article.categories} />
                       </List.Item>
                       <List.Item>
                         <Label as="a" className="tag-label">Keywords</Label>
-                        <Tags content={keywords} />
+                        <Tags content={article.keywords} />
                       </List.Item>
                       <List.Item>
                         <Label as="a" className="tag-label">Organizations</Label>
-                        <Tags content={organizations} />
+                        <Tags content={article.organizations} />
                       </List.Item>
                       <List.Item>
                         <Label as="a" className="tag-label">People</Label>
-                        <Tags content={people} />
+                        <Tags content={article.people} />
                       </List.Item>
                     </List>
                     <Reactions
-                      reactions={reactions}
-                      id={id}
+                      reactions={article.reactions}
+                      id={article.id}
                     />
                   </div>
                 </Grid.Column>
                 <Grid.Column width={6}>
                   <div className="news-summary">
-                    {summary}
+                    {article.summary}
                   </div>
                   <div className="related-stories">
-                    <RelatedArticles content={relatedArticles} />
+                    <RelatedArticles content={article.relatedArticles} />
                   </div>
                 </Grid.Column>
               </Grid>
             </Segment>
-            ))}
+          ))}
         </Modal.Content>
         <Modal.Actions>
           {((isOpen && status.success) || articles.length) && totalCount > limit ? (

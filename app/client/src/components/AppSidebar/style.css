@@ -165,3 +165,29 @@ i.darkgrey.icon {
 .ui.list > .item > i.icon {
   padding-right: 0;
 }
+
+/* Mobile < 742px */
+
+.ui.labeled.icon.menu .item { margin: 0 auto; }
+
+@media (max-width: 742px) {
+  .mobile-menu-container { width: 100vw; }
+}
+
+@media (max-width: 600px) {
+  .mobile-menu-container { width: auto; }
+  .ui.labeled.icon.menu .item { font-size: 16px; }
+}
+
+@media (max-width: 570px) {
+  .ui.labeled.icon.menu .item { font-size: 11.2px; padding: 14px 0; }
+}
+
+@media (max-width: 376px) {
+  .ui.labeled.icon.menu .item { font-size: 10px; }
+}
+
+@media (max-width: 321px) {
+  .ui.labeled.icon.menu .item { font-size: 8.7px; padding: 12px 0; }
+}
+

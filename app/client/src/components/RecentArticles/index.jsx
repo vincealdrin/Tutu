@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {
   Grid,
-  Image,
   Header,
   Divider,
   Label,
@@ -15,8 +14,8 @@ import shortid from 'shortid';
 import moment from 'moment';
 import { addRecentArticle, fetchRecentArticles } from '../../modules/recentArticles';
 import { fetchFocusedInfo } from '../../modules/mapArticles';
-import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png';
 import './styles.css';
+import ImagePlaceholder from '../Common/ImagePlaceholder';
 
 const mapStateToProps = ({
   recentArticles: {
@@ -41,10 +40,6 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 }, dispatch);
 
 class RecentArticles extends Component {
-  state = {
-    brokenImgs: [],
-  };
-
   componentDidMount() {
     const { socket, isCredible } = this.props;
 
@@ -61,18 +56,8 @@ class RecentArticles extends Component {
     this.props.socket.removeAllListeners();
   }
 
-  handleImgError = (id) => {
-    this.setState({
-      brokenImgs: [
-        ...this.state.brokenImgs,
-        id,
-      ],
-    });
-  }
-
   render() {
     const { articles, fetchStatus } = this.props;
-    const { brokenImgs } = this.state;
 
     return (
       <Segment className="rec-segment-container">
@@ -90,16 +75,8 @@ class RecentArticles extends Component {
               <Grid>
                 <Grid.Row className="article-item">
                   <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important' }}>
-                    <Image
-                      src={
-                        brokenImgs.includes(article.id)
-                          ? topImgPlaceholder
-                          : article.topImageUrl || topImgPlaceholder
-                      }
-                      onError={() => this.handleImgError(article.id)}
-                      href={article.url}
-                      target="_blank"
-                    />
+                    <ImagePlaceholder src={article.topImageUrl} />
+
                     <Button
                       onClick={() => this.props.fetchFocusedInfo(article)}
                       content="View details"

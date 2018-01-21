@@ -286,7 +286,6 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
       const sliceArticles = (focusedClusterArticles.length ? focusedClusterArticles : articles)
         .slice(page * limit, (page + 1) * limit);
 
-
       const {
         data: focusedClusterInfo,
         status,

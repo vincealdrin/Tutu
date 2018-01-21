@@ -1,40 +1,28 @@
 import React, { PureComponent } from 'react';
-import { Header, Grid, Image, Icon, Label } from 'semantic-ui-react';
+import { Header, Grid, Icon, Label } from 'semantic-ui-react';
 import { Motion, spring } from 'react-motion';
 import { Tooltip } from 'react-tippy';
 import moment from 'moment';
-import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png';
 import './styles.css';
 import TutuLogo from '../../assets/logo/tutu-logo.svg';
 import { DATE_FORMAT } from '../../constants';
+import ImagePlaceholder from '../Common/ImagePlaceholder';
 
 const config = { stiffness: 140, damping: 14 };
 const toCSS = (translateX) => ({ transform: `translateX: ${translateX}px` });
 
 class SimpleMarker extends PureComponent {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      topImgUrl: this.props.article.topImageUrl || topImgPlaceholder,
-    };
-  }
-
-  handleImgError = () => {
-    this.setState({ topImgUrl: topImgPlaceholder });
-  }
-
   render() {
     const {
       article: {
         title,
         source,
         publishDate,
+        topImageUrl,
       },
       isCredible,
       $hover,
     } = this.props;
-    const { topImgUrl } = this.state;
 
     return (
       <Tooltip
@@ -45,10 +33,7 @@ class SimpleMarker extends PureComponent {
               <Grid.Row columns={2}>
                 <Grid.Column width={7}>
                   {$hover ? (
-                    <Image
-                      src={topImgUrl}
-                      onError={this.handleImgError}
-                    />
+                    <ImagePlaceholder src={topImageUrl} />
                   ) : null}
                 </Grid.Column>
                 <Grid.Column width={9} className="marker-title-column">

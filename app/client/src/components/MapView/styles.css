@@ -200,15 +200,15 @@
 
 .modal-article-container {
   display: flex;
-  align-items: flex-start;
   justify-content: center;
+  align-items: flex-start;
 }
 
 .news-label {
   position: absolute !important;
-  left: -1.05rem !important;
+  z-index: 800;
   top: 1.3rem;
-  z-index: 1000;
+  left: -1.05rem !important;
 }
 
 .news-label-name {
@@ -252,7 +252,6 @@
 @media (max-width: 320px) {
   .reactions { margin: 0 -5.3px !important; }
 }
-
 
 .reaction-alert {
   display: flex;
@@ -371,6 +370,14 @@
   display: flex;
 }
 
+.map-bot-buttons {
+  position: absolute;
+  right: 85.5px;
+  bottom: 25px;
+  z-index: 1000;
+  display: flex;
+}
+
 .adjust-top-buttons-visible {
   right: 483.85px;
 }
@@ -387,6 +394,6 @@
   position: absolute !important;
   bottom: -30px;
   left: 50%;
-  z-index: 100;
+  z-index: 900;
   transform: translateX(-50%);
 }

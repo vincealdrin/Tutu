@@ -6,8 +6,9 @@ const {
   mapArticle,
   mapArticleInfo,
   PH_TIMEZONE,
-  getCategoriesField,
   mapRelatedArticles,
+  mapGridArticle,
+  buildArticlesQuery,
 } = require('../../utils');
 
 const DAY_IN_SECONDS = 86400;
@@ -17,6 +18,8 @@ module.exports = (conn, io) => {
 
   router.get('/', async (req, res, next) => {
     const {
+      limit,
+      page,
       neLng,
       neLat,
       nwLng,
@@ -25,157 +28,43 @@ module.exports = (conn, io) => {
       seLat,
       swLng,
       swLat,
-      limit = 500,
-      keywords = '',
-      categories = '',
-      orgs = '',
-      people = '',
-      sources = '',
-      timeWindow = '7,0',
-      date = new Date().toLocaleString(),
-      popular = '',
-      sentiment = '',
       isCredible = 'yes',
     } = req.query;
-    const bounds = r.polygon(
-      [parseFloat(swLng), parseFloat(swLat)],
-      [parseFloat(seLng), parseFloat(seLat)],
-      [parseFloat(neLng), parseFloat(neLat)],
-      [parseFloat(nwLng), parseFloat(nwLat)]
-    );
-    const catsArr = categories.split(',');
+    let bounds;
+
+    if (neLng && neLat && nwLng && nwLat &&
+      seLng && seLat && swLng && swLat) {
+      bounds = r.polygon(
+        [parseFloat(swLng), parseFloat(swLat)],
+        [parseFloat(seLng), parseFloat(seLat)],
+        [parseFloat(neLng), parseFloat(neLat)],
+        [parseFloat(nwLng), parseFloat(nwLat)]
+      );
+    }
 
     try {
-      const totalCount = await r.table(tbl).count().run(conn);
+      let query = await buildArticlesQuery(req.query, bounds);
 
-      let query = await r.table(tbl).getIntersecting(bounds, {
-        index: 'positions',
-      }).distinct();
+      query = query.filter(r.row('right')('isReliable').eq(isCredible === 'yes'));
 
-      const [start, end] = timeWindow.split(',');
-      const selectedDate = new Date(JSON.parse(date));
-      const parsedStart = parseInt(start);
-      const parsedEnd = parseInt(end);
+      let totalCount = 0;
 
-      if (!parsedStart && !parsedEnd) {
-        query = query.filter((article) =>
-          article('publishDate').date()
-            .eq(r.expr(selectedDate).inTimezone(PH_TIMEZONE).date()));
-      } else {
-        const startDate = new Date(selectedDate.getTime());
-        startDate.setDate(selectedDate.getDate() - parsedStart);
-        const endDate = new Date(selectedDate.getTime());
-        endDate.setDate(selectedDate.getDate() - parsedEnd);
-
-        query = query.filter(r.row('publishDate').date().during(
-          r.expr(startDate).inTimezone(PH_TIMEZONE).date(),
-          r.expr(endDate).inTimezone(PH_TIMEZONE).date(),
-          { rightBound: 'closed' }
-        ));
+      if (page && limit) {
+        totalCount = await query.count().run(conn);
       }
 
-      if (keywords) {
-        query = query.filter((article) => article('body').match(`(?i)${keywords.replace(',', '|')}`));
-      }
+      if (page && limit) {
+        const parsedPage = parseInt(page);
+        const parsedLimit = parseInt(limit);
 
-      if (categories) {
-        query = query.filter((article) => getCategoriesField(article)
-          .contains((category) => r.expr(catsArr).contains(category)));
-      }
-
-      if (orgs) {
-        query = query.filter((article) => r.expr(orgs.split(','))
-          .contains((org) => article('organizations').contains(org)));
-      }
-
-      if (people) {
-        query = query.filter((article) => r.expr(people.split(','))
-          .contains((person) => article('people').contains(person)));
-      }
-
-      if (sentiment) {
-        if (sentiment === 'positive') {
-          query = query.filter((article) => article('sentiment')('compound').ge(0.5));
-        } else if (sentiment === 'negative') {
-          query = query.filter((article) => article('sentiment')('compound').le(-0.5));
-        } else {
-          query = query.filter((article) => article('sentiment')('compound').gt(0.5)
-            .and(article('sentiment')('compound').lt(-0.5)));
-        }
-      }
-
-      if (popular) {
-        const [socialNetworks, top] = popular.split('|');
-        const socials = socialNetworks.split(',');
-        const topCount = parseInt(top);
-
-        if (socials[0] === 'all') {
-          query = query.filter((article) => article('popularity')('totalScore').gt(0));
-        } else {
-          switch (socials.length) {
-          case 2:
-            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
-              .or(article('popularity')(socials[1]).gt(0)));
-            break;
-          case 3:
-            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
-              .or(article('popularity')(socials[1]).gt(0))
-              .or(article('popularity')(socials[2]).gt(0)));
-            break;
-          case 4:
-            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
-              .or(article('popularity')(socials[1]).gt(0))
-              .or(article('popularity')(socials[2]).gt(0))
-              .or(article('popularity')(socials[3]).gt(0)));
-            break;
-          case 5:
-            query = query.filter((article) => article('popularity')(socials[0]).gt(0)
-              .or(article('popularity')(socials[1]).gt(0))
-              .or(article('popularity')(socials[2]).gt(0))
-              .or(article('popularity')(socials[3]).gt(0))
-              .or(article('popularity')(socials[4]).gt(0)));
-            break;
-          default:
-            query = query.filter((article) => article('popularity')(socials[0]).gt(0));
-          }
-
-          if (socials[0] === 'all') {
-            query = query.orderBy(r.desc(r.row('popularity')('totalScore')));
-          } else {
-            query = query.orderBy(r.desc(r.row('popularity')(socials[0])));
-          }
-
-          if (socials[1]) {
-            query = query.orderBy(r.desc(r.row('popularity')(socials[1])));
-          }
-          if (socials[2]) {
-            query = query.orderBy(r.desc(r.row('popularity')(socials[2])));
-          }
-          if (socials[3]) {
-            query = query.orderBy(r.desc(r.row('popularity')(socials[3])));
-          }
-          if (socials[4]) {
-            query = query.orderBy(r.desc(r.row('popularity')(socials[4])));
-          }
-        }
-
-        query = query.slice(0, topCount);
-      }
-
-      query = query.eqJoin('sourceId', r.table('sources'));
-
-      if (sources) {
-        query = query.filter((article) => article('right')('brand')
-          .match(`(?i)${sources.replace(',', '|')}`));
-      }
-
-      if (limit) {
+        query = query.slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit);
+      } else if (limit) {
         query = query.limit(parseInt(limit));
       }
 
       const cursor = await query
-        .filter(r.row('right')('isReliable').eq(isCredible === 'yes'))
-        .map(mapArticle(bounds))
+        .map(bounds ? mapArticle(bounds) : mapGridArticle)
+        .distinct()
         .run(conn);
       const articles = await cursor.toArray();
 

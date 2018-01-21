@@ -33,6 +33,8 @@ const AppSidebar = ({
   shrinkSidebar,
   showSidebarContent,
   toggleSidebarContent,
+  fetchArticles,
+  hideCount,
 }) => {
   const isWideClass = isWide ? 'show' : 'hide';
   let visibleClassName;
@@ -53,20 +55,27 @@ const AppSidebar = ({
           <Icon name={`angle ${isIconVisible}`} size="large" />
         </div>
         <div className={`side-menu-item-container ${visibleClassName}`}>
-          {isVisible ? (
-            <Switch>
-              <Route path="/" component={PopularArticles} exact />
-              <Route path="(.*)/popular" component={PopularArticles} exact />
-              <Route path="(.*)/recent" component={RecentArticles} exact />
-              <Route path="(.*)/preferences" component={Filter} exact />
-              <Route path="(.*)/about" component={About} exact />
-              <Route path="(.*)/submit" component={Submit} exact />
-              <Route path="(.*)/categories" component={Categories} exact />
-              <Route path="(.*)/themes" component={MapThemes} exact />
-              <Route path="(.*)/sources" component={SourcesList} exact />
-              <Redirect to="/" />
-            </Switch>
-        ) : null}
+          <Switch>
+            <Route path="/" component={PopularArticles} exact />
+            <Route path="(.*)/popular" component={PopularArticles} exact />
+            <Route path="(.*)/recent" component={RecentArticles} exact />
+            <Route
+              path="(.*)/preferences"
+              component={(routeProps) => (
+                <Filter
+                  {...routeProps}
+                  fetchArticles={fetchArticles}
+                  hideCount={hideCount}
+                />
+              )}
+              exact
+            />
+            <Route path="(.*)/about" component={About} exact />
+            <Route path="(.*)/submit" component={Submit} exact />
+            <Route path="(.*)/categories" component={Categories} exact />
+            <Route path="(.*)/themes" component={MapThemes} exact />
+            <Route path="(.*)/sources" component={SourcesList} exact />
+          </Switch>
         </div>
       </div>
 
@@ -83,15 +92,15 @@ const AppSidebar = ({
         </div>
         <div className="side-menu">
           <span className={`label ${isWideClass}`}>MENU</span>
-          <Link to="/popular" onClick={showSidebarContent}>
+          <Link to="popular" onClick={showSidebarContent}>
             <Icon name="newspaper" color="darkgrey" />
             <span className={`sidebar-text ${isWideClass}`}>Popular News</span>
           </Link>
-          <Link to="/recent" onClick={showSidebarContent}>
+          <Link to="recent" onClick={showSidebarContent}>
             <Icon name="plus square outline" color="darkgrey" />
             <span className={`sidebar-text ${isWideClass}`}>Recent Articles</span>
           </Link>
-          <Link to="/preferences" onClick={showSidebarContent}>
+          <Link to="preferences" onClick={showSidebarContent}>
             <Icon name="cogs" color="darkgrey" />
             <span className={`sidebar-text ${isWideClass}`}>Preferences</span>
           </Link>
@@ -99,11 +108,11 @@ const AppSidebar = ({
               <Icon name="tags" color="darkgrey" />
               <span className={`sidebar-text ${isWideClass}`}>Categories</span>
             </Link> */}
-          <Link to="/submit" onClick={showSidebarContent}>
+          <Link to="submit" onClick={showSidebarContent}>
             <Icon name="legal" color="darkgrey" />
             <span className={`sidebar-text ${isWideClass}`}>Analyze</span>
           </Link>
-          <Link to="/about" onClick={showSidebarContent}>
+          <Link to="about" onClick={showSidebarContent}>
             <Icon name="browser" color="darkgrey" />
             <span className={`sidebar-text ${isWideClass}`}>About</span>
           </Link>

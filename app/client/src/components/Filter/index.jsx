@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Slider from 'rc-slider';
 import DatePicker from 'react-datepicker';
-import { fetchBoundArticles } from '../../modules/mapArticles';
 import {
   changeCategoriesFilter,
   changeKeywordsFilter,
@@ -25,8 +24,10 @@ import './styles.css';
 
 const mapStateToProps = ({
   filters,
-}) => ({
+}, { fetchArticles, hideCount }) => ({
   filters,
+  fetchArticles,
+  hideCount,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -40,7 +41,6 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   changePopularSocialsFilter,
   changePopularTopFilter,
   changeSentimentFilter,
-  fetchBoundArticles,
   changeDateFilter,
   clearFilters,
 }, dispatch);
@@ -103,7 +103,11 @@ class Filter extends Component {
   state = { popularSocialOptions }
 
   render() {
-    const { filters } = this.props;
+    const {
+      filters,
+      fetchArticles,
+      hideCount,
+    } = this.props;
     const {
       keywords,
       sources,
@@ -134,7 +138,7 @@ class Filter extends Component {
                 content="Save"
                 labelPosition="left"
                 color="green"
-                onClick={() => localStorage.setItem('filterSettings', JSON.stringify(this.props.filters))}
+                onClick={() => localStorage.setItem('filterSettings', JSON.stringify(filters))}
               />
             </Tooltip>
             <Tooltip
@@ -151,7 +155,7 @@ class Filter extends Component {
                 color="red"
                 onClick={() => {
                   this.props.clearFilters();
-                  this.props.fetchBoundArticles();
+                  fetchArticles();
                   localStorage.removeItem('filterSettings');
                 }}
               />
@@ -167,7 +171,7 @@ class Filter extends Component {
             value={keywords}
             onChange={(_, { value }) => {
               this.props.changeKeywordsFilter(value);
-              this.props.fetchBoundArticles();
+              fetchArticles();
             }}
             search
             selection
@@ -184,7 +188,7 @@ class Filter extends Component {
             options={categoriesOptions}
             onChange={(_, { value }) => {
               this.props.changeCategoriesFilter(value);
-              this.props.fetchBoundArticles();
+              fetchArticles();
             }}
             value={categories}
             search
@@ -203,7 +207,7 @@ class Filter extends Component {
             value={sources}
             onChange={(_, { value }) => {
               this.props.changeSourcesFilter(value);
-              this.props.fetchBoundArticles();
+              fetchArticles();
             }}
             search
             selection
@@ -222,7 +226,7 @@ class Filter extends Component {
                 maxDate={now}
                 onChange={(newDate) => {
                   this.props.changeDateFilter(newDate);
-                  this.props.fetchBoundArticles();
+                  fetchArticles();
                 }}
                 showMonthDropdown
                 showYearDropdown
@@ -237,7 +241,7 @@ class Filter extends Component {
             value={timeWindow}
             onChange={(value) => {
               this.props.changeTimeWindowFilter(value);
-              this.props.fetchBoundArticles();
+              fetchArticles();
             }}
           />
           <span className="timewindow-text">
@@ -253,7 +257,7 @@ class Filter extends Component {
             value={organizations}
             onChange={(_, { value }) => {
               this.props.changeOrganizationsFilter(value);
-              this.props.fetchBoundArticles();
+              fetchArticles();
             }}
             search
             selection
@@ -270,7 +274,7 @@ class Filter extends Component {
             value={people}
             onChange={(_, { value }) => {
               this.props.changePeopleFilter(value);
-              this.props.fetchBoundArticles();
+              fetchArticles();
             }}
             search
             selection
@@ -288,7 +292,7 @@ class Filter extends Component {
             options={sentimentsOptions}
             onChange={(_, { value }) => {
               this.props.changeSentimentFilter(value);
-              this.props.fetchBoundArticles();
+              fetchArticles();
             }}
             search
             upward
@@ -296,17 +300,21 @@ class Filter extends Component {
             fluid
           />
           <Divider />
-          <span className="input-label">COUNT (<b>{limit}</b>)</span>
-          <Slider
-            min={0}
-            max={10000}
-            value={limit}
-            onChange={(value) => {
-              this.props.changeLimitFilter(value);
-              this.props.fetchBoundArticles();
-            }}
-          />
-          <Divider />
+          {!hideCount ? (
+            <div>
+              <span className="input-label">COUNT (<b>{limit}</b>)</span>
+              <Slider
+                min={0}
+                max={10000}
+                value={limit}
+                onChange={(value) => {
+                this.props.changeLimitFilter(value);
+                fetchArticles();
+              }}
+              />
+              <Divider />
+            </div>
+          ) : null}
           <span className="input-label">POPULAR IN</span>
           <Dropdown
             text="Popular in..."
@@ -323,8 +331,9 @@ class Filter extends Component {
                   popularSocialOptions: popularSocialOptions.slice(0),
                 });
               }
+
               this.props.changePopularSocialsFilter(value);
-              this.props.fetchBoundArticles();
+              fetchArticles();
             }}
             upward
             search
@@ -341,7 +350,7 @@ class Filter extends Component {
             options={popularTopOptions}
             onChange={(_, { value }) => {
               this.props.changePopularTopFilter(value);
-              this.props.fetchBoundArticles();
+              fetchArticles();
             }}
             fluid
             upward

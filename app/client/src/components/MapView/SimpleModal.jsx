@@ -35,14 +35,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 }, dispatch);
 
 class SimpleModal extends PureComponent {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      topImgUrl: this.props.article.topImageUrl || topImgPlaceholder,
-    };
-  }
-
+  state = { topImgUrl: '' };
   getSentimentColor = (sentiment) => {
     if (sentiment === 'Positive') {
       return 'green';
@@ -71,6 +64,7 @@ class SimpleModal extends PureComponent {
         sourceUrl,
         url,
         id,
+        topImageUrl,
         reactions = {
           happy: 0,
           sad: 0,
@@ -125,8 +119,8 @@ class SimpleModal extends PureComponent {
                   className="top-image"
                   style={{
                     width: 219.63,
-                    height: 294.84,
-                    backgroundImage: `url(${topImgUrl || topImgPlaceholder})`,
+                    maxHeight: 298,
+                    backgroundImage: `url(${topImgUrl || topImageUrl || topImgPlaceholder})`,
                     backgroundPosition: 'center',
                     backgroundSize: 'cover',
                   }}
@@ -165,7 +159,14 @@ class SimpleModal extends PureComponent {
               </List>
             </Grid.Column>
           </Grid>
-          <Header as="a" color="blue" href={url} target="_blank">{title}</Header>
+          <Header
+            as="a"
+            color="blue"
+            href={url}
+            target="_blank"
+          >
+            {title}
+          </Header>
           <p className="article-date">
             {moment(publishDate).format(DATE_FORMAT)}
             &nbsp;{status.success && authors.length > 0 ? ` | ${authors.join(', ')}` : ''}

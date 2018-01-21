@@ -254,6 +254,18 @@ module.exports.mapRelatedArticles = (join) => ({
   sourceUrl: join('right')('url'),
 });
 
+module.exports.mapGridArticle = (join) => ({
+  id: join('left')('id'),
+  url: join('left')('url'),
+  title: join('left')('title'),
+  authors: join('left')('authors'),
+  summary: join('left')('summary').nth(0),
+  publishDate: join('left')('publishDate'),
+  topImageUrl: join('left')('topImageUrl'),
+  source: join('right')('brand'),
+  sourceUrl: join('right')('url'),
+});
+
 module.exports.mapArticleInfo = (catsFilterLength = 2) => (article) => ({
   id: article('id'),
   url: article('url'),
@@ -361,4 +373,199 @@ module.exports.mapLog = (join) => ({
     .pluck('authors', 'title', 'summary', 'url', 'publishDate')
     .merge((article) => ({ summary: article('summary').nth(0) }))
     .default({}),
+});
+
+module.exports.buildArticlesQuery = async (params, bounds) => {
+  const {
+    keywords = '',
+    categories = '',
+    orgs = '',
+    people = '',
+    sources = '',
+    timeWindow = '7,0',
+    date = new Date().toLocaleString(),
+    popular = '',
+    sentiment = '',
+    isCredible = 'yes',
+  } = params;
+  const catsArr = categories.split(',');
+  let query = await r.table('articles');
+
+  if (bounds) {
+    query = query.getIntersecting(bounds, {
+      index: 'positions',
+    }).distinct();
+  }
+
+  const [start, end] = timeWindow.split(',');
+  const selectedDate = new Date(JSON.parse(date));
+  const parsedStart = parseInt(start);
+  const parsedEnd = parseInt(end);
+
+  if (!parsedStart && !parsedEnd) {
+    query = query.filter((article) =>
+      article('publishDate').date()
+        .eq(r.expr(selectedDate).inTimezone(PH_TIMEZONE).date()));
+  } else {
+    const startDate = new Date(selectedDate.getTime());
+    startDate.setDate(selectedDate.getDate() - parsedStart);
+    const endDate = new Date(selectedDate.getTime());
+    endDate.setDate(selectedDate.getDate() - parsedEnd);
+
+    query = query.filter(r.row('publishDate').date().during(
+      r.expr(startDate).inTimezone(PH_TIMEZONE).date(),
+      r.expr(endDate).inTimezone(PH_TIMEZONE).date(),
+      { rightBound: 'closed' }
+    ));
+  }
+
+  if (keywords) {
+    query = query.filter((article) => article('body').match(`(?i)${keywords.replace(',', '|')}`));
+  }
+
+  if (categories) {
+    query = query.filter((article) => getCategoriesField(article)
+      .contains((category) => r.expr(catsArr).contains(category)));
+  }
+
+  if (orgs) {
+    query = query.filter((article) => r.expr(orgs.split(','))
+      .contains((org) => article('organizations').contains(org)));
+  }
+
+  if (people) {
+    query = query.filter((article) => r.expr(people.split(','))
+      .contains((person) => article('people').contains(person)));
+  }
+
+  if (sentiment) {
+    if (sentiment === 'positive') {
+      query = query.filter((article) => article('sentiment')('compound').ge(0.5));
+    } else if (sentiment === 'negative') {
+      query = query.filter((article) => article('sentiment')('compound').le(-0.5));
+    } else {
+      query = query.filter((article) => article('sentiment')('compound').gt(0.5)
+        .and(article('sentiment')('compound').lt(-0.5)));
+    }
+  }
+
+  if (popular) {
+    const [socialNetworks, top] = popular.split('|');
+    const socials = socialNetworks.split(',');
+    const topCount = parseInt(top);
+
+    if (socials[0] === 'all') {
+      query = query.filter((article) => article('popularity')('totalScore').gt(0));
+    } else {
+      switch (socials.length) {
+      case 2:
+        query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+          .or(article('popularity')(socials[1]).gt(0)));
+        break;
+      case 3:
+        query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+          .or(article('popularity')(socials[1]).gt(0))
+          .or(article('popularity')(socials[2]).gt(0)));
+        break;
+      case 4:
+        query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+          .or(article('popularity')(socials[1]).gt(0))
+          .or(article('popularity')(socials[2]).gt(0))
+          .or(article('popularity')(socials[3]).gt(0)));
+        break;
+      case 5:
+        query = query.filter((article) => article('popularity')(socials[0]).gt(0)
+          .or(article('popularity')(socials[1]).gt(0))
+          .or(article('popularity')(socials[2]).gt(0))
+          .or(article('popularity')(socials[3]).gt(0))
+          .or(article('popularity')(socials[4]).gt(0)));
+        break;
+      default:
+        query = query.filter((article) => article('popularity')(socials[0]).gt(0));
+      }
+
+      if (socials[0] === 'all') {
+        query = query.orderBy(r.desc(r.row('popularity')('totalScore')));
+      } else {
+        query = query.orderBy(r.desc(r.row('popularity')(socials[0])));
+      }
+
+      if (socials[1]) {
+        query = query.orderBy(r.desc(r.row('popularity')(socials[1])));
+      }
+      if (socials[2]) {
+        query = query.orderBy(r.desc(r.row('popularity')(socials[2])));
+      }
+      if (socials[3]) {
+        query = query.orderBy(r.desc(r.row('popularity')(socials[3])));
+      }
+      if (socials[4]) {
+        query = query.orderBy(r.desc(r.row('popularity')(socials[4])));
+      }
+    }
+
+    query = query.slice(0, topCount);
+  }
+
+  query = query.eqJoin('sourceId', r.table('sources'));
+
+  if (sources) {
+    query = query.filter((article) => article('right')('brand')
+      .match(`(?i)${sources.replace(',', '|')}`));
+  }
+
+  query = query.filter(r.row('right')('isReliable').eq(isCredible === 'yes'));
+
+  return query;
+};
+
+module.exports.mapCategoriesInsight = (article) => {
+  const categories = getCategoriesField(article);
+  return {
+    Economy: r.branch(categories.contains('Economy'), 1, 0),
+    Lifestyle: r.branch(categories.contains('Lifestyle'), 1, 0),
+    Sports: r.branch(categories.contains('Sports'), 1, 0),
+    Politics: r.branch(categories.contains('Politics'), 1, 0),
+    Health: r.branch(categories.contains('Health'), 1, 0),
+    Crime: r.branch(categories.contains('Crime'), 1, 0),
+    Weather: r.branch(categories.contains('Weather'), 1, 0),
+    Culture: r.branch(categories.contains('Culture'), 1, 0),
+    Environment: r.branch(categories.contains('Environment'), 1, 0),
+    'Business & Finance': r.branch(categories.contains('Business & Finance'), 1, 0),
+    'Disaster & Accident': r.branch(categories.contains('Disaster & Accident'), 1, 0),
+    'Entertainment & Arts': r.branch(categories.contains('Entertainment & Arts'), 1, 0),
+    'Law & Government': r.branch(categories.contains('Law & Government'), 1, 0),
+    'Science & Technology': r.branch(categories.contains('Science & Technology'), 1, 0),
+  };
+};
+
+module.exports.reduceCategoriesInsight = (left, right) => ({
+  Economy: left('Economy').add(right('Economy')),
+  Lifestyle: left('Lifestyle').add(right('Lifestyle')),
+  Sports: left('Sports').add(right('Sports')),
+  Politics: left('Politics').add(right('Politics')),
+  Health: left('Health').add(right('Health')),
+  Crime: left('Crime').add(right('Crime')),
+  Weather: left('Weather').add(right('Weather')),
+  Culture: left('Culture').add(right('Culture')),
+  Environment: left('Environment').add(right('Environment')),
+  'Business & Finance': left('Business & Finance').add(right('Business & Finance')),
+  'Disaster & Accident': left('Disaster & Accident').add(right('Disaster & Accident')),
+  'Entertainment & Arts': left('Entertainment & Arts').add(right('Entertainment & Arts')),
+  'Law & Government': left('Law & Government').add(right('Law & Government')),
+  'Science & Technology': left('Science & Technology').add(right('Science & Technology')),
+});
+
+
+module.exports.mapSentimentInsight = (article) => r.branch(
+  article('sentiment')('compound').ge(0.5),
+  { pos: 1, neu: 0, neg: 0 },
+  article('sentiment')('compound').le(-0.5),
+  { pos: 0, neu: 0, neg: 1 },
+  { pos: 0, neu: 1, neg: 0 }
+);
+module.exports.reduceSentimentInsight = (left, right) => ({
+  pos: left('pos').add(right('pos')),
+  neu: left('neu').add(right('neu')),
+  neg: left('neg').add(right('neg')),
 });

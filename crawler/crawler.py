@@ -362,8 +362,11 @@ while True:
                 sentiment = SentimentIntensityAnalyzer().polarity_scores(body)
                 # topics = parse_topics(body)
                 popularity = get_popularity(article.url)
+                joined_authors = ''.join(article.authors)
 
-                if not article.authors:
+                if len(joined_authors) > 75:
+                    article.authors = [search_authors(article.html)]
+                elif not article.authors:
                     author = search_authors(article.html)
                     if author:
                         article.authors.append(author)

@@ -2,72 +2,57 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { NProgress } from 'redux-nprogress';
-import { Icon, Input, Button, Message } from 'semantic-ui-react';
+import { Button, Message } from 'semantic-ui-react';
+import InfiniteScroll from 'react-infinite-scroller';
 import {
   fetchArticles,
   fetchFocusedInfo,
-  updateMapState,
-  fetchFocusedClusterInfo,
   toggleSourcesType,
   clearState,
 } from '../../modules/mapArticles';
-import { fetchRecentArticles } from '../../modules/recentArticles';
-import { fetchPopularArticles } from '../../modules/popularArticles';
-import ClusterModal from './ClusterModal';
-import Insights from '../Insights';
 import AppSidebar from '../AppSidebar';
-import SimpleModal from './SimpleModal';
-import Map from './Map';
+import SimpleModal from '../MapView/SimpleModal';
+import Insights from '../Insights';
+import ArticlesGrid from './ArticlesGrid';
 import './styles.css';
 
 const mapStateToProps = ({
   mapArticles: {
     articles,
-    clusters,
-    mapState,
     isCredible,
-    focusedOn,
+    totalCount,
     fetchStatus,
+    focusedOn,
   },
 }) => ({
-  // mapState: map.viewport.toJS(),
-  mapState,
   articles,
-  clusters,
   isCredible,
-  focusedOn,
+  totalCount,
   fetchStatus,
+  focusedOn,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchArticles,
   fetchFocusedInfo,
-  updateMapState,
-  fetchFocusedClusterInfo,
   toggleSourcesType,
-  fetchRecentArticles,
-  fetchPopularArticles,
   clearState,
 }, dispatch);
 
-class MapView extends Component {
+class GridView extends Component {
   state = {
-    currentPosition: null,
     isSidebarWiden: false,
     isSidebarVisible: false,
+    limit: 9,
+    page: 0,
     isMsgShown: true,
   }
 
   componentDidMount() {
-    navigator.geolocation.getCurrentPosition(({ coords }) => {
-      this.setState({
-        currentPosition: {
-          lat: coords.latitude,
-          lng: coords.longitude,
-        },
-      });
-    });
+    const { page, limit } = this.state;
+    this.props.fetchArticles(limit, page);
   }
+
 
   getBtnsClassName = () => {
     const {
@@ -96,39 +81,28 @@ class MapView extends Component {
   toggleSidebarContent = () => this.setState({ isSidebarVisible: !this.state.isSidebarVisible })
   closeMessage = () => this.setState({ isMsgShown: false })
 
-  _onChange = ({ center, zoom, marginBounds }) => {
-    this.props.updateMapState(center, zoom, marginBounds);
-
-    this.props.fetchArticles();
-  }
-
-  _onChildClick = (_, childProps) => {
-    if (childProps.articles) {
-      this.props.fetchFocusedClusterInfo(childProps.articles);
-    } else {
-      this.props.fetchFocusedInfo(childProps.article);
-    }
-  }
-
   render() {
     const {
       articles,
-      clusters,
-      mapState,
-      isCredible,
+      totalCount,
+      fetchStatus,
       focusedOn,
       history: { location, push },
-      fetchStatus,
+      isCredible,
     } = this.props;
     const {
-      currentPosition,
       isSidebarVisible,
       isSidebarWiden,
+      limit,
+      page,
       isMsgShown,
     } = this.state;
+    const hasMore = page * limit < totalCount;
 
     return (
-      <div className="map-container">
+      <div className="grid-view-container">
+        {focusedOn === 'simple' ? <SimpleModal /> : null}
+        <NProgress />
         <div className={`map-top-buttons ${this.getBtnsClassName()}`}>
           <Button
             content={`${isCredible ? 'Not Credible' : 'Credible'} Sources`}
@@ -138,7 +112,9 @@ class MapView extends Component {
             onClick={() => {
               this.setState({ isMsgShown: true });
               this.props.toggleSourcesType();
-              this.props.fetchArticles();
+              this.props.fetchArticles(limit, 0, () => {
+                this.setState({ page: 0 });
+              }, true);
 
               if (isSidebarVisible) {
                 this.props.fetchRecentArticles();
@@ -146,8 +122,7 @@ class MapView extends Component {
               }
             }}
           />
-          {fetchStatus.success ? <Insights /> : null}
-
+          <Insights />
         </div>
         <div className={`map-bot-buttons ${this.getBtnsClassName()}`}>
           <Button
@@ -156,21 +131,10 @@ class MapView extends Component {
             icon={location.pathname === '/' ? 'grid layout' : 'map'}
             onClick={() => {
               this.props.clearState();
-              push('/grid/');
+              push('/');
             }}
           />
         </div>
-        {isMsgShown ? (
-          <Message
-            header={`Map of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
-            content={`Each marker contains news from ${isCredible ? 'credible' : 'not credible'} sources`}
-            className="src-type-message"
-            onDismiss={this.closeMessage}
-          />
-        ) : null}
-        <NProgress />
-        {focusedOn === 'simple' ? <SimpleModal /> : null}
-        {focusedOn === 'cluster' ? <ClusterModal /> : null}
         <AppSidebar
           isWide={isSidebarWiden}
           isVisible={isSidebarVisible}
@@ -178,32 +142,40 @@ class MapView extends Component {
           toggleSidebarContent={this.toggleSidebarContent}
           expandSidebar={this.expandSidebar}
           shrinkSidebar={this.shrinkSidebar}
-          fetchArticles={this.props.fetchArticles}
+          fetchArticles={() => {
+            this.props.fetchArticles(limit, 0, () => {
+              this.setState({ page: 0 });
+            }, true);
+          }}
+          hideCount
         />
-        <Input className="search-box" icon>
-          <input id="searchBoxInput" placeholder="Search places" />
-          <Icon name="search" />
-        </Input>
-        {currentPosition ? (
-          <Button
-            className="current-loc"
-            icon="crosshairs"
-            onClick={() => {
-              this.props.updateMapState(currentPosition, 12);
-            }}
-            circular
+        {isMsgShown ? (
+          <Message
+            header={`Grid of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
+            content={`Each card contains news from ${isCredible ? 'credible' : 'not credible'} sources`}
+            className="src-type-message"
+            onDismiss={this.closeMessage}
           />
         ) : null}
-
-        <Map
-          mapState={mapState}
-          clusters={clusters}
-          articles={articles}
-          updateMapState={this.props.updateMapState}
-          onChange={this._onChange}
-          onChildClick={this._onChildClick}
-          isCredible={isCredible}
-        />
+        <InfiniteScroll
+          pageStart={page}
+          loadMore={() => {
+            if (!fetchStatus.pending && hasMore) {
+              const newPage = page + 1;
+              this.props.fetchArticles(limit, newPage, () => {
+                this.setState({ page: newPage });
+              });
+            }
+          }}
+          hasMore={hasMore}
+          initialLoad={false}
+          useWindow={false}
+        >
+          <ArticlesGrid
+            articles={articles}
+            fetchArticle={this.props.fetchFocusedInfo}
+          />
+        </InfiniteScroll>
       </div>
     );
   }
@@ -212,5 +184,5 @@ class MapView extends Component {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(MapView);
+)(GridView);
 

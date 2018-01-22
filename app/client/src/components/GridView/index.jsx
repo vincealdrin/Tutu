@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { NProgress } from 'redux-nprogress';
-import { Button, Message } from 'semantic-ui-react';
+import { Button, Message, Dimmer, Loader, Header } from 'semantic-ui-react';
 import InfiniteScroll from 'react-infinite-scroller';
 import {
   fetchArticles,
@@ -163,9 +163,9 @@ class GridView extends Component {
             if (!fetchStatus.pending && hasMore) {
               const newPage = page + 1;
               this.props.fetchArticles(limit, newPage, () => {
-                this.setState({ page: newPage });
+								this.setState({ page: newPage });
               });
-            }
+						}
           }}
           hasMore={hasMore}
           initialLoad={false}
@@ -175,6 +175,13 @@ class GridView extends Component {
             articles={articles}
             fetchArticle={this.props.fetchFocusedInfo}
           />
+          {fetchStatus.pending && hasMore ? (
+            <Dimmer page active>
+              <Loader inverted>LOADING...</Loader>
+            </Dimmer>
+          ) : (
+            <Header textAlign="center" className="no-more-articles">NO MORE ARTICLES TO SHOW</Header>
+          )}
         </InfiniteScroll>
       </div>
     );

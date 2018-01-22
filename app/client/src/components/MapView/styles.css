@@ -407,12 +407,14 @@
   height: 100%;
 }
 
-.fake-news-button-mobile, .insights-button-mobile {
+.fake-news-button-mobile, .insights-button-mobile, .grid-button-mobile {
   position: absolute;
   z-index: 999;
   right: 5px;
   box-shadow: 5px 3px 10px rgba(0,0,0,0.2) !important;
 }
+
+.current-loc-mobile { left: 7px; }
 
 @media (max-width: 815px) {
   .map-container {
@@ -421,6 +423,7 @@
   }
   .fake-news-button-mobile { bottom: 100px; }
   .insights-button-mobile { bottom: 145px; }
+  .grid-button-mobile { bottom: 190px;}
 }
 
 @media (max-width: 770px) { .map-container { height: calc(100% - 74px); } }
@@ -431,10 +434,11 @@
   .map-container { height: calc(100% - 64px); }
   .fake-news-button-mobile { bottom: 90px; }
   .insights-button-mobile { bottom: 135px; }
+  .grid-button-mobile { bottom: 180px;}
 }
 
 @media (max-width: 375px) { .map-container { height: calc(100% - 55px); } }
-@media (max-width: 360px) { .map-container { height: calc(100% - 60px); } }
+@media (max-width: 373px) { .map-container { height: calc(100% - 60px); } }
 @media (max-width: 320px) { .map-container { height: calc(100% - 55px); } }
 
 /* Mobile Tutu Logo and Top Bar */
@@ -447,9 +451,14 @@
   letter-spacing: 3px;
 }
 
+@media (max-width: 410px) { .search-topbar-mobile { width: 70% !important; } }
+
 @media (max-width: 360px) {
   .mobile-tutu-logo { width: 20px !important; }
   .mobile-tutu-title { font-size: 1rem; }
+  .search-topbar-mobile { width: 75% !important; }
 }
 
-@media (max-width: 320px) { .search-topbar-mobile { width: 90% !important; } }
+@media (max-width: 320px) { .search-topbar-mobile { width: 60% !important; } }
+
+

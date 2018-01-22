@@ -143,11 +143,48 @@ class MapView extends Component {
                   <input id="searchBoxInput" placeholder="Search places" />
                   <Icon name="search" />
                 </Input>
+                {currentPosition ? (
+                  <Button
+                    className="current-loc-mobile"
+                    icon="crosshairs"
+                    onClick={() => {
+                      this.props.updateMapState(currentPosition, 12);
+                    }}
+                    circular
+                  />
+                ) : null}
               </Menu.Item>
             </Menu.Menu>
           </Menu>
-          <Button size="large" circular color="red" icon="newspaper" className="fake-news-button-mobile" />
+          <Button 
+            size="large" 
+            circular 
+            icon="newspaper" 
+            className="fake-news-button-mobile" 
+            color={`${isCredible ? 'red' : 'green'}`}
+            onClick={() => {
+              this.setState({ isMsgShown: true });
+              this.props.toggleSourcesType();
+              this.props.fetchArticles();
+
+              if (isSidebarVisible) {
+                this.props.fetchRecentArticles();
+                this.props.fetchPopularArticles();
+              }
+            }}
+          />
           <Button size="large" circular color="blue" icon="bar chart" className="insights-button-mobile" />
+          <Button 
+            size="large" 
+            circular 
+            color="default" 
+            className="grid-button-mobile" 
+            icon={location.pathname === '/' ? 'grid layout' : 'map'}
+              onClick={() => {
+                this.props.clearState();
+                push('/grid/');
+              }}
+            />
         </div>
         <div className="hide-when-mobile">
           <div className={`map-top-buttons ${this.getBtnsClassName()}`}>

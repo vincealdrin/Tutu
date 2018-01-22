@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Label, List, Icon, Accordion } from 'semantic-ui-react';
+import { Label, List, Accordion } from 'semantic-ui-react';
 import upperFirst from 'lodash/upperFirst';
-import { fetchRelatedArticles } from '../../modules/mapArticles';
 import './styles.css';
 
 class MarkerAccordion extends Component {

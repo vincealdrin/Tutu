@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { NProgress } from 'redux-nprogress';
-import { Icon, Input, Button, Message } from 'semantic-ui-react';
+import { Icon, Input, Button, Message, Menu } from 'semantic-ui-react';
 import {
   fetchArticles,
   fetchFocusedInfo,
@@ -18,6 +18,7 @@ import Insights from '../Insights';
 import AppSidebar from '../AppSidebar';
 import SimpleModal from './SimpleModal';
 import Map from './Map';
+import tutuLogo from '../../assets/logo/tutu-logo.png';
 import './styles.css';
 import '../../index.css';
 
@@ -131,8 +132,22 @@ class MapView extends Component {
     return (
       <div className="map-container">
         <div className="show-on-mobile">
+          <Menu fixed="top" borderless>
+            <Menu.Item>
+              <img src={tutuLogo} className="mobile-tutu-logo"/>
+            </Menu.Item>   
+            <Menu.Item header className="mobile-tutu-title">TUTÛ</Menu.Item>
+            <Menu.Menu position='right'>
+              <Menu.Item>
+                <Input icon className="search-topbar-mobile">
+                  <input id="searchBoxInput" placeholder="Search places" />
+                  <Icon name="search" />
+                </Input>
+              </Menu.Item>
+            </Menu.Menu>
+          </Menu>
           <Button size="large" circular color="red" icon="newspaper" className="fake-news-button-mobile" />
-          <Button size="large" circular color="default" icon="bar chart" className="insights-button-mobile" />
+          <Button size="large" circular color="blue" icon="bar chart" className="insights-button-mobile" />
         </div>
         <div className="hide-when-mobile">
           <div className={`map-top-buttons ${this.getBtnsClassName()}`}>
@@ -180,20 +195,6 @@ class MapView extends Component {
             />
           ) : null}
         </div>
-        <Input className="search-box" icon>
-          <input id="searchBoxInput" placeholder="Search places" />
-          <Icon name="search" />
-        </Input>
-        {currentPosition ? (
-          <Button
-            className="current-loc"
-            icon="crosshairs"
-            onClick={() => {
-              this.props.updateMapState(currentPosition, 12);
-            }}
-            circular
-          />
-          ) : null}
         {isMsgShown ? (
           <Message
             header={`Map of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}

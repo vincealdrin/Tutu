@@ -153,7 +153,7 @@ export const requestInsights = async (insightType, state, extraParams = {}) => {
     router: { location },
     filters,
   } = state;
-  const isMap = location.pathname === '/';
+  const isMap = !/grid/.test(location.pathname);
 
   let ids;
 

@@ -7,7 +7,6 @@ import {
   List,
   Modal,
   Menu,
-  Input
 } from 'semantic-ui-react';
 import RecentArticles from '../RecentArticles';
 import PopularArticles from '../PopularArticles';
@@ -19,7 +18,7 @@ import SourcesList from '../SourcesList';
 import MapThemes from '../MapThemes';
 import tutuLogo from '../../assets/logo/tutu-logo.png';
 import './style.css';
-import '../../index.css'
+import '../../index.css';
 
 // expandSidebar = () => setState({ isWide: true })
 // shrinkSidebar = () => setState({ isWide: false })
@@ -52,10 +51,10 @@ const AppSidebar = ({
   return (
     <div>
       <div className="show-on-mobile">
-        <Menu compact icon='labeled' borderless fixed="bottom" className="mobile-menu-container">
-          <Menu.Item name='popular'>
-            <Icon name='newspaper'/>
-            Popular 
+        <Menu compact icon="labeled" borderless fixed="bottom" className="mobile-menu-container">
+          <Menu.Item name="popular">
+            <Icon name="newspaper" />
+            Popular
           </Menu.Item>
           <Menu.Item name="related">
             <Icon name="plus square outline" />
@@ -185,7 +184,9 @@ const AppSidebar = ({
                     </List.Item>
                     <List.Item>
                       <List.Icon name="send outline" size="big" />
-                      <List.Content>Submit an article to be evaluated by TUTÛ Evaluator</List.Content>
+                      <List.Content>
+                        Submit an article to be evaluated by TUTÛ Evaluator
+                      </List.Content>
                     </List.Item>
                     <List.Item>
                       <List.Icon name="list ul" size="big" />

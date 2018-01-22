@@ -158,7 +158,7 @@ export const fetchArticles = (limit, page, cb, isNewQuery = false) =>
         router: { location },
         filters,
       } = getState();
-      const isMap = location.pathname === '/';
+      const isMap = !/grid/.test(location.pathname);
       const params = buildArticleQueryParams({
         filters,
         bounds,

@@ -13,7 +13,6 @@ import {
 import moment from 'moment';
 import { removeFocused, fetchFocusedClusterInfo } from '../../modules/mapArticles';
 import Pagination from './Pagination';
-import './styles.css';
 import Tags from './Tags';
 import Reactions from './Reactions';
 import RelatedArticles from './RelatedArticles';

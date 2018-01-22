@@ -6,7 +6,6 @@ import {
 } from 'semantic-ui-react';
 import moment from 'moment';
 import axios from 'axios';
-import './styles.css';
 import { DATE_FORMAT } from '../../constants';
 import { crudStatus, updateCrudStatus } from '../../utils';
 

@@ -75,7 +75,6 @@ class Insights extends Component {
       topPeople,
       topOrgs,
       topLocations,
-      ids,
     } = this.props;
 
     switch (this.state.activeCard) {

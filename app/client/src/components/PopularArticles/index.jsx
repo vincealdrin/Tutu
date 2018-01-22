@@ -56,7 +56,7 @@ class PopularArticles extends PureComponent {
           <div className="pop-scrollable-section">
             {articles.map((article) => (
               <div key={shortid.generate()}>
-                <Grid>
+                <Grid className="article-item-container">
                   <Grid.Row className="article-item">
                     <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important', position: 'relative' }}>
                       <ImagePlaceholder src={article.topImageUrl} />

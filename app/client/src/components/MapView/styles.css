@@ -400,6 +400,7 @@
 
 @media (max-width: 815px) { .src-type-message { bottom: 5%; } }
 @media (max-width: 605px) { .src-type-message { bottom: 8%; } }
+@media (max-width: 376px) { .src-type-message { bottom: 9%; } }
 
 .map-container {
   width: 100%;
@@ -434,3 +435,21 @@
 
 @media (max-width: 375px) { .map-container { height: calc(100% - 55px); } }
 @media (max-width: 360px) { .map-container { height: calc(100% - 60px); } }
+@media (max-width: 320px) { .map-container { height: calc(100% - 55px); } }
+
+/* Mobile Tutu Logo and Top Bar */
+
+.mobile-tutu-logo { width: 25px !important; }
+
+.mobile-tutu-title { 
+  margin-left: -25px !important; 
+  font-size: 1.3rem;
+  letter-spacing: 3px;
+}
+
+@media (max-width: 360px) {
+  .mobile-tutu-logo { width: 20px !important; }
+  .mobile-tutu-title { font-size: 1rem; }
+}
+
+@media (max-width: 320px) { .search-topbar-mobile { width: 90% !important; } }

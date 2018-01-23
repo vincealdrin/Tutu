@@ -38,8 +38,8 @@
   border: 5px solid #1b272b;
 }
 
-
 /* radar pulse animation for cluster marker */
+
 @keyframes pulse {
   1% {
     opacity: 1;
@@ -191,7 +191,7 @@
 
 /* MODAL ARTICLE CONTAINER */
 .modal-container {
-  padding: 0.5rem;
+  padding: 1.5rem 0.5rem;
 }
 
 .modal-article-container {
@@ -274,10 +274,15 @@
 
 /* cluster modal articles */
 
-.image-tag-title-container {
+.image-tag-title-container,
+.image-tag-title-container-single {
   display: flex;
   width: 100%;
-  height: 215px;
+  height: 100%;
+}
+
+@media (max-width: 780px) {
+  .image-tag-title-container-single { height: 250px; }
 }
 
 .ui.header.news-title {

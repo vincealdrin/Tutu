@@ -69,6 +69,7 @@ class ClusterModal extends PureComponent {
           this.props.removeFocused();
           this.setState({ currentPage: 1 });
         }}
+        closeIcon
         closeOnDimmerClick
         dimmer
       >

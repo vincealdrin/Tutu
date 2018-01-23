@@ -53,6 +53,7 @@ const AppSidebar = ({
                 Popular
               </Menu.Item>
             }
+            closeIcon
           >
             <PopularArticles />
           </Modal>
@@ -63,6 +64,7 @@ const AppSidebar = ({
                 Recent
               </Menu.Item>
             }
+            closeIcon
           >
             <RecentArticles />
           </Modal>
@@ -73,6 +75,7 @@ const AppSidebar = ({
                 Preferences
               </Menu.Item>
             }
+            closeIcon
           >
             <Filter
               fetchArticles={fetchArticles}
@@ -86,6 +89,7 @@ const AppSidebar = ({
                 Analyze
               </Menu.Item>
             }
+            closeIcon
           >
             <Submit />
           </Modal>
@@ -96,6 +100,7 @@ const AppSidebar = ({
                 About
               </Menu.Item>
             }
+            closeIcon
           >
             <About />
           </Modal>
@@ -106,6 +111,7 @@ const AppSidebar = ({
                 Help
               </Menu.Item>
             }
+            closeIcon
             size="tiny"
             basic
           >

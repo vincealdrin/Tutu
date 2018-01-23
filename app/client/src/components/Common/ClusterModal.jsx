@@ -97,16 +97,23 @@ class ClusterModal extends PureComponent {
                 >
                   <div className="news-label-name">{article.source}</div>
                 </Label>
-                <Grid.Column width={4} style={{ position: 'relative' }}>
-                  <div className="image-tag-title-container">
-                    <div className="top-image">
-                      <ImagePlaceholder src={article.topImageUrl} />
-                      <Header as="a" href={article.url} color="blue" className="news-title" target="_blank">{article.title}</Header>
-                      <p className="article-date">
-                        {moment(article.publishDate).format(DATE_FORMAT)} {article.authors.length > 0 ? ` | ${article.authors.join(', ')}` : ''}
-                      </p>
-                    </div>
-                  </div>
+                <Grid.Column width={4}>
+                  <ImagePlaceholder
+                    src={article.topImageUrl}
+                    style={{ maxHeight: 127, marginBottom: 3 }}
+                  />
+                  <Header
+                    as="a"
+                    color="blue"
+                    className="news-title"
+                    target="_blank"
+                    href={article.url}
+                  >
+                    {article.title}
+                  </Header>
+                  <p className="article-date">
+                    {moment(article.publishDate).format(DATE_FORMAT)} {article.authors.length > 0 ? ` | ${article.authors.join(', ')}` : ''}
+                  </p>
                 </Grid.Column>
                 <Grid.Column width={6}>
                   <div className="tags">

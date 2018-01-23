@@ -27,11 +27,11 @@ class ClusterMarker extends PureComponent {
                 <Grid>
                   <Grid.Row columns={2}>
                     <Grid.Column width={7}>
-                      {$hover ? (
+                      <div className="img-placeholder-wrapper">
                         <ImagePlaceholder src={article.topImageUrl} />
-                      ) : null}
+                      </div>
                     </Grid.Column>
-                    <Grid.Column width={9} className="marker-title-column">
+                    <Grid.Column width={9}>
                       <div>
                         <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
                         <List.Description className="article-date">
@@ -50,6 +50,7 @@ class ClusterMarker extends PureComponent {
         open={$hover}
         disabled={isFocused}
         animateFill={false}
+        interactive
         sticky
       >
         <div

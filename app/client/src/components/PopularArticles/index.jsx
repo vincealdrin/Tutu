@@ -17,7 +17,7 @@ import { fetchPopularArticles } from '../../modules/popularArticles';
 import { fetchFocusedInfo } from '../../modules/mapArticles';
 import './styles.css';
 import { DATE_FORMAT } from '../../constants';
-import ImagePlaceholder from '../Common/ImagePlaceholder';
+import ImageErrorPlaceholder from '../Common/ImageErrorPlaceholder';
 
 const mapStateToProps = ({
   popularArticles: {
@@ -59,7 +59,9 @@ class PopularArticles extends PureComponent {
                 <Grid className="article-item-container">
                   <Grid.Row className="article-item">
                     <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important', position: 'relative' }}>
-                      <ImagePlaceholder src={article.topImageUrl} />
+                      <div className="sidebar-img-placeholder-wrapper">
+                        <ImageErrorPlaceholder src={article.topImageUrl} />
+                      </div>
                       <Button
                         onClick={() => this.props.fetchFocusedInfo(article)}
                         content="View details"

@@ -13,5 +13,5 @@ export const DEFAULT_CENTER = {
 };
 export const MAPS_CONTROL_STYLE = 1;
 export const MAPS_POSITION_LEFT_BOTTOM = 6;
-export const MAPS_POSITION_BOTTOM_LEFT = 6;
+export const MAPS_POSITION_BOTTOM_LEFT = 10;
 export const DATE_FORMAT = 'MM/DD/YYYY';

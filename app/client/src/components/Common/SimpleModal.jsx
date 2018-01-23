@@ -101,21 +101,7 @@ class SimpleModal extends PureComponent {
           ) : null}
           <Grid columns={2} style={{ marginBottom: '1rem' }} stackable>
             <Grid.Column width={7}>
-              <div className="image-tag-title-container-single">
-                <div className="image-container-single-placeholder">
-                  <div
-                    className="top-image"
-                    style={{
-                      width: 219.63,
-                      maxHeight: 298,
-                      backgroundImage: `url(${topImageUrl})`,
-                      backgroundPosition: 'center',
-                      backgroundSize: 'cover',
-                    }}
-                    onError={this.handleImgError}
-                  />
-                </div>
-              </div>
+              <ImagePlaceholder src={topImageUrl} style={{ maxHeight: 298 }} />
             </Grid.Column>
             <Grid.Column width={9}>
               <List divided relaxed className="keywords-modal-mobile">

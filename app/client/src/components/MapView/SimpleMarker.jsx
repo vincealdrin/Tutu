@@ -35,7 +35,11 @@ class SimpleMarker extends PureComponent {
               <Grid.Row columns={2}>
                 <Grid.Column width={7}>
                   {$hover ? (
-                    <ImagePlaceholder src={topImageUrl} />
+                    <div className="img-placeholder-wrapper">
+                      <ImagePlaceholder
+                        src={topImageUrl}
+                      />
+                    </div>
                   ) : null}
                 </Grid.Column>
                 <Grid.Column width={9} className="marker-title-column">

@@ -15,7 +15,7 @@ import moment from 'moment';
 import { addRecentArticle, fetchRecentArticles } from '../../modules/recentArticles';
 import { fetchFocusedInfo } from '../../modules/mapArticles';
 import './styles.css';
-import ImagePlaceholder from '../Common/ImagePlaceholder';
+import ImageErrorPlaceholder from '../Common/ImageErrorPlaceholder';
 
 const mapStateToProps = ({
   recentArticles: {
@@ -75,8 +75,7 @@ class RecentArticles extends Component {
               <Grid className="article-item-container">
                 <Grid.Row className="article-item">
                   <Grid.Column width={6} className="article-info" style={{ padding: '1.3rem !important' }}>
-                    <ImagePlaceholder src={article.topImageUrl} />
-
+                    <ImageErrorPlaceholder src={article.topImageUrl} />
                     <Button
                       onClick={() => this.props.fetchFocusedInfo(article)}
                       content="View details"

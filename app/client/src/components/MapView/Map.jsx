@@ -39,7 +39,7 @@ const mapOptions = {
   minZoom: MIN_ZOOM,
   maxZoom: MAX_ZOOM,
   gestureHandling: 'greedy',
-}
+};
 
 class Map extends PureComponent {
   render() {

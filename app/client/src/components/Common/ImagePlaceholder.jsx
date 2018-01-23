@@ -1,24 +1,18 @@
-import React, { PureComponent } from 'react';
-import { Image } from 'semantic-ui-react';
-import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png';
+import React from 'react';
+import './styles.css';
 
-class ImagePlaceholder extends PureComponent {
-  state = { tempImageUrl: '' }
-  handleImgError = () => {
-    this.setState({ tempImageUrl: topImgPlaceholder });
-  }
-
-  render() {
-    const { src } = this.props;
-    const { tempImageUrl } = this.state;
-
-    return (
-      <Image
-        src={tempImageUrl || src || topImgPlaceholder}
-        onError={this.handleImgError}
-      />
-    );
-  }
-}
+const ImagePlaceholder = ({ src, style }) => (
+  <div className="top-img-container" style={style}>
+    <div
+      style={{
+        height: '100%',
+        width: '100%',
+        backgroundImage: `url(${src})`,
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+      }}
+    />
+  </div>
+);
 
 export default ImagePlaceholder;

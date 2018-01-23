@@ -85,8 +85,8 @@ class MapInterface extends PureComponent {
         {focusedOn === 'cluster' ? <ClusterModal /> : null}
         {isMsgShown ? (
           <Message
-            header={`Map of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
-            content={`Each marker contains news from ${isCredible ? 'credible' : 'not credible'} sources`}
+            header={`${isMap ? 'Map' : 'Grid'} of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
+            content={`Each ${isMap ? 'marker contains' : 'card has'} news from ${isCredible ? 'credible' : 'not credible'} sources`}
             className="src-type-message"
             onDismiss={this.closeMessage}
           />

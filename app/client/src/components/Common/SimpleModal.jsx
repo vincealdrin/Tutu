@@ -101,11 +101,13 @@ class SimpleModal extends PureComponent {
           <Grid columns={2} style={{ marginBottom: '1rem' }} stackable>
             <Grid.Column width={7}>
               <div className="image-tag-title-container-single">
-                <ImagePlaceholder src={topImageUrl} />
+                <div className="top-image-single">
+                  <ImagePlaceholder src={topImageUrl} />
+                </div>
               </div>
             </Grid.Column>
             <Grid.Column width={9}>
-              <List divided relaxed>
+              <List divided relaxed className="keywords-modal-mobile">
                 <List.Item>
                   <Label
                     as="a"

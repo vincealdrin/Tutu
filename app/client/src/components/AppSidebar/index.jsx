@@ -45,61 +45,69 @@ const AppSidebar = ({
   return (
     <div>
       <div className="show-on-mobile">
-        <Menu compact icon='labeled' borderless fixed="bottom" className="mobile-menu-container">
-          <Modal 
+        <Menu compact icon="labeled" borderless fixed="bottom" className="mobile-menu-container">
+          <Modal
             trigger={
-            <Menu.Item name='popular'>
-              <Icon name='newspaper'/>
-              Popular 
-            </Menu.Item>
-          }>
+              <Menu.Item name="popular">
+                <Icon name="newspaper" />
+                Popular
+              </Menu.Item>
+            }
+          >
             <PopularArticles />
           </Modal>
           <Modal
             trigger={
-            <Menu.Item name="related">
-              <Icon name="plus square outline" />
-              Recent
-            </Menu.Item>
-          }>
+              <Menu.Item name="related">
+                <Icon name="plus square outline" />
+                Recent
+              </Menu.Item>
+            }
+          >
             <RecentArticles />
           </Modal>
           <Modal
             trigger={
-            <Menu.Item name="preferences">
-              <Icon name="cogs" />
-              Preferences
-            </Menu.Item>
-          }>
-            <Filter />
+              <Menu.Item name="preferences">
+                <Icon name="cogs" />
+                Preferences
+              </Menu.Item>
+            }
+          >
+            <Filter
+              fetchArticles={fetchArticles}
+              hideCount={hideCount}
+            />
           </Modal>
           <Modal
             trigger={
-            <Menu.Item name="analyze">
-              <Icon name="legal" />
-              Analyze
-            </Menu.Item>
-          }>
+              <Menu.Item name="analyze">
+                <Icon name="legal" />
+                Analyze
+              </Menu.Item>
+            }
+          >
             <Submit />
           </Modal>
           <Modal
             trigger={
-            <Menu.Item name="about">
-              <Icon name="browser" />
-              About
-            </Menu.Item>
-          }>
+              <Menu.Item name="about">
+                <Icon name="browser" />
+                About
+              </Menu.Item>
+            }
+          >
             <About />
           </Modal>
           <Modal
             trigger={
-            <Menu.Item name="help">
-              <Icon name="help circle outline" />
-              Help
-            </Menu.Item>
-          }
-          size="tiny"
-          basic
+              <Menu.Item name="help">
+                <Icon name="help circle outline" />
+                Help
+              </Menu.Item>
+            }
+            size="tiny"
+            basic
           >
             <Header as="h2" inverted>Legends:</Header>
             <Modal.Content>

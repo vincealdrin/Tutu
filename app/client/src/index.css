@@ -21,8 +21,9 @@ body {
 
 .show-on-mobile { display: none; }
 
-@media (max-width: 815px) { 
+@media (max-width: 815px) {
   .hide-when-mobile { display: none; }
   .show-on-mobile { display: block; }
+  #nprogress .bar { width: 100vw !important; }
 }
 

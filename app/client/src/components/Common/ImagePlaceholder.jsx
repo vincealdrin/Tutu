@@ -15,7 +15,7 @@ class ImagePlaceholder extends PureComponent {
     return (
       <Image
         src={tempImageUrl || src || topImgPlaceholder}
-        onError={() => this.handleImgError()}
+        onError={this.handleImgError}
       />
     );
   }

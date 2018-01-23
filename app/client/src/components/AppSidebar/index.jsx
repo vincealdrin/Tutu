@@ -84,9 +84,9 @@ const AppSidebar = ({
           </Modal>
           <Modal
             trigger={
-              <Menu.Item name="analyze">
-                <Icon name="legal" />
-                Analyze
+              <Menu.Item name="submit">
+                <Icon name="detective" />
+                Detect/Submit
               </Menu.Item>
             }
             closeIcon
@@ -131,7 +131,7 @@ const AppSidebar = ({
                   <List.Content>Prefer something you prefer</List.Content>
                 </List.Item>
                 <List.Item>
-                  <List.Icon name="send outline" size="big" />
+                  <List.Icon name="detective" size="big" />
                   <List.Content>Submit an article to be evaluated by TUTÛ Evaluator</List.Content>
                 </List.Item>
                 <List.Item>
@@ -215,8 +215,8 @@ const AppSidebar = ({
                   <span className={`sidebar-text ${isWideClass}`}>Categories</span>
                 </Link> */}
               <Link to="submit" onClick={showSidebarContent}>
-                <Icon name="legal" color="darkgrey" />
-                <span className={`sidebar-text ${isWideClass}`}>Analyze</span>
+                <Icon name="detective" color="darkgrey" />
+                <span className={`sidebar-text ${isWideClass}`}>Detect/Submit</span>
               </Link>
               <Link to="about" onClick={showSidebarContent}>
                 <Icon name="browser" color="darkgrey" />
@@ -256,7 +256,7 @@ const AppSidebar = ({
                       <List.Content>Prefer something you prefer</List.Content>
                     </List.Item>
                     <List.Item>
-                      <List.Icon name="send outline" size="big" />
+                      <List.Icon name="detective" size="big" />
                       <List.Content>
                         Submit an article to be evaluated by TUTÛ Evaluator
                       </List.Content>

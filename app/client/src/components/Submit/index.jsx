@@ -119,7 +119,7 @@ class Submit extends Component {
 
             <Message color={result.isReliable ? 'green' : 'red'} info>
               <Message.Header>
-                {submitStatus === 'pending' ? 'please wait...' : ''}
+                {submitStatus === 'pending' ? 'Analyzing...' : ''}
                 {submitStatus === 'success' ? (
                   <span>
                     {!result.isVerified

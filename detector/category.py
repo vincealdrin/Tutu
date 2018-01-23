@@ -9,10 +9,10 @@ from sklearn.pipeline import Pipeline
 from nltk.stem.snowball import SnowballStemmer
 import pandas as pd
 
-articles = get_articles(lambda article: {
-    'body': article['left']['body'],
-    'title': article['left']['title'],
-    'category': article['left']['categories'].nth(0).get_field('label')
+articles = get_articles(lambda join: {
+    'body': join['left']['body'],
+    'title': join['left']['title'],
+    'category': join['left']['categories'].nth(0).get_field('label')
 })[:-9]
 print(len(articles))
 

@@ -81,7 +81,7 @@ class MapView extends Component {
           isMap={isMap}
           isCredible={isCredible}
           status={fetchStatus}
-          focusedOn={focusedOn}
+          updateMapState={this.props.updateMapState}
           fetchArticles={this.props.fetchArticles}
           openInsights={this.props.openModal}
           onSourcesTypeToggle={(isSidebarVisible) => {

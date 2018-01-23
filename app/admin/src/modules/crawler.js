@@ -1,7 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import { updateCrudStatus, crudStatus } from '../utils';
-import { DATE_FORMAT } from '../constants';
+import { DATE_FORMAT } from '../../constants';
 
 export const FETCH_LOGS = 'crawler/FETCH_LOGS';
 export const ADD_LOG = 'crawler/ADD_LOG';

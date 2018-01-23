@@ -30,7 +30,8 @@ const mapStateToProps = ({
     isCredible,
   },
 }) => ({
-  isOpen: focusedOn === 'cluster' && !clusterStatus.cancelled,
+  isOpen: focusedOn === 'cluster'
+    && ((!clusterStatus.cancelled && clusterStatus.success) || clusterStatus.pending),
   status: clusterStatus,
   articles: focusedClusterInfo,
   totalCount: focusedClusterArticles.length,

@@ -11,4 +11,7 @@ export const DEFAULT_CENTER = {
   lat: 13.589065900042726,
   lng: 121.7421765136719,
 };
+export const MAPS_CONTROL_STYLE = 1;
+export const MAPS_POSITION_LEFT_BOTTOM = 6;
+export const MAPS_POSITION_BOTTOM_LEFT = 6;
 export const DATE_FORMAT = 'MM/DD/YYYY';

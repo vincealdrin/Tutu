@@ -1,4 +1,3 @@
-import axios from 'axios';
 import moment from 'moment';
 import { crudStatus, updateCrudStatus, httpThunk, requestInsights } from '../utils';
 import { DATE_FORMAT } from '../constants';

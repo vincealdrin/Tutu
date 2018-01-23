@@ -26,7 +26,8 @@ const mapStateToProps = ({
     isCredible,
   },
 }) => ({
-  isOpen: focusedOn === 'simple' && !infoStatus.cancelled,
+  isOpen: focusedOn === 'simple'
+    && ((!infoStatus.cancelled && infoStatus.success) || infoStatus.pending),
   article: focusedInfo,
   status: infoStatus,
   isCredible,
@@ -101,7 +102,19 @@ class SimpleModal extends PureComponent {
           <Grid columns={2} style={{ marginBottom: '1rem' }} stackable>
             <Grid.Column width={7}>
               <div className="image-tag-title-container-single">
-                <ImagePlaceholder src={topImageUrl} />
+                <div className="image-container-single-placeholder">
+                  <div
+                    className="top-image"
+                    style={{
+                      width: 219.63,
+                      maxHeight: 298,
+                      backgroundImage: `url(${topImageUrl})`,
+                      backgroundPosition: 'center',
+                      backgroundSize: 'cover',
+                    }}
+                    onError={this.handleImgError}
+                  />
+                </div>
               </div>
             </Grid.Column>
             <Grid.Column width={9}>

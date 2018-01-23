@@ -5,8 +5,8 @@ import { Tooltip } from 'react-tippy';
 import moment from 'moment';
 import './styles.css';
 import TutuLogo from '../../assets/logo/tutu-logo.svg';
-import { DATE_FORMAT } from '../../constants';
 import ImagePlaceholder from '../Common/ImagePlaceholder';
+import { DATE_FORMAT } from '../../constants';
 
 const config = { stiffness: 140, damping: 14 };
 const toCSS = (translateX) => ({ transform: `translateX: ${translateX}px` });
@@ -71,9 +71,9 @@ class SimpleMarker extends PureComponent {
           {(v) => (
             <Icon
               color={isCredible ? 'red' : 'black'}
-              name="simple-marker-icon"
               size={$hover ? 'huge' : 'big'}
-              className={`marker ${$hover ? 'hovered' : ''}`}
+              name="marker"
+              className={`simple-marker-icon marker ${$hover ? 'hovered' : ''}`}
               style={toCSS(v.translateX)}
             />
           )}

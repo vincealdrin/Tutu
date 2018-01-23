@@ -14,7 +14,32 @@ import {
   DEFAULT_ZOOM,
   MAX_ZOOM,
   MIN_ZOOM,
+  MAPS_POSITION_LEFT_BOTTOM,
+  MAPS_POSITION_BOTTOM_LEFT,
+  MAPS_CONTROL_STYLE,
 } from '../../constants';
+
+const mapOptions = {
+  zoomControlOptions: {
+    position: MAPS_POSITION_LEFT_BOTTOM,
+    style: MAPS_CONTROL_STYLE,
+  },
+  mapTypeControlOptions: {
+    position: MAPS_POSITION_BOTTOM_LEFT,
+    style: MAPS_CONTROL_STYLE,
+  },
+  fullscreenControlOptions: {
+    position: MAPS_POSITION_LEFT_BOTTOM,
+    style: MAPS_CONTROL_STYLE,
+  },
+  fullscreenControl: true,
+  zoomControl: true,
+  mapTypeControl: true,
+  minZoomOverride: true,
+  minZoom: MIN_ZOOM,
+  maxZoom: MAX_ZOOM,
+  gestureHandling: 'greedy',
+}
 
 class Map extends PureComponent {
   render() {
@@ -33,28 +58,10 @@ class Map extends PureComponent {
       <GoogleMapReact
         defaultZoom={DEFAULT_ZOOM}
         bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds', libraries: 'places' }}
-        options={(maps) => ({
-          zoomControlOptions: {
-            position: maps.ControlPosition.LEFT_BOTTOM,
-            style: maps.ZoomControlStyle.SMALL,
-          },
-          mapTypeControlOptions: {
-            position: maps.ControlPosition.BOTTOM_LEFT,
-            style: maps.MapTypeControlStyle.SMALL,
-          },
-          fullscreenControlOptions: {
-            position: maps.ControlPosition.LEFT_BOTTOM,
-            style: maps.ZoomControlStyle.SMALL,
-          },
-          fullscreenControl: true,
-          zoomControl: true,
-          mapTypeControl: true,
-          minZoomOverride: true,
-          minZoom: MIN_ZOOM,
-          maxZoom: MAX_ZOOM,
+        options={{
+          ...mapOptions,
           styles: isCredible ? credibleMapStyle : notCredibleMapStyle,
-          gestureHandling: 'greedy',
-        })}
+        }}
         // defaultCenter={mapState.center}
         center={mapState.center}
         zoom={mapState.zoom}

@@ -68,8 +68,8 @@ class MapInterface extends PureComponent {
       isMap,
       onViewToggle,
       fetchArticles,
-      focusedOn,
       openInsights,
+      updateMapState,
     } = this.props;
     const {
       currentPosition,
@@ -77,12 +77,13 @@ class MapInterface extends PureComponent {
       isSidebarWiden,
       isMsgShown,
     } = this.state;
+    const isMapBtnDisabled = isMap && (status.pending || status.cancelled);
 
     return (
       <div>
         <NProgress />
-        {focusedOn === 'simple' ? <SimpleModal /> : null}
-        {focusedOn === 'cluster' ? <ClusterModal /> : null}
+        <SimpleModal />
+        <ClusterModal />
         {isMsgShown ? (
           <Message
             header={`${isMap ? 'Map' : 'Grid'} of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}
@@ -91,6 +92,7 @@ class MapInterface extends PureComponent {
             onDismiss={this.closeMessage}
           />
         ) : null}
+        <Insights />
         <AppSidebar
           isWide={isSidebarWiden}
           isVisible={isSidebarVisible}
@@ -116,7 +118,7 @@ class MapInterface extends PureComponent {
                   className="current-loc-mobile"
                   icon="crosshairs"
                   onClick={() => {
-                    this.props.updateMapState(currentPosition, 12);
+                    updateMapState(currentPosition, 12);
                   }}
                   disabled={!currentPosition}
                   circular
@@ -147,13 +149,19 @@ class MapInterface extends PureComponent {
             icon="bar chart"
             className="insights-button-mobile"
             onClick={openInsights}
-            disabled={isMap && status.pending}
+            disabled={isMapBtnDisabled}
             circular
           />
         </div>
         <div className="hide-when-mobile">
           <div className={`map-top-buttons ${this.getBtnsClassName()}`}>
-            <Insights disabled={isMap && status.pending} />
+            <Button
+              content="Insights"
+              icon="bar chart"
+              labelPosition="left"
+              disabled={isMapBtnDisabled}
+              loading={isMapBtnDisabled}
+            />
             <Button
               content={`${isCredible ? 'Not Credible' : 'Credible'} Sources`}
               color={`${isCredible ? 'red' : 'green'}`}

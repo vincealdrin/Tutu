@@ -155,42 +155,33 @@ class Insights extends Component {
 
   render() {
     const { activeCard, labelDesc } = this.state;
-    const { isModalOpen, disabled } = this.props;
+    const { isModalOpen } = this.props;
 
     return (
-      <div>
-        <Button
-          content="Insights"
-          icon="bar chart"
-          labelPosition="left"
-          onClick={this.props.openModal}
-          disabled={disabled}
-        />
-        <Modal
-          open={isModalOpen}
-          onClose={() => {
+      <Modal
+        open={isModalOpen}
+        onClose={() => {
             this.props.closeModal();
             this.setState({ activeCard: 'mainMenu' });
           }}
-          closeOnDimmerClick
-        >
-          <Label as="a" color="teal" size="large" ribbon>{labelDesc}</Label>
-          <Button
-            as="a"
-            icon={activeCard === 'mainMenu' ? 'close' : 'long arrow left'}
-            floated="right"
-            color="white"
-            content={activeCard === 'mainMenu' ? 'CLOSE' : 'BACK'}
-            onClick={() => (activeCard === 'mainMenu'
-              ? this.props.closeModal()
-              : this.setState({ activeCard: 'mainMenu', labelDesc: 'Insights' }))
-            }
-          />
-          <Modal.Content scrolling>
-            {this.renderCharts()}
-          </Modal.Content>
-        </Modal>
-      </div>
+        closeOnDimmerClick
+      >
+        <Label as="a" color="teal" size="large" ribbon>{labelDesc}</Label>
+        <Button
+          as="a"
+          icon={activeCard === 'mainMenu' ? 'close' : 'long arrow left'}
+          floated="right"
+          color="white"
+          content={activeCard === 'mainMenu' ? 'CLOSE' : 'BACK'}
+          onClick={() => (activeCard === 'mainMenu'
+            ? this.props.closeModal()
+            : this.setState({ activeCard: 'mainMenu', labelDesc: 'Insights' }))
+          }
+        />
+        <Modal.Content scrolling>
+          {this.renderCharts()}
+        </Modal.Content>
+      </Modal>
     );
   }
 }

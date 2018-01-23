@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { NProgress } from 'redux-nprogress';
-import { Button, Message, Dimmer, Loader, Header } from 'semantic-ui-react';
+import { Header } from 'semantic-ui-react';
 import InfiniteScroll from 'react-infinite-scroller';
 import {
   fetchArticles,
@@ -113,7 +112,8 @@ class GridView extends Component {
           <Header textAlign="center" className="no-more-articles">
             {fetchStatus.pending ? 'Loading...' : null}
             {!fetchStatus.pending && fetchStatus.success && !hasMore
-              ? 'NO MORE ARTICLES TO SHOW' : null}
+              ? 'NO MORE ARTICLES TO SHOW'
+              : null}
           </Header>
         </InfiniteScroll>
       </div>

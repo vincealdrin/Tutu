@@ -17,7 +17,6 @@ import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png'
 import { removeFocused } from '../../modules/mapArticles';
 import { DATE_FORMAT } from '../../constants';
 import { getSentimentColor } from '../../utils';
-import CredibleArticles from './CredibleArticles';
 
 const mapStateToProps = ({
   mapArticles: {
@@ -70,7 +69,7 @@ class SimpleModal extends PureComponent {
         keywords = [],
         organizations = [],
         people = [],
-        relatedArticles = [],
+        relatedArticles = {},
       },
       status,
       isCredible,
@@ -100,7 +99,6 @@ class SimpleModal extends PureComponent {
           </Label>
         ) : null}
         <Modal.Content scrolling>
-          {!isCredible ? <CredibleArticles id={id} /> : null}
           {status.pending ? (
             <Dimmer active inverted>
               <Header as="h4">Loading article...</Header>
@@ -130,7 +128,7 @@ class SimpleModal extends PureComponent {
                     className="tag-label"
                     color={getSentimentColor(sentiment)}
                   >
-                      Sentiment
+                    Sentiment
                   </Label>
                   <span className="article-tags">{sentiment}</span>
                 </List.Item>
@@ -168,7 +166,11 @@ class SimpleModal extends PureComponent {
           <div className="carousel-container">
             {summary}
           </div>
-          <RelatedArticles content={relatedArticles} />
+          <RelatedArticles
+            isCredible={isCredible}
+            relatedArticles={relatedArticles.articles}
+            credibleArticles={relatedArticles.credibleArticles}
+          />
           <div className="extras">
             {!status.pending && status.success ? (
               <Reactions

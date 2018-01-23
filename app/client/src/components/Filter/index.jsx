@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Label, Segment, Dropdown, Divider, Button, Icon } from 'semantic-ui-react';
 import { Tooltip } from 'react-tippy';
 import { connect } from 'react-redux';
@@ -11,8 +11,7 @@ import {
   changeLimitFilter,
   changeOrganizationsFilter,
   changePeopleFilter,
-  changePopularSocialsFilter,
-  changePopularTopFilter,
+  changeTopPopular,
   changeSentimentFilter,
   changeSourcesFilter,
   changeTimeWindowFilter,
@@ -38,8 +37,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   changeLimitFilter,
   changeOrganizationsFilter,
   changePeopleFilter,
-  changePopularSocialsFilter,
-  changePopularTopFilter,
+  changeTopPopular,
   changeSentimentFilter,
   changeDateFilter,
   clearFilters,
@@ -68,16 +66,8 @@ const sentimentsOptions = [
   { key: 'negative', text: 'Negative', value: 'negative' },
 ];
 
-const popularSocialOptions = [
-  { key: 'all', text: 'All', value: 'all' },
-  { key: 'facebook', text: 'Facebook', value: 'facebook' },
-  { key: 'reddit', text: 'Reddit', value: 'reddit' },
-  { key: 'linkedin', text: 'LinkedIn', value: 'linkedin' },
-  { key: 'pinterest', text: 'Pinterest', value: 'pinterest' },
-  { key: 'stumbleupon', text: 'StumbleUpon', value: 'stumbleupon' },
-];
-
 const popularTopOptions = [
+  { key: 'none', text: 'None', value: 'none' },
   { key: '10', text: '10', value: '10' },
   { key: '30', text: '30', value: '30' },
   { key: '50', text: '50', value: '50' },
@@ -99,9 +89,7 @@ const FilterAlert = ({ action }) => (
 
 const now = new Date();
 
-class Filter extends Component {
-  state = { popularSocialOptions }
-
+class Filter extends PureComponent {
   render() {
     const {
       filters,
@@ -117,6 +105,8 @@ class Filter extends Component {
       limit,
       categories,
       date,
+      topPopular,
+      sentiment,
     } = filters;
     const startRange = 31 - timeWindow[0];
     const endRange = 31 - timeWindow[1];
@@ -289,11 +279,13 @@ class Filter extends Component {
             // text="Sentiment"
             // icon="smile"
             // className="icon little-width"
-            defaultValue="none"
+            value={sentiment}
             options={sentimentsOptions}
             onChange={(_, { value }) => {
-              this.props.changeSentimentFilter(value);
-              fetchArticles();
+              if (value !== sentiment) {
+                this.props.changeSentimentFilter(value);
+                fetchArticles();
+              }
             }}
             search
             upward
@@ -309,55 +301,28 @@ class Filter extends Component {
                 max={10000}
                 value={limit}
                 onChange={(value) => {
-                this.props.changeLimitFilter(value);
-                fetchArticles();
-              }}
+                  this.props.changeLimitFilter(value);
+                  fetchArticles();
+                }}
               />
               <Divider />
             </div>
           ) : null}
-          <span className="input-label">POPULAR IN</span>
-          <Dropdown
-            text="Popular in..."
-            // icon="internet explorer"
-            // className="icon"
-            options={this.state.popularSocialOptions}
-            onChange={(_, { value }) => {
-              if (value[0] === 'all') {
-                this.setState({ popularSocialOptions: [popularSocialOptions[0]] });
-              } else if (!value.length) {
-                this.setState({ popularSocialOptions });
-              } else {
-                this.setState({
-                  popularSocialOptions: popularSocialOptions.slice(0),
-                });
-              }
-
-              this.props.changePopularSocialsFilter(value);
-              fetchArticles();
-            }}
-            upward
-            search
-            selection
-            fluid
-            multiple
-            allowAdditions
-          />
           <span className="input-label">POPULAR TOP</span>
           <Dropdown
             icon="sort"
-            className="icon"
-            defaultValue="100"
+            value={topPopular}
             options={popularTopOptions}
             onChange={(_, { value }) => {
-              this.props.changePopularTopFilter(value);
-              fetchArticles();
+              if (value !== topPopular) {
+                this.props.changeTopPopular(value);
+                fetchArticles();
+              }
             }}
-            fluid
+            search
             upward
-            labeled
-            button
             selection
+            fluid
           />
         </div>
       </Segment>

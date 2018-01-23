@@ -11,6 +11,7 @@ import {
   Grid,
 } from 'semantic-ui-react';
 import moment from 'moment';
+import shortid from 'shortid';
 import { removeFocused, fetchFocusedClusterInfo } from '../../modules/mapArticles';
 import Pagination from './Pagination';
 import Tags from './Tags';
@@ -19,7 +20,6 @@ import RelatedArticles from './RelatedArticles';
 import { DATE_FORMAT } from '../../constants';
 import { getSentimentColor } from '../../utils';
 import ImagePlaceholder from '../Common/ImagePlaceholder';
-import CredibleArticles from './CredibleArticles';
 
 const mapStateToProps = ({
   mapArticles: {
@@ -80,6 +80,7 @@ class ClusterModal extends PureComponent {
           ) : null}
           {articles.map((article) => (
             <Segment
+              key={shortid.generate()}
               className="modal-article-container"
               raised
             >
@@ -94,7 +95,6 @@ class ClusterModal extends PureComponent {
                 >
                   <div className="news-label-name">{article.source}</div>
                 </Label>
-                {!isCredible ? <CredibleArticles id={article.id} /> : null}
                 <Grid.Column width={4} style={{ position: 'relative' }}>
                   <div className="image-tag-title-container">
                     <div className="top-image">
@@ -147,7 +147,11 @@ class ClusterModal extends PureComponent {
                     {article.summary}
                   </div>
                   <div className="related-stories">
-                    <RelatedArticles content={article.relatedArticles} />
+                    <RelatedArticles
+                      relatedArticles={article.relatedArticles.articles}
+                      credibleArticles={article.relatedArticles.credibleArticles}
+                      isCredible={isCredible}
+                    />
                   </div>
                 </Grid.Column>
               </Grid>

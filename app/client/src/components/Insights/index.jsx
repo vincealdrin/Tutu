@@ -155,7 +155,7 @@ class Insights extends Component {
 
   render() {
     const { activeCard, labelDesc } = this.state;
-    const { isModalOpen } = this.props;
+    const { isModalOpen, disabled } = this.props;
 
     return (
       <div>
@@ -164,6 +164,7 @@ class Insights extends Component {
           icon="bar chart"
           labelPosition="left"
           onClick={this.props.openModal}
+          disabled={disabled}
         />
         <Modal
           open={isModalOpen}

@@ -98,9 +98,9 @@ class GridView extends Component {
             if (!fetchStatus.pending && hasMore) {
               const newPage = page + 1;
               this.props.fetchArticles(limit, newPage, () => {
-								this.setState({ page: newPage });
+                this.setState({ page: newPage });
               });
-						}
+            }
           }}
           hasMore={hasMore}
           initialLoad={false}
@@ -110,13 +110,11 @@ class GridView extends Component {
             articles={articles}
             fetchArticle={this.props.fetchFocusedInfo}
           />
-          {fetchStatus.pending && hasMore ? (
-            <Dimmer page active>
-              <Loader inverted>LOADING...</Loader>
-            </Dimmer>
-          ) : (
-            <Header textAlign="center" className="no-more-articles">NO MORE ARTICLES TO SHOW</Header>
-          )}
+          <Header textAlign="center" className="no-more-articles">
+            {fetchStatus.pending ? 'Loading...' : null}
+            {!fetchStatus.pending && fetchStatus.success && !hasMore
+              ? 'NO MORE ARTICLES TO SHOW' : null}
+          </Header>
         </InfiniteScroll>
       </div>
     );

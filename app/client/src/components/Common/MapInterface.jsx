@@ -6,6 +6,7 @@ import Insights from '../Insights';
 import tutuLogo from '../../assets/logo/tutu-logo.png';
 import SimpleModal from './SimpleModal';
 import ClusterModal from './ClusterModal';
+import './styles.css';
 
 class MapInterface extends PureComponent {
   state = {
@@ -100,7 +101,7 @@ class MapInterface extends PureComponent {
           fetchArticles={fetchArticles}
         />
         <div className="show-on-mobile">
-          <Menu fixed="top" borderless>
+          <Menu fixed="top" className="mobile-top-bar" borderless>
             <Menu.Item>
               <Image src={tutuLogo} className="mobile-tutu-logo" />
             </Menu.Item>
@@ -128,12 +129,13 @@ class MapInterface extends PureComponent {
             icon="bar chart"
             className="insights-button-mobile"
             onClick={openInsights}
+            disabled={isMap && status.pending}
             circular
           />
         </div>
         <div className="hide-when-mobile">
           <div className={`map-top-buttons ${this.getBtnsClassName()}`}>
-            {status.success ? <Insights /> : null}
+            <Insights disabled={isMap && status.pending} />
             <Button
               content={`${isCredible ? 'Not Credible' : 'Credible'} Sources`}
               color={`${isCredible ? 'red' : 'green'}`}
@@ -150,20 +152,23 @@ class MapInterface extends PureComponent {
               onClick={onViewToggle}
             />
           </div>
-          <Input className="search-box" icon>
-            <input id="searchBoxInput" placeholder="Search places" />
-            <Icon name="search" />
-          </Input>
-          {currentPosition ? (
-            <Button
-              className="current-loc"
-              icon="crosshairs"
-              onClick={() => {
-                this.props.updateMapState(currentPosition, 12);
-              }}
-              circular
-            />
-            ) : null}
+          {isMap ? (
+            <div>
+              <Input className="search-box" icon>
+                <input id="searchBoxInput" placeholder="Search places" />
+                <Icon name="search" />
+              </Input>
+              <Button
+                className="current-loc"
+                icon="crosshairs"
+                onClick={() => {
+                  this.props.updateMapState(currentPosition, 12);
+                }}
+                disabled={!currentPosition}
+                circular
+              />
+            </div>
+          ) : null}
         </div>
       </div>
     );

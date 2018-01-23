@@ -136,8 +136,8 @@
 .related-stories {
   max-height: 180px;
   margin-top: 1.7rem;
-  overflow-y: auto;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .related-source-label {
@@ -202,9 +202,9 @@
 
 .news-label {
   position: absolute !important;
-  z-index: 800;
   top: 1.3rem;
   left: -1.05rem !important;
+  z-index: 800;
 }
 
 .news-label-name {
@@ -266,6 +266,7 @@
 .center-column-items {
   background-color: green;
 }
+
 /* remove accordion padding */
 .ui.accordion .title:not(.ui) {
   padding: 0;
@@ -274,9 +275,9 @@
 /* cluster modal articles */
 
 .image-tag-title-container {
+  display: flex;
   width: 100%;
   height: 215px;
-  display: flex;
 }
 
 .ui.header.news-title {
@@ -399,66 +400,7 @@
 }
 
 @media (max-width: 815px) { .src-type-message { bottom: 5%; } }
+
 @media (max-width: 605px) { .src-type-message { bottom: 8%; } }
+
 @media (max-width: 376px) { .src-type-message { bottom: 9%; } }
-
-.map-container {
-  width: 100%;
-  height: 100%;
-}
-
-.fake-news-button-mobile, .insights-button-mobile, .grid-button-mobile {
-  position: absolute;
-  z-index: 999;
-  right: 5px;
-  box-shadow: 5px 3px 10px rgba(0,0,0,0.2) !important;
-}
-
-.current-loc-mobile { left: 7px; }
-
-@media (max-width: 815px) {
-  .map-container {
-    width: 100vw;
-    height: calc(100% - 73px);
-  }
-  .fake-news-button-mobile { bottom: 100px; }
-  .insights-button-mobile { bottom: 145px; }
-  .grid-button-mobile { bottom: 190px;}
-}
-
-@media (max-width: 770px) { .map-container { height: calc(100% - 74px); } }
-@media (max-width: 600px) { .map-container { height: calc(100% - 80px); } }
-@media (max-width: 568px) { .map-container { height: calc(100% - 65px); } }
-
-@media (max-width: 415px) {
-  .map-container { height: calc(100% - 64px); }
-  .fake-news-button-mobile { bottom: 90px; }
-  .insights-button-mobile { bottom: 135px; }
-  .grid-button-mobile { bottom: 180px;}
-}
-
-@media (max-width: 375px) { .map-container { height: calc(100% - 55px); } }
-@media (max-width: 373px) { .map-container { height: calc(100% - 60px); } }
-@media (max-width: 320px) { .map-container { height: calc(100% - 55px); } }
-
-/* Mobile Tutu Logo and Top Bar */
-
-.mobile-tutu-logo { width: 25px !important; }
-
-.mobile-tutu-title {
-  margin-left: -25px !important;
-  font-size: 1.3rem;
-  letter-spacing: 3px;
-}
-
-@media (max-width: 410px) { .search-topbar-mobile { width: 70% !important; } }
-
-@media (max-width: 360px) {
-  .mobile-tutu-logo { width: 20px !important; }
-  .mobile-tutu-title { font-size: 1rem; }
-  .search-topbar-mobile { width: 75% !important; }
-}
-
-@media (max-width: 320px) { .search-topbar-mobile { width: 60% !important; } }
-
-

@@ -112,9 +112,27 @@ class MapInterface extends PureComponent {
                   <input id="searchBoxInput" placeholder="Search places" />
                   <Icon name="search" />
                 </Input>
+                <Button
+                  className="current-loc-mobile"
+                  icon="crosshairs"
+                  onClick={() => {
+                    this.props.updateMapState(currentPosition, 12);
+                  }}
+                  disabled={!currentPosition}
+                  circular
+                />
               </Menu.Item>
             </Menu.Menu>
           </Menu>
+
+          <Button
+            size="large"
+            color="default"
+            className="grid-button-mobile"
+            icon={isMap ? 'grid layout' : 'map'}
+            onClick={onViewToggle}
+            circular
+          />
           <Button
             size="large"
             color="red"

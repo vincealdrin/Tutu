@@ -135,7 +135,7 @@ class MapInterface extends PureComponent {
           />
           <Button
             size="large"
-            color="red"
+            color={`${isCredible ? 'red' : 'green'}`}
             icon="newspaper"
             className="fake-news-button-mobile"
             onClick={this.onSourcesTypeToggle_}

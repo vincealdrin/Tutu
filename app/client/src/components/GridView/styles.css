@@ -8,3 +8,7 @@
 .ui.header.no-more-articles {
   padding: 2rem;
 }
+
+@media (max-width: 815px) {
+  .grid-view-container { width: 100vw; }
+}

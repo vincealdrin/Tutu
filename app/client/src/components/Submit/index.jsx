@@ -82,14 +82,14 @@ class Submit extends Component {
     return (
       <div>
         <Segment>
-          <Label as="a" color="orange" ribbon style={{ marginBottom: '1rem' }}>Submit</Label>
+          <Label as="a" color="orange" ribbon style={{ marginBottom: '1rem' }}>Detect/Submit</Label>
           <div className="scrollable-section about-section-info">
             <Header as="h2" style={{ marginBottom: 32 }}>
-              Analyze Source&#x27;s Credibility
+              Detect News Source's Credibility
             </Header>
 
             <p className="tutu-description" >
-              Please insert any Article URL from the source to be analyze by our trained model
+              Please insert any Article URL from the source to be analyzed by our trained model to see if they are similar to known not credible news sources.
             </p>
 
             <Input
@@ -99,7 +99,7 @@ class Submit extends Component {
             />
 
             <Checkbox
-              label="Submit source to be verified by journalists"
+              label="Submit news source to be verified by journalists"
               onChange={() => {
                 this.setState({ submitSource: !submitSource });
               }}
@@ -115,7 +115,9 @@ class Submit extends Component {
               Submit
             </Button>
 
-            <h5>Our analyzer accuracy improves everytime you submit a source</h5>
+            <h5>
+              You help us improve our detector&#39;s accuracy everytime you submit a source
+            </h5>
 
             <Message color={result.isReliable ? 'green' : 'red'} info>
               <Message.Header>

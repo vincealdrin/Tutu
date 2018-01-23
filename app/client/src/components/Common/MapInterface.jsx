@@ -159,6 +159,7 @@ class MapInterface extends PureComponent {
               content="Insights"
               icon="bar chart"
               labelPosition="left"
+              onClick={openInsights}
               disabled={isMapBtnDisabled}
               loading={isMapBtnDisabled}
             />

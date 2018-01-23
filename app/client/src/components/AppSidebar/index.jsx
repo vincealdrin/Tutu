@@ -134,10 +134,10 @@ const AppSidebar = ({
                   <List.Icon name="send outline" size="big" />
                   <List.Content>Submit an article to be evaluated by TUTÛ Evaluator</List.Content>
                 </List.Item>
-                <List.Item>
+                {/* <List.Item>
                   <List.Icon name="list ul" size="big" />
                   <List.Content>Take a look at the sources in our archives</List.Content>
-                </List.Item>
+                </List.Item> */}
                 <List.Item>
                   <List.Icon name="marker" size="big" />
                   <List.Content>Display a single article</List.Content>

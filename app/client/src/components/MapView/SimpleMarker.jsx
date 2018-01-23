@@ -22,11 +22,13 @@ class SimpleMarker extends PureComponent {
       },
       isCredible,
       $hover,
+      isFocused,
     } = this.props;
 
     return (
       <Tooltip
         position="bottom-start"
+        trigger="manual"
         html={
           <div className="simple-marker">
             <Grid>
@@ -37,7 +39,9 @@ class SimpleMarker extends PureComponent {
                   ) : null}
                 </Grid.Column>
                 <Grid.Column width={9} className="marker-title-column">
-                  <Header as="a" color="blue" target="_blank" className="simple-marker-title">{title}</Header>
+                  <Header as="a" color="blue" target="_blank" className="simple-marker-title">
+                    {title}
+                  </Header>
                   <p className="article-date">{moment(publishDate).format(DATE_FORMAT)}</p>
                   <Label as="a" circular className="source-label">{source}</Label>
                 </Grid.Column>
@@ -49,7 +53,9 @@ class SimpleMarker extends PureComponent {
           </div>
         }
         open={$hover}
+        disabled={isFocused}
         animateFill={false}
+        touchHold
         sticky
       >
         <Motion
@@ -63,17 +69,14 @@ class SimpleMarker extends PureComponent {
           }}
         >
           {(v) => (
-            <div>
-              <Icon
-                color={isCredible ? 'red' : 'black'}
-                name="simple-marker-icon"
-                size={$hover ? 'huge' : 'big'}
-                className={`marker ${$hover ? 'hovered' : ''}`}
-                style={toCSS(v.translateX)}
-              />
-            </div>
-            )
-          }
+            <Icon
+              color={isCredible ? 'red' : 'black'}
+              name="simple-marker-icon"
+              size={$hover ? 'huge' : 'big'}
+              className={`marker ${$hover ? 'hovered' : ''}`}
+              style={toCSS(v.translateX)}
+            />
+          )}
         </Motion>
       </Tooltip>
     );

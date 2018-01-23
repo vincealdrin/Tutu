@@ -14,6 +14,7 @@ class ClusterMarker extends PureComponent {
       articles,
       $hover,
       isCredible,
+      isFocused,
     } = this.props;
 
     return (
@@ -47,6 +48,7 @@ class ClusterMarker extends PureComponent {
           </List>
         }
         open={$hover}
+        disabled={isFocused}
         animateFill={false}
         sticky
       >

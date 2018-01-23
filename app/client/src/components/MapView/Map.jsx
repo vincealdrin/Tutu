@@ -26,6 +26,7 @@ class Map extends PureComponent {
       onChildClick,
       updateMapState,
       isCredible,
+      isFocused,
     } = this.props;
 
     return (
@@ -91,6 +92,7 @@ class Map extends PureComponent {
                 lng={lng}
                 lat={lat}
                 isCredible={isCredible}
+                isFocused={isFocused}
               />
             );
           }
@@ -104,6 +106,7 @@ class Map extends PureComponent {
               lng={lng}
               lat={lat}
               isCredible={isCredible}
+              isFocused={isFocused}
             />
           );
         })}

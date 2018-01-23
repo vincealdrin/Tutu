@@ -122,6 +122,7 @@ class Reactions extends Component {
             </Tooltip>
           </List.Item>
           <List.Item className="reactions">
+
             <Tooltip
               title="Amused"
               distance={-8}

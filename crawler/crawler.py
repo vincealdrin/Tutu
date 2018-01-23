@@ -1,7 +1,7 @@
 # start CoreNLP server
 # java -mx4g -cp "*" --add-modules java.xml.bind edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 20000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
 # for deployment
-# pm2 start java --name="corenlp" --cwd="/usr/bin/" -x -- -mx4g -cp "/home/vnc/corenlp/*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 20000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
+# pm2 start java --name="corenlp" --cwd="/usr/bin/" -x -- -mx4g -cp "/home/vnc/corenlp/*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 20000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly -quiet
 # hack method to backup db on server
 # rethinkdb dump -c localhost:28015
 # tar zxvf ./rethinkdb_dump_2017-01-24T21:42:08.tar.gz

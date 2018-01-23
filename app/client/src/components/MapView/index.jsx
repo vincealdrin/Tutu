@@ -107,6 +107,7 @@ class MapView extends Component {
           onChange={this._onChange}
           onChildClick={this._onChildClick}
           isCredible={isCredible}
+          isFocused={focusedOn}
         />
       </div>
     );

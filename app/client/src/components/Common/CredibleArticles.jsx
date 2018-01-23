@@ -17,6 +17,11 @@ class CredibleArticles extends PureComponent {
 
   fetchCredibleNews = async () => {
     const { id } = this.props;
+    this.setState({
+      status: updateCrudStatus({
+        statusText: 'pending',
+      }),
+    });
 
     try {
       const { data: articles, status } = await axios.get('/articles/related', {
@@ -53,21 +58,17 @@ class CredibleArticles extends PureComponent {
             className="show-real-news-label"
             content="Related Credible News"
             attached="bottom left"
-            as="a"
           />
         }
-        position="left center"
-        on="click"
-        onOpen={() => {
-          this.fetchCredibleNews();
-        }}
+        position="right center"
+        onOpen={this.fetchCredibleNews}
+        hoverable
       >
         {status.pending ? 'Loading...' : null}
         {status.success && !articles.length ? 'Nothing found' : null}
         <List divided relaxed>
           {articles.map((article) => (
             <List.Item>
-              <List.Icon name="check" size="large" verticalAlign="middle" />
               <List.Content>
                 <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
                 <List.Description>

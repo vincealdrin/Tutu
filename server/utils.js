@@ -246,13 +246,41 @@ const getSentiment = (sentiment) => r.branch(
   'Neutral',
 );
 
-module.exports.mapRelatedArticles = (join) => ({
-  title: join('left')('title'),
-  url: join('left')('url'),
-  publishDate: join('left')('publishDate'),
-  source: join('right')('brand'),
-  sourceUrl: join('right')('url'),
-});
+module.exports.mergeRelatedArticles = (isCredible) => (article) => {
+  const query = r.table('articles')
+    .getAll(r.args(article('relatedArticles')))
+    .eqJoin('sourceId', r.table('sources'));
+
+  const relatedArticles = {
+    articles: query
+      .filter((join) => join('right')('isReliable').eq(isCredible))
+      .limit(5)
+      .map((join) => ({
+        title: join('left')('title'),
+        url: join('left')('url'),
+        publishDate: join('left')('publishDate'),
+        source: join('right')('brand'),
+        sourceUrl: join('right')('url'),
+      }))
+      .coerceTo('array'),
+  };
+
+  if (!isCredible) {
+    relatedArticles.credibleArticles = query
+      .filter((join) => join('right')('isReliable').eq(true))
+      .limit(5)
+      .map((join) => ({
+        title: join('left')('title'),
+        url: join('left')('url'),
+        publishDate: join('left')('publishDate'),
+        source: join('right')('brand'),
+        sourceUrl: join('right')('url'),
+      }))
+      .coerceTo('array');
+  }
+
+  return { relatedArticles };
+};
 
 module.exports.mapGridArticle = (join) => ({
   id: join('left')('id'),
@@ -384,7 +412,7 @@ module.exports.buildArticlesQuery = async (params, bounds) => {
     sources = '',
     timeWindow = '7,0',
     date = new Date().toLocaleString(),
-    popular = '',
+    topPopular = '',
     sentiment = '',
     isCredible = 'yes',
   } = params;
@@ -449,62 +477,10 @@ module.exports.buildArticlesQuery = async (params, bounds) => {
     }
   }
 
-  if (popular) {
-    const [socialNetworks, top] = popular.split('|');
-    const socials = socialNetworks.split(',');
-    const topCount = parseInt(top);
+  if (topPopular) {
+    const parsedTopPop = parseInt(topPopular);
 
-    if (socials[0] === 'all') {
-      query = query.filter((article) => article('popularity')('totalScore').gt(0));
-    } else {
-      switch (socials.length) {
-      case 2:
-        query = query.filter((article) => article('popularity')(socials[0]).gt(0)
-          .or(article('popularity')(socials[1]).gt(0)));
-        break;
-      case 3:
-        query = query.filter((article) => article('popularity')(socials[0]).gt(0)
-          .or(article('popularity')(socials[1]).gt(0))
-          .or(article('popularity')(socials[2]).gt(0)));
-        break;
-      case 4:
-        query = query.filter((article) => article('popularity')(socials[0]).gt(0)
-          .or(article('popularity')(socials[1]).gt(0))
-          .or(article('popularity')(socials[2]).gt(0))
-          .or(article('popularity')(socials[3]).gt(0)));
-        break;
-      case 5:
-        query = query.filter((article) => article('popularity')(socials[0]).gt(0)
-          .or(article('popularity')(socials[1]).gt(0))
-          .or(article('popularity')(socials[2]).gt(0))
-          .or(article('popularity')(socials[3]).gt(0))
-          .or(article('popularity')(socials[4]).gt(0)));
-        break;
-      default:
-        query = query.filter((article) => article('popularity')(socials[0]).gt(0));
-      }
-
-      if (socials[0] === 'all') {
-        query = query.orderBy(r.desc(r.row('popularity')('totalScore')));
-      } else {
-        query = query.orderBy(r.desc(r.row('popularity')(socials[0])));
-      }
-
-      if (socials[1]) {
-        query = query.orderBy(r.desc(r.row('popularity')(socials[1])));
-      }
-      if (socials[2]) {
-        query = query.orderBy(r.desc(r.row('popularity')(socials[2])));
-      }
-      if (socials[3]) {
-        query = query.orderBy(r.desc(r.row('popularity')(socials[3])));
-      }
-      if (socials[4]) {
-        query = query.orderBy(r.desc(r.row('popularity')(socials[4])));
-      }
-    }
-
-    query = query.slice(0, topCount);
+    query = query.orderBy(r.desc(r.row('popularity')('totalScore'))).limit(parsedTopPop);
   }
 
   query = query.eqJoin('sourceId', r.table('sources'));

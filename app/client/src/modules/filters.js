@@ -9,7 +9,7 @@ export const CHANGE_LIMIT = 'filters/CHANGE_LIMIT';
 export const CHANGE_ORGANIZATIONS = 'filters/CHANGE_ORGANIZATIONS';
 export const CHANGE_PEOPLE = 'filters/CHANGE_PEOPLE';
 export const CHANGE_SENTIMENT = 'filters/CHANGE_SENTIMENT';
-export const CHANGE_POPULAR = 'filters/CHANGE_POPULAR';
+export const CHANGE_TOP_POPULAR = 'filters/CHANGE_TOP_POPULAR';
 export const UPDATE_MAP_STATE = 'filters/UPDATE_MAP_STATE';
 export const CLEAR_FILTERS = 'filters/CLEAR_FILTERS';
 
@@ -19,11 +19,8 @@ export const filtersInitialState = {
   organizations: [],
   people: [],
   sources: [],
-  sentiment: '',
-  popular: {
-    socials: [],
-    top: 100,
-  },
+  sentiment: 'none',
+  topPopular: 'none',
   timeWindow: [28, 31],
   date: moment(),
   limit: 1500,
@@ -71,13 +68,10 @@ export default (state = filtersInitialState, action) => {
         ...state,
         people: action.people,
       };
-    case CHANGE_POPULAR:
+    case CHANGE_TOP_POPULAR:
       return {
         ...state,
-        popular: {
-          socials: action.socials || state.popular.socials,
-          top: action.top || state.popular.top,
-        },
+        topPopular: action.topPopular,
       };
     case CHANGE_SENTIMENT:
       return {
@@ -136,15 +130,11 @@ export const changeSentimentFilter = (sentiment) => ({
   sentiment,
 });
 
-export const changePopularSocialsFilter = (socials) => ({
-  type: CHANGE_POPULAR,
-  socials,
+export const changeTopPopular = (topPopular) => ({
+  type: CHANGE_TOP_POPULAR,
+  topPopular,
 });
 
-export const changePopularTopFilter = (top) => ({
-  type: CHANGE_POPULAR,
-  top,
-});
 export const clearFilters = () => ({
   type: CLEAR_FILTERS,
 });

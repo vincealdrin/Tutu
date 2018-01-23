@@ -107,12 +107,14 @@ class MapInterface extends PureComponent {
             </Menu.Item>
             <Menu.Item header className="mobile-tutu-title">TUTÛ</Menu.Item>
             <Menu.Menu position="right">
-              <Menu.Item>
-                <Input icon className="search-topbar-mobile">
-                  <input id="searchBoxInput" placeholder="Search places" />
-                  <Icon name="search" />
-                </Input>
-              </Menu.Item>
+              {isMap ? (
+                <Menu.Item>
+                  <Input icon className="search-topbar-mobile">
+                    <input id="searchBoxInput" placeholder="Search places" />
+                    <Icon name="search" />
+                  </Input>
+                </Menu.Item>
+            ) : null}
             </Menu.Menu>
           </Menu>
           <Button

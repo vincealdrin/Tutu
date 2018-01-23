@@ -119,7 +119,7 @@ export const buildArticleQueryParams = ({
     people: filters.people.join(),
     orgs: filters.organizations.join(),
     sentiment: filters.sentiment !== 'none' ? filters.sentiment : '',
-    popular: filters.popular.socials.length ? `${filters.popular.socials.join()}|${filters.popular.top}` : '',
+    topPopular: filters.topPopular !== 'none' ? filters.topPopular : '',
     date: filters.date,
     timeWindow: `${31 - filters.timeWindow[0]},${31 - filters.timeWindow[1]}`,
     isCredible: isCredible ? 'yes' : 'no',

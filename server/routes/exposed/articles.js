@@ -1,14 +1,13 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
-const natural = require('natural');
 const _ = require('lodash');
 const {
   mapArticle,
   mapArticleInfo,
   PH_TIMEZONE,
-  mapRelatedArticles,
   mapGridArticle,
   buildArticlesQuery,
+  mergeRelatedArticles,
 } = require('../../utils');
 
 const DAY_IN_SECONDS = 86400;
@@ -84,15 +83,7 @@ module.exports = (conn, io) => {
       const articleInfo = await r.table(tbl)
         .get(id)
         .merge((article) => mapArticleInfo()(article))
-        .merge((article) => ({
-          relatedArticles: r.table(tbl)
-            .getAll(r.args(article('relatedArticles')))
-            .eqJoin('sourceId', r.table('sources'))
-            .filter((join) => join('right')('isReliable').eq(isCredible === 'yes'))
-            .limit(5)
-            .map(mapRelatedArticles)
-            .coerceTo('array'),
-        }))
+        .merge(mergeRelatedArticles(isCredible === 'yes'))
         .without(
           'timestamp', 'body', 'id',
           'summary2', 'title', 'locations',
@@ -116,15 +107,7 @@ module.exports = (conn, io) => {
       const uuids = ids.split(',');
       const cursor = await r.table(tbl)
         .getAll(r.args(uuids))
-        .merge((article) => ({
-          relatedArticles: r.table(tbl)
-            .getAll(r.args(article('relatedArticles')))
-            .eqJoin('sourceId', r.table('sources'))
-            .filter((join) => join('right')('isReliable').eq(isCredible === 'yes'))
-            .limit(5)
-            .map(mapRelatedArticles)
-            .coerceTo('array'),
-        }))
+        .merge(mergeRelatedArticles(isCredible === 'yes'))
         .map(mapArticleInfo())
         // .without(
         //   'timestamp', 'body', 'id',

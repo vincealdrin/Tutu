@@ -85,7 +85,7 @@ const AppSidebar = ({
           <Modal
             trigger={
               <Menu.Item name="analyze">
-                <Icon name="legal" />
+                <Icon name="detective" />
                 Analyze
               </Menu.Item>
             }
@@ -132,12 +132,8 @@ const AppSidebar = ({
                 </List.Item>
                 <List.Item>
                   <List.Icon name="send outline" size="big" />
-                  <List.Content>Submit an article to be evaluated by TUTÛ Evaluator</List.Content>
+                  <List.Content>Submit an article to be analyzed by the TUTÛ Detector</List.Content>
                 </List.Item>
-                {/* <List.Item>
-                  <List.Icon name="list ul" size="big" />
-                  <List.Content>Take a look at the sources in our archives</List.Content>
-                </List.Item> */}
                 <List.Item>
                   <List.Icon name="marker" size="big" />
                   <List.Content>Display a single article</List.Content>
@@ -215,7 +211,7 @@ const AppSidebar = ({
                   <span className={`sidebar-text ${isWideClass}`}>Categories</span>
                 </Link> */}
               <Link to="submit" onClick={showSidebarContent}>
-                <Icon name="legal" color="darkgrey" />
+                <Icon name="detective" color="darkgrey" />
                 <span className={`sidebar-text ${isWideClass}`}>Analyze</span>
               </Link>
               <Link to="about" onClick={showSidebarContent}>
@@ -258,12 +254,8 @@ const AppSidebar = ({
                     <List.Item>
                       <List.Icon name="send outline" size="big" />
                       <List.Content>
-                        Submit an article to be evaluated by TUTÛ Evaluator
+                        Submit an article to be analyzed by the TUTÛ Detector
                       </List.Content>
-                    </List.Item>
-                    <List.Item>
-                      <List.Icon name="list ul" size="big" />
-                      <List.Content>Take a look at the sources in our archives</List.Content>
                     </List.Item>
                     <List.Item>
                       <List.Icon name="marker" size="big" />

@@ -1,3 +1,70 @@
 .mobile-top-bar {
-  z-index: 999999 !important;
+  z-index: 999 !important;
+}
+
+.fake-news-button-mobile,
+.insights-button-mobile,
+.grid-button-mobile {
+  position: absolute;
+  right: 5px;
+  z-index: 999;
+  box-shadow: 5px 3px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Mobile Tutu Logo and Top Bar */
+
+.mobile-tutu-logo { width: 25px !important; }
+
+.mobile-tutu-title {
+  margin-left: -25px !important;
+  font-size: 1.3rem;
+  letter-spacing: 3px;
+}
+
+.current-loc-mobile { left: 7px; }
+
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 815px) {
+  .map-container {
+    width: 100vw;
+    height: calc(100% - 73px);
+  }
+  .fake-news-button-mobile { bottom: 100px; }
+  .insights-button-mobile { bottom: 145px; }
+  .grid-button-mobile { bottom: 190px; }
+}
+
+@media (max-width: 770px) { .map-container { height: calc(100% - 74px); } }
+
+@media (max-width: 600px) { .map-container { height: calc(100% - 80px); } }
+
+@media (max-width: 568px) { .map-container { height: calc(100% - 65px); } }
+
+@media (max-width: 415px) {
+  .map-container { height: calc(100% - 64px); }
+  .fake-news-button-mobile { bottom: 90px; }
+  .insights-button-mobile { bottom: 135px; }
+  .grid-button-mobile { bottom: 180px; }
+}
+
+@media (max-width: 376px) {
+  .map-container { height: calc(100% - 55px); }
+  .search-topbar-mobile { width: 70% !important; }
+}
+
+@media (max-width: 373px) { .map-container { height: calc(100% - 60px); } }
+
+@media (max-width: 360px) {
+  .mobile-tutu-logo { width: 20px !important; }
+  .mobile-tutu-title { font-size: 1rem; }
+  .search-topbar-mobile { width: 65% !important; }
+}
+
+@media (max-width: 320px) {
+  .map-container { height: calc(100% - 55px); }
+  .search-topbar-mobile { width: 60% !important; }
 }

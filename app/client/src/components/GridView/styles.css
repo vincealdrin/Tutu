@@ -1,5 +1,10 @@
 .grid-view-container {
   height: 100vh;
+  padding: 2rem;
   overflow-x: hidden;
   overflow-y: auto;
+}
+
+.ui.header.no-more-articles {
+  padding: 2rem;
 }

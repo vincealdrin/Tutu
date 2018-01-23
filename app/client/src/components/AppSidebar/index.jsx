@@ -20,12 +20,6 @@ import tutuLogo from '../../assets/logo/tutu-logo.png';
 import './style.css';
 import '../../index.css';
 
-// expandSidebar = () => setState({ isWide: true })
-// shrinkSidebar = () => setState({ isWide: false })
-// showSidebarContent = () => setState({ visible: true })
-// toggleVisibility = () => setState({ visible: !state.visible })
-
-
 const AppSidebar = ({
   isWide,
   isVisible,
@@ -51,31 +45,96 @@ const AppSidebar = ({
   return (
     <div>
       <div className="show-on-mobile">
-        <Menu compact icon="labeled" borderless fixed="bottom" className="mobile-menu-container">
-          <Menu.Item name="popular">
-            <Icon name="newspaper" />
-            Popular
-          </Menu.Item>
-          <Menu.Item name="related">
-            <Icon name="plus square outline" />
-            Related
-          </Menu.Item>
-          <Menu.Item name="preferences">
-            <Icon name="cogs" />
-            Preferences
-          </Menu.Item>
-          <Menu.Item name="analyze">
-            <Icon name="legal" />
-            Analyze
-          </Menu.Item>
-          <Menu.Item name="about">
-            <Icon name="browser" />
-            About
-          </Menu.Item>
-          <Menu.Item name="help">
-            <Icon name="help circle outline" />
-            Help
-          </Menu.Item>
+        <Menu compact icon='labeled' borderless fixed="bottom" className="mobile-menu-container">
+          <Modal 
+            trigger={
+            <Menu.Item name='popular'>
+              <Icon name='newspaper'/>
+              Popular 
+            </Menu.Item>
+          }>
+            <PopularArticles />
+          </Modal>
+          <Modal
+            trigger={
+            <Menu.Item name="related">
+              <Icon name="plus square outline" />
+              Recent
+            </Menu.Item>
+          }>
+            <RecentArticles />
+          </Modal>
+          <Modal
+            trigger={
+            <Menu.Item name="preferences">
+              <Icon name="cogs" />
+              Preferences
+            </Menu.Item>
+          }>
+            <Filter />
+          </Modal>
+          <Modal
+            trigger={
+            <Menu.Item name="analyze">
+              <Icon name="legal" />
+              Analyze
+            </Menu.Item>
+          }>
+            <Submit />
+          </Modal>
+          <Modal
+            trigger={
+            <Menu.Item name="about">
+              <Icon name="browser" />
+              About
+            </Menu.Item>
+          }>
+            <About />
+          </Modal>
+          <Modal
+            trigger={
+            <Menu.Item name="help">
+              <Icon name="help circle outline" />
+              Help
+            </Menu.Item>
+          }
+          size="tiny"
+          basic
+          >
+            <Header as="h2" inverted>Legends:</Header>
+            <Modal.Content>
+              <List relaxed="very">
+                <List.Item>
+                  <List.Icon name="newspaper" size="big" />
+                  <List.Content>Take a look at the popular news</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="plus square outline" size="big" />
+                  <List.Content>Take a look at the recently added news</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="cogs" size="big" />
+                  <List.Content>Prefer something you prefer</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="send outline" size="big" />
+                  <List.Content>Submit an article to be evaluated by TUTÛ Evaluator</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="list ul" size="big" />
+                  <List.Content>Take a look at the sources in our archives</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="marker" size="big" />
+                  <List.Content>Display a single article</List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Icon name="dot circle outline" size="big" />
+                  <List.Content>Display a cluster of articles in a region</List.Content>
+                </List.Item>
+              </List>
+            </Modal.Content>
+          </Modal>
         </Menu>
       </div>
       <div className="hide-when-mobile">

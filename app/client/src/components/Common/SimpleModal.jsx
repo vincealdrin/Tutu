@@ -13,10 +13,10 @@ import moment from 'moment';
 import Tags from './Tags';
 import RelatedArticles from './RelatedArticles';
 import Reactions from './Reactions';
-import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png';
 import { removeFocused } from '../../modules/mapArticles';
 import { DATE_FORMAT } from '../../constants';
 import { getSentimentColor } from '../../utils';
+import ImagePlaceholder from './ImagePlaceholder';
 
 const mapStateToProps = ({
   mapArticles: {
@@ -37,12 +37,6 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 }, dispatch);
 
 class SimpleModal extends PureComponent {
-  state = { topImgUrl: '' };
-
-  handleImgError = () => {
-    this.setState({ topImgUrl: topImgPlaceholder });
-  }
-
   render() {
     const {
       isOpen,
@@ -74,7 +68,6 @@ class SimpleModal extends PureComponent {
       status,
       isCredible,
     } = this.props;
-    const { topImgUrl } = this.state;
 
     return (
       <Modal
@@ -108,13 +101,7 @@ class SimpleModal extends PureComponent {
           <Grid columns={2} style={{ marginBottom: '1rem' }} stackable>
             <Grid.Column width={7}>
               <div className="image-tag-title-container-single">
-                <div
-                  className="top-image"
-                  style={{
-                    backgroundImage: `url(${topImgUrl || topImageUrl || topImgPlaceholder})`,
-                  }}
-                  onError={this.handleImgError}
-                />
+                <ImagePlaceholder src={topImageUrl} />
               </div>
             </Grid.Column>
             <Grid.Column width={9}>

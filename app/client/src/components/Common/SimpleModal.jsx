@@ -118,7 +118,7 @@ class SimpleModal extends PureComponent {
               </div>
             </Grid.Column>
             <Grid.Column width={9}>
-              <List divided relaxed>
+              <List divided relaxed className="keywords-modal-mobile">
                 <List.Item>
                   <Label
                     as="a"

@@ -132,11 +132,7 @@ const AppSidebar = ({
                 </List.Item>
                 <List.Item>
                   <List.Icon name="detective" size="big" />
-                  <List.Content>Submit an article to be evaluated by TUTÛ Evaluator</List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Icon name="list ul" size="big" />
-                  <List.Content>Take a look at the sources in our archives</List.Content>
+                  <List.Content>Submit an article to be analyzed by the TUTÛ Detector</List.Content>
                 </List.Item>
                 <List.Item>
                   <List.Icon name="marker" size="big" />
@@ -258,12 +254,8 @@ const AppSidebar = ({
                     <List.Item>
                       <List.Icon name="detective" size="big" />
                       <List.Content>
-                        Submit an article to be evaluated by TUTÛ Evaluator
+                        Submit an article to be analyzed by the TUTÛ Detector
                       </List.Content>
-                    </List.Item>
-                    <List.Item>
-                      <List.Icon name="list ul" size="big" />
-                      <List.Content>Take a look at the sources in our archives</List.Content>
                     </List.Item>
                     <List.Item>
                       <List.Icon name="marker" size="big" />

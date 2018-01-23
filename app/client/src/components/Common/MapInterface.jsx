@@ -129,14 +129,6 @@ class MapInterface extends PureComponent {
 
           <Button
             size="large"
-            color="default"
-            className="grid-button-mobile"
-            icon={isMap ? 'grid layout' : 'map'}
-            onClick={onViewToggle}
-            circular
-          />
-          <Button
-            size="large"
             color={`${isCredible ? 'red' : 'green'}`}
             icon="newspaper"
             className="fake-news-button-mobile"
@@ -150,6 +142,14 @@ class MapInterface extends PureComponent {
             className="insights-button-mobile"
             onClick={openInsights}
             disabled={isMapBtnDisabled}
+            circular
+          />
+          <Button
+            size="large"
+            color="default"
+            className="grid-button-mobile"
+            icon={isMap ? 'grid layout' : 'map'}
+            onClick={onViewToggle}
             circular
           />
         </div>

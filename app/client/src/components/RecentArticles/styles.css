@@ -16,6 +16,10 @@
   font-size: 1.141592654rem;
 }
 
+.ui.grid.article-item-container {
+  min-height: 180px;
+}
+
 .row { align-items: flex-start !important; }
 .article-item { padding: 0 !important; }
 /*

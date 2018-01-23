@@ -15,7 +15,6 @@ import RelatedArticles from './RelatedArticles';
 import Reactions from './Reactions';
 import topImgPlaceholder from '../../assets/placeholder/top-img-placeholder.png';
 import { removeFocused } from '../../modules/mapArticles';
-import './styles.css';
 import { DATE_FORMAT } from '../../constants';
 import { getSentimentColor } from '../../utils';
 import CredibleArticles from './CredibleArticles';

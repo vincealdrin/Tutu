@@ -15,6 +15,7 @@ class ClusterMarker extends PureComponent {
       $hover,
       isCredible,
       isFocused,
+      isMobile,
     } = this.props;
 
     return (
@@ -27,16 +28,18 @@ class ClusterMarker extends PureComponent {
               <Grid.Row key={shortid.generate()} className="cluster-article-container">
                 <Grid.Column width={7}>
                   <div className="img-placeholder-wrapper">
-                    <ImagePlaceholder src={article.topImageUrl} />
+                    {$hover ? (
+                      <ImagePlaceholder src={article.topImageUrl} />
+                    ) : null}
                   </div>
                 </Grid.Column>
                 <Grid.Column width={9} className="marker-title-column">
                   <Header as="a" color="blue" target="_blank" className="cluster-marker-title">
                     {article.title}
                   </Header>
-                  <div className="cluster-article-date">
+                  <p className="cluster-article-date">
                     {moment(article.publishDate).format(DATE_FORMAT)}
-                  </div>
+                  </p>
                   <Label as="a" circular className="source-label">{article.source}</Label>
                 </Grid.Column>
               </Grid.Row>
@@ -45,7 +48,7 @@ class ClusterMarker extends PureComponent {
           </Grid>
         }
         open={$hover}
-        disabled={isFocused}
+        disabled={isMobile || isFocused}
         animateFill={false}
         sticky
       >

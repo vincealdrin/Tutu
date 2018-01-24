@@ -41,6 +41,8 @@
 @media (max-width: 780px) {
   .top-img-container {
     width: 100%;
+  }
+  .top-img-portrait {
     height: 250px;
     max-height: 250px !important;
   }

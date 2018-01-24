@@ -52,6 +52,7 @@ class Map extends PureComponent {
       updateMapState,
       isCredible,
       isFocused,
+      isMobile,
     } = this.props;
 
     return (
@@ -100,6 +101,7 @@ class Map extends PureComponent {
                 lat={lat}
                 isCredible={isCredible}
                 isFocused={isFocused}
+                isMobile={isMobile}
               />
             );
           }
@@ -114,6 +116,7 @@ class Map extends PureComponent {
               lat={lat}
               isCredible={isCredible}
               isFocused={isFocused}
+              isMobile={isMobile}
             />
           );
         })}

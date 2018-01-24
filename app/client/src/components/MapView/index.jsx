@@ -49,6 +49,14 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 }, dispatch);
 
 class MapView extends Component {
+  state = { isMobile: false }
+
+  componentDidMount() {
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      this.setState({ isMobile: true });
+    }
+  }
+
   _onChange = ({ center, zoom, marginBounds }) => {
     this.props.updateMapState(center, zoom, marginBounds);
 
@@ -73,6 +81,7 @@ class MapView extends Component {
       history: { location, push },
       fetchStatus,
     } = this.props;
+    const { isMobile } = this.state;
     const isMap = !/grid/.test(location.pathname);
 
     return (
@@ -81,6 +90,7 @@ class MapView extends Component {
           isMap={isMap}
           isCredible={isCredible}
           status={fetchStatus}
+          isMobile={isMobile}
           updateMapState={this.props.updateMapState}
           fetchArticles={this.props.fetchArticles}
           openInsights={this.props.openModal}
@@ -108,6 +118,7 @@ class MapView extends Component {
           onChildClick={this._onChildClick}
           isCredible={isCredible}
           isFocused={focusedOn}
+          isMobile={isMobile}
         />
       </div>
     );

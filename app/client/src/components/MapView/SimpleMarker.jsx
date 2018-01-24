@@ -23,6 +23,7 @@ class SimpleMarker extends PureComponent {
       isCredible,
       $hover,
       isFocused,
+      isMobile,
     } = this.props;
 
     return (
@@ -36,9 +37,7 @@ class SimpleMarker extends PureComponent {
                 <Grid.Column width={7}>
                   {$hover ? (
                     <div className="img-placeholder-wrapper">
-                      <ImagePlaceholder
-                        src={topImageUrl}
-                      />
+                      <ImagePlaceholder src={topImageUrl} />
                     </div>
                   ) : null}
                 </Grid.Column>
@@ -57,7 +56,7 @@ class SimpleMarker extends PureComponent {
           </div>
         }
         open={$hover}
-        disabled={isFocused}
+        disabled={isMobile || isFocused}
         animateFill={false}
         sticky
       >

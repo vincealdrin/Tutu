@@ -32,7 +32,7 @@ class SimpleMarker extends PureComponent {
         html={
           <div className="simple-marker">
             <Grid>
-              <Grid.Row columns={2}>
+              <Grid.Row>
                 <Grid.Column width={7}>
                   {$hover ? (
                     <div className="img-placeholder-wrapper">
@@ -59,7 +59,6 @@ class SimpleMarker extends PureComponent {
         open={$hover}
         disabled={isFocused}
         animateFill={false}
-        touchHold
         sticky
       >
         <Motion

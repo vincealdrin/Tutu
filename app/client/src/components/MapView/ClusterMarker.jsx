@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { List, Label, Grid } from 'semantic-ui-react';
+import { List, Label, Grid, Header } from 'semantic-ui-react';
 import shortid from 'shortid';
 import moment from 'moment';
 import { Tooltip } from 'react-tippy';
@@ -20,37 +20,33 @@ class ClusterMarker extends PureComponent {
     return (
       <Tooltip
         position="bottom-start"
+        trigger="manual"
         html={
-          <List divided relaxed className="cluster-list-container">
+          <Grid className="cluster-list-container">
             {articles.slice(0, 4).map((article) => (
-              <List.Item key={shortid.generate()} className="cluster-article-container">
-                <Grid>
-                  <Grid.Row columns={2}>
-                    <Grid.Column width={7}>
-                      <div className="img-placeholder-wrapper">
-                        <ImagePlaceholder src={article.topImageUrl} />
-                      </div>
-                    </Grid.Column>
-                    <Grid.Column width={9}>
-                      <div>
-                        <List.Header as="a" href={article.url} target="_blank">{article.title}</List.Header>
-                        <List.Description className="article-date">
-                          {moment(article.publishDate).format(DATE_FORMAT)}
-                        </List.Description>
-                        <Label as="a" circular className="source-label">{article.source}</Label>
-                      </div>
-                    </Grid.Column>
-                  </Grid.Row>
-                </Grid>
-              </List.Item>
+              <Grid.Row key={shortid.generate()} className="cluster-article-container">
+                <Grid.Column width={7}>
+                  <div className="img-placeholder-wrapper">
+                    <ImagePlaceholder src={article.topImageUrl} />
+                  </div>
+                </Grid.Column>
+                <Grid.Column width={9} className="marker-title-column">
+                  <Header as="a" color="blue" target="_blank" className="cluster-marker-title">
+                    {article.title}
+                  </Header>
+                  <div className="cluster-article-date">
+                    {moment(article.publishDate).format(DATE_FORMAT)}
+                  </div>
+                  <Label as="a" circular className="source-label">{article.source}</Label>
+                </Grid.Column>
+              </Grid.Row>
             ))}
             <Label className="see-more-button" attached="bottom">Click marker to view more stories...</Label>
-          </List>
+          </Grid>
         }
         open={$hover}
         disabled={isFocused}
         animateFill={false}
-        interactive
         sticky
       >
         <div

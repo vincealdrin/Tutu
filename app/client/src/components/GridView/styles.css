@@ -10,5 +10,8 @@
 }
 
 @media (max-width: 815px) {
-  .grid-view-container { width: 100vw; }
+  .grid-view-container {
+    width: 100vw;
+    padding-top: 100px;
+  }
 }

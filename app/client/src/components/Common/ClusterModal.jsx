@@ -29,13 +29,14 @@ const mapStateToProps = ({
     focusedClusterArticles,
     isCredible,
   },
-}) => ({
+}, { isMobile }) => ({
   isOpen: focusedOn === 'cluster'
     && ((!clusterStatus.cancelled && clusterStatus.success) || clusterStatus.pending),
   status: clusterStatus,
   articles: focusedClusterInfo,
   totalCount: focusedClusterArticles.length,
   isCredible,
+  isMobile,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -56,6 +57,7 @@ class ClusterModal extends PureComponent {
       isOpen,
       status,
       isCredible,
+      isMobile,
     } = this.props;
     const {
       currentPage,
@@ -101,6 +103,7 @@ class ClusterModal extends PureComponent {
                   <ImagePlaceholder
                     src={article.topImageUrl}
                     style={{ maxHeight: 127, marginBottom: 3 }}
+                    imgClass="top-img-portrait"
                   />
                   <Header
                     as="a"
@@ -172,6 +175,9 @@ class ClusterModal extends PureComponent {
             <Pagination
               currentPage={currentPage || 1}
               totalPages={Math.ceil((totalCount || limit) / limit) || 1}
+              siblingPagesRange={isMobile ? 0 : 1}
+              hideFirstAndLastPageLinks={isMobile}
+              hidePreviousAndNextPageLinks={isMobile}
               onChange={(page) => {
                 this.setState({ currentPage: page });
                 this.props.fetchFocusedClusterInfo(null, page - 1, limit);

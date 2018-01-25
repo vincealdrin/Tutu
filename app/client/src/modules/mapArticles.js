@@ -166,6 +166,7 @@ export const fetchArticles = (limit, page, cb, isNewQuery = false) =>
         limit,
         page,
         isMap,
+        zoom,
       });
 
       const {

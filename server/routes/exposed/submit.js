@@ -20,9 +20,11 @@ module.exports = (conn, io) => {
       const { url, submit = 'yes' } = req.query;
       const domain = cleanUrl(removeUrlPath(url));
       const uuid = await r.uuid(domain).run(conn);
+      console.log(domain);
+      console.log(uuid);
       // const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
       const matchedSource = await r.table('sources').get(uuid).run(conn);
-
+      console.log(matchedSource);
       // if (matchedPending) {
       //   return res.json({
       //     isReliable: matchedPending.isReliable,
@@ -80,11 +82,13 @@ module.exports = (conn, io) => {
         },
         json: true,
       });
-      const isReliablePred = Boolean(overallPred);
+      const isReliablePred = Boolean(reliable);
       const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
       const cleanedSrcUrl = cleanUrl(sourceUrl);
       const id = await r.uuid(cleanedSrcUrl).run(conn);
-
+      console.log('after');
+      console.log(cleanedSrcUrl);
+      console.log(id);
       await r.table('pendingSources').insert({
         url: cleanedSrcUrl,
         timestamp: r.now().inTimezone(PH_TIMEZONE),

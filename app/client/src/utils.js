@@ -105,6 +105,7 @@ export const buildArticleQueryParams = ({
   isMap,
   limit,
   page,
+  zoom,
 }) => {
   const {
     ne,
@@ -128,6 +129,7 @@ export const buildArticleQueryParams = ({
   };
 
   if (isMap) {
+    params.zoom = zoom;
     params.neLng = ne.lng;
     params.neLat = ne.lat;
     params.nwLng = nw.lng;

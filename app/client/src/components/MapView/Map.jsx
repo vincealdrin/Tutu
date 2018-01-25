@@ -72,9 +72,21 @@ class Map extends PureComponent {
         onChildClick={onChildClick}
         onGoogleApiLoaded={({ maps }) => {
           const input = document.getElementById('searchBoxInput');
+          const inputMobile = document.getElementById('searchBoxInputMobile');
+
           const searchBox = new maps.places.SearchBox(input);
+          const searchBoxMobile = new maps.places.SearchBox(inputMobile);
 
           searchBox.addListener('places_changed', () => {
+            const places = searchBox.getPlaces();
+
+            updateMapState({
+              lat: places[0].geometry.location.lat(),
+              lng: places[0].geometry.location.lng(),
+            }, 12);
+          });
+
+          searchBoxMobile.addListener('places_changed', () => {
             const places = searchBox.getPlaces();
 
             updateMapState({

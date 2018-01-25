@@ -26,7 +26,7 @@ const mapStateToProps = ({
     fetchStatus,
     isModalOpen,
   },
-}) => ({
+}, { isMap }) => ({
   sentiment,
   categories,
   topPeople,
@@ -35,6 +35,7 @@ const mapStateToProps = ({
   topKeywords,
   fetchStatus,
   isModalOpen,
+  isMap,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -155,7 +156,7 @@ class Insights extends Component {
 
   render() {
     const { activeCard, labelDesc } = this.state;
-    const { isModalOpen } = this.props;
+    const { isModalOpen, isMap } = this.props;
 
     return (
       <Modal
@@ -178,6 +179,11 @@ class Insights extends Component {
             : this.setState({ activeCard: 'mainMenu', labelDesc: 'Insights' }))
           }
         />
+        {isMap ? (
+          <Modal.Header style={{ fontSize: '1.1rem', color: '#767676' }}>
+            Note: Showed data is contingent on the area of view of the map. (Zoom-in or zoom-out to get more data)
+          </Modal.Header>
+        ) : null}
         <Modal.Content scrolling>
           {this.renderCharts()}
         </Modal.Content>

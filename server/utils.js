@@ -415,15 +415,17 @@ module.exports.buildArticlesQuery = async (params, bounds) => {
     topPopular = '',
     sentiment = '',
     isCredible = 'yes',
+    zoom = '8',
   } = params;
   const catsArr = categories.split(',');
   let query = await r.table('articles');
+  const parsedZoom = parseInt(zoom);
 
-  if (bounds) {
-    query = query.getIntersecting(bounds, {
-      index: 'positions',
-    }).distinct();
-  }
+  // if (bounds && parsedZoom !== 6) {
+  //   query = query.getIntersecting(bounds, {
+  //     index: 'positions',
+  //   }).distinct();
+  // }
 
   const [start, end] = timeWindow.split(',');
   const selectedDate = new Date(JSON.parse(date));

@@ -93,7 +93,7 @@ class MapInterface extends PureComponent {
             onDismiss={this.closeMessage}
           />
         ) : null}
-        <Insights />
+        <Insights isMap={isMap} />
         <AppSidebar
           isWide={isSidebarWiden}
           isVisible={isSidebarVisible}
@@ -112,7 +112,7 @@ class MapInterface extends PureComponent {
             <Menu.Menu position="right">
               <Menu.Item>
                 <Input icon className="search-topbar-mobile">
-                  <input id="searchBoxInput" placeholder="Search places" />
+                  <input id="searchBoxInputMobile" placeholder="Search places" />
                   <Icon name="search" />
                 </Input>
                 <Button

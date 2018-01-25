@@ -48,18 +48,10 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   clearState,
 }, dispatch);
 
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 class MapView extends Component {
-  state = { isMobile: false }
-
-  componentDidMount() {
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-      this.setState({ isMobile: true });
-    }
-  }
-
   _onChange = ({ center, zoom, marginBounds }) => {
     this.props.updateMapState(center, zoom, marginBounds);
-
     this.props.fetchArticles();
   }
 
@@ -81,7 +73,6 @@ class MapView extends Component {
       history: { location, push },
       fetchStatus,
     } = this.props;
-    const { isMobile } = this.state;
     const isMap = !/grid/.test(location.pathname);
 
     return (

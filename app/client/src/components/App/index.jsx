@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import axios from 'axios';
 import 'react-tippy/dist/tippy.css';
-import 'semantic-ui-css/semantic.min.css';
+// import 'semantic-ui-css/semantic.min.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'rc-slider/assets/index.css';
 import MapView from '../MapView';

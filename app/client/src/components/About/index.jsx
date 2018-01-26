@@ -10,20 +10,23 @@ class About extends Component {
           <Label as="a" color="red" ribbon style={{ marginBottom: '1rem' }}>About</Label>
           <div className="scrollable-section about-section-info">
             <Header as="h2" style={{ marginBottom: 32 }}>
-              TUTÛ: A Web-based Interactive Map of Credible News Outlets in the Philippines
+              TUTÛ: Interactive Map of Philippines&apos; Credible News
             </Header>
 
             <p className="tutu-description" >
-              TUTÛ is an interactive map of credible news outlets in the Philippines.
-              We crawl news sites for articles and basically check if the site is credible or not,
-              through the articles in the site, keywords used, and the sitemap structure of the site.
-              TUTÛ stores articles gathered in a database and archives it for the future.
+            TUTÛ is an interactive map of articles from news portals in the Philippines.
+            It aggregates articles from our list of news portals (vetted by veteran journalists) and extracts information in each articles through Natural Language Processing. TUTÛ also features a news portal analyzer which scores the credibility of a news portal and its content using a trained machine-learning model.
             </p>
 
             <Divider style={{ width: 100, margin: '2.3rem 0' }} />
 
             <section className="social-media">
-              <Icon name="facebook" size="large" />
+              <Icon
+                name="facebook"
+                size="large"
+                as="a"
+                href="https://fb.com/tutunewsph"
+              />
               <Icon name="twitter" size="large" />
               <Icon name="mail" size="large" />
             </section>

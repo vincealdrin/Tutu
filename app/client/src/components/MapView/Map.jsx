@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import GoogleMapReact from 'google-map-react';
-import shortid from 'shortid';
 import SimpleMarker from './SimpleMarker';
 import ClusterMarker from './ClusterMarker';
 import credibleMapStyle from './credibleMapStyle.json';
@@ -98,16 +97,18 @@ class Map extends PureComponent {
         yesIWantToUseGoogleMapApiInternals
       >
         {clusters.map(({
-            wx: lng,
+          wx: lng,
           wy: lat,
           numPoints,
           points,
-          }) => {
+        }) => {
+          const id = `${lng}-${lat}-${numPoints}-${points[0].id}`;
+
           if (numPoints === 1) {
             const article = articles[points[0].id];
             return (
               <SimpleMarker
-                key={shortid.generate()}
+                key={id}
                 article={article}
                 lng={lng}
                 lat={lat}
@@ -121,7 +122,7 @@ class Map extends PureComponent {
           const ids = points.map((point) => point.id);
           return (
             <ClusterMarker
-              key={shortid.generate()}
+              key={id}
               articles={articles.filter((_, i) => ids.includes(i))}
               count={numPoints}
               lng={lng}

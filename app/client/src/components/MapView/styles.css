@@ -14,7 +14,6 @@
   border-radius: 100%;
   box-shadow: 0 3px 24px #1b272b;
   transform-origin: center;
-  transition: all 0.2s cubic-bezier(0.56, 0.21, 0.38, 1.55);
 }
 
 .cluster-marker-container-radiant {
@@ -89,7 +88,7 @@
   position: absolute;
   bottom: 1px;
   left: -13.5px;
-  transition: all 0.141592654s ease-in-out;
+  transition: line-height 0.141592654s ease-in-out, font-size 0.141592654s ease-in-out, vertical-align 0.141592654s ease-in-out, left 0.141592654s ease-in-out;
 }
 
 .tippy-tooltip {

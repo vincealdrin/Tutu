@@ -1,15 +1,31 @@
 .cluster-marker-container {
-  position: relative;
+  position: absolute;
+  top: -26px;
+  left: -26px;
   z-index: -1000;
   display: flex;
-  width: 3.2rem !important;
-  height: 3.2rem !important;
+  justify-content: center;
+  align-items: center;
+  width: 52px;
+  height: 52px;
+  cursor: pointer;
   background: #fff;
   border: 5px solid #f25100;
   border-radius: 100%;
   box-shadow: 0 3px 24px #1b272b;
   transform-origin: center;
   transition: all 0.2s cubic-bezier(0.56, 0.21, 0.38, 1.55);
+}
+
+.cluster-marker-container-radiant {
+  position: absolute;
+  z-index: -20000;
+  width: 52px;
+  height: 52px;
+  background: #fff;
+  border: 5px solid #f25100;
+  border-radius: 100%;
+  transform-origin: center;
 }
 
 .cluster-marker-container > p {
@@ -19,19 +35,6 @@
 
 .cluster-marker-container-hovered {
   animation: pulse 2s infinite;
-}
-
-.cluster-marker-container-radiant {
-  position: absolute;
-  top: -0.37rem;
-  left: -0.37rem;
-  z-index: -20000;
-  width: 3.2rem;
-  height: 3.2rem;
-  background: #fff;
-  border: 5px solid #f25100;
-  border-radius: 100%;
-  transform-origin: center;
 }
 
 .cluster-marker-container-not-credible {
@@ -99,20 +102,6 @@
 .arrow-regular {
   top: 4.2rem !important;
   border-right-color: #fff !important;
-}
-
-.cluster-marker-container {
-  position: absolute;
-  top: -21px;
-  left: -21px;
-  z-index: -100;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 42px;
-  height: 42px;
-  cursor: pointer;
-  border-radius: 50px;
 }
 
 .author-date-container {

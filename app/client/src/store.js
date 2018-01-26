@@ -11,9 +11,7 @@ import thunk from 'redux-thunk';
 import createHistory from 'history/createBrowserHistory';
 import { nprogressMiddleware } from 'redux-nprogress';
 import rootReducer from './modules';
-import {
-  filtersInitialState,
-} from './modules/filters';
+import { filtersInitialState } from './modules/filters';
 
 export const history = createHistory();
 

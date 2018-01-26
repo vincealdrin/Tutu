@@ -1,7 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import { updateCrudStatus, crudStatus, httpThunk } from '../utils';
-import { DATE_FORMAT } from '../../constants';
+import { DATE_FORMAT } from '../constants';
 
 export const FETCH_COUNTS = 'dashboard/FETCH_COUNTS';
 export const FETCH_SOURCES_SUBMIT = 'dashboard/FETCH_SOURCES_SUBMIT';

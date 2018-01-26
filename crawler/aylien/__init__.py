@@ -88,7 +88,7 @@ def categorize(url, use_fake_keys=False):
 
         categories = category1['classes'] + category2['classes'] + category3['classes']
         # print(categories)
-        categories = [cat for cat in categories if cat['score'] > 0]
+        categories = [cat for cat in categories if cat['score'] != None and cat['score'] > 0]
         categories = sorted(
             categories, key=lambda c: c['score'], reverse=True)
 

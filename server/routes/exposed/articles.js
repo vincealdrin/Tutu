@@ -19,30 +19,12 @@ module.exports = (conn, io) => {
     const {
       limit,
       page,
-      neLng,
-      neLat,
-      nwLng,
-      nwLat,
-      seLng,
-      seLat,
-      swLng,
-      swLat,
       isCredible = 'yes',
+      isMap = 'yes',
     } = req.query;
-    let bounds;
-
-    if (neLng && neLat && nwLng && nwLat &&
-      seLng && seLat && swLng && swLat) {
-      bounds = r.polygon(
-        [parseFloat(swLng), parseFloat(swLat)],
-        [parseFloat(seLng), parseFloat(seLat)],
-        [parseFloat(neLng), parseFloat(neLat)],
-        [parseFloat(nwLng), parseFloat(nwLat)]
-      );
-    }
 
     try {
-      let query = await buildArticlesQuery(req.query, bounds);
+      let query = await buildArticlesQuery(req.query);
 
       query = query.filter(r.row('right')('isReliable').eq(isCredible === 'yes'));
 
@@ -62,7 +44,7 @@ module.exports = (conn, io) => {
       }
 
       const cursor = await query
-        .map(bounds ? mapArticle(bounds) : mapGridArticle)
+        .map(isMap === 'yes' ? mapArticle : mapGridArticle)
         .distinct()
         .run(conn);
       const articles = await cursor.toArray();

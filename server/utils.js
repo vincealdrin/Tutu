@@ -320,7 +320,7 @@ module.exports.mapArticleInfo = (catsFilterLength = 2) => (article) => ({
   ,
 });
 
-module.exports.mapArticle = (bounds) => (join) => {
+module.exports.mapArticle = (join) => {
   const article = {
     id: join('left')('id'),
     title: join('left')('title'),
@@ -328,15 +328,8 @@ module.exports.mapArticle = (bounds) => (join) => {
     topImageUrl: join('left')('topImageUrl'),
     source: join('right')('brand'),
     sourceUrl: join('right')('url'),
+    locations: join('left')('locations').map(mapLocation),
   };
-
-  if (bounds) {
-    article.locations = join('left')('locations')
-      .filter((loc) => bounds.intersects(loc('location')('position')))
-      .map(mapLocation);
-  } else {
-    article.locations = join('left')('locations').map(mapLocation);
-  }
 
   return article;
 };
@@ -365,6 +358,7 @@ module.exports.mapFeedLog = (join) => ({
   log: {
     status: join('left')('new_val')('status'),
     type: join('left')('new_val')('type'),
+    crawlerName: join('left')('new_val')('crawlerName'),
     runTime: join('left')('new_val')('runTime').default(0),
     articleUrl: join('left')('new_val')('articleUrl').default(''),
     timestamp: join('left')('new_val')('timestamp'),
@@ -385,6 +379,7 @@ module.exports.mapFeedLog = (join) => ({
 
 module.exports.mapLog = (join) => ({
   status: join('left')('status'),
+  crawlerName: join('left')('crawlerName').default(''),
   type: join('left')('type'),
   runTime: join('left')('runTime').default(0),
   articleUrl: join('left')('articleUrl').default(''),
@@ -407,25 +402,16 @@ module.exports.buildArticlesQuery = async (params, bounds) => {
   const {
     keywords = '',
     categories = '',
-    orgs = '',
-    people = '',
     sources = '',
     timeWindow = '7,0',
     date = new Date().toLocaleString(),
     topPopular = '',
     sentiment = '',
     isCredible = 'yes',
-    zoom = '8',
+    authors = '',
   } = params;
   const catsArr = categories.split(',');
   let query = await r.table('articles');
-  const parsedZoom = parseInt(zoom);
-
-  // if (bounds && parsedZoom !== 6) {
-  //   query = query.getIntersecting(bounds, {
-  //     index: 'positions',
-  //   }).distinct();
-  // }
 
   const [start, end] = timeWindow.split(',');
   const selectedDate = new Date(JSON.parse(date));
@@ -450,7 +436,10 @@ module.exports.buildArticlesQuery = async (params, bounds) => {
   }
 
   if (keywords) {
-    query = query.filter((article) => article('body').match(`(?i)${keywords.replace(',', '|')}`));
+    query = query.filter((article) => {
+      const keywordsRgx = `(?i)\\b(${keywords.replace('.-', '|')})\\b`;
+      return article('body').match(keywordsRgx).or(article('title').match(keywordsRgx));
+    });
   }
 
   if (categories) {
@@ -458,14 +447,9 @@ module.exports.buildArticlesQuery = async (params, bounds) => {
       .contains((category) => r.expr(catsArr).contains(category)));
   }
 
-  if (orgs) {
-    query = query.filter((article) => r.expr(orgs.split(','))
-      .contains((org) => article('organizations').contains(org)));
-  }
-
-  if (people) {
-    query = query.filter((article) => r.expr(people.split(','))
-      .contains((person) => article('people').contains(person)));
+  if (authors) {
+    query = query.filter((article) => article('authors')
+      .contains((a) => a.match(`(?i)${authors}`)));
   }
 
   if (sentiment) {

@@ -9,14 +9,13 @@ import {
   changeCategoriesFilter,
   changeKeywordsFilter,
   changeLimitFilter,
-  changeOrganizationsFilter,
-  changePeopleFilter,
   changeTopPopular,
   changeSentimentFilter,
   changeSourcesFilter,
   changeTimeWindowFilter,
   changeDateFilter,
   clearFilters,
+  changeAuthorsFilter,
 } from '../../modules/filters';
 import { mapOptions } from '../../utils';
 import './styles.css';
@@ -35,12 +34,11 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   changeSourcesFilter,
   changeTimeWindowFilter,
   changeLimitFilter,
-  changeOrganizationsFilter,
-  changePeopleFilter,
   changeTopPopular,
   changeSentimentFilter,
   changeDateFilter,
   clearFilters,
+  changeAuthorsFilter,
 }, dispatch);
 
 const categoriesOptions = [
@@ -99,8 +97,7 @@ class Filter extends PureComponent {
     const {
       keywords,
       sources,
-      people,
-      organizations,
+      authors,
       timeWindow,
       limit,
       categories,
@@ -117,10 +114,28 @@ class Filter extends PureComponent {
         <div className="filter-scrollable">
           <Button.Group labeled icon>
             <Tooltip
+              title="Loading..."
+              trigger="click"
+              duration={500}
+              hideDelay={900}
+              animation="scale"
+            >
+              <Button
+                className="save-button-filter"
+                icon="play"
+                content="Run"
+                labelPosition="left"
+                onClick={() => {
+                  fetchArticles();
+                }}
+                color="green"
+              />
+            </Tooltip>
+            <Tooltip
               html={<FilterAlert action="save" />}
               trigger="click"
-              duration={1000}
-              hideDelay={2000}
+              duration={500}
+              hideDelay={900}
               animation="scale"
             >
               <Button
@@ -135,34 +150,32 @@ class Filter extends PureComponent {
             <Tooltip
               html={<FilterAlert action="clear" />}
               trigger="click"
-              duration={1000}
-              hideDelay={2000}
+              duration={500}
+              hideDelay={900}
               animation="scale"
+              onShown={() => {
+                this.props.clearFilters();
+                localStorage.removeItem('filterSettings');
+              }}
             >
               <Button
                 icon="delete"
                 labelPosition="left"
                 content="Clear"
                 color="default"
-                onClick={() => {
-                  this.props.clearFilters();
-                  fetchArticles();
-                  localStorage.removeItem('filterSettings');
-                }}
               />
             </Tooltip>
           </Button.Group>
           <Divider />
-          <span className="input-label">SEARCH KEYWORDS</span>
+          <span className="input-label">SEARCH</span>
           <Dropdown
-            placeholder="Keywords"
+            placeholder="Add keywords to filter results"
             icon="search"
-            noResultsMessage="Add keywords"
+            noResultsMessage="Add keyword"
             options={keywords.map(mapOptions)}
             value={keywords}
             onChange={(_, { value }) => {
               this.props.changeKeywordsFilter(value);
-              fetchArticles();
             }}
             search
             selection
@@ -179,7 +192,6 @@ class Filter extends PureComponent {
             options={categoriesOptions}
             onChange={(_, { value }) => {
               this.props.changeCategoriesFilter(value);
-              fetchArticles();
             }}
             value={categories}
             search
@@ -190,15 +202,32 @@ class Filter extends PureComponent {
           <Divider />
           <span className="input-label">SOURCES</span>
           <Dropdown
-            text="Source"
+            text="Sources"
             // icon="browser"
             // className="icon half-width"
-            noResultsMessage="Add sources"
+            noResultsMessage="Add source"
             options={sources.map(mapOptions)}
             value={sources}
             onChange={(_, { value }) => {
               this.props.changeSourcesFilter(value);
-              fetchArticles();
+            }}
+            search
+            selection
+            fluid
+            multiple
+            allowAdditions
+          />
+          <Divider />
+          <span className="input-label">AUTHORS</span>
+          <Dropdown
+            text="Authors"
+            // icon="browser"
+            // className="icon half-width"
+            noResultsMessage="Add author"
+            options={authors.map(mapOptions)}
+            value={authors}
+            onChange={(_, { value }) => {
+              this.props.changeAuthorsFilter(value);
             }}
             search
             selection
@@ -217,7 +246,6 @@ class Filter extends PureComponent {
                 maxDate={now}
                 onChange={(newDate) => {
                   this.props.changeDateFilter(newDate);
-                  fetchArticles();
                 }}
                 showMonthDropdown
                 showYearDropdown
@@ -232,47 +260,12 @@ class Filter extends PureComponent {
             value={timeWindow}
             onChange={(value) => {
               this.props.changeTimeWindowFilter(value);
-              fetchArticles();
             }}
           />
           <span className="timewindow-text">
             <span>{`${startRange} day${startRange === 1 ? '' : 's'} ago`}</span>
             <span>{`${endRange} day${endRange === 1 ? '' : 's'} ago`}</span>
           </span>
-          <Divider />
-          <span className="input-label">ORGANIZATIONS</span>
-          <Dropdown
-            placeholder="Organizations"
-            noResultsMessage="Add organizations"
-            options={organizations.map(mapOptions)}
-            value={organizations}
-            onChange={(_, { value }) => {
-              this.props.changeOrganizationsFilter(value);
-              fetchArticles();
-            }}
-            search
-            selection
-            fluid
-            multiple
-            allowAdditions
-          />
-          <Divider />
-          <span className="input-label">PEOPLE</span>
-          <Dropdown
-            placeholder="People"
-            noResultsMessage="Add people"
-            options={people.map(mapOptions)}
-            value={people}
-            onChange={(_, { value }) => {
-              this.props.changePeopleFilter(value);
-              fetchArticles();
-            }}
-            search
-            selection
-            fluid
-            multiple
-            allowAdditions
-          />
           <Divider />
           <span className="input-label">SENTIMENT</span>
           <Dropdown
@@ -284,7 +277,6 @@ class Filter extends PureComponent {
             onChange={(_, { value }) => {
               if (value !== sentiment) {
                 this.props.changeSentimentFilter(value);
-                fetchArticles();
               }
             }}
             search
@@ -302,7 +294,6 @@ class Filter extends PureComponent {
                 value={limit}
                 onChange={(value) => {
                   this.props.changeLimitFilter(value);
-                  fetchArticles();
                 }}
               />
               <Divider />
@@ -316,7 +307,6 @@ class Filter extends PureComponent {
             onChange={(_, { value }) => {
               if (value !== topPopular) {
                 this.props.changeTopPopular(value);
-                fetchArticles();
               }
             }}
             search

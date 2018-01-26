@@ -25,6 +25,7 @@ const mapStateToProps = ({
     isCredible,
     focusedOn,
     fetchStatus,
+    initLoad,
   },
 }) => ({
   // mapState: map.viewport.toJS(),
@@ -34,6 +35,7 @@ const mapStateToProps = ({
   isCredible,
   focusedOn,
   fetchStatus,
+  initLoad,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -51,8 +53,12 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 class MapView extends Component {
   _onChange = ({ center, zoom, marginBounds }) => {
+    const { initLoad } = this.props;
     this.props.updateMapState(center, zoom, marginBounds);
-    this.props.fetchArticles();
+
+    if (initLoad) {
+      this.props.fetchArticles();
+    }
   }
 
   _onChildClick = (_, childProps) => {

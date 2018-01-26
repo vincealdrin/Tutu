@@ -100,45 +100,25 @@ export const getLineDataset = (dataset) => dataset.map(({
 
 export const buildArticleQueryParams = ({
   filters,
-  bounds,
   isCredible,
   isMap,
   limit,
   page,
-  zoom,
 }) => {
-  const {
-    ne,
-    nw,
-    se,
-    sw,
-  } = bounds;
   const params = {
-    keywords: filters.keywords.join(),
+    keywords: filters.keywords.join('.-'),
     categories: filters.categories.join(),
     sources: filters.sources.join(),
-    people: filters.people.join(),
-    orgs: filters.organizations.join(),
+    authors: filters.authors.join(),
     sentiment: filters.sentiment !== 'none' ? filters.sentiment : '',
     topPopular: filters.topPopular !== 'none' ? filters.topPopular : '',
     date: filters.date,
     timeWindow: `${31 - filters.timeWindow[0]},${31 - filters.timeWindow[1]}`,
     isCredible: isCredible ? 'yes' : 'no',
     limit: limit || filters.limit,
+    isMap: isMap ? 'yes' : 'no',
     page,
   };
-
-  if (isMap) {
-    params.zoom = zoom;
-    params.neLng = ne.lng;
-    params.neLat = ne.lat;
-    params.nwLng = nw.lng;
-    params.nwLat = nw.lat;
-    params.seLng = se.lng;
-    params.seLat = se.lat;
-    params.swLng = sw.lng;
-    params.swLat = sw.lat;
-  }
 
   return params;
 };

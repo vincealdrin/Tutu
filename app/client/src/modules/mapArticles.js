@@ -21,6 +21,7 @@ export const REMOVE_FOCUSED = 'mapArticles/REMOVE_FOCUSED';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
 export const TOGGLE_SOURCES = 'mapArticles/TOGGLE_SOURCES';
 export const CLEAR_STATE = 'mapArticles/CLEAR_STATE';
+export const INIT_LOAD = 'mapArticles/INIT_LOAD';
 
 const initialState = {
   articles: [],
@@ -39,6 +40,7 @@ const initialState = {
     bounds: {},
   },
   isCredible: true,
+  initLoad: true,
 };
 let source;
 let focusedClusterSource;
@@ -52,6 +54,35 @@ const articlesReducer = (state, action) => {
   return action.articles
     ? [...state.articles, ...action.articles]
     : state.articles;
+};
+
+const clusterReducer = (state, action) => {
+  const { center, zoom, bounds } = action;
+  const articles = action.articles || state.articles;
+
+  const coords = flattenDeep(articles.map(({
+    locations,
+  }, index) =>
+    locations.map(({
+      lng,
+      lat,
+    }) => ({
+      id: index,
+      lng,
+      lat,
+    }))));
+
+  const cluster = supercluster(coords, {
+    minZoom: MIN_ZOOM,
+    maxZoom: MAX_ZOOM,
+    radius: 52,
+  });
+
+  return cluster({
+    center,
+    zoom,
+    bounds,
+  });
 };
 
 export default (state = initialState, action) => {
@@ -69,14 +100,27 @@ export default (state = initialState, action) => {
       return {
         ...state,
         articles: articlesReducer(state, action),
-        clusters: action.clusters || state.clusters,
+        clusters: action.articles && (action.isMap === undefined || action.isMap)
+          ? clusterReducer(state, action)
+          : state.clusters,
         totalCount: action.totalCount || state.totalCount,
         fetchStatus: updateCrudStatus(action),
+        initLoad: false,
       };
     case UPDATE_MAP_STATE:
       return {
         ...state,
-        mapState: action.mapState,
+        clusters: clusterReducer(state, action),
+        mapState: {
+          center: action.center,
+          zoom: action.zoom,
+          bounds: action.bounds,
+        },
+      };
+    case INIT_LOAD:
+      return {
+        ...state,
+        initLoad: true,
       };
     case FETCH_FOCUSED_INFO:
       return {
@@ -131,11 +175,9 @@ export const removeFocused = () => {
 
 export const updateMapState = (center, zoom, bounds) => ({
   type: UPDATE_MAP_STATE,
-  mapState: {
-    center,
-    zoom,
-    bounds,
-  },
+  center,
+  zoom,
+  bounds,
 });
 
 export const fetchArticles = (limit, page, cb, isNewQuery = false) =>
@@ -149,9 +191,9 @@ export const fetchArticles = (limit, page, cb, isNewQuery = false) =>
       const {
         mapArticles: {
           mapState: {
-            center,
             zoom,
             bounds,
+            center,
           },
           isCredible,
         },
@@ -161,12 +203,10 @@ export const fetchArticles = (limit, page, cb, isNewQuery = false) =>
       const isMap = !/grid/.test(location.pathname);
       const params = buildArticleQueryParams({
         filters,
-        bounds,
         isCredible,
         limit,
         page,
         isMap,
-        zoom,
       });
 
       const {
@@ -180,44 +220,19 @@ export const fetchArticles = (limit, page, cb, isNewQuery = false) =>
 
       if (cb) cb();
 
-      const payload = {
+      // dispatch(updateMapState(center, zoom, bounds));
+      source = null;
+
+      return {
         totalCount: parseInt(headers['x-total-count'], 10),
         articles,
         status,
         isMap,
         isNewQuery,
+        center,
+        bounds,
+        zoom,
       };
-
-      if (isMap) {
-        const coords = flattenDeep(articles.map(({
-          locations,
-        }, index) =>
-          locations.map(({
-            lng,
-            lat,
-          }) => ({
-            id: index,
-            lng,
-            lat,
-          }))));
-
-        const cluster = supercluster(coords, {
-          minZoom: MIN_ZOOM,
-          maxZoom: MAX_ZOOM,
-          radius: 42,
-        });
-
-        payload.clusters = cluster({
-          center,
-          zoom,
-          bounds,
-        });
-      }
-
-      // dispatch(updateMapState(center, zoom, bounds));
-      source = null;
-
-      return payload;
     } catch (e) {
       return e;
     }
@@ -321,3 +336,4 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
 
 export const toggleSourcesType = () => ({ type: TOGGLE_SOURCES });
 export const clearState = () => ({ type: CLEAR_STATE });
+export const initLoad = () => ({ type: INIT_LOAD });

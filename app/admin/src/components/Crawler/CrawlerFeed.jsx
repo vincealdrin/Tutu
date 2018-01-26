@@ -104,6 +104,7 @@ class CrawlerFeed extends Component {
                 <Feed.Extra>
                   {log.article && <a href={log.article.url} target="__blank">{log.article.title}</a>}
                   {feedHtml}
+                  &gt; {log.crawlerName}
                 </Feed.Extra>
                 <Feed.Meta>
                   <Feed.Like>

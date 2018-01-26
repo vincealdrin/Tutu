@@ -1,7 +1,7 @@
 # start CoreNLP server
 # java -mx4g -cp "*" --add-modules java.xml.bind edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 20000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly
 # for deployment
-# pm2 start java --name="corenlp" --cwd="/usr/bin/" -x -- -mx4g -cp "/home/vnc/corenlp/*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 20000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly -quiet
+# pm2 start java --crawlerName="corenlp" --cwd="/usr/bin/" -x -- -mx4g -cp "/home/vnc/corenlp/*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 20000 -annotators tokenize,ssplit,pos,lemma,ner,parse,sentiment -ssplit.eolonly -quiet
 # hack method to backup db on server
 # rethinkdb dump -c localhost:28015
 # tar zxvf ./rethinkdb_dump_2017-01-24T21:42:08.tar.gz
@@ -76,7 +76,8 @@ while True:
                 print('(SOURCE ERROR) Source Skipped\n')
             insert_log(source_id, 'sourceCrawl', 'error',
                        float(time.clock() - src_start_time), {
-                           'errorMessage': 'SOURCE ERROR'
+                           'errorMessage': 'SOURCE ERROR',
+                           'crawlerName': 'credible crawler'
                        })
             continue
 
@@ -91,7 +92,7 @@ while True:
 
             if get_one(url_uuid, 'errorArticles') or get_one(
                     url_uuid, 'articles'):
-                print('Skiped: ' + article.url)
+                print('Skipped: ' + article.url)
                 error_articles.append(article.id)
 
             prev_uuid = url_uuid
@@ -111,7 +112,8 @@ while True:
             float(time.clock() - src_start_time), {
                 'proxy': proxy['http'],
                 'userAgent': config.browser_user_agent,
-                'articlesCount': len(source.articles)
+                'articlesCount': len(source.articles),
+                'crawlerName': 'credible crawler'
             })
 
         if not source.articles:
@@ -119,7 +121,8 @@ while True:
                 print('(ZERO ARTICLES) Source Skipped\n')
             slp_time = insert_log(source_id, 'sourceCrawl', 'error',
                                   float(time.clock() - src_start_time), {
-                                      'errorMessage': 'ZERO ARTICLES'
+                                      'errorMessage': 'ZERO ARTICLES',
+                                      'crawlerName': 'credible crawler'
                                   })
             continue
 
@@ -133,7 +136,8 @@ while True:
                 print(article.url)
 
             insert_log(source_id, 'articleCrawl', 'pending', float(slp_time), {
-                'articleUrl': article.url
+                'articleUrl': article.url,
+                'crawlerName': 'credible crawler'
             })
 
             if re.search('/(category|gallery|photos?)/', article.url,
@@ -146,6 +150,7 @@ while True:
                     float(time.clock() - start_time), {
                         'articleUrl': article.url,
                         'errorMessage': 'NOT AN ARTICLE PAGE',
+                        'crawlerName': 'credible crawler'
                     })
                 insert_item({'id': article.id}, 'errorArticles')
                 continue
@@ -170,6 +175,8 @@ while True:
                             float(time.clock() - start_time), {
                                 'errorMessage':
                                 'REACHED AYLIEN LIMIT (1 HOUR SLEEP)',
+                                'crawlerName':
+                                'credible crawler'
                             })
                         repeat_categorize = True
                         sleep(3600)
@@ -186,6 +193,7 @@ while True:
                             'articleUrl': article.url,
                             'articleTitle': title,
                             'errorMessage': 'CAN\'T PARSE BODY',
+                            'crawlerName': 'credible crawler'
                         })
                     insert_item({'id': article.id}, 'errorArticles')
                     continue
@@ -205,6 +213,7 @@ while True:
                                 'articleUrl': article.url,
                                 'articleTitle': title,
                                 'errorMessage': 'NOT ENGLISH',
+                                'crawlerName': 'credible crawler'
                             })
                         insert_item({'id': article.id}, 'errorArticles')
                         continue
@@ -218,6 +227,7 @@ while True:
                             'articleUrl': article.url,
                             'articleTitle': title,
                             'errorMessage': 'NOT ENGLISH',
+                            'crawlerName': 'credible crawler'
                         })
                     insert_item({'id': article.id}, 'errorArticles')
                     continue
@@ -232,6 +242,7 @@ while True:
                             'articleUrl': article.url,
                             'articleTitle': title,
                             'errorMessage': 'SHORT CONTENT',
+                            'crawlerName': 'credible crawler'
                         })
                     insert_item({'id': article.id}, 'errorArticles')
                     continue
@@ -246,6 +257,7 @@ while True:
                             'articleUrl': article.url,
                             'articleTitle': title,
                             'errorMessage': 'SOURCE IS IN BODY',
+                            'crawlerName': 'credible crawler'
                         })
                     insert_item({'id': article.id}, 'errorArticles')
                     continue
@@ -260,6 +272,7 @@ while True:
                             'articleUrl': article.url,
                             'articleTitle': title,
                             'errorMessage': 'NO TEXT',
+                            'crawlerName': 'credible crawler'
                         })
                     insert_item({'id': article.id}, 'errorArticles')
                     continue
@@ -287,7 +300,8 @@ while True:
                             float(time.clock() - start_time), {
                                 'articleUrl': article.url,
                                 'articleTitle': title,
-                                'errorMessage': 'HAS OTHER COUNTRY BUT NO PH'
+                                'errorMessage': 'HAS OTHER COUNTRY BUT NO PH',
+                                'crawlerName': 'credible crawler'
                             })
                         insert_item({'id': article.id}, 'errorArticles')
                         continue
@@ -302,14 +316,16 @@ while True:
                             float(time.clock() - start_time), {
                                 'articleUrl': article.url,
                                 'articleTitle': title,
-                                'errorMessage': 'CAN\'T FIND LOCATION'
+                                'errorMessage': 'CAN\'T FIND LOCATION',
+                                'crawlerName': 'credible crawler'
                             })
                         insert_item({'id': article.id}, 'errorArticles')
                         continue
 
                 publish_date = get_publish_date(article.html)
 
-                if publish_date.year < 2017 or publish_date.replace(tzinfo=None).date() > datetime.now().date():
+                if publish_date.year < 2017 or publish_date.replace(
+                        tzinfo=None).date() > datetime.now().date():
                     if PY_ENV == 'development':
                         print('\n(PUBLISH DATE NOT IN RANGE) Skipped: ' +
                               str(article.url) + '\n')
@@ -318,7 +334,8 @@ while True:
                         float(time.clock() - start_time), {
                             'articleUrl': article.url,
                             'articleTitle': title,
-                            'errorMessage': 'PUBLISH DATE NOT IN RANGE'
+                            'errorMessage': 'PUBLISH DATE NOT IN RANGE',
+                            'crawlerName': 'credible crawler'
                         })
                     insert_item({'id': article.id}, 'errorArticles')
                     continue
@@ -332,7 +349,8 @@ while True:
                         float(time.clock() - start_time), {
                             'articleUrl': article.url,
                             'articleTitle': title,
-                            'errorMessage': 'CAN\'T FIND PUBLISH DATE'
+                            'errorMessage': 'CAN\'T FIND PUBLISH DATE',
+                            'crawlerName': 'credible crawler'
                         })
                     insert_item({'id': article.id}, 'errorArticles')
                     continue
@@ -349,7 +367,8 @@ while True:
                         float(time.clock() - start_time), {
                             'articleUrl': article.url,
                             'articleTitle': title,
-                            'errorMessage': 'TEXT IS TOO LONG'
+                            'errorMessage': 'TEXT IS TOO LONG',
+                            'crawlerName': 'credible crawler'
                         })
                     insert_item({'id': article.id}, 'errorArticles')
                     continue
@@ -371,7 +390,7 @@ while True:
                     if author:
                         article.authors.append(author)
 
-                top_image = '' if re.search(
+                article.top_image = '' if re.search(
                     'favicon', article.top_image) else article.top_image
 
                 with open('../detector/tl_stopwords.txt', 'r') as f:
@@ -452,7 +471,8 @@ while True:
 
                 slp_time = insert_log(source_id, 'articleCrawl', 'success',
                                       float(time.clock() - start_time), {
-                                          'articleId': article.id
+                                          'articleId': article.id,
+                                          'crawlerName': 'credible crawler'
                                       })
 
             except newspaper.ArticleException as e:
@@ -460,13 +480,15 @@ while True:
                     print('\n(ARTICLE ERROR) Article Skipped\n')
                 slp_time = insert_log(source_id, 'articleCrawl', 'error',
                                       float(time.clock() - start_time), {
-                                          'articleUrl': url
+                                          'articleUrl': url,
+                                          'crawlerName': 'credible crawler'
                                       })
                 continue
 
         insert_log(source_id, 'sourceCrawl', 'success',
                    float(time.clock() - src_start_time), {
                        'articlesCrawledCount': src_art_count,
+                       'crawlerName': 'credible crawler'
                    })
 
         if PY_ENV == 'development':

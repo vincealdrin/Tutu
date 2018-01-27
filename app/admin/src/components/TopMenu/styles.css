@@ -1,0 +1,9 @@
+.top-menu-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ui.menu .menu.userinfo-logout {
+  display: flex;
+  align-items: center;
+}

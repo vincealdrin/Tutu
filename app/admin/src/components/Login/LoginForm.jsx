@@ -28,7 +28,7 @@ class LoginForm extends Component {
           fluid
         />
         <br />
-        <Button content="Login" color="blue" onClick={login} />
+        <Button content="LOGIN" color="blue" onClick={login} fluid />
       </form>
     );
   }

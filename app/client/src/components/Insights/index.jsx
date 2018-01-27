@@ -184,7 +184,7 @@ class Insights extends Component {
             Note: Showed data is contingent on the area of view of the map. (Zoom-in or zoom-out to get more data)
           </Modal.Header>
         ) : null}
-        <Modal.Content scrolling>
+        <Modal.Content>
           {this.renderCharts()}
         </Modal.Content>
       </Modal>

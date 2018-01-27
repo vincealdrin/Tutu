@@ -1,15 +1,41 @@
 import React, { Component } from 'react';
-import { Header } from 'semantic-ui-react';
-import { HorizontalBar, Bar, Line, Pie } from 'react-chartjs-2';
+import { Menu } from 'semantic-ui-react';
+import { HorizontalBar, Line, Pie } from 'react-chartjs-2';
 import { getLineDataset } from '../../utils';
 
+const ActiveMenuItem = ({
+  activeItem,
+  categoriesLineData,
+  categoriesPieData,
+  categoriesBarData,
+}) => {
+  switch (activeItem) {
+    case 'line': {
+      return <Line data={categoriesLineData} />;
+    }
+    case 'pie': {
+      return <Pie data={categoriesPieData} />;
+    }
+    case 'horizontal': {
+      return <HorizontalBar data={categoriesBarData} />;
+    }
+    default:
+      return <p>No Item</p>;
+  }
+};
+
 class CategoriesCharts extends Component {
+  state = { activeItem: 'line' };
+
   componentDidMount() {
     console.log(this.props);
     this.props.fetchCategoriesInsights();
   }
 
+  changeItem = (_, { name }) => this.setState({ activeItem: name });
+
   render() {
+    const { activeItem } = this.state;
     const {
       categories = [],
     } = this.props;
@@ -199,9 +225,17 @@ class CategoriesCharts extends Component {
 
     return (
       <div>
-        <Line data={categoriesLineData} />
-        <Pie data={categoriesPieData} />
-        <HorizontalBar data={categoriesBarData} />
+        <Menu pointing secondary>
+          <Menu.Item name="line" active={activeItem === 'line'} onClick={this.changeItem} />
+          <Menu.Item name="pie" active={activeItem === 'pie'} onClick={this.changeItem} />
+          <Menu.Item name="horizontal" active={activeItem === 'horizontal'} onClick={this.changeItem} />
+        </Menu>
+        <ActiveMenuItem
+          activeItem={activeItem}
+          categoriesLineData={categoriesLineData}
+          categoriesPieData={categoriesPieData}
+          categoriesBarData={categoriesBarData}
+        />
       </div>
     );
   }

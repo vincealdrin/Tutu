@@ -42,3 +42,7 @@
     0 4px 27px 0 rgba(34, 36, 38, 0.16);
 }
 
+.ui.pointing.secondary.modal-insight-menu {
+  margin: 0;
+}
+

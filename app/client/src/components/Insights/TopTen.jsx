@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Header, Menu } from 'semantic-ui-react';
+import { Menu } from 'semantic-ui-react';
 import { HorizontalBar } from 'react-chartjs-2';
 import { getLineDataset } from '../../utils';
 

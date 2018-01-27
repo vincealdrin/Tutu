@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Segment, Grid, Label, Button } from 'semantic-ui-react';
+import { Segment, Grid, Label, Button, Menu } from 'semantic-ui-react';
 import moment from 'moment';
 import DataTable from '../Common/DataTable';
 import SourcesForm from './SourcesForm';
@@ -99,14 +99,77 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   verifyPendingSource,
 }, dispatch);
 
+const ActiveMenuItem = ({
+  activeItem,
+  sourcesData,
+  pendingData,
+  fakeData,
+  totalCount,
+  columns,
+  deleteSources,
+  fetchSources,
+}) => {
+  switch (activeItem) {
+    case 'news sources': {
+      return (
+        <DataTable
+          defaultSearchFilter="brand"
+          label="Sources"
+          totalCount={totalCount}
+          data={sourcesData}
+          columns={columns}
+          onDeleteSelected={deleteSources}
+          onPaginate={fetchSources}
+          addModalContent={<SourcesForm />}
+          addModalActions={(closeModal) => (
+            <div>
+              <Button
+                color="black"
+                content="Cancel"
+                onClick={closeModal}
+              />
+              <Button
+                color="green"
+                onClick={async () => {
+                  await this.props.addSources();
+                  // this.resetInputVals();
+                  closeModal();
+                }}
+                content="Add All Sources"
+              />
+            </div>
+          )}
+          rowActions={(id) => (
+            <div>
+              {id}
+            </div>
+          )}
+        />
+      );
+    }
+    // case 'pending news sources': {
+    //   return <HorizontalBar data={orgsBarData} />;
+    // }
+    // case 'fake news sources': {
+    //   return <HorizontalBar data={locationsBarData} />;
+    // }
+    default:
+      return <p>No Item</p>;
+  }
+};
+
 class Sources extends Component {
+  state = { activeItem: 'news sources' };
   componentDidMount() {
     this.props.fetchSources();
     this.props.fetchPendingSources();
     this.props.fetchFakeSources();
   }
 
+  changeItem = (_, { name }) => this.setState({ activeItem: name });
+
   render() {
+    const { activeItem } = this.state;
     const {
       sources,
       totalCount,
@@ -118,6 +181,23 @@ class Sources extends Component {
 
     return (
       <div className="sources-container">
+        <Menu pointing secondary>
+          <Menu.Item name="news sources" active={activeItem === 'news sources'} onClick={this.changeItem} />
+          <Menu.Item name="pending news sources" active={activeItem === 'pending news sources'} onClick={this.changeItem} />
+          <Menu.Item name="fake news sources" active={activeItem === 'fake news sources'} onClick={this.changeItem} />
+        </Menu>
+        <ActiveMenuItem
+          activeItem={activeItem}
+          sourcesData={sources}
+          pendingData={pendingSources}
+          fakeData={fakeSources}
+          totalCount={totalCount}
+          pendingTotalCount={pendingTotalCount}
+          columns={columns}
+          pendingColumns={pendingColumns}
+          deleteSources={this.props.deleteSources}
+          fetchSources={this.props.fetchSources}
+        />
         <Grid>
           <Grid.Row>
             <Grid.Column>

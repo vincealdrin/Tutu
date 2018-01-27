@@ -48,7 +48,7 @@ const SimpleMarker = ({
           </Grid.Row>
         </Grid>
         <Label className="see-more-button simple-marker-see-more" attached="bottom">
-          Click marker to view more details
+          Click marker to view full article
         </Label>
       </div>
     }

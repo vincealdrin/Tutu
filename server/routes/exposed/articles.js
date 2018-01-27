@@ -80,15 +80,30 @@ module.exports = (conn, io) => {
     }
   });
 
-  router.get('/clusterInfo', async (req, res, next) => {
+  router.post('/clusterInfo', async (req, res, next) => {
     try {
       const {
         ids,
         isCredible = 'yes',
-      } = req.query;
-      const uuids = ids.split(',');
-      const cursor = await r.table(tbl)
-        .getAll(r.args(uuids))
+        limit = 15,
+        page = 0,
+        isDesc = true,
+        keywords = [],
+      } = req.body;
+      let query = await r.table(tbl).getAll(r.args(ids));
+
+      if (keywords.length) {
+        query = query.filter((article) => {
+          const keywordsRgx = `(?i)\\b(${keywords.join('|')})\\b`;
+          return article('body').match(keywordsRgx).or(article('title').match(keywordsRgx));
+        });
+      }
+
+      const totalCount = await query.count().run(conn);
+
+      const articles = await query
+        .orderBy(isDesc ? r.desc('publishDate') : r.asc('publishDate'))
+        .slice(page * limit, (page + 1) * limit)
         .merge(mergeRelatedArticles(isCredible === 'yes'))
         .map(mapArticleInfo())
         // .without(
@@ -98,10 +113,10 @@ module.exports = (conn, io) => {
         //   'popularity', 'topics'
         // )
         .run(conn);
-      const articles = await cursor.toArray();
 
       // console.log(articles);
 
+      res.setHeader('X-Total-Count', totalCount);
       res.json(articles);
     } catch (e) {
       next(e);

@@ -131,6 +131,9 @@ class Filter extends PureComponent {
                 color="green"
               />
             </Tooltip>
+
+          </Button.Group>
+          <Button.Group>
             <Tooltip
               html={<FilterAlert action="save" />}
               trigger="click"

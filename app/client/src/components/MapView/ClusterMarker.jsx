@@ -45,7 +45,7 @@ const ClusterMarker = ({
             </Grid.Column>
           </Grid.Row>
             ))}
-        <Label className="see-more-button" attached="bottom">Click marker to view more stories...</Label>
+        <Label className="see-more-button" attached="bottom">Click marker to view full articles...</Label>
       </Grid>
     }
     open={$hover}

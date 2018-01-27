@@ -106,6 +106,14 @@ module.exports = async (cb) => {
       }
 
       try {
+        await r.table('articles').wait();
+        await r.table('articles').indexCreate('publishDate', r.row('publishDate')).run(conn);
+        console.log('publishDate index created on articles table');
+      } catch (e) {
+        console.log('publishDate index already exists on articles table');
+      }
+
+      try {
         await r.table('crawlerLogs').wait();
         await r.table('crawlerLogs')
           .indexCreate('status', (article) => article('timestamp').date())

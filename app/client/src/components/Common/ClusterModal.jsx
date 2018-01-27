@@ -9,6 +9,9 @@ import {
   Label,
   Segment,
   Grid,
+  Dropdown,
+  Icon,
+  Button,
 } from 'semantic-ui-react';
 import moment from 'moment';
 import shortid from 'shortid';
@@ -18,7 +21,7 @@ import Tags from './Tags';
 import Reactions from './Reactions';
 import RelatedArticles from './RelatedArticles';
 import { DATE_FORMAT } from '../../constants';
-import { getSentimentColor } from '../../utils';
+import { getSentimentColor, mapOptions } from '../../utils';
 import ImagePlaceholder from '../Common/ImagePlaceholder';
 
 const mapStateToProps = ({
@@ -26,7 +29,7 @@ const mapStateToProps = ({
     focusedOn,
     clusterStatus,
     focusedClusterInfo,
-    focusedClusterArticles,
+    focusedClusterTotalCount,
     isCredible,
   },
 }, { isMobile }) => ({
@@ -34,7 +37,7 @@ const mapStateToProps = ({
     && ((!clusterStatus.cancelled && clusterStatus.success) || clusterStatus.pending),
   status: clusterStatus,
   articles: focusedClusterInfo,
-  totalCount: focusedClusterArticles.length,
+  totalCount: focusedClusterTotalCount,
   isCredible,
   isMobile,
 });
@@ -48,6 +51,8 @@ class ClusterModal extends PureComponent {
   state = {
     currentPage: 1,
     limit: 10,
+    keywords: [],
+    isDesc: true,
   };
 
   render() {
@@ -62,6 +67,8 @@ class ClusterModal extends PureComponent {
     const {
       currentPage,
       limit,
+      isDesc,
+      keywords,
     } = this.state;
 
     return (
@@ -76,6 +83,57 @@ class ClusterModal extends PureComponent {
         closeOnDimmerClick
         dimmer
       >
+        <Modal.Header>
+          <Grid columns={2}>
+            <Grid.Column>
+              <Dropdown
+                placeholder="Search"
+                icon="search"
+                noResultsMessage="Add keyword"
+                options={keywords.map(mapOptions)}
+                value={keywords}
+                onChange={(_, { value }) => {
+                  this.setState({ keywords: value }, () => {
+                    this.props.fetchFocusedClusterInfo(null, {
+                      page: 0,
+                      limit,
+                      isDesc,
+                      keywords: value,
+                    });
+                  });
+                }}
+                search
+                selection
+                fluid
+                multiple
+                allowAdditions
+              />
+            </Grid.Column>
+            <Grid.Column>
+              <Button
+                labelPosition="right"
+                onClick={() => {
+                  this.setState({
+                    currentPage: 0,
+                    isDesc: !isDesc,
+                  }, () => {
+                    this.props.fetchFocusedClusterInfo(null, {
+                      page: 0,
+                      limit,
+                      isDesc,
+                      keywords,
+                    });
+                  });
+                }}
+                icon
+              >
+              Publish Date
+              <Icon name={`sort content ${isDesc ? 'descending' : 'ascending'}`} />
+              </Button>
+            </Grid.Column>
+          </Grid>
+
+        </Modal.Header>
         <Modal.Content scrolling>
           {status.pending ? (
             <Dimmer active inverted>
@@ -180,7 +238,12 @@ class ClusterModal extends PureComponent {
               hidePreviousAndNextPageLinks={isMobile}
               onChange={(page) => {
                 this.setState({ currentPage: page });
-                this.props.fetchFocusedClusterInfo(null, page - 1, limit);
+                this.props.fetchFocusedClusterInfo(null, {
+                  page: page - 1,
+                  limit,
+                  keywords,
+                  isDesc,
+                });
               }}
             />
           ) : null}

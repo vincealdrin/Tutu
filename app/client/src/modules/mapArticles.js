@@ -33,6 +33,7 @@ const initialState = {
   focusedInfo: {},
   focusedClusterInfo: [],
   focusedClusterArticles: [],
+  focusedClusterTotalCount: 0,
   focusedOn: '',
   mapState: {
     zoom: DEFAULT_ZOOM,
@@ -135,6 +136,7 @@ export default (state = initialState, action) => {
     case FETCH_CLUSTER_INFO:
       return {
         ...state,
+        focusedClusterTotalCount: action.totalCount,
         focusedClusterInfo: action.focusedClusterInfo
           ? action.focusedClusterInfo
           : state.focusedClusterInfo,
@@ -281,7 +283,7 @@ export const fetchFocusedInfo = (article) =>
     }
   });
 
-export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
+export const fetchFocusedClusterInfo = (rawArticles, params) =>
   httpThunk(FETCH_CLUSTER_INFO, async (getState) => {
     try {
       if (focusedClusterSource) {
@@ -299,26 +301,28 @@ export const fetchFocusedClusterInfo = (articles, page = 0, limit = 10) =>
           isCredible,
         },
       } = getState();
-      const sliceArticles = (focusedClusterArticles.length ? focusedClusterArticles : articles)
-        .slice(page * limit, (page + 1) * limit);
-
+      const articles = (focusedClusterArticles.length
+        ? focusedClusterArticles
+        : rawArticles);
       const {
         data: focusedClusterInfo,
         status,
-      } = await axios.get('/articles/clusterInfo', {
-        params: {
-          catsFilterLength: categories.length,
-          isCredible: isCredible ? 'yes' : 'no',
-          ids: sliceArticles.map((article) => article.id).join(),
-        },
+        headers,
+      } = await axios.post('/articles/clusterInfo', {
+        catsFilterLength: categories.length,
+        isCredible: isCredible ? 'yes' : 'no',
+        ids: articles.map((article) => article.id),
+        ...params,
+      }, {
         cancelToken: focusedClusterSource.token,
       });
 
       const payload = {
-        focusedClusterInfo: await sliceArticles.map((article) => ({
+        focusedClusterInfo: focusedClusterInfo.map((article) => ({
           ...article,
-          ...focusedClusterInfo.find((info) => info.id === article.id),
+          ...articles.find((a) => article.id === a.id),
         })),
+        totalCount: parseInt(headers['x-total-count'], 10),
         status,
       };
 

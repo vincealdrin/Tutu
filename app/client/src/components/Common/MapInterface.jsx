@@ -109,23 +109,26 @@ class MapInterface extends PureComponent {
               <Image src={tutuLogo} className="mobile-tutu-logo" />
             </Menu.Item>
             <Menu.Item header className="mobile-tutu-title">TUTÛ</Menu.Item>
-            <Menu.Menu position="right">
-              <Menu.Item>
-                <Input icon className="search-topbar-mobile">
-                  <input id="searchBoxInputMobile" placeholder="Search places" />
-                  <Icon name="search" />
-                </Input>
-                <Button
-                  className="current-loc-mobile"
-                  icon="crosshairs"
-                  onClick={() => {
+            {isMap ? (
+
+              <Menu.Menu position="right">
+                <Menu.Item>
+                  <Input icon className="search-topbar-mobile">
+                    <input id="searchBoxInputMobile" placeholder="Search places" />
+                    <Icon name="search" />
+                  </Input>
+                  <Button
+                    className="current-loc-mobile"
+                    icon="crosshairs"
+                    onClick={() => {
                     updateMapState(currentPosition, 12);
                   }}
-                  disabled={!currentPosition}
-                  circular
-                />
-              </Menu.Item>
-            </Menu.Menu>
+                    disabled={!currentPosition}
+                    circular
+                  />
+                </Menu.Item>
+              </Menu.Menu>
+            ) : null}
           </Menu>
 
           <Button

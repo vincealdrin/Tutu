@@ -1,10 +1,20 @@
 import React, { Component } from 'react';
 import { Sidebar, Segment, Menu } from 'semantic-ui-react';
 
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+
 import MenuItems from './MenuItems';
 import TopMenu from '../TopMenu';
 import './styles.css';
 
+const mapStateToProps = ({
+  user: {
+    info,
+  },
+}) => ({
+  info,
+});
 
 class AppSidebar extends Component {
   state = { isExpanded: true }
@@ -12,7 +22,11 @@ class AppSidebar extends Component {
   toggleExpand = () => this.setState({ isExpanded: !this.state.isExpanded })
 
   render() {
-    const { isLogin, logout } = this.props;
+    const {
+      isLogin,
+      logout,
+      info,
+    } = this.props;
     const { isExpanded } = this.state;
 
     return (
@@ -31,6 +45,7 @@ class AppSidebar extends Component {
           </Sidebar>
           <Sidebar.Pusher>
             <TopMenu
+              userInfo={info}
               toggleSidebarExpand={this.toggleExpand}
               isLogin={isLogin}
               logout={logout}
@@ -45,4 +60,4 @@ class AppSidebar extends Component {
   }
 }
 
-export default AppSidebar;
+export default connect(mapStateToProps)(AppSidebar);

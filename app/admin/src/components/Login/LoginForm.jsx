@@ -16,16 +16,19 @@ class LoginForm extends Component {
         <Field
           component={InputField}
           name="username"
-          placeholder="username"
+          placeholder="Username"
           fluid
         />
+        <br />
         <Field
           component={InputField}
           name="password"
-          placeholder="password"
+          type="password"
+          placeholder="Password"
           fluid
         />
-        <Button content="login" onClick={login} />
+        <br />
+        <Button content="Login" color="blue" onClick={login} />
       </form>
     );
   }

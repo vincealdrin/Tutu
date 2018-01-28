@@ -308,10 +308,6 @@ class MapView extends Component {
     }
 
     this.props.updateMapState(center, zoom, marginBounds);
-    // console.log(center);
-    // console.log(marginBounds);
-    // console.log(zoom);
-
 
     if (initLoad) {
       this.props.fetchArticles();

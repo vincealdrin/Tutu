@@ -5,7 +5,7 @@ import { Feed, Icon, Segment } from 'semantic-ui-react';
 import shortid from 'shortid';
 import moment from 'moment';
 import { fetchUsersFeed, addFeedItem } from '../../modules/usersFeed';
-import { DATE_FORMAT, TIME_FORMAT } from '../../constants';
+import { TIME_FORMAT } from '../../constants';
 
 const mapStateToProps = ({
   usersFeed: {

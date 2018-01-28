@@ -47,11 +47,8 @@ class Users extends Component {
 
   renderActiveMenuItem = () => {
     const {
-      columns,
       users,
       totalCount,
-      deleteUsers,
-      fetchUsers,
     } = this.props;
 
     switch (this.state.activeItem) {

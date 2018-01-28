@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Feed, Icon } from 'semantic-ui-react';
+import { Feed, Icon, Segment } from 'semantic-ui-react';
 import shortid from 'shortid';
 import moment from 'moment';
 import { fetchUsersFeed, addFeedItem } from '../../modules/usersFeed';
@@ -60,65 +60,67 @@ class UsersFeed extends Component {
   render() {
     const { feed } = this.props;
     return (
-      <Feed className="crawlerfeed-container">
-        {feed.map((item) => {
-          const {
-            sources = [],
-            deleted = [],
-            source = {},
-            table,
-            timestamp,
-            type,
-            user,
-            isReliable,
-          } = item;
+      <Segment>
+        <Feed className="crawlerfeed-container">
+          {feed.map((item) => {
+            const {
+              sources = [],
+              deleted = [],
+              source = {},
+              table,
+              timestamp,
+              type,
+              user,
+              isReliable,
+            } = item;
 
-          return (
-            <Feed.Event key={shortid.generate()}>
-              <Feed.Label icon={this.getTypeIcon(type, isReliable)} />
-              <Feed.Content>
-                <Feed.Summary>
-                  <Feed.User>{user}</Feed.User> has {this.getTypeAction(type)}
-                  {type === 'verify' && isReliable ? ' a RELIABLE' : null}
-                  {type === 'verify' && !isReliable ? ' a NOT RELIABLE' : null}
-                  &nbsp;source/s in {table}&#39; table
-                  <Feed.Date content={moment(timestamp).fromNow()} />
-                </Feed.Summary>
-                <Feed.Extra>
-                  {sources.map((src, i) => (
-                    <span>
-                      <a href={src.url} target="_blank" >
-                        {src.brand}
-                      </a>{i === sources.length - 1 ? null : ', '}
-                    </span>
-                  ))}
-                  {deleted.map((deletedSource, i) => (
-                    <span>
-                      <a href={deletedSource.url} target="_blank" >
-                        {deletedSource.brand}
-                      </a>{i === deleted.length - 1 ? null : ', '}
-                    </span>
-                  ))}
-                  {type === 'verify' ? (
-                    <p>
-                      <a href={source.url} target="_blank" >
-                        {source.brand}
-                      </a> is verified to be a {isReliable ? 'reliable' : 'not reliable'} source
-                    </p>
-                  ) : null}
-                </Feed.Extra>
-                <Feed.Meta>
-                  <Feed.Like>
-                    <Icon name="time" />
-                    {moment(timestamp).format(TIME_FORMAT)}
-                  </Feed.Like>
-                </Feed.Meta>
-              </Feed.Content>
-            </Feed.Event>
-          );
-        })}
+            return (
+              <Feed.Event key={shortid.generate()}>
+                <Feed.Label icon={this.getTypeIcon(type, isReliable)} />
+                <Feed.Content>
+                  <Feed.Summary>
+                    <Feed.User>{user}</Feed.User> has {this.getTypeAction(type)}
+                    {type === 'verify' && isReliable ? ' a RELIABLE' : null}
+                    {type === 'verify' && !isReliable ? ' a NOT RELIABLE' : null}
+                    &nbsp;source/s in {table}&#39; table
+                    <Feed.Date content={moment(timestamp).fromNow()} />
+                  </Feed.Summary>
+                  <Feed.Extra>
+                    {sources.map((src, i) => (
+                      <span>
+                        <a href={src.url} target="_blank" >
+                          {src.brand}
+                        </a>{i === sources.length - 1 ? null : ', '}
+                      </span>
+                    ))}
+                    {deleted.map((deletedSource, i) => (
+                      <span>
+                        <a href={deletedSource.url} target="_blank" >
+                          {deletedSource.brand}
+                        </a>{i === deleted.length - 1 ? null : ', '}
+                      </span>
+                    ))}
+                    {type === 'verify' ? (
+                      <p>
+                        <a href={source.url} target="_blank" >
+                          {source.brand}
+                        </a> is verified to be a {isReliable ? 'reliable' : 'not reliable'} source
+                      </p>
+                    ) : null}
+                  </Feed.Extra>
+                  <Feed.Meta>
+                    <Feed.Like>
+                      <Icon name="time" />
+                      {moment(timestamp).format(TIME_FORMAT)}
+                    </Feed.Like>
+                  </Feed.Meta>
+                </Feed.Content>
+              </Feed.Event>
+            );
+          })}
 
-      </Feed>
+        </Feed>
+      </Segment>
     );
   }
 }

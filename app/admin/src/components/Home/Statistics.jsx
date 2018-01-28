@@ -10,8 +10,8 @@ const Statistics = ({
 
 }) => (
   <Grid columns={5}>
-    <Grid.Column>
-      <Segment>
+    <Grid.Column className="statistics-container">
+      <Segment style={{ minHeight: 100 }}>
         <Statistic size="tiny">
           <Statistic.Value>
             <Icon name="eye" />
@@ -21,7 +21,7 @@ const Statistics = ({
         </Statistic>
       </Segment>
     </Grid.Column>
-    <Grid.Column>
+    <Grid.Column className="statistics-container">
       <Segment>
         <Statistic size="tiny">
           <Statistic.Value>
@@ -32,7 +32,7 @@ const Statistics = ({
         </Statistic>
       </Segment>
     </Grid.Column>
-    <Grid.Column>
+    <Grid.Column className="statistics-container">
       <Segment>
         <Statistic size="tiny">
           <Statistic.Value>
@@ -43,7 +43,7 @@ const Statistics = ({
         </Statistic>
       </Segment>
     </Grid.Column>
-    <Grid.Column>
+    <Grid.Column className="statistics-container">
       <Segment>
         <Statistic size="tiny">
           <Statistic.Value>
@@ -54,7 +54,7 @@ const Statistics = ({
         </Statistic>
       </Segment>
     </Grid.Column>
-    <Grid.Column>
+    <Grid.Column className="statistics-container">
       <Segment>
         <Statistic size="tiny">
           <Statistic.Value>

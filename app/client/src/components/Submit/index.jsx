@@ -82,10 +82,10 @@ class Submit extends Component {
     return (
       <div>
         <Segment>
-          <Label as="a" color="orange" ribbon style={{ marginBottom: '1rem' }}>Detect/Submit</Label>
+          <Label as="a" color="orange" ribbon style={{ marginBottom: '1rem' }}>Detect</Label>
           <div className="scrollable-section about-section-info">
             <Header as="h2" style={{ marginBottom: 32 }}>
-              Detect News Source's Credibility
+              Detect News Source&apos;s Credibility
             </Header>
 
             <p className="tutu-description" >

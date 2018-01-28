@@ -87,9 +87,10 @@ module.exports = (conn, io) => {
         isCredible = 'yes',
         limit = 15,
         page = 0,
-        isDesc = true,
         keywords = [],
+        sort = 'publishDate-DESC',
       } = req.body;
+      const [field, order] = sort.split('-');
       let query = await r.table(tbl).getAll(r.args(ids));
 
       if (keywords.length) {
@@ -102,7 +103,7 @@ module.exports = (conn, io) => {
       const totalCount = await query.count().run(conn);
 
       const articles = await query
-        .orderBy(isDesc ? r.desc('publishDate') : r.asc('publishDate'))
+        .orderBy(order === 'DESC' ? r.desc(field) : field)
         .slice(page * limit, (page + 1) * limit)
         .merge(mergeRelatedArticles(isCredible === 'yes'))
         .map(mapArticleInfo())

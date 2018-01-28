@@ -19,6 +19,7 @@ export const FETCH_FOCUSED_INFO = 'mapArticles/FETCH_FOCUSED_INFO';
 export const FETCH_CLUSTER_INFO = 'mapArticles/FETCH_CLUSTER_INFO';
 export const REMOVE_FOCUSED = 'mapArticles/REMOVE_FOCUSED';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
+export const UPDATE_MAP_LOC_STATE = 'mapArticles/UPDATE_MAP_LOC_STATE';
 export const TOGGLE_SOURCES = 'mapArticles/TOGGLE_SOURCES';
 export const CLEAR_STATE = 'mapArticles/CLEAR_STATE';
 export const INIT_LOAD = 'mapArticles/INIT_LOAD';
@@ -35,6 +36,11 @@ const initialState = {
   focusedClusterArticles: [],
   focusedClusterTotalCount: 0,
   focusedOn: '',
+  mapLocState: {
+    zoom: DEFAULT_ZOOM,
+    center: DEFAULT_CENTER,
+    bounds: {},
+  },
   mapState: {
     zoom: DEFAULT_ZOOM,
     center: DEFAULT_CENTER,
@@ -117,6 +123,16 @@ export default (state = initialState, action) => {
           zoom: action.zoom,
           bounds: action.bounds,
         },
+        mapLocState: {
+          center: action.center,
+          zoom: action.zoom,
+          bounds: action.bounds,
+        },
+      };
+    case UPDATE_MAP_LOC_STATE:
+      return {
+        ...state,
+        mapLocState: action.mapLocState,
       };
     case INIT_LOAD:
       return {
@@ -174,13 +190,6 @@ export const removeFocused = () => {
     type: REMOVE_FOCUSED,
   };
 };
-
-export const updateMapState = (center, zoom, bounds) => ({
-  type: UPDATE_MAP_STATE,
-  center,
-  zoom,
-  bounds,
-});
 
 export const fetchArticles = (limit, page, cb, isNewQuery = false) =>
   httpThunk(FETCH_ARTICLES, async (getState) => {
@@ -341,3 +350,17 @@ export const fetchFocusedClusterInfo = (rawArticles, params) =>
 export const toggleSourcesType = () => ({ type: TOGGLE_SOURCES });
 export const clearState = () => ({ type: CLEAR_STATE });
 export const initLoad = () => ({ type: INIT_LOAD });
+export const updateMapLocState = (center, zoom, bounds) => ({
+  type: UPDATE_MAP_LOC_STATE,
+  mapLocState: {
+    center,
+    zoom,
+    bounds,
+  },
+});
+export const updateMapState = (center, zoom, bounds) => ({
+  type: UPDATE_MAP_STATE,
+  center,
+  zoom,
+  bounds,
+});

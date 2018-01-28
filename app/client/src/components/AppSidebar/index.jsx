@@ -86,7 +86,7 @@ const AppSidebar = ({
             trigger={
               <Menu.Item name="submit">
                 <Icon name="detective" />
-                Detect/Submit
+                Detect
               </Menu.Item>
             }
             closeIcon
@@ -212,7 +212,7 @@ const AppSidebar = ({
                 </Link> */}
               <Link to="submit" onClick={showSidebarContent}>
                 <Icon name="detective" color="darkgrey" />
-                <span className={`sidebar-text ${isWideClass}`}>Detect/Submit</span>
+                <span className={`sidebar-text ${isWideClass}`}>Detect</span>
               </Link>
               <Link to="about" onClick={showSidebarContent}>
                 <Icon name="browser" color="darkgrey" />

@@ -12,6 +12,7 @@ import {
   Dropdown,
   Icon,
   Button,
+  Divider,
 } from 'semantic-ui-react';
 import moment from 'moment';
 import shortid from 'shortid';
@@ -23,6 +24,13 @@ import RelatedArticles from './RelatedArticles';
 import { DATE_FORMAT } from '../../constants';
 import { getSentimentColor, mapOptions } from '../../utils';
 import ImagePlaceholder from '../Common/ImagePlaceholder';
+
+const sortOptions = [
+  { key: 'Publish Date (latest to oldest)', text: 'Publish Date (latest to oldest)', value: 'publishDate-DESC' },
+  { key: 'Publish Date (oldest to latest)', text: 'Publish Date (oldest to latest)', value: 'publishDate-ASC' },
+  { key: 'Popularity (high to low)', text: 'Popularity (high to low)', value: 'popularity-DESC' },
+  { key: 'Popularity (low to high)', text: 'Popularity (low to high)', value: 'popularity-ASC' },
+];
 
 const mapStateToProps = ({
   mapArticles: {
@@ -47,13 +55,17 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchFocusedClusterInfo,
 }, dispatch);
 
+const initState = {
+  currentPage: 1,
+  limit: 10,
+  keywords: [],
+  isDesc: true,
+  sort: 'publishDate-DESC',
+  sortText: 'Publish Date (latest to oldest)',
+};
+
 class ClusterModal extends PureComponent {
-  state = {
-    currentPage: 1,
-    limit: 10,
-    keywords: [],
-    isDesc: true,
-  };
+  state = initState;
 
   render() {
     const {
@@ -69,6 +81,8 @@ class ClusterModal extends PureComponent {
       limit,
       isDesc,
       keywords,
+      sort,
+      sortText,
     } = this.state;
 
     return (
@@ -77,15 +91,42 @@ class ClusterModal extends PureComponent {
         open={isOpen}
         onClose={() => {
           this.props.removeFocused();
-          this.setState({ currentPage: 1 });
+          this.setState(initState);
         }}
         closeIcon
         closeOnDimmerClick
         dimmer
       >
-        <Modal.Header>
-          <Grid columns={2}>
-            <Grid.Column>
+        <Modal.Description>
+          <Grid>
+            <Grid.Column width={9}>
+              <Dropdown
+                className="icon"
+                icon="sort"
+                value={sort}
+                options={sortOptions}
+                onChange={(_, { value }) => {
+                  this.setState({
+                    sort: value,
+                    sortText: sortOptions.find((opt) => opt.value === value).text,
+                    currentPage: 0,
+                  }, () => {
+                    this.props.fetchFocusedClusterInfo(null, {
+                      page: 0,
+                      sort: value,
+                      limit,
+                      keywords,
+                    });
+                  });
+                }}
+                text={`Sort by: ${sortText}`}
+                button
+                floating
+                labeled
+                search
+              />
+            </Grid.Column>
+            <Grid.Column width={7}>
               <Dropdown
                 placeholder="Search"
                 icon="search"
@@ -108,32 +149,11 @@ class ClusterModal extends PureComponent {
                 multiple
                 allowAdditions
               />
-            </Grid.Column>
-            <Grid.Column>
-              <Button
-                labelPosition="right"
-                onClick={() => {
-                  this.setState({
-                    currentPage: 0,
-                    isDesc: !isDesc,
-                  }, () => {
-                    this.props.fetchFocusedClusterInfo(null, {
-                      page: 0,
-                      limit,
-                      isDesc,
-                      keywords,
-                    });
-                  });
-                }}
-                icon
-              >
-              Publish Date
-              <Icon name={`sort content ${isDesc ? 'descending' : 'ascending'}`} />
-              </Button>
+
             </Grid.Column>
           </Grid>
-
-        </Modal.Header>
+        </Modal.Description>
+        <Divider />
         <Modal.Content scrolling>
           {status.pending ? (
             <Dimmer active inverted>

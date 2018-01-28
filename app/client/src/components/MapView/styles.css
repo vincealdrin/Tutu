@@ -206,7 +206,7 @@
   position: absolute !important;
   top: 1.3rem;
   left: -1.05rem !important;
-  z-index: 800;
+  z-index: 10;
 }
 
 .news-label-name {

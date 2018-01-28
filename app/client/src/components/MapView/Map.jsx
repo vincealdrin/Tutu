@@ -43,7 +43,7 @@ const mapOptions = {
 class Map extends PureComponent {
   render() {
     const {
-      mapState,
+      mapLocState,
       clusters,
       articles,
       onChange,
@@ -63,8 +63,8 @@ class Map extends PureComponent {
           styles: isCredible ? credibleMapStyle : notCredibleMapStyle,
         }}
         // defaultCenter={mapState.center}
-        center={mapState.center}
-        zoom={mapState.zoom}
+        center={mapLocState.center}
+        zoom={mapLocState.zoom}
         hoverDistance={HOVER_DISTANCE}
         margin={[MARGIN_TOP, MARGIN_RIGHT, MARGIN_BOTTOM, MARGIN_LEFT]}
         onChange={onChange}

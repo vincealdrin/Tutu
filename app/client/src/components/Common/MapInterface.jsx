@@ -69,7 +69,7 @@ class MapInterface extends PureComponent {
       onViewToggle,
       fetchArticles,
       openInsights,
-      updateMapState,
+      updateMapLocState,
       isMobile,
     } = this.props;
     const {
@@ -121,8 +121,8 @@ class MapInterface extends PureComponent {
                     className="current-loc-mobile"
                     icon="crosshairs"
                     onClick={() => {
-                    updateMapState(currentPosition, 12);
-                  }}
+                      updateMapLocState(currentPosition, 12);
+                    }}
                     disabled={!currentPosition}
                     circular
                   />
@@ -193,7 +193,7 @@ class MapInterface extends PureComponent {
                 className="current-loc"
                 icon="crosshairs"
                 onClick={() => {
-                  this.props.updateMapState(currentPosition, 12);
+                  updateMapLocState(currentPosition, 12);
                 }}
                 disabled={!currentPosition}
                 circular

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button } from 'semantic-ui-react';
+import { Button, Menu } from 'semantic-ui-react';
 import { fetchUsers, addUser, deleteUsers } from '../../modules/users';
 import DataTable from '../Common/DataTable';
 import UserForm from './UserForm';
@@ -38,51 +38,77 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 }, dispatch);
 
 class Users extends Component {
+  state = { activeItem: 'users activity' };
   componentDidMount() {
     this.props.fetchUsers();
   }
 
-  render() {
+  changeItem = (_, { name }) => this.setState({ activeItem: name });
+
+  renderActiveMenuItem = () => {
     const {
+      columns,
       users,
       totalCount,
+      deleteUsers,
+      fetchUsers,
     } = this.props;
+
+    switch (this.state.activeItem) {
+      case 'users activity': {
+        return <UsersFeed />;
+      }
+      case 'users table': {
+        return (
+          <DataTable
+            defaultSearchFilter="username"
+            columns={columns}
+            data={users}
+            totalCount={totalCount}
+            label="User"
+            onDeleteSelected={this.props.deleteUsers}
+            onPaginate={this.props.fetchUsers}
+            addModalContent={<UserForm />}
+            addModalActions={(closeModal) => (
+              <div>
+                <Button
+                  color="black"
+                  content="Cancel"
+                  onClick={closeModal}
+                />
+                <Button
+                  color="green"
+                  onClick={async () => {
+                    await this.props.addUser();
+                    closeModal();
+                  }}
+                  content="Add User"
+                />
+              </div>
+            )}
+            rowActions={(id) => (
+              <div>
+                {id}
+              </div>
+            )}
+          />
+        );
+      }
+      default:
+        return <p>No Item</p>;
+    }
+  }
+
+  render() {
+    const { activeItem } = this.state;
 
     return (
       <div className="users-container">
-        <DataTable
-          defaultSearchFilter="username"
-          columns={columns}
-          data={users}
-          totalCount={totalCount}
-          label="User"
-          onDeleteSelected={this.props.deleteUsers}
-          onPaginate={this.props.fetchUsers}
-          addModalContent={<UserForm />}
-          addModalActions={(closeModal) => (
-            <div>
-              <Button
-                color="black"
-                content="Cancel"
-                onClick={closeModal}
-              />
-              <Button
-                color="green"
-                onClick={async () => {
-                  await this.props.addUser();
-                  closeModal();
-                }}
-                content="Add User"
-              />
-            </div>
-          )}
-          rowActions={(id) => (
-            <div>
-              {id}
-            </div>
-          )}
-        />
-        <UsersFeed />
+        <Menu pointing secondary>
+          <Menu.Item name="users activity" active={activeItem === 'users activity'} onClick={this.changeItem} />
+          <Menu.Item name="users table" active={activeItem === 'users table'} onClick={this.changeItem} />
+        </Menu>
+        {this.renderActiveMenuItem()}
       </div>
     );
   }

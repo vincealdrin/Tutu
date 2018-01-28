@@ -1,0 +1,8 @@
+.sources-container {
+  padding: 0 1rem;
+}
+
+.ui.modal > .action.sources-modal-note {
+  display: flex;
+  justify-content: space-between;
+}

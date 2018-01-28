@@ -56,6 +56,7 @@ class SourcesForm extends Component {
           // }}
           fluid
         />
+        <br />
         <Field
           component={InputField}
           name="source2"
@@ -70,6 +71,7 @@ class SourcesForm extends Component {
           // }}
           fluid
         />
+        <br />
         <Field
           component={InputField}
           name="source3"

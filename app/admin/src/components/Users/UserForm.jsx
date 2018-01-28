@@ -12,12 +12,14 @@ class UserForm extends Component {
           placeholder="Username"
           fluid
         />
+        <br />
         <Field
           component={InputField}
           name="password"
           placeholder="Password"
           fluid
         />
+        <br />
         <Field
           component={InputField}
           name="name"

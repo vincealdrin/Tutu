@@ -6,6 +6,7 @@ import {
   Input,
   Dropdown,
   Modal,
+  Header,
 } from 'semantic-ui-react';
 import shortid from 'shortid';
 import debounce from 'lodash/debounce';
@@ -102,6 +103,7 @@ class DataTable extends PureComponent {
             ) : null}
               {!isDeleting && !hideAddBtn ? (
                 <Modal
+                  size="small"
                   trigger={
                     <Button
                       labelPosition="left"
@@ -120,7 +122,16 @@ class DataTable extends PureComponent {
                       {addModalContent}
                     </Modal.Description>
                   </Modal.Content>
-                  <Modal.Actions>
+                  <Modal.Actions className="sources-modal-note">
+                    {label === 'Sources' || label === 'Fake Sources' ? (
+                      <Header
+                        floated="left"
+                        as="p"
+                        style={{ fontSize: '.9rem', color: '#767676' }}
+                      >
+                        Note: You can add up to 3 sources at the same time.
+                      </Header>
+                    ) : null}
                     {addModalActions && addModalActions(this.cancelAdd)}
                   </Modal.Actions>
                 </Modal>

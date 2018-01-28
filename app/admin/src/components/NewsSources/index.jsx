@@ -99,123 +99,6 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   verifyPendingSource,
 }, dispatch);
 
-const ActiveMenuItem = ({
-  activeItem,
-  sourcesData,
-  pendingData,
-  fakeData,
-  totalCount,
-  pendingTotalCount,
-  fakeTotalCount,
-  fakeColumns,
-}) => {
-  switch (activeItem) {
-    case 'news sources': {
-      return (
-        <DataTable
-          defaultSearchFilter="brand"
-          label="Sources"
-          totalCount={totalCount}
-          data={sourcesData}
-          columns={columns}
-          onDeleteSelected={deleteSources}
-          onPaginate={fetchSources}
-          addModalContent={<SourcesForm />}
-          addModalActions={(closeModal) => (
-            <div>
-              <Button
-                color="black"
-                content="Cancel"
-                onClick={closeModal}
-              />
-              <Button
-                color="green"
-                onClick={async () => {
-                  await this.props.addSources();
-                  // this.resetInputVals();
-                  closeModal();
-                }}
-                content="Add All Sources"
-              />
-            </div>
-          )}
-          rowActions={(id) => (
-            <div>
-              {id}
-            </div>
-          )}
-        />
-      );
-    }
-    case 'pending news sources': {
-      return (
-        <DataTable
-          defaultSearchFilter="brand"
-          label="Pending Sources"
-          totalCount={pendingTotalCount}
-          data={pendingData}
-          columns={pendingColumns}
-          onDeleteSelected={deletePendingSources}
-          onPaginate={fetchPendingSources}
-          rowActions={(id) => (
-            <div>
-              <Button
-                color="green"
-                content="Reliable"
-                onClick={() => this.props.verifyPendingSource(id, true)}
-              />
-              <Button
-                color="red"
-                content="Unreliable"
-                onClick={() => this.props.verifyPendingSource(id, false)}
-              />
-            </div>
-          )}
-        />
-      );
-    }
-    case 'fake news sources': {
-      return (
-        <DataTable
-          defaultSearchFilter="brand"
-          label="Fake Sources"
-          totalCount={fakeTotalCount}
-          data={fakeData}
-          columns={fakeColumns}
-          onDeleteSelected={deleteFakeSources}
-          onPaginate={fetchFakeSources}
-          addModalContent={<FakeSourcesForm />}
-          addModalActions={(closeModal) => (
-            <div>
-              <Button
-                color="black"
-                content="Cancel"
-                onClick={closeModal}
-              />
-              <Button
-                color="green"
-                onClick={async () => {
-                  await this.props.addFakeSources();
-                  // this.resetInputVals();
-                  closeModal();
-                }}
-                content="Add All Fake Sources"
-              />
-            </div>
-          )}
-          rowActions={(id) => (
-            <div>
-              {id}
-            </div>
-          )}
-        />
-      );
-    }
-    default:
-      return <p>No Item</p>;
-  }
-};
-
 class Sources extends Component {
   state = { activeItem: 'news sources' };
   componentDidMount() {
@@ -226,16 +109,144 @@ class Sources extends Component {
 
   changeItem = (_, { name }) => this.setState({ activeItem: name });
 
-  render() {
-    const { activeItem } = this.state;
+  renderActiveMenuItem = () => {
     const {
       sources,
-      totalCount,
-      fakeSources,
-      fakeTotalCount,
       pendingSources,
+      fakeSources,
+      totalCount,
       pendingTotalCount,
+      fakeTotalCount,
     } = this.props;
+
+    switch (this.state.activeItem) {
+      case 'news sources': {
+        return (
+          <DataTable
+            defaultSearchFilter="brand"
+            label="Sources"
+            totalCount={totalCount}
+            data={sources}
+            columns={columns}
+            onDeleteSelected={this.props.deleteSources}
+            onPaginate={this.props.fetchSources}
+            addModalContent={<SourcesForm />}
+            addModalActions={(closeModal) => (
+              <div>
+                <Button
+                  color="black"
+                  content="Cancel"
+                  onClick={closeModal}
+                />
+                <Button
+                  color="green"
+                  onClick={async () => {
+                    await this.props.addSources();
+                    // this.resetInputVals();
+                    closeModal();
+                  }}
+                  content="Add All Sources"
+                />
+              </div>
+            )}
+            rowActions={(id) => (
+              <div>
+                {id}
+              </div>
+            )}
+          />
+        );
+      }
+      case 'pending news sources': {
+        return (
+          <DataTable
+            defaultSearchFilter="brand"
+            label="Pending Sources"
+            totalCount={pendingTotalCount}
+            data={pendingSources}
+            columns={pendingColumns}
+            onDeleteSelected={this.props.deletePendingSources}
+            onPaginate={this.props.fetchPendingSources}
+            addModalContent={<PendingSourcesForm />}
+            addModalActions={(closeModal) => (
+              <div>
+                <Button
+                  color="black"
+                  content="Cancel"
+                  onClick={closeModal}
+                />
+                <Button
+                  color="green"
+                  onClick={async () => {
+                    await this.props.addSources();
+                    // this.resetInputVals();
+                    closeModal();
+                  }}
+                  content="Add All Sources"
+                />
+              </div>
+            )}
+            rowActions={(id) => (
+              <div>
+                <Button
+                  color="green"
+                  content="Reliable"
+                  onClick={() => this.props.verifyPendingSource(id, true)}
+                />
+                <Button
+                  color="red"
+                  content="Unreliable"
+                  onClick={() => this.props.verifyPendingSource(id, false)}
+                />
+              </div>
+            )}
+          />
+        );
+      }
+      case 'fake news sources': {
+        return (
+          <DataTable
+            defaultSearchFilter="brand"
+            label="Fake Sources"
+            totalCount={fakeTotalCount}
+            data={fakeSources}
+            columns={columns}
+            onDeleteSelected={this.props.deleteFakeSources}
+            onPaginate={this.props.fetchFakeSources}
+            addModalContent={<FakeSourcesForm />}
+            addModalActions={(closeModal) => (
+              <div>
+                <Button
+                  color="black"
+                  content="Cancel"
+                  onClick={closeModal}
+                />
+                <Button
+                  color="green"
+                  onClick={async () => {
+                    await this.props.addFakeSources();
+                    // this.resetInputVals();
+                    closeModal();
+                  }}
+                  content="Add All Fake Sources"
+                />
+              </div>
+            )}
+            rowActions={(id) => (
+              <div>
+                {id}
+              </div>
+            )}
+          />
+        );
+      }
+      default:
+        return <p>No Item</p>;
+    }
+  };
+
+  render() {
+    const { activeItem } = this.state;
 
     return (
       <div className="sources-container">
@@ -244,24 +255,7 @@ class Sources extends Component {
           <Menu.Item name="pending news sources" active={activeItem === 'pending news sources'} onClick={this.changeItem} />
           <Menu.Item name="fake news sources" active={activeItem === 'fake news sources'} onClick={this.changeItem} />
         </Menu>
-        <ActiveMenuItem
-          activeItem={activeItem}
-          sourcesData={sources}
-          pendingData={pendingSources}
-          fakeData={fakeSources}
-          totalCount={totalCount}
-          pendingTotalCount={pendingTotalCount}
-          fakeTotalCount={fakeTotalCount}
-          columns={columns}
-          pendingColumns={pendingColumns}
-          fakeColumns={columns}
-          deleteSources={this.props.deleteSources}
-          deletePendingSources={this.props.deletePendingSources}
-          deleteFakeSources={this.props.deleteFakeSources}
-          fetchSources={this.props.fetchSources}
-          fetchPendingSources={this.props.fetchPendingSources}
-          fetchFakeSources={this.props.fetchFakeSources}
-        />
+        {this.renderActiveMenuItem()}
       </div>
     );
   }

@@ -105,9 +105,9 @@ const ActiveMenuItem = ({
   pendingData,
   fakeData,
   totalCount,
-  columns,
-  deleteSources,
-  fetchSources,
+  pendingTotalCount,
+  fakeTotalCount,
+  fakeColumns,
 }) => {
   switch (activeItem) {
     case 'news sources': {
@@ -147,12 +147,70 @@ const ActiveMenuItem = ({
         />
       );
     }
-    // case 'pending news sources': {
-    //   return <HorizontalBar data={orgsBarData} />;
-    // }
-    // case 'fake news sources': {
-    //   return <HorizontalBar data={locationsBarData} />;
-    // }
+    case 'pending news sources': {
+      return (
+        <DataTable
+          defaultSearchFilter="brand"
+          label="Pending Sources"
+          totalCount={pendingTotalCount}
+          data={pendingData}
+          columns={pendingColumns}
+          onDeleteSelected={deletePendingSources}
+          onPaginate={fetchPendingSources}
+          rowActions={(id) => (
+            <div>
+              <Button
+                color="green"
+                content="Reliable"
+                onClick={() => this.props.verifyPendingSource(id, true)}
+              />
+              <Button
+                color="red"
+                content="Unreliable"
+                onClick={() => this.props.verifyPendingSource(id, false)}
+              />
+            </div>
+          )}
+        />
+      );
+    }
+    case 'fake news sources': {
+      return (
+        <DataTable
+          defaultSearchFilter="brand"
+          label="Fake Sources"
+          totalCount={fakeTotalCount}
+          data={fakeData}
+          columns={fakeColumns}
+          onDeleteSelected={deleteFakeSources}
+          onPaginate={fetchFakeSources}
+          addModalContent={<FakeSourcesForm />}
+          addModalActions={(closeModal) => (
+            <div>
+              <Button
+                color="black"
+                content="Cancel"
+                onClick={closeModal}
+              />
+              <Button
+                color="green"
+                onClick={async () => {
+                  await this.props.addFakeSources();
+                  // this.resetInputVals();
+                  closeModal();
+                }}
+                content="Add All Fake Sources"
+              />
+            </div>
+          )}
+          rowActions={(id) => (
+            <div>
+              {id}
+            </div>
+          )}
+        />
+      );
+    }
     default:
       return <p>No Item</p>;
   }
@@ -193,145 +251,17 @@ class Sources extends Component {
           fakeData={fakeSources}
           totalCount={totalCount}
           pendingTotalCount={pendingTotalCount}
+          fakeTotalCount={fakeTotalCount}
           columns={columns}
           pendingColumns={pendingColumns}
+          fakeColumns={columns}
           deleteSources={this.props.deleteSources}
+          deletePendingSources={this.props.deletePendingSources}
+          deleteFakeSources={this.props.deleteFakeSources}
           fetchSources={this.props.fetchSources}
+          fetchPendingSources={this.props.fetchPendingSources}
+          fetchFakeSources={this.props.fetchFakeSources}
         />
-        <Grid>
-          <Grid.Row>
-            <Grid.Column>
-              <Segment>
-                <Label color="blue" ribbon>News Sources</Label>
-                <DataTable
-                  defaultSearchFilter="brand"
-                  label="Sources"
-                  totalCount={totalCount}
-                  data={sources}
-                  columns={columns}
-                  onDeleteSelected={this.props.deleteSources}
-                  onPaginate={this.props.fetchSources}
-                  addModalContent={<SourcesForm />}
-                  addModalActions={(closeModal) => (
-                    <div>
-                      <Button
-                        color="black"
-                        content="Cancel"
-                        onClick={closeModal}
-                      />
-                      <Button
-                        color="green"
-                        onClick={async () => {
-                          await this.props.addSources();
-                          // this.resetInputVals();
-                          closeModal();
-                        }}
-                        content="Add All Sources"
-                      />
-                    </div>
-                  )}
-                  rowActions={(id) => (
-                    <div>
-                      {id}
-                    </div>
-                  )}
-                />
-              </Segment>
-            </Grid.Column>
-          </Grid.Row>
-
-          <Grid.Row>
-            <Grid.Column>
-              <Segment>
-                <Label color="orange" ribbon>Pending News Sources</Label>
-                <DataTable
-                  defaultSearchFilter="url"
-                  label="Pending Source"
-                  deleteLabel="Pending Sources"
-                  totalCount={pendingTotalCount}
-                  data={pendingSources}
-                  columns={pendingColumns}
-                  onDeleteSelected={this.props.deletePendingSources}
-                  onPaginate={this.props.fetchPendingSources}
-                  addModalContent={<PendingSourcesForm />}
-                  addModalActions={(closeModal) => (
-                    <div>
-                      <Button
-                        color="black"
-                        content="Cancel"
-                        onClick={closeModal}
-                      />
-                      <Button
-                        color="green"
-                        onClick={async () => {
-                          await this.props.addPendingSources();
-                          // this.resetInputVals();
-                          closeModal();
-                        }}
-                        content="Add All Pending Sources"
-                      />
-                    </div>
-                  )}
-                  rowActions={(id) => (
-                    <div>
-                      <Button
-                        color="green"
-                        content="Reliable"
-                        onClick={() => this.props.verifyPendingSource(id, true)}
-                      />
-                      <Button
-                        color="red"
-                        content="Unreliable"
-                        onClick={() => this.props.verifyPendingSource(id, false)}
-                      />
-                    </div>
-                  )}
-                  hideAddBtn
-                />
-              </Segment>
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column>
-              <Segment>
-                <Label color="red" ribbon>Fake News Sources</Label>
-                <DataTable
-                  defaultSearchFilter="brand"
-                  label="Fake Sources"
-                  totalCount={fakeTotalCount}
-                  data={fakeSources}
-                  columns={columns}
-                  onDeleteSelected={this.props.deleteFakeSources}
-                  onPaginate={this.props.fetchFakeSources}
-                  addModalContent={<FakeSourcesForm />}
-                  addModalActions={(closeModal) => (
-                    <div>
-                      <Button
-                        color="black"
-                        content="Cancel"
-                        onClick={closeModal}
-                      />
-                      <Button
-                        color="green"
-                        onClick={async () => {
-                          await this.props.addFakeSources();
-                          // this.resetInputVals();
-                          closeModal();
-                        }}
-                        content="Add All Fake Sources"
-                      />
-                    </div>
-                  )}
-                  rowActions={(id) => (
-                    <div>
-                      {id}
-                    </div>
-                  )}
-                />
-              </Segment>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
       </div>
     );
   }

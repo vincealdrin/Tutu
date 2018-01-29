@@ -34,6 +34,8 @@ module.exports = (conn, io) => {
         totalCount = await query.count().run(conn);
       }
 
+      query = query.orderBy(r.desc(r.row('left')('publishDate')));
+
       if (page && limit) {
         const parsedPage = parseInt(page);
         const parsedLimit = parseInt(limit);
@@ -45,7 +47,6 @@ module.exports = (conn, io) => {
 
       const cursor = await query
         .map(isMap === 'yes' ? mapArticle : mapGridArticle)
-        .distinct()
         .run(conn);
       const articles = await cursor.toArray();
 

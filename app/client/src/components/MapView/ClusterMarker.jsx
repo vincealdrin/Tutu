@@ -13,7 +13,6 @@ const defaultStyle = { scale: 0.2 };
 const style = { scale: spring(1, config) };
 
 const ClusterMarker = ({
-  count,
   articles,
   $hover,
   isCredible,
@@ -25,7 +24,7 @@ const ClusterMarker = ({
     trigger="manual"
     html={
       <Grid className="cluster-list-container">
-        {articles.slice(0, 4).map((article) => (
+        {articles.slice(0, 3).map((article) => (
           <Grid.Row key={shortid.generate()} className="cluster-article-container">
             <Grid.Column width={7}>
               <div className="img-placeholder-wrapper">
@@ -44,7 +43,7 @@ const ClusterMarker = ({
               <Label as="a" circular className="source-label">{article.source}</Label>
             </Grid.Column>
           </Grid.Row>
-            ))}
+        ))}
         <Label className="see-more-button" attached="bottom">Click marker to view full articles...</Label>
       </Grid>
     }
@@ -65,8 +64,10 @@ const ClusterMarker = ({
             zIndex: $hover ? 10000 : 0,
           }}
         >
-          <div className={`cluster-marker-container-radiant ${isCredible ? '' : 'cluster-marker-container-not-credible'} ${$hover ? 'cluster-marker-container-hovered' : ''}`} />
-          <p>{count}</p>
+          {$hover ? (
+            <div className={`cluster-marker-container-radiant ${isCredible ? '' : 'cluster-marker-container-not-credible'} cluster-marker-container-hovered`} />
+          ) : null}
+          <p>{articles.length}</p>
         </div>
       )}
     </Motion>

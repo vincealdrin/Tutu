@@ -14,6 +14,7 @@ const awisClient = awis({
 
 const PH_TIMEZONE = '+08:00';
 const WEEK_IN_SEC = 604800;
+const DAY_IN_SEC = 86400;
 
 module.exports.PH_TIMEZONE = PH_TIMEZONE;
 module.exports.WEEK_IN_SEC = WEEK_IN_SEC;
@@ -419,20 +420,31 @@ module.exports.buildArticlesQuery = async (params, bounds) => {
   const parsedEnd = parseInt(end);
 
   if (!parsedStart && !parsedEnd) {
-    query = query.filter((article) =>
-      article('publishDate').date()
-        .eq(r.expr(selectedDate).inTimezone(PH_TIMEZONE).date()));
+    query = query.between(
+      r.expr(selectedDate).inTimezone(PH_TIMEZONE).date(),
+      r.expr(selectedDate).inTimezone(PH_TIMEZONE).add(DAY_IN_SEC).date(),
+      {
+        index: 'publishDate',
+        rightBound: 'closed',
+      }
+    );
   } else {
     const startDate = new Date(selectedDate.getTime());
     startDate.setDate(selectedDate.getDate() - parsedStart);
     const endDate = new Date(selectedDate.getTime());
     endDate.setDate(selectedDate.getDate() - parsedEnd);
 
-    query = query.filter(r.row('publishDate').date().during(
+    query = query.between(
       r.expr(startDate).inTimezone(PH_TIMEZONE).date(),
-      r.expr(endDate).inTimezone(PH_TIMEZONE).date(),
-      { rightBound: 'closed' }
-    ));
+      r.expr(endDate).inTimezone(PH_TIMEZONE).add(DAY_IN_SEC).date(),
+      { index: 'publishDate', rightBound: 'closed' }
+    );
+
+    // query = query.filter(r.row('publishDate').date().during(
+    //   r.expr(startDate).inTimezone(PH_TIMEZONE).date(),
+    //   r.expr(endDate).inTimezone(PH_TIMEZONE).date(),
+    //   { rightBound: 'closed' }
+    // ));
   }
 
   if (keywords) {

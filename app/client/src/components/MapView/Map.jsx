@@ -124,7 +124,6 @@ class Map extends PureComponent {
             <ClusterMarker
               key={id}
               articles={articles.filter((_, i) => ids.includes(i))}
-              count={numPoints}
               lng={lng}
               lat={lat}
               isCredible={isCredible}

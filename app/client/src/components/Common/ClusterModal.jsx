@@ -123,7 +123,6 @@ class ClusterModal extends PureComponent {
                 button
                 floating
                 labeled
-                search
               />
             </Grid.Column>
             <Grid.Column width={7}>

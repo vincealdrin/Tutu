@@ -251,9 +251,21 @@ class Sources extends Component {
     return (
       <div className="sources-container">
         <Menu pointing secondary>
-          <Menu.Item name="news sources" active={activeItem === 'news sources'} onClick={this.changeItem} />
-          <Menu.Item name="pending news sources" active={activeItem === 'pending news sources'} onClick={this.changeItem} />
-          <Menu.Item name="fake news sources" active={activeItem === 'fake news sources'} onClick={this.changeItem} />
+          <Menu.Item
+            name="news sources"
+            active={activeItem === 'news sources'}
+            onClick={this.changeItem}
+          />
+          <Menu.Item
+            name="pending news sources"
+            active={activeItem === 'pending news sources'}
+            onClick={this.changeItem}
+          />
+          <Menu.Item
+            name="fake news sources"
+            active={activeItem === 'fake news sources'}
+            onClick={this.changeItem}
+          />
         </Menu>
         {this.renderActiveMenuItem()}
       </div>

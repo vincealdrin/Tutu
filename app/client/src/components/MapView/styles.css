@@ -1,23 +1,19 @@
 .cluster-marker-container {
-  position: absolute;
-  top: -26px;
-  left: -26px;
+  position: relative;
   z-index: -1000;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 52px;
-  height: 52px;
-  cursor: pointer;
+  width: 52px !important;
+  height: 52px !important;
   background: #fff;
   border: 5px solid #f25100;
   border-radius: 100%;
   box-shadow: 0 3px 24px #1b272b;
-  transform-origin: center;
 }
 
 .cluster-marker-container-radiant {
   position: absolute;
+  top: -0.37rem;
+  left: -0.37rem;
   z-index: -20000;
   width: 52px;
   height: 52px;
@@ -25,6 +21,20 @@
   border: 5px solid #f25100;
   border-radius: 100%;
   transform-origin: center;
+}
+
+.cluster-marker-container {
+  position: absolute;
+  top: -26px;
+  left: -26px;
+  z-index: -100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  border-radius: 50px;
 }
 
 .cluster-marker-container > p {

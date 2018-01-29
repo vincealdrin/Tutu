@@ -187,6 +187,37 @@ class Filter extends PureComponent {
             allowAdditions
           />
           <Divider />
+          <span className="input-label">DATE</span>
+          <div className="ui input fluid">
+            <div className="filter-datepicker-wrapper">
+              <DatePicker
+                className="filter-datepicker"
+                dateFormat="MMMM D, YYYY"
+                selected={date}
+                maxDate={now}
+                onChange={(newDate) => {
+                  this.props.changeDateFilter(newDate);
+                }}
+                showMonthDropdown
+                showYearDropdown
+              />
+            </div>
+          </div>
+          <span className="input-label">TIME WINDOW</span>
+          <Slider.Range
+            min={0}
+            max={31}
+            allowCross={false}
+            value={timeWindow}
+            onChange={(value) => {
+              this.props.changeTimeWindowFilter(value);
+            }}
+          />
+          <span className="timewindow-text">
+            <span>{`${startRange} day${startRange === 1 ? '' : 's'} ago`}</span>
+            <span>{`${endRange} day${endRange === 1 ? '' : 's'} ago`}</span>
+          </span>
+          <Divider />
           <span className="input-label">CATEGORIES</span>
           <Dropdown
             text="Select Category"
@@ -238,37 +269,6 @@ class Filter extends PureComponent {
             multiple
             allowAdditions
           />
-          <Divider />
-          <span className="input-label">DATE</span>
-          <div className="ui input fluid">
-            <div className="filter-datepicker-wrapper">
-              <DatePicker
-                className="filter-datepicker"
-                dateFormat="MMMM D, YYYY"
-                selected={date}
-                maxDate={now}
-                onChange={(newDate) => {
-                  this.props.changeDateFilter(newDate);
-                }}
-                showMonthDropdown
-                showYearDropdown
-              />
-            </div>
-          </div>
-          <span className="input-label">TIME WINDOW</span>
-          <Slider.Range
-            min={0}
-            max={31}
-            allowCross={false}
-            value={timeWindow}
-            onChange={(value) => {
-              this.props.changeTimeWindowFilter(value);
-            }}
-          />
-          <span className="timewindow-text">
-            <span>{`${startRange} day${startRange === 1 ? '' : 's'} ago`}</span>
-            <span>{`${endRange} day${endRange === 1 ? '' : 's'} ago`}</span>
-          </span>
           <Divider />
           <span className="input-label">SENTIMENT</span>
           <Dropdown

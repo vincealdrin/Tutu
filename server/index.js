@@ -14,6 +14,8 @@ const cors = require('cors');
 const initDb = require('./db');
 const routes = require('./routes');
 const { startIoClient, startIoAdmin } = require('./socket-server');
+// const r = require('rethinkdb');
+// const { getWotReputation } = require('./utils');
 
 const app = express();
 const server = http.Server(app);
@@ -43,8 +45,26 @@ const isProduction = process.env.NODE_ENV === 'production';
 if (isProduction) {
   app.use(errorhandler());
 }
+// function sleep(ms) {
+//   return new Promise((resolve) => setTimeout(resolve, ms));
+// }
+initDb(async (conn) => {
+  // const s = await r.table('sources').run(conn);
+  // const z = await s.toArray();
 
-initDb((conn) => {
+  // z.forEach(async ({ id, url }) => {
+  //   const res = await getWotReputation(url);
+  //   console.log(res);
+  //   if (res) {
+  //     await r.table('sources').get(id).update({
+  //       wotReputation: res,
+  //     }).run(conn);
+  //   }
+
+  //   await sleep(2000);
+  // });
+
+
   io.sockets.on('connection', (socket) => {
     console.log(`${socket.id} has connected`);
   });

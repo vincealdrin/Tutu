@@ -12,6 +12,7 @@ const {
   getDomainOnly,
   cloudScrape,
   removeUrlPath,
+  getWotReputation,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -58,6 +59,7 @@ module.exports = (conn, io) => {
       const brand = getSourceBrand(cheerioDoc) || getDomainOnly(url);
       const title = getTitle(cheerioDoc);
       const faviconUrl = getFaviconUrl(cheerioDoc, url);
+      const wotReputation = await getWotReputation(url);
       const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, url);
       const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
       const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);
@@ -94,6 +96,7 @@ module.exports = (conn, io) => {
         timestamp: r.now().inTimezone(PH_TIMEZONE),
         senderIpAddress: ipAddress,
         id,
+        wotReputation,
         brand,
         isReliablePred,
         aboutUsUrl,

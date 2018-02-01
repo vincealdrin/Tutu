@@ -14,6 +14,7 @@ const {
   getAlexaRank,
   getDomainOnly,
   getDomainCreationDate,
+  getWotReputation,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -132,6 +133,7 @@ module.exports = (conn, io) => {
         const sourceCleanUrl = cleanUrl(sourceUrl);
         const socialScore = await getSocialScore(source.url);
         const brand = getSourceBrand(cheerioDoc) || getDomainOnly(source.url);
+        const wotReputation = await getWotReputation(source.url);
         // const domainCreationDate = getDomainCreationDate(source.url);
 
         return {
@@ -140,6 +142,7 @@ module.exports = (conn, io) => {
           verifiedByUserId: req.user.id,
           timestamp: r.now().inTimezone(PH_TIMEZONE),
           // domainCreationDate: r.expr(domainCreationDate).date(),
+          wotReputation,
           title,
           isReliable,
           socialScore,

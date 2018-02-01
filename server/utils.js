@@ -530,7 +530,6 @@ module.exports.reduceCategoriesInsight = (left, right) => ({
   'Science & Technology': left('Science & Technology').add(right('Science & Technology')),
 });
 
-
 module.exports.mapSentimentInsight = (article) => r.branch(
   article('sentiment')('compound').ge(0.5),
   { pos: 1, neu: 0, neg: 0 },
@@ -538,8 +537,22 @@ module.exports.mapSentimentInsight = (article) => r.branch(
   { pos: 0, neu: 0, neg: 1 },
   { pos: 0, neu: 1, neg: 0 }
 );
+
 module.exports.reduceSentimentInsight = (left, right) => ({
   pos: left('pos').add(right('pos')),
   neu: left('neu').add(right('neu')),
   neg: left('neg').add(right('neg')),
 });
+
+module.exports.getWotReputation = async (url) => {
+  const res = await rp(`http://api.mywot.com/0.4/public_link_json2?hosts=${url}/&key=${process.env.WOT_API_KEY}`).json();
+  const keys = Object.keys(res);
+
+  if (keys.length) {
+    const urlKey = keys[0];
+    console.log(urlKey);
+    return (res[urlKey] && res[urlKey][0] && res[urlKey][0][0]) || 0;
+  }
+
+  return 0;
+};

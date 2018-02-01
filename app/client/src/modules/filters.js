@@ -22,7 +22,7 @@ export const filtersInitialState = {
   topPopular: 'none',
   timeWindow: [28, 31],
   date: moment(),
-  limit: 1000,
+  limit: 10000,
 };
 
 export default (state = filtersInitialState, action) => {

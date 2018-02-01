@@ -63,8 +63,8 @@ class MapView extends Component {
     bounds,
     marginBounds,
   }) => {
-    console.log(bounds);
-    console.log(zoom);
+    // console.log(bounds);
+    // console.log(zoom);
     if (timeoutId) {
       clearTimeout(timeoutId);
     }

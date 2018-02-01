@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import { Segment, Label, Icon, Header, Divider, List } from 'semantic-ui-react';
+import { Button,
+  Segment,
+  Label,
+  Icon,
+  Header,
+  Divider,
+  List,
+} from 'semantic-ui-react';
 import './style.css';
 
 class About extends Component {
@@ -21,14 +28,19 @@ class About extends Component {
             <Divider style={{ width: 100, margin: '2.3rem 0' }} />
 
             <section className="social-media">
-              <Icon
+              {/* <Icon
                 name="facebook"
                 size="large"
                 as="a"
                 href="https://fb.com/tutunewsph"
               />
-              <Icon name="twitter" size="large" />
-              <Icon name="mail" size="large" />
+              <Icon name="twitter" size="large" /> */}
+              <a href="mailto:tutunewsph@gmail.com">
+                <Icon
+                  name="mail"
+                  size="large"
+                />
+              </a>
             </section>
 
             <section className="member-names">

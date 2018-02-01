@@ -1,4 +1,5 @@
 import axios, { Cancel } from 'axios';
+import flatten from 'lodash/flatten';
 import { beginTask, endTask } from 'redux-nprogress';
 
 export const updateCrudStatus = (action) => ({
@@ -127,6 +128,7 @@ export const requestInsights = async (insightType, state, extraParams = {}) => {
   const {
     mapArticles: {
       articles,
+      clusters,
       mapState: {
         bounds,
       },
@@ -140,7 +142,8 @@ export const requestInsights = async (insightType, state, extraParams = {}) => {
   let ids;
 
   if (isMap) {
-    ids = articles.map((article) => article.id);
+    const indexes = flatten(clusters.map(({ points }) => points.map((point) => point.id)));
+    ids = articles.filter((_, i) => indexes.includes(i)).map((article) => article.id);
   }
 
   const params = !isMap ? {

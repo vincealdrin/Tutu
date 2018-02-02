@@ -366,6 +366,7 @@
   right: 85.5px;
   z-index: 1000;
   display: flex;
+  transition: all 0.4s cubic-bezier(0.62, 0.04, 0.35, 0.96);
 }
 
 .map-bot-buttons {
@@ -374,6 +375,7 @@
   bottom: 25px;
   z-index: 1000;
   display: flex;
+  transition: all 0.4s cubic-bezier(0.62, 0.04, 0.35, 0.96);
 }
 
 .adjust-top-buttons-visible {

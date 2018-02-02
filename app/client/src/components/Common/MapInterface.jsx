@@ -160,7 +160,7 @@ class MapInterface extends PureComponent {
         <div className="hide-when-mobile">
           <div className={`map-top-buttons ${this.getBtnsClassName()}`}>
             <Button
-              content="Insights"
+              content="Visualized Data"
               icon="bar chart"
               labelPosition="left"
               onClick={openInsights}

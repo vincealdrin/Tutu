@@ -49,7 +49,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 class Insights extends Component {
   state = {
     activeCard: 'mainMenu',
-    labelDesc: 'Insights',
+    labelDesc: 'Visualized Data',
   };
 
   renderSegment = (icon, header, desc) => (
@@ -176,7 +176,7 @@ class Insights extends Component {
           content={activeCard === 'mainMenu' ? 'CLOSE' : 'BACK'}
           onClick={() => (activeCard === 'mainMenu'
             ? this.props.closeModal()
-            : this.setState({ activeCard: 'mainMenu', labelDesc: 'Insights' }))
+            : this.setState({ activeCard: 'mainMenu', labelDesc: 'Visualized Data' }))
           }
         />
         {isMap ? (

@@ -55,13 +55,9 @@ initDb(async (conn) => {
   // z.forEach(async ({ id, url }) => {
   //   const res = await getWotReputation(url);
   //   console.log(res);
-  //   if (res) {
-  //     await r.table('sources').get(id).update({
-  //       wotReputation: res,
-  //     }).run(conn);
-  //   }
-
-  //   await sleep(2000);
+  //   await r.table('sources').get(id).update({
+  //     wotReputation: res,
+  //   }).run(conn);
   // });
 
 

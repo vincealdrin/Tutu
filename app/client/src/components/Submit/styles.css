@@ -11,10 +11,16 @@
   margin: 4rem 0;
 }
 
-.doThis {
-  background-color: red !important;
+.submit-segment-container {
+  height: 100vh;
+  padding-right: 1px !important;
+  margin-right: 0;
 }
 
-.dontDoThis {
-  background-color: blue !important;
+.submit-scrollable-section {
+  height: 96%;
+  min-width: 288.42px;
+  padding: 2rem 14px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }

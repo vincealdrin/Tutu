@@ -3,6 +3,7 @@ const awis = require('awis');
 const _ = require('lodash');
 const { parseString } = require('xml2js');
 const r = require('rethinkdb');
+const parseDomain = require('parse-domain');
 const rp = require('request-promise');
 const randomUserAgent = require('random-useragent');
 const cloudscraper = require('cloudscraper');
@@ -18,6 +19,11 @@ const DAY_IN_SEC = 86400;
 
 module.exports.PH_TIMEZONE = PH_TIMEZONE;
 module.exports.WEEK_IN_SEC = WEEK_IN_SEC;
+
+module.exports.getDomain = (url) => {
+  const parsed = parseDomain(url);
+  return `http://${parsed.domain}.${parsed.tld}`;
+};
 
 module.exports.getUpdatedFields = (changes) =>
   changes.map((change) => {
@@ -113,7 +119,7 @@ module.exports.getSourceInfo = (url, responseGroups) => new Promise((resolve, re
   });
 });
 
-module.exports.getDomainOnly = (url) => url
+module.exports.getTempBrand = (url) => url
   .replace(/https?:\/\//, '')
   .split('.')
   .slice(0, -1)

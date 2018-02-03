@@ -2,6 +2,7 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
+const validUrl = require('valid-url');
 const {
   cleanUrl,
   getAboutContactUrl,
@@ -9,37 +10,31 @@ const {
   getTitle,
   getFaviconUrl,
   PH_TIMEZONE,
-  getDomainOnly,
+  getTempBrand,
   cloudScrape,
   removeUrlPath,
   getWotReputation,
+  getDomain,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
   router.get('/', async (req, res, next) => {
     try {
       const { url, submit = 'yes' } = req.query;
-      const domain = cleanUrl(removeUrlPath(url));
-      const uuid = await r.uuid(domain).run(conn);
-      console.log(domain);
-      console.log(uuid);
-      // const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
-      const matchedSource = await r.table('sources').get(uuid).run(conn);
-      console.log(matchedSource);
-      // if (matchedPending) {
-      //   return res.json({
-      //     isReliable: matchedPending.isReliable,
-      //     isVerified: false,
-      //   });
-      // }
 
-      if (matchedSource) {
-        return res.json({
-          isReliable: matchedSource.isReliable,
-          sourceUrl: matchedSource.url,
-          isVerified: true,
+      if (!validUrl.isUri(url)) {
+        return next({
+          status: 400,
+          message: 'Invalid URL',
         });
       }
+
+      const domain = cleanUrl(removeUrlPath(url));
+      const domainOnly = cleanUrl(getDomain(removeUrlPath(url)));
+      const uuid = await r.uuid(domain).run(conn);
+      const uuidDom = await r.uuid(domainOnly).run(conn);
+      // const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
+      const matchedSource = await r.table('sources').get(uuid).run(conn) || await r.table('sources').get(uuidDom).run(conn);
 
       let body;
       try {
@@ -56,16 +51,16 @@ module.exports = (conn, io) => {
       }
 
       const cheerioDoc = cheerio.load(body);
-      const brand = getSourceBrand(cheerioDoc) || getDomainOnly(url);
+      const brand = getSourceBrand(cheerioDoc) || getTempBrand(url);
       const title = getTitle(cheerioDoc);
       const faviconUrl = getFaviconUrl(cheerioDoc, url);
-      const wotReputation = await getWotReputation(url);
+      const wotReputation = await getWotReputation(domain);
       const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, url);
       const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
       const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);
-
+      console.log('haai');
       const {
-        reliable,
+        isCredible,
         pct,
         sourceUrl,
         sourcePct,
@@ -79,12 +74,14 @@ module.exports = (conn, io) => {
         body: {
           sourceHasAboutPage: (hasAboutPage && aboutUsUrl) ? 1 : 0,
           sourceHasContactPage: (hasContactPage && contactUsUrl) ? 1 : 0,
+          wotReputation,
           url,
           body,
         },
         json: true,
       });
-      const isReliablePred = Boolean(reliable);
+
+      const isReliablePred = Boolean(isCredible);
       const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
       const cleanedSrcUrl = cleanUrl(sourceUrl);
       const id = await r.uuid(cleanedSrcUrl).run(conn);
@@ -95,8 +92,8 @@ module.exports = (conn, io) => {
         url: cleanedSrcUrl,
         timestamp: r.now().inTimezone(PH_TIMEZONE),
         senderIpAddress: ipAddress,
-        id,
         wotReputation,
+        id,
         brand,
         isReliablePred,
         aboutUsUrl,
@@ -120,8 +117,12 @@ module.exports = (conn, io) => {
 
       res.json({
         sourceUrl: cleanedSrcUrl,
-        isVerified: false,
-        isReliable: Boolean(reliable),
+        isCredible: Boolean(isCredible),
+        isVerified: !!matchedSource,
+        verifiedRes: {
+          isCredible: (matchedSource || {}).isReliable,
+          url: (matchedSource || {}).url,
+        },
         pct,
         sourcePct,
         contentPct,

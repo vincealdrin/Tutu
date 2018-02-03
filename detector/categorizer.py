@@ -1,4 +1,4 @@
-from db import get_articles
+from db import get_articles_filtered
 from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
@@ -10,7 +10,7 @@ from nltk.stem.snowball import SnowballStemmer
 import pandas as pd
 import pickle
 
-articles = get_articles(lambda join: {
+articles = get_articles_filtered(lambda join: {
     'body': join['left']['body'],
     'title': join['left']['title'],
     'category': join['left']['categories'].nth(0).get_field('label')
@@ -42,7 +42,6 @@ df = pd.concat([
     df[df['category'] == 'Science & Technology'],
 ])
 
-
 X_train, X_test, y_train, y_test = train_test_split(
     df.body.values, df.category.values, test_size=0.20, random_state=123)
 
@@ -53,7 +52,7 @@ text_clf = Pipeline([
          ngram_range=(1, 2),
          max_df=0.85,
          min_df=0.01)),
-    ('clf', MultinomialNB(fit_prior=False)),
+    ('clf',  (fit_prior=False)),
 ])
 
 text_clf.fit(X_train, y_train)

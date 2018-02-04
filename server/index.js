@@ -68,7 +68,7 @@ initDb(async (conn) => {
   startIoAdmin(io, conn);
   startIoClient(ioClient, conn);
 
-  app.use('/api', routes(conn, io));
+  app.use('/api', routes(conn, { io, ioClient }));
 
   // always return the main index.html, so react-router render the route in the client
   // app.get('*', (req, res) => {

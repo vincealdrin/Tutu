@@ -2,7 +2,7 @@ import { HorizontalBar, Line, Pie, Bar } from 'react-chartjs-2';
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Grid, Segment, Label } from 'semantic-ui-react';
+import { Grid, Segment, Label, Statistic, Icon } from 'semantic-ui-react';
 import WordCloud from 'react-d3-cloud';
 import Statistics from './Statistics';
 import {
@@ -49,7 +49,10 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 
 
 class Home extends Component {
+  state = { activeUsers: null }
+
   componentDidMount() {
+    const { socket } = this.props;
     this.props.fetchCounts();
     this.props.fetchSentimentInsights();
     this.props.fetchTopInsights('people');
@@ -58,6 +61,14 @@ class Home extends Component {
     this.props.fetchTopInsights('keywords', 200);
     this.props.fetchCategoriesInsights();
     this.props.fetchSourcesSubmit();
+
+    socket.on('activeUsers', (val) => {
+      this.setState({ activeUsers: val });
+    });
+  }
+
+  componentWillUnmount() {
+    this.props.socket.removeAllListeners();
   }
 
   render() {
@@ -74,6 +85,7 @@ class Home extends Component {
       },
       counts,
     } = this.props;
+    const { activeUsers } = this.state;
 
     const wordCloud = topKeywords.map(({ keyword, count }) => ({
       text: keyword,
@@ -417,12 +429,35 @@ class Home extends Component {
       ],
     };
 
-
     return (
       <Grid>
         <Grid.Row>
           <Grid.Column width={7}>
             <Grid.Column>
+              <Grid columns="equal">
+                <Grid.Column>
+                  <Segment style={{ textAlign: 'center' }}>
+                    <Statistic size="tiny">
+                      <Statistic.Value>
+                        <Icon name="eye" />
+                        {activeUsers === null ? counts.activeUsers : activeUsers}
+                      </Statistic.Value>
+                      <Statistic.Label>Active Users</Statistic.Label>
+                    </Statistic>
+                  </Segment>
+                </Grid.Column>
+                <Grid.Column>
+                  <Segment style={{ textAlign: 'center' }}>
+                    <Statistic size="tiny">
+                      <Statistic.Value>
+                        <Icon name="users" />
+                        {counts.visitors}
+                      </Statistic.Value>
+                      <Statistic.Label>Unique Visitors</Statistic.Label>
+                    </Statistic>
+                  </Segment>
+                </Grid.Column>
+              </Grid>
               <Segment>
                 <Label attached="top right">Verified Sources Count</Label>
                 <Line data={verifiedSourcesLineData} />
@@ -441,13 +476,7 @@ class Home extends Component {
           </Grid.Column>
 
           <Grid.Column width={9}>
-            <Statistics
-              visitors={counts.visitors}
-              articles={counts.articles}
-              pendingSources={counts.pendingSources}
-              credibleSources={counts.credibleSources}
-              notCredibleSources={counts.notCredibleSources}
-            />
+            <Statistics {...counts} />
             <Segment>
               <Label attached="top right">Articles</Label>
               <HorizontalBar data={categoriesBarData} />

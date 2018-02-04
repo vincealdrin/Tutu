@@ -3,7 +3,23 @@ const r = require('rethinkdb');
 const _ = require('lodash');
 const { getCategoriesField } = require('../../utils');
 
-module.exports = (conn, io) => {
+let activeUsers = 0;
+
+module.exports = (conn, { ioClient, io }) => {
+  ioClient.on('connection', (socket) => {
+    activeUsers += 1;
+    io.emit('activeUsers', activeUsers);
+
+    socket.on('disconnect', () => {
+      if (activeUsers <= 0) {
+        activeUsers = 0;
+      } else {
+        activeUsers -= 1;
+      }
+      io.emit('activeUsers', activeUsers);
+    });
+  });
+
   router.get('/visits', async (req, res, next) => {
     try {
       return res.json({
@@ -57,7 +73,16 @@ module.exports = (conn, io) => {
     try {
       return res.json({
         visitors: await r.table('visitors').count().run(conn),
-        articles: await r.table('articles').count().run(conn),
+        notCredibleArticles: await r.table('articles')
+          .eqJoin('sourceId', r.table('sources'))
+          .filter(r.row('right')('isReliable').eq(false))
+          .count()
+          .run(conn),
+        credibleArticles: await r.table('articles')
+          .eqJoin('sourceId', r.table('sources'))
+          .filter(r.row('right')('isReliable').eq(true))
+          .count()
+          .run(conn),
         pendingSources: await r.table('pendingSources').count().run(conn),
         credibleSources: await r.table('sources')
           .filter(r.row('isReliable').eq(true))
@@ -67,6 +92,7 @@ module.exports = (conn, io) => {
           .filter(r.row('isReliable').eq(false))
           .count()
           .run(conn),
+        activeUsers,
       });
     } catch (e) {
       next(e);
@@ -121,7 +147,7 @@ module.exports = (conn, io) => {
         ))
         .orderBy(r.desc('count'))
         .limit(parseInt(limit))
-        .run(conn);
+        .run(conn, { arrayLimit: 1000000000 });
       const words = await cursor.toArray();
 
       return res.json(words);

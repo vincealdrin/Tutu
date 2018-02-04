@@ -211,16 +211,16 @@ class ClusterModal extends PureComponent {
                         <Tags content={article.categories} />
                       </List.Item>
                       <List.Item>
-                        <Label as="a" className="tag-label">Keywords</Label>
-                        <Tags content={article.keywords} />
-                      </List.Item>
-                      <List.Item>
                         <Label as="a" className="tag-label">Organizations</Label>
                         <Tags content={article.organizations} />
                       </List.Item>
                       <List.Item>
                         <Label as="a" className="tag-label">People</Label>
                         <Tags content={article.people} />
+                      </List.Item>
+                      <List.Item>
+                        <Label as="a" className="tag-label">Keywords</Label>
+                        <Tags content={article.keywords} />
                       </List.Item>
                     </List>
                     <Reactions

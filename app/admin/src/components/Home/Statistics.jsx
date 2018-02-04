@@ -2,37 +2,14 @@ import React from 'react';
 import { Grid, Statistic, Icon, Segment } from 'semantic-ui-react';
 
 const Statistics = ({
-  visitors,
-  articles,
+  notCredibleArticles,
+  credibleArticles,
   pendingSources,
   credibleSources,
   notCredibleSources,
-
 }) => (
-  <Grid columns={5}>
-    <Grid.Column className="statistics-container">
-      <Segment style={{ minHeight: 100 }}>
-        <Statistic size="tiny">
-          <Statistic.Value>
-            <Icon name="eye" />
-            {visitors}
-          </Statistic.Value>
-          <Statistic.Label>Unique Visitors</Statistic.Label>
-        </Statistic>
-      </Segment>
-    </Grid.Column>
-    <Grid.Column className="statistics-container">
-      <Segment>
-        <Statistic size="tiny">
-          <Statistic.Value>
-            <Icon name="newspaper" />
-            {articles}
-          </Statistic.Value>
-          <Statistic.Label>News Articles</Statistic.Label>
-        </Statistic>
-      </Segment>
-    </Grid.Column>
-    <Grid.Column className="statistics-container">
+  <Grid columns="equal">
+    <Grid.Column>
       <Segment>
         <Statistic size="tiny">
           <Statistic.Value>
@@ -43,7 +20,18 @@ const Statistics = ({
         </Statistic>
       </Segment>
     </Grid.Column>
-    <Grid.Column className="statistics-container">
+    <Grid.Column>
+      <Segment>
+        <Statistic size="tiny">
+          <Statistic.Value>
+            <Icon name="newspaper" />
+            {credibleArticles}
+          </Statistic.Value>
+          <Statistic.Label>Credible Articles</Statistic.Label>
+        </Statistic>
+      </Segment>
+    </Grid.Column>
+    <Grid.Column>
       <Segment>
         <Statistic size="tiny">
           <Statistic.Value>
@@ -54,7 +42,7 @@ const Statistics = ({
         </Statistic>
       </Segment>
     </Grid.Column>
-    <Grid.Column className="statistics-container">
+    <Grid.Column>
       <Segment>
         <Statistic size="tiny">
           <Statistic.Value>
@@ -62,6 +50,17 @@ const Statistics = ({
             {notCredibleSources}
           </Statistic.Value>
           <Statistic.Label>Not Credible Sources</Statistic.Label>
+        </Statistic>
+      </Segment>
+    </Grid.Column>
+    <Grid.Column>
+      <Segment>
+        <Statistic size="tiny">
+          <Statistic.Value>
+            <Icon name="newspaper" />
+            {notCredibleArticles}
+          </Statistic.Value>
+          <Statistic.Label>Not Credible Articles</Statistic.Label>
         </Statistic>
       </Segment>
     </Grid.Column>

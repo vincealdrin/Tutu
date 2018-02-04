@@ -143,7 +143,7 @@ const AppSidebar = ({
                   <List.Content>Display a cluster of articles in a region</List.Content>
                 </List.Item>
                 <List.Item>
-                  <List.Icon name="video" size="big" />
+                  <List.Icon name="file video outline" size="big" />
                   <List.Content as="a" href="https://youtu.be/sf-R5tBzGMY" target="_blank">Click here to watch the instructional video</List.Content>
                 </List.Item>
               </List>
@@ -270,7 +270,7 @@ const AppSidebar = ({
                       <List.Content>Display a cluster of articles in a region</List.Content>
                     </List.Item>
                     <List.Item >
-                      <List.Icon name="video" size="big" />
+                      <List.Icon name="file video outline" size="big" />
                       <List.Content as="a" href="https://youtu.be/sf-R5tBzGMY" target="_blank">Click here to watch the instructional video</List.Content>
                     </List.Item>
                   </List>

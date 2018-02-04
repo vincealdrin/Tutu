@@ -7,7 +7,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import Pipeline, FeatureUnion
 from nltk.stem.snowball import SnowballStemmer
 from scipy.sparse import hstack
 from sklearn.metrics import confusion_matrix, classification_report, auc, roc_curve
@@ -18,7 +18,9 @@ import pandas as pd
 import rethinkdb as r
 import re
 
-def plot_confusion_matrix(cm, classes,
+
+def plot_confusion_matrix(cm,
+                          classes,
                           normalize=False,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues):
@@ -44,9 +46,12 @@ def plot_confusion_matrix(cm, classes,
     fmt = '.2f' if normalize else 'd'
     thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
+        plt.text(
+            j,
+            i,
+            format(cm[i, j], fmt),
+            horizontalalignment="center",
+            color="white" if cm[i, j] > thresh else "black")
 
     plt.tight_layout()
     plt.ylabel('True label')
@@ -71,7 +76,7 @@ articles = get_articles(lambda join: {
     'src_id': join['right']['id'],
     'credible': join['right']['isReliable']
 })
-train_sources = get_sources_sample(10)
+train_sources = get_sources_sample(20)
 
 train_articles = [a for a in articles if a['src_id'] not in train_sources]
 
@@ -86,8 +91,10 @@ df = pd.DataFrame.from_records(train_articles)
 print(df.head())
 
 df['credible'] = df['credible'].apply(lambda credible: 1 if credible else 0)
-df['src_world_rank'] = df['src_world_rank'].apply(lambda rank: 999999999 if rank == 0 else rank)
-df['src_country_rank'] = df['src_country_rank'].apply(lambda rank: 999999999 if rank == 0 else rank)
+df['src_world_rank'] = df['src_world_rank'].apply(
+    lambda rank: 999999999 if rank == 0 else rank)
+df['src_country_rank'] = df['src_country_rank'].apply(
+    lambda rank: 999999999 if rank == 0 else rank)
 
 with open('./tl_stopwords.txt', 'r') as f:
     TL_STOPWORDS = f.read().splitlines()
@@ -117,14 +124,17 @@ X_train = hstack([df, body, title], format='csr')
 
 test_df = pd.DataFrame.from_records(test_articles)
 
-test_df['credible'] = test_df['credible'].apply(lambda credible: 1 if credible else 0)
-test_df['src_world_rank'] = test_df['src_world_rank'].apply(lambda rank: 999999999 if rank == 0 else rank)
-test_df['src_country_rank'] = test_df['src_country_rank'].apply(lambda rank: 999999999 if rank == 0 else rank)
+test_df['credible'] = test_df['credible'].apply(
+    lambda credible: 1 if credible else 0)
+test_df['src_world_rank'] = test_df['src_world_rank'].apply(
+    lambda rank: 999999999 if rank == 0 else rank)
+test_df['src_country_rank'] = test_df['src_country_rank'].apply(
+    lambda rank: 999999999 if rank == 0 else rank)
 
 y_test = test_df.credible.values
 
-test_body = body_tfidf.transform(test_df['body'])
-test_title = title_tfidf.transform(test_df['title'])
+test_body = body_tfidf.transform(test_df.body.values)
+test_title = title_tfidf.transform(test_df.title.values)
 
 print(df.head())
 test_df.drop(['src_id', 'body', 'title', 'credible'], axis=1, inplace=True)
@@ -144,7 +154,8 @@ print(classification_report(y_test, lr_pred, target_names=target_names))
 
 print('Accuracy: ' + str(accuracy_score(y_test, lr_pred)))
 cv_scores = cross_val_score(lr_clf, X_train, y_train, cv=5)
-print("Cross Validation: %0.2f (+/- %0.2f)" % (cv_scores.mean(), cv_scores.std() * 2))
+print("Cross Validation: %0.2f (+/- %0.2f)" % (cv_scores.mean(),
+                                               cv_scores.std() * 2))
 
 cnf_matrix = confusion_matrix(y_test, lr_pred)
 np.set_printoptions(precision=2)
@@ -153,9 +164,9 @@ fpr, tpr, _ = roc_curve(y_test, lr_clf.predict_proba(X_test)[:, 1])
 auc = auc(fpr, tpr)
 
 plt.title('Receiver Operating Characteristic')
-plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % auc)
-plt.legend(loc = 'lower right')
-plt.plot([0, 1], [0, 1],'r--')
+plt.plot(fpr, tpr, 'b', label='AUC = %0.2f' % auc)
+plt.legend(loc='lower right')
+plt.plot([0, 1], [0, 1], 'r--')
 plt.xlim([0, 1])
 plt.ylim([0, 1])
 plt.ylabel('True Positive Rate')
@@ -178,4 +189,3 @@ plt.show()
 # nb_pred = nb_clf.predict(X_test)
 # print('Naive Bayes: ' + str(accuracy_score(y_test, nb_pred)))
 # print(classification_report(y_test, nb_pred, target_names=['not credible', 'credible']))
-

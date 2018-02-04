@@ -7,7 +7,8 @@ import {
   updateMapState,
   updateMapLocState,
   fetchFocusedClusterInfo,
-  toggleSourcesType,
+  changeSourcesCredible,
+  changeSourcesNotCredible,
   clearState,
 } from '../../modules/mapArticles';
 import { openModal } from '../../modules/insights';
@@ -45,7 +46,8 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchFocusedInfo,
   updateMapState,
   fetchFocusedClusterInfo,
-  toggleSourcesType,
+  changeSourcesCredible,
+  changeSourcesNotCredible,
   fetchRecentArticles,
   fetchPopularArticles,
   updateMapLocState,
@@ -79,7 +81,7 @@ class MapView extends Component {
         if (center.lng > DEFAULT_CENTER.lng || center.lng < DEFAULT_CENTER.lng) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState(DEFAULT_CENTER, MIN_ZOOM);
-          }, 200);
+          }, 100);
         }
         break;
       case 7:
@@ -89,7 +91,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 125.8314099121094,
             }, 7);
-          }, 200);
+          }, 100);
         }
 
         if (leftBound < 108.6213269042969) {
@@ -98,7 +100,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 120.6213269042969,
             }, 7);
-          }, 200);
+          }, 100);
         }
 
         if (topBound > 22.105756998510458) {
@@ -107,7 +109,7 @@ class MapView extends Component {
               lat: 17.831994375473,
               lng: center.lng,
             }, 7);
-          }, 200);
+          }, 100);
         }
 
         if (botBound < 4.496137280287343) {
@@ -116,7 +118,7 @@ class MapView extends Component {
               lat: 8.096137280287343,
               lng: center.lng,
             }, 7);
-          }, 200);
+          }, 100);
         }
         break;
       case 8:
@@ -126,7 +128,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 125.8314099121094,
             }, 8);
-          }, 200);
+          }, 100);
         }
 
         if (leftBound < 112.8045544433594) {
@@ -135,7 +137,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 118.6213269042969,
             }, 8);
-          }, 200);
+          }, 100);
         }
 
         if (topBound > 21.870177650159505) {
@@ -144,7 +146,7 @@ class MapView extends Component {
               lat: 19.631994375473,
               lng: center.lng,
             }, 8);
-          }, 200);
+          }, 100);
         }
 
         if (botBound < 3.901446551859408) {
@@ -153,7 +155,7 @@ class MapView extends Component {
               lat: 6.796137280287343,
               lng: center.lng,
             }, 8);
-          }, 200);
+          }, 100);
         }
         break;
       case 9:
@@ -163,7 +165,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 125.8314099121094,
             }, 9);
-          }, 200);
+          }, 100);
         }
 
         if (leftBound < 113.6724743652344) {
@@ -172,7 +174,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 117.6213269042969,
             }, 9);
-          }, 200);
+          }, 100);
         }
 
         if (topBound > 21.690238515991084) {
@@ -181,7 +183,7 @@ class MapView extends Component {
               lat: 20.631994375473,
               lng: center.lng,
             }, 9);
-          }, 200);
+          }, 100);
         }
 
         if (botBound < 4.540199986969856) {
@@ -190,7 +192,7 @@ class MapView extends Component {
               lat: 5.796137280287343,
               lng: center.lng,
             }, 9);
-          }, 200);
+          }, 100);
         }
         break;
       case 10:
@@ -200,7 +202,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 125.8314099121094,
             }, 10);
-          }, 200);
+          }, 100);
         }
 
         if (leftBound < 115.53255126953127) {
@@ -209,7 +211,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 116.9213269042969,
             }, 10);
-          }, 200);
+          }, 100);
         }
 
         if (topBound > 21.466342099774664) {
@@ -218,7 +220,7 @@ class MapView extends Component {
               lat: 20.831994375473,
               lng: center.lng,
             }, 10);
-          }, 200);
+          }, 100);
         }
 
         if (botBound < 5.07430457682338) {
@@ -227,7 +229,7 @@ class MapView extends Component {
               lat: 5.596137280287343,
               lng: center.lng,
             }, 10);
-          }, 200);
+          }, 100);
         }
         break;
       case 11:
@@ -237,7 +239,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 125.8314099121094,
             }, 11);
-          }, 200);
+          }, 100);
         }
 
         if (leftBound < 116.46453521728517) {
@@ -246,7 +248,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 116.9213269042969,
             }, 11);
-          }, 200);
+          }, 100);
         }
 
         if (topBound > 21.34451936116666) {
@@ -255,7 +257,7 @@ class MapView extends Component {
               lat: 21.05994375473,
               lng: center.lng,
             }, 11);
-          }, 200);
+          }, 100);
         }
 
         if (botBound < 5.222899228122202) {
@@ -264,7 +266,7 @@ class MapView extends Component {
               lat: 5.396137280287343,
               lng: center.lng,
             }, 11);
-          }, 200);
+          }, 100);
         }
         break;
       case MAX_ZOOM:
@@ -274,7 +276,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 125.8314099121094,
             }, MAX_ZOOM);
-          }, 200);
+          }, 100);
         }
 
         if (leftBound < 116.648571472167997) {
@@ -283,7 +285,7 @@ class MapView extends Component {
               lat: center.lat,
               lng: 116.9213269042969,
             }, MAX_ZOOM);
-          }, 200);
+          }, 100);
         }
 
         if (topBound > 21.280528599739483) {
@@ -292,7 +294,7 @@ class MapView extends Component {
               lat: 21.15994375473,
               lng: center.lng,
             }, MAX_ZOOM);
-          }, 200);
+          }, 100);
         }
 
         if (botBound < 5.26922503276468) {
@@ -301,7 +303,7 @@ class MapView extends Component {
               lat: 5.36922503276468,
               lng: center.lng,
             }, MAX_ZOOM);
-          }, 200);
+          }, 100);
         }
         break;
       default:
@@ -344,8 +346,13 @@ class MapView extends Component {
           updateMapLocState={this.props.updateMapLocState}
           fetchArticles={this.props.fetchArticles}
           openInsights={this.props.openModal}
-          onSourcesTypeToggle={(isSidebarVisible) => {
-            this.props.toggleSourcesType();
+          onSourcesTypeChange={(isSidebarVisible, sourcesType) => {
+            if (sourcesType === 'credible') {
+              this.props.changeSourcesCredible();
+            } else {
+              this.props.changeSourcesNotCredible();
+            }
+
             this.props.fetchArticles();
 
             if (isSidebarVisible) {

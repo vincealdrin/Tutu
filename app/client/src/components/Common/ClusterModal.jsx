@@ -10,8 +10,6 @@ import {
   Segment,
   Grid,
   Dropdown,
-  Icon,
-  Button,
   Divider,
 } from 'semantic-ui-react';
 import moment from 'moment';
@@ -235,13 +233,11 @@ class ClusterModal extends PureComponent {
                   <div className="news-summary">
                     {article.summary}
                   </div>
-                  <div className="related-stories">
-                    <RelatedArticles
-                      relatedArticles={article.relatedArticles.articles}
-                      credibleArticles={article.relatedArticles.credibleArticles}
-                      isCredible={isCredible}
-                    />
-                  </div>
+                  <RelatedArticles
+                    relatedArticles={article.relatedArticles.articles}
+                    credibleArticles={article.relatedArticles.credibleArticles}
+                    isCredible={isCredible}
+                  />
                 </Grid.Column>
               </Grid>
             </Segment>

@@ -26,8 +26,8 @@ classes = [
     'Economy', 'Business & Finance', 'Lifestyle', 'Disaster & Accident',
     'Entertainment & Arts', 'Sports', 'Law & Government', 'Politics', 'Health',
     'Science & Technology', 'Crime', 'Weather',
-    'Culture', #'Nation',
     'Environment'
+    #'Culture', #'Nation',
 ]
 
 

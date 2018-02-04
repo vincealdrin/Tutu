@@ -16,29 +16,31 @@ class RelatedArticles extends PureComponent {
         title: 'Recommended Articles',
         content: {
           content: (
-            <List divided relaxed>
-              {relatedArticles.length
-                ? relatedArticles.map((article) => (
-                  <List.Item>
-                    <List.Header
-                      as="a"
-                      color="blue"
-                      href={article.url}
-                      target="_blank"
-                      className="related-articles"
-                    >
-                      {article.title}
-                    </List.Header>
-                    <List.Description>
-                      <p className="article-date">
-                        {moment(article.publishDate).format(DATE_FORMAT)}
-                      </p>
-                      <Label circular className="related-source-label">{article.source}</Label>
-                    </List.Description>
-                  </List.Item>
-                ))
-                : <span className="no-info">No recommended articles</span>}
-            </List>
+            <div className="related-stories">
+              <List divided relaxed>
+                {relatedArticles.length
+                  ? relatedArticles.map((article) => (
+                    <List.Item>
+                      <List.Header
+                        as="a"
+                        color="blue"
+                        href={article.url}
+                        target="_blank"
+                        className="related-articles"
+                      >
+                        {article.title}
+                      </List.Header>
+                      <List.Description>
+                        <p className="article-date">
+                          {moment(article.publishDate).format(DATE_FORMAT)}
+                        </p>
+                        <Label circular className="related-source-label">{article.source}</Label>
+                      </List.Description>
+                    </List.Item>
+                  ))
+                  : <span className="no-info">No recommended articles</span>}
+              </List>
+            </div>
           ),
         },
       },
@@ -46,8 +48,9 @@ class RelatedArticles extends PureComponent {
         title: 'Recommended Credible Articles',
         content: {
           content: (
-            <List divided relaxed>
-              {credibleArticles.length
+            <div className="related-stories">
+              <List divided relaxed>
+                {credibleArticles.length
                 ? credibleArticles.map((article) => (
                   <List.Item>
                     <List.Header
@@ -68,7 +71,8 @@ class RelatedArticles extends PureComponent {
                   </List.Item>
                 ))
                 : <span className="no-info">No recommended credible articles</span>}
-            </List>
+              </List>
+            </div>
           ),
         },
       },

@@ -23,8 +23,6 @@ module.exports = async (cb) => {
       'sources',
       'articles',
       'users',
-      'siteStats',
-      'fakeArticles',
       'pendingSources',
       'locations',
       'provinces',
@@ -32,7 +30,6 @@ module.exports = async (cb) => {
       'usersFeed',
       'visitors',
       'errorArticles',
-      // 'errorSources',
     ];
 
     r.dbCreate(DB_NAME).run(conn, async (err) => {

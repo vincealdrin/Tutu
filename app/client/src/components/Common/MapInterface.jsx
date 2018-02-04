@@ -1,5 +1,13 @@
 import React, { PureComponent } from 'react';
-import { Icon, Input, Button, Menu, Image, Message } from 'semantic-ui-react';
+import {
+  Icon,
+  Input,
+  Button,
+  Menu,
+  Image,
+  Message,
+  Dropdown,
+} from 'semantic-ui-react';
 import { NProgress } from 'redux-nprogress';
 import AppSidebar from '../AppSidebar';
 import Insights from '../Insights';
@@ -7,6 +15,16 @@ import tutuLogo from '../../assets/logo/tutu-logo.png';
 import SimpleModal from './SimpleModal';
 import ClusterModal from './ClusterModal';
 import './styles.css';
+
+const sourcesTypeOpts = [{
+  key: 'Credible Sources',
+  text: 'Credible Sources',
+  value: 'credible',
+}, {
+  key: 'Not Credible Sources',
+  text: 'Not Credible Sources',
+  value: 'not credible',
+}];
 
 class MapInterface extends PureComponent {
   state = {
@@ -27,11 +45,11 @@ class MapInterface extends PureComponent {
     });
   }
 
-  onSourcesTypeToggle_ = () => {
+  onSourcesTypeChange_ = (sourcesType) => {
     const { isSidebarVisible } = this.state;
 
     this.setState({ isMsgShown: true });
-    this.props.onSourcesTypeToggle(isSidebarVisible);
+    this.props.onSourcesTypeChange(isSidebarVisible, sourcesType);
   }
 
   getBtnsClassName = () => {
@@ -136,7 +154,7 @@ class MapInterface extends PureComponent {
             color={`${isCredible ? 'red' : 'green'}`}
             icon="newspaper"
             className="fake-news-button-mobile"
-            onClick={this.onSourcesTypeToggle_}
+            onClick={this.onSourcesTypeChange_}
             circular
           />
           <Button
@@ -167,13 +185,23 @@ class MapInterface extends PureComponent {
               disabled={isMapBtnDisabled}
               loading={isMapBtnDisabled}
             />
-            <Button
-              content={`${isCredible ? 'Not Credible' : 'Credible'} Sources`}
-              color={`${isCredible ? 'red' : 'green'}`}
-              icon="newspaper"
-              labelPosition="left"
-              onClick={this.onSourcesTypeToggle_}
-            />
+            <Button.Group color={isCredible ? 'green' : 'red'}>
+              <Dropdown
+                className="icon"
+                icon="newspaper"
+                labelPosition="left"
+                text={isCredible ? 'Credible Sources' : 'Not Credible Sources'}
+                options={sourcesTypeOpts}
+                onChange={(_, { value }) => {
+                  this.onSourcesTypeChange_(value);
+                }}
+                defaultValue="credible"
+                button
+                floating
+                labeled
+              />
+            </Button.Group>
+
           </div>
           <div className={`map-bot-buttons ${this.getBtnsClassName()}`}>
             <Button

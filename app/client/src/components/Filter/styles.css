@@ -35,6 +35,12 @@
   padding-left: 3rem !important;
 }
 
+.filter-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .menu.visible {
   max-height: 200px;
   overflow-y: auto;

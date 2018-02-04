@@ -20,7 +20,8 @@ export const FETCH_CLUSTER_INFO = 'mapArticles/FETCH_CLUSTER_INFO';
 export const REMOVE_FOCUSED = 'mapArticles/REMOVE_FOCUSED';
 export const UPDATE_MAP_STATE = 'mapArticles/UPDATE_MAP_STATE';
 export const UPDATE_MAP_LOC_STATE = 'mapArticles/UPDATE_MAP_LOC_STATE';
-export const TOGGLE_SOURCES = 'mapArticles/TOGGLE_SOURCES';
+export const CHANGE_SOURCES_CREDIBLE = 'mapArticles/CHANGE_SOURCES_CREDIBLE';
+export const CHANGE_SOURCES_NOT_CREDIBLE = 'mapArticles/CHANGE_SOURCES_NOT_CREDIBLE';
 export const CLEAR_STATE = 'mapArticles/CLEAR_STATE';
 export const INIT_LOAD = 'mapArticles/INIT_LOAD';
 
@@ -96,12 +97,19 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case CLEAR_STATE:
       return initialState;
-    case TOGGLE_SOURCES:
+    case CHANGE_SOURCES_CREDIBLE:
       return {
         ...state,
         clusters: [],
         articles: [],
-        isCredible: !state.isCredible,
+        isCredible: true,
+      };
+    case CHANGE_SOURCES_NOT_CREDIBLE:
+      return {
+        ...state,
+        clusters: [],
+        articles: [],
+        isCredible: false,
       };
     case FETCH_ARTICLES:
       return {
@@ -195,9 +203,12 @@ export const fetchArticles = (limit, page, cb, isNewQuery = false) =>
   httpThunk(FETCH_ARTICLES, async (getState) => {
     if (source) {
       source.cancel();
+      console.log(source);
+      console.log('cancel');
       // dispatch(endTask());
     }
     source = axios.CancelToken.source();
+
     try {
       const {
         mapArticles: {
@@ -347,7 +358,8 @@ export const fetchFocusedClusterInfo = (rawArticles, params) =>
     }
   });
 
-export const toggleSourcesType = () => ({ type: TOGGLE_SOURCES });
+export const changeSourcesCredible = () => ({ type: CHANGE_SOURCES_CREDIBLE });
+export const changeSourcesNotCredible = () => ({ type: CHANGE_SOURCES_NOT_CREDIBLE });
 export const clearState = () => ({ type: CLEAR_STATE });
 export const initLoad = () => ({ type: INIT_LOAD });
 export const updateMapLocState = (center, zoom, bounds) => ({

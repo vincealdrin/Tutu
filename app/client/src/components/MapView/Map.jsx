@@ -18,6 +18,7 @@ import {
   MAPS_CONTROL_STYLE,
 } from '../../constants';
 
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 const mapOptions = {
   zoomControlOptions: {
     position: MAPS_POSITION_LEFT_BOTTOM,
@@ -35,7 +36,7 @@ const mapOptions = {
   zoomControl: true,
   mapTypeControl: true,
   minZoomOverride: true,
-  minZoom: MIN_ZOOM,
+  minZoom: isMobile ? 7 : MIN_ZOOM,
   maxZoom: MAX_ZOOM,
   gestureHandling: 'greedy',
 };
@@ -51,7 +52,6 @@ class Map extends PureComponent {
       updateMapState,
       isCredible,
       isFocused,
-      isMobile,
     } = this.props;
 
     return (

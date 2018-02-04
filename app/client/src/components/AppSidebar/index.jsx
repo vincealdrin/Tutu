@@ -142,6 +142,10 @@ const AppSidebar = ({
                   <List.Icon name="dot circle outline" size="big" />
                   <List.Content>Display a cluster of articles in a region</List.Content>
                 </List.Item>
+                <List.Item>
+                  <List.Icon name="video" size="big" />
+                  <List.Content as="a" href="https://youtu.be/sf-R5tBzGMY" target="_blank">Click here to watch the instructional video</List.Content>
+                </List.Item>
               </List>
             </Modal.Content>
           </Modal>
@@ -175,7 +179,7 @@ const AppSidebar = ({
                   <Route path="(.*)/categories" component={Categories} exact />
                   <Route path="(.*)/themes" component={MapThemes} exact />
                   <Route path="(.*)/sources" component={SourcesList} exact />
-                  <Redirect to="/" />
+                  <Redirect to="/grid/popular" />
                 </Switch>
             ) : null}
             </div>
@@ -264,6 +268,10 @@ const AppSidebar = ({
                     <List.Item>
                       <List.Icon name="dot circle outline" size="big" />
                       <List.Content>Display a cluster of articles in a region</List.Content>
+                    </List.Item>
+                    <List.Item >
+                      <List.Icon name="video" size="big" />
+                      <List.Content as="a" href="https://youtu.be/sf-R5tBzGMY" target="_blank">Click here to watch the instructional video</List.Content>
                     </List.Item>
                   </List>
                 </Modal.Content>

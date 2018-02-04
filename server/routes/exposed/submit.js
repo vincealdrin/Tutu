@@ -54,7 +54,8 @@ module.exports = (conn, io) => {
       const brand = getSourceBrand(cheerioDoc) || getTempBrand(url);
       const title = getTitle(cheerioDoc);
       const faviconUrl = getFaviconUrl(cheerioDoc, url);
-      const wotReputation = await getWotReputation(domain);
+      // const wotReputation = await getWotReputation(domain);
+      const wotReputation = 0;
       const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, url);
       const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
       const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);

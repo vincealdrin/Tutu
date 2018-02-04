@@ -6,7 +6,8 @@ import InfiniteScroll from 'react-infinite-scroller';
 import {
   fetchArticles,
   fetchFocusedInfo,
-  toggleSourcesType,
+  changeSourcesCredible,
+  changeSourcesNotCredible,
   clearState,
 } from '../../modules/mapArticles';
 import { openModal } from '../../modules/insights';
@@ -33,7 +34,8 @@ const mapStateToProps = ({
 const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchArticles,
   fetchFocusedInfo,
-  toggleSourcesType,
+  changeSourcesCredible,
+  changeSourcesNotCredible,
   clearState,
   openModal,
 }, dispatch);
@@ -75,8 +77,13 @@ class GridView extends Component {
               this.setState({ page: 0 });
             }, true);
           }}
-          onSourcesTypeToggle={(isSidebarVisible) => {
-            this.props.toggleSourcesType();
+          onSourcesTypeToggle={(isSidebarVisible, sourcesType) => {
+            if (sourcesType === 'credible') {
+              this.props.changeSourcesCredible();
+            } else {
+              this.props.changeSourcesNotCredible();
+            }
+
             this.props.fetchArticles(limit, 0, () => {
               this.setState({ page: 0 });
             }, true);

@@ -42,7 +42,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 }, dispatch);
 
 const categoriesOptions = [
-  { key: 'Arts & Entertainment', text: 'Arts & Entertainment', value: 'Arts & Entertainment' },
+  { key: 'Entertainment & Arts', text: 'Entertainment & Arts', value: 'Entertainment & Arts' },
   { key: 'Business & Finance', text: 'Business & Finance', value: 'Business & Finance' },
   { key: 'Crime', text: 'Crime', value: 'Crime' },
   { key: 'Disaster & Accident', text: 'Disaster & Accident', value: 'Disaster & Accident' },
@@ -112,7 +112,7 @@ class Filter extends PureComponent {
       <Segment className="filter-segment-container">
         <Label as="a" color="teal" ribbon style={{ marginBottom: '1rem' }}>Preferences</Label>
         <div className="filter-scrollable">
-          <Button.Group labeled icon>
+          <div className="filter-buttons">
             <Tooltip
               title="Loading..."
               trigger="click"
@@ -123,31 +123,12 @@ class Filter extends PureComponent {
               <Button
                 className="save-button-filter"
                 icon="play"
-                content="Run"
+                content="Load Articles"
                 labelPosition="left"
                 onClick={() => {
                   fetchArticles();
                 }}
                 color="green"
-              />
-            </Tooltip>
-
-          </Button.Group>
-          <Button.Group>
-            <Tooltip
-              html={<FilterAlert action="save" />}
-              trigger="click"
-              duration={500}
-              hideDelay={900}
-              animation="scale"
-            >
-              <Button
-                className="save-button-filter"
-                icon="save"
-                content="Save"
-                labelPosition="left"
-                onClick={() => localStorage.setItem('filterSettings', JSON.stringify(filters))}
-                color="blue"
               />
             </Tooltip>
             <Tooltip
@@ -156,10 +137,7 @@ class Filter extends PureComponent {
               duration={500}
               hideDelay={900}
               animation="scale"
-              onShown={() => {
-                this.props.clearFilters();
-                localStorage.removeItem('filterSettings');
-              }}
+              onShown={this.props.clearFilters}
             >
               <Button
                 icon="delete"
@@ -168,7 +146,7 @@ class Filter extends PureComponent {
                 color="default"
               />
             </Tooltip>
-          </Button.Group>
+          </div>
           <Divider />
           <span className="input-label">SEARCH</span>
           <Dropdown

@@ -12,9 +12,11 @@ const TopMenu = ({
     {isLogin ? (
       <div className="top-menu-container">
         <Menu.Item>
-          <Button onClick={toggleSidebarExpand} icon>
-            <Icon name="content" />
-          </Button>
+          {userInfo.role !== 'curator' ? (
+            <Button onClick={toggleSidebarExpand} icon >
+              <Icon name="content" />
+            </Button>
+          ) : null}
         </Menu.Item>
         <Menu.Menu className="userinfo-logout">
           Hello, {userInfo.name}!

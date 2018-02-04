@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Segment, Grid, Label, Button, Menu } from 'semantic-ui-react';
+import { Button, Menu } from 'semantic-ui-react';
 import moment from 'moment';
 import DataTable from '../Common/DataTable';
 import SourcesForm from './SourcesForm';
@@ -100,16 +100,11 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 }, dispatch);
 
 class Sources extends Component {
-  state = { activeItem: 'news sources' };
-  componentDidMount() {
-    this.props.fetchSources();
-    this.props.fetchPendingSources();
-    this.props.fetchFakeSources();
-  }
+  state = { activeItem: 'pending sources' };
 
   changeItem = (_, { name }) => this.setState({ activeItem: name });
 
-  renderActiveMenuItem = () => {
+  render() {
     const {
       sources,
       pendingSources,
@@ -118,19 +113,37 @@ class Sources extends Component {
       pendingTotalCount,
       fakeTotalCount,
     } = this.props;
+    const { activeItem } = this.state;
 
-    switch (this.state.activeItem) {
-      case 'news sources': {
-        return (
+    return (
+      <div className="sources-container">
+        <Menu pointing secondary>
+          <Menu.Item
+            name="pending sources"
+            active={activeItem === 'pending sources'}
+            onClick={this.changeItem}
+          />
+          <Menu.Item
+            name="credible sources"
+            active={activeItem === 'credible sources'}
+            onClick={this.changeItem}
+          />
+          <Menu.Item
+            name="not credible sources"
+            active={activeItem === 'not credible sources'}
+            onClick={this.changeItem}
+          />
+        </Menu>
+        {activeItem === 'not credible sources' ? (
           <DataTable
             defaultSearchFilter="brand"
-            label="Sources"
-            totalCount={totalCount}
-            data={sources}
+            label="Not Credible Sources"
+            totalCount={fakeTotalCount}
+            data={fakeSources}
             columns={columns}
-            onDeleteSelected={this.props.deleteSources}
-            onPaginate={this.props.fetchSources}
-            addModalContent={<SourcesForm />}
+            onDeleteSelected={this.props.deleteFakeSources}
+            onPaginate={this.props.fetchFakeSources}
+            addModalContent={<FakeSourcesForm />}
             addModalActions={(closeModal) => (
               <div>
                 <Button
@@ -141,11 +154,11 @@ class Sources extends Component {
                 <Button
                   color="green"
                   onClick={async () => {
-                    await this.props.addSources();
+                    await this.props.addFakeSources();
                     // this.resetInputVals();
                     closeModal();
                   }}
-                  content="Add All Sources"
+                  content="Add All Fake Sources"
                 />
               </div>
             )}
@@ -154,11 +167,10 @@ class Sources extends Component {
                 {id}
               </div>
             )}
+            initLoad
           />
-        );
-      }
-      case 'pending news sources': {
-        return (
+        ) : null}
+        {activeItem === 'pending sources' ? (
           <DataTable
             defaultSearchFilter="brand"
             label="Pending Sources"
@@ -200,20 +212,19 @@ class Sources extends Component {
                 />
               </div>
             )}
+            initLoad
           />
-        );
-      }
-      case 'fake news sources': {
-        return (
+        ) : null}
+        {activeItem === 'credible sources' ? (
           <DataTable
             defaultSearchFilter="brand"
-            label="Fake Sources"
-            totalCount={fakeTotalCount}
-            data={fakeSources}
+            label="Credible Sources"
+            totalCount={totalCount}
+            data={sources}
             columns={columns}
-            onDeleteSelected={this.props.deleteFakeSources}
-            onPaginate={this.props.fetchFakeSources}
-            addModalContent={<FakeSourcesForm />}
+            onDeleteSelected={this.props.deleteSources}
+            onPaginate={this.props.fetchSources}
+            addModalContent={<SourcesForm />}
             addModalActions={(closeModal) => (
               <div>
                 <Button
@@ -224,11 +235,11 @@ class Sources extends Component {
                 <Button
                   color="green"
                   onClick={async () => {
-                    await this.props.addFakeSources();
+                    await this.props.addSources();
                     // this.resetInputVals();
                     closeModal();
                   }}
-                  content="Add All Fake Sources"
+                  content="Add All Sources"
                 />
               </div>
             )}
@@ -237,37 +248,9 @@ class Sources extends Component {
                 {id}
               </div>
             )}
+            initLoad
           />
-        );
-      }
-      default:
-        return <p>No Item</p>;
-    }
-  };
-
-  render() {
-    const { activeItem } = this.state;
-
-    return (
-      <div className="sources-container">
-        <Menu pointing secondary>
-          <Menu.Item
-            name="news sources"
-            active={activeItem === 'news sources'}
-            onClick={this.changeItem}
-          />
-          <Menu.Item
-            name="pending news sources"
-            active={activeItem === 'pending news sources'}
-            onClick={this.changeItem}
-          />
-          <Menu.Item
-            name="fake news sources"
-            active={activeItem === 'fake news sources'}
-            onClick={this.changeItem}
-          />
-        </Menu>
-        {this.renderActiveMenuItem()}
+        ) : null}
       </div>
     );
   }

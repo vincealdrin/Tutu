@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Sidebar, Segment, Menu } from 'semantic-ui-react';
-
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
@@ -13,7 +12,7 @@ const mapStateToProps = ({
     info,
   },
 }) => ({
-  info,
+  user: info,
 });
 
 class AppSidebar extends Component {
@@ -25,7 +24,7 @@ class AppSidebar extends Component {
     const {
       isLogin,
       logout,
-      info,
+      user = { role: '' },
     } = this.props;
     const { isExpanded } = this.state;
 
@@ -37,7 +36,7 @@ class AppSidebar extends Component {
             animation="slide out"
             width="thin"
             as={Menu}
-            visible={isLogin && isExpanded}
+            visible={user.role === 'superadmin' ? (isLogin && isExpanded) : false}
             vertical
             inverted
           >
@@ -45,7 +44,7 @@ class AppSidebar extends Component {
           </Sidebar>
           <Sidebar.Pusher>
             <TopMenu
-              userInfo={info}
+              userInfo={user}
               toggleSidebarExpand={this.toggleExpand}
               isLogin={isLogin}
               logout={logout}

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import {
   Button,
   Table,
@@ -20,7 +20,7 @@ const rowsPerPageOptions = [
   { key: '30', text: '30', value: 30 },
   { key: '50', text: '50', value: 50 },
 ];
-class DataTable extends PureComponent {
+class DataTable extends Component {
   state = {
     isDeleting: false,
     isAdding: false,
@@ -30,6 +30,14 @@ class DataTable extends PureComponent {
     searchFilter: this.props.defaultSearchFilter,
     currentPage: 1,
     limit: 20,
+  }
+
+  componentDidMount() {
+    const { initLoad, onPaginate } = this.props;
+
+    if (initLoad) {
+      onPaginate();
+    }
   }
 
   enableAdd = () => this.setState({ isAdding: true })

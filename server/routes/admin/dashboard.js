@@ -16,6 +16,7 @@ module.exports = (conn, { ioClient, io }) => {
       } else {
         activeUsers -= 1;
       }
+
       io.emit('activeUsers', activeUsers);
     });
   });

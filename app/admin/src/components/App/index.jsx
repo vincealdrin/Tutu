@@ -15,9 +15,11 @@ const mapStateToProps = ({
   user: {
     isLogin,
     token,
+    info,
   },
 }) => ({
   isLogin,
+  info,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -26,14 +28,14 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 
 class App extends Component {
   render() {
-    const { isLogin } = this.props;
+    const { isLogin, info } = this.props;
 
     return (
       <Sidebar
         isLogin={isLogin}
         logout={this.props.logout}
       >
-        <Routes isLogin={isLogin} />
+        <Routes isLogin={isLogin} user={info} />
       </Sidebar>
     );
   }

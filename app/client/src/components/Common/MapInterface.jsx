@@ -26,6 +26,7 @@ const sourcesTypeOpts = [{
   value: 'not credible',
 }];
 
+let sourcesTypeTemp = 'credible';
 class MapInterface extends PureComponent {
   state = {
     currentPosition: null,
@@ -50,6 +51,7 @@ class MapInterface extends PureComponent {
 
     this.setState({ isMsgShown: true });
     this.props.onSourcesTypeChange(isSidebarVisible, sourcesType);
+    sourcesTypeTemp = sourcesType;
   }
 
   getBtnsClassName = () => {
@@ -128,7 +130,6 @@ class MapInterface extends PureComponent {
             </Menu.Item>
             <Menu.Item header className="mobile-tutu-title">TUTÛ</Menu.Item>
             {isMap ? (
-
               <Menu.Menu position="right">
                 <Menu.Item>
                   <Input icon className="search-topbar-mobile">
@@ -154,7 +155,7 @@ class MapInterface extends PureComponent {
             color={`${isCredible ? 'red' : 'green'}`}
             icon="newspaper"
             className="fake-news-button-mobile"
-            onClick={this.onSourcesTypeChange_}
+            onClick={() => this.onSourcesTypeChange_(sourcesTypeTemp === 'credible' ? 'not credible' : 'credible')}
             circular
           />
           <Button

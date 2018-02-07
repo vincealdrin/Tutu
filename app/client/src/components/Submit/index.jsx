@@ -20,15 +20,14 @@ class Submit extends Component {
     result: {
       overallPred: false,
       isCredible: true,
-      verifiedRes: {},
-      isVerified: false,
+      verifiedRes: null,
       result: 0,
       sourceResult: 0,
       contentResult: 0,
       sourceUrl: '',
     },
-    showPrediction: true,
     url: '',
+    showPrediction: false,
   };
 
   submit = async () => {
@@ -39,7 +38,6 @@ class Submit extends Component {
       const {
         data: {
           isCredible,
-          isVerified,
           verifiedRes,
           sourcePct,
           contentPct,
@@ -57,7 +55,6 @@ class Submit extends Component {
       this.setState({
         result: {
           isCredible,
-          isVerified,
           verifiedRes,
           pct,
           sourcePct,
@@ -65,7 +62,7 @@ class Submit extends Component {
           overallPred,
           sourceUrl,
         },
-        showPrediction: !isVerified,
+        showPrediction: !verifiedRes,
         submitStatus: 'success',
         errorMessage: '',
       });
@@ -88,7 +85,7 @@ class Submit extends Component {
 
     return (
       <Segment className="submit-segment-container">
-        <Label as="a" color="orange" ribbon style={{ marginBottom: '1rem' }}>Detect</Label>
+        <Label color="orange" ribbon style={{ marginBottom: '1rem' }}>Detect</Label>
         <div className="submit-scrollable-section">
           <Header as="h2" style={{ marginBottom: 32 }}>
               Detect News Source&apos;s Credibility
@@ -135,25 +132,25 @@ class Submit extends Component {
                 </Message>
                 ) : null}
 
-              {submitStatus === 'success' && result.isVerified ? (
+              {submitStatus === 'success' && result.verifiedRes ? (
                 <Message color={result.verifiedRes.isCredible ? 'green' : 'red'} info>
                   <Message.Header>
                     <p>
-                      <Icon name={result.isCredible ? 'check' : 'warning sign'} />
+                      <Icon name={result.verifiedRes.isCredible ? 'check' : 'warning sign'} />
                       <a href={result.sourceUrl} target="_blank">{result.sourceUrl}</a>
-                      <br />is tagged by a professional journalist as a <b>{result.isCredible ? 'CREDIBLE' : 'NOT CREDIBLE'} SOURCE</b>
+                      <br />is tagged by a journalist as a <b>{result.verifiedRes.isCredible ? 'CREDIBLE' : 'NOT CREDIBLE'} SOURCE</b>
                     </p>
                     <Button
                       content={`I ${showPrediction ? 'DON\'T' : 'STILL'} WANNA SEE THE PREDICTION`}
                       onClick={() => {
-                          this.setState({ showPrediction: !showPrediction });
-                        }}
+                        this.setState({ showPrediction: !showPrediction });
+                      }}
                     />
                   </Message.Header>
                 </Message>
                 ) : null}
 
-              {submitStatus === 'success' && result.isVerified && showPrediction ? (
+              {submitStatus === 'success' && showPrediction ? (
                 <Message color={result.isCredible ? 'green' : 'red'} info>
                   <Message.Header>
                     <span>

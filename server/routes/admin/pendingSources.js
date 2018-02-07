@@ -2,6 +2,7 @@ const router = require('express').Router();
 const r = require('rethinkdb');
 const cheerio = require('cheerio');
 const rp = require('request-promise');
+const validUrl = require('valid-url');
 const {
   cleanUrl,
   getAboutContactUrl,
@@ -12,7 +13,10 @@ const {
   PH_TIMEZONE,
   getTitle,
   getFaviconUrl,
-  getDomainOnly,
+  removeUrlPath,
+  getDomain,
+  cloudScrape,
+  getTempBrand,
 } = require('../../utils');
 
 module.exports = (conn, io) => {
@@ -37,7 +41,7 @@ module.exports = (conn, io) => {
 
       const totalCount = await query.count().run(conn);
       const cursor = await query
-        .orderBy(r.desc('timestamp'))
+        .orderBy(r.desc('isReliablePred'), r.desc('timestamp'))
         .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
         .run(conn);
       const sources = await cursor.toArray();
@@ -65,10 +69,21 @@ module.exports = (conn, io) => {
     const pendingSource = req.body;
     const url = cleanUrl(pendingSource.url);
 
+    if (!validUrl.isUri(url)) {
+      return next({
+        status: 400,
+        message: 'Invalid URL',
+      });
+    }
+
     try {
-      const uuid = await r.uuid(url).run(conn);
-      const matchedPending = await r.table('pendingSources').get(uuid).run(conn);
-      const matchedSource = await r.table('sources').get(uuid).run(conn);
+      const domain = cleanUrl(removeUrlPath(url));
+      const domainOnly = cleanUrl(getDomain(removeUrlPath(url)));
+      const uuid = await r.uuid(domain).run(conn);
+      const uuidDom = await r.uuid(domainOnly).run(conn);
+
+      const matchedPending = await r.table('pendingSources').get(uuid).run(conn) || await r.table('pendingSources').get(uuidDom).run(conn);
+      const matchedSource = await r.table('sources').get(uuid).run(conn) || await r.table('sources').get(uuidDom).run(conn);
 
       if (matchedPending) {
         return next({
@@ -80,26 +95,37 @@ module.exports = (conn, io) => {
       if (matchedSource) {
         return next({
           status: 400,
-          message: `${url} already exists in the list of ${matchedSource.isReliable ? 'reliable' : 'unreliable'} sources`,
+          message: `${url} already exists in the list of ${matchedSource.isReliable ? 'credible' : 'not credible'} sources`,
         });
       }
 
-      const cheerioDoc = cheerio.load(await rp(url));
-      const brand = getSourceBrand(cheerioDoc) || getDomainOnly(url);
+      let body;
+      try {
+        body = await rp(url);
+      } catch (e) {
+        try {
+          body = await cloudScrape(url);
+        } catch (err) {
+          return next({
+            status: 500,
+            message: 'Can\'t access the article url, please try again later',
+          });
+        }
+      }
+
+      const cheerioDoc = cheerio.load(body);
+      const brand = getSourceBrand(cheerioDoc) || getTempBrand(url);
       const title = getTitle(cheerioDoc);
-      // const socialScore = await getSocialScore(url);
-      // const { countryRank, worldRank, sourceUrl } = await getAlexaRank(url);
       const faviconUrl = getFaviconUrl(cheerioDoc, url);
+      // const wotReputation = await getWotReputation(domain);
+      const wotReputation = 0;
       const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, url);
       const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
       const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);
 
       const {
-        reliable,
+        isCredible,
         sourceUrl,
-        pct,
-        sourcePct,
-        contentPct,
         socialScore,
         countryRank,
         worldRank,
@@ -108,31 +134,32 @@ module.exports = (conn, io) => {
         body: {
           sourceHasAboutPage: (hasAboutPage && aboutUsUrl) ? 1 : 0,
           sourceHasContactPage: (hasContactPage && contactUsUrl) ? 1 : 0,
+          wotReputation,
           url,
+          body,
         },
         json: true,
       });
-      const isReliablePred = Boolean(reliable);
-      const sourceCleanUrl = cleanUrl(sourceUrl);
+
+      const isReliablePred = Boolean(isCredible);
+      const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+      const cleanedSrcUrl = cleanUrl(sourceUrl);
+      const id = await r.uuid(cleanedSrcUrl).run(conn);
 
       const pendingSourceInfo = {
-        ...pendingSource,
-        id: await r.uuid(sourceCleanUrl).run(conn),
-        url: sourceCleanUrl,
+        url: cleanedSrcUrl,
         timestamp: r.now().inTimezone(PH_TIMEZONE),
-        prediction: {
-          isReliable: isReliablePred,
-          pct,
-          sourcePct,
-          contentPct,
-        },
+        senderIpAddress: ipAddress,
+        wotReputation,
+        id,
+        brand,
+        isReliablePred,
+        aboutUsUrl,
+        contactUsUrl,
         socialScore,
         countryRank,
         worldRank,
-        brand,
         faviconUrl,
-        aboutUsUrl,
-        contactUsUrl,
         title,
       };
       const { changes } = await r.table(tbl)

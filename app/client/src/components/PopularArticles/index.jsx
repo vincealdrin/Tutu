@@ -51,7 +51,7 @@ class PopularArticles extends PureComponent {
             </Dimmer>
           ) : null}
           {!fetchStatus.pending ? (
-            <Label as="a" color="red" ribbon style={{ marginBottom: '1rem' }}>Popular Articles</Label>
+            <Label color="red" ribbon style={{ marginBottom: '1rem' }}>Popular Articles</Label>
           ) : null}
           <div className="pop-scrollable-section">
             {articles.map((article) => (

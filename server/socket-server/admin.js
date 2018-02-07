@@ -26,7 +26,8 @@ module.exports = (io, conn) => {
       cursor.each((e, feed) => {
         if (e) throw e;
         if (feed.type === 'add') {
-          io.emit('newPendingSource');
+          console.log(feed);
+          io.emit('newPendingSource', feed.new_val);
         }
       });
     });

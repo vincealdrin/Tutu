@@ -370,7 +370,7 @@ class MapView extends Component {
           clusters={clusters}
           articles={articles}
           openInsights={this.props.openModal}
-          updateMapState={this.props.updateMapState}
+          updateMapLocState={this.props.updateMapLocState}
           onChange={this._onChange}
           onChildClick={this._onChildClick}
           isCredible={isCredible}

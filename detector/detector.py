@@ -88,7 +88,7 @@ print('test articles: ' + str(len(test_articles)))
 
 df = pd.DataFrame.from_records(train_articles)
 
-print(df.head())
+# print(df.head())
 
 df['credible'] = df['credible'].apply(lambda credible: 1 if credible else 0)
 df['src_world_rank'] = df['src_world_rank'].apply(
@@ -136,7 +136,7 @@ y_test = test_df.credible.values
 test_body = body_tfidf.transform(test_df.body.values)
 test_title = title_tfidf.transform(test_df.title.values)
 
-print(df.head())
+# print(df.head())
 test_df.drop(['src_id', 'body', 'title', 'credible'], axis=1, inplace=True)
 
 X_test = hstack([test_df, test_body, test_title], format='csr')
@@ -146,6 +146,7 @@ X_test = hstack([test_df, test_body, test_title], format='csr')
 target_names = ['not credible', 'credible']
 
 lr_clf = LogisticRegression(penalty='l1')
+
 lr_clf.fit(X_train, y_train)
 lr_pred = lr_clf.predict(X_test)
 print('Logistic Regression')
@@ -153,6 +154,8 @@ print('Classification Report')
 print(classification_report(y_test, lr_pred, target_names=target_names))
 
 print('Accuracy: ' + str(accuracy_score(y_test, lr_pred)))
+
+lr_clf = LogisticRegression(penalty='l1')
 cv_scores = cross_val_score(lr_clf, X_train, y_train, cv=5)
 print("Cross Validation: %0.2f (+/- %0.2f)" % (cv_scores.mean(),
                                                cv_scores.std() * 2))

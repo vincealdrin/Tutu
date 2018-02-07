@@ -85,7 +85,7 @@ class Users extends Component {
             )}
             rowActions={(id) => (
               <div>
-                {id}
+                <Button content="Update" />
               </div>
             )}
           />

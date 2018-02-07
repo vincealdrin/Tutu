@@ -26,6 +26,7 @@ import {
 import './styles.css';
 import { TIME_FORMAT } from '../../constants';
 
+
 const columns = [
   { key: 'brand', text: 'Brand' },
   {
@@ -51,7 +52,7 @@ const pendingColumns = [
   },
   {
     key: 'isReliablePred',
-    wrapper: (val) => (val ? 'Reliable' : 'Unreliable'),
+    wrapper: (val) => (val ? 'Credible' : 'Not Credible'),
     text: 'Prediction',
   },
   {
@@ -164,7 +165,7 @@ class Sources extends Component {
             )}
             rowActions={(id) => (
               <div>
-                {id}
+                <Button content="Update" />
               </div>
             )}
             initLoad
@@ -190,7 +191,7 @@ class Sources extends Component {
                 <Button
                   color="green"
                   onClick={async () => {
-                    await this.props.addSources();
+                    await this.props.addPendingSources();
                     // this.resetInputVals();
                     closeModal();
                   }}
@@ -202,12 +203,12 @@ class Sources extends Component {
               <div>
                 <Button
                   color="green"
-                  content="Reliable"
+                  content="Credible"
                   onClick={() => this.props.verifyPendingSource(id, true)}
                 />
                 <Button
                   color="red"
-                  content="Unreliable"
+                  content="Not Credible"
                   onClick={() => this.props.verifyPendingSource(id, false)}
                 />
               </div>
@@ -245,7 +246,7 @@ class Sources extends Component {
             )}
             rowActions={(id) => (
               <div>
-                {id}
+                <Button content="Update" />
               </div>
             )}
             initLoad

@@ -8,13 +8,13 @@
       "type": "image/x-icon"
     },
     {
-      "src": "favicon-144px.ico",
+      "src": "favicon-144x144.png",
       "sizes": "144x144",
-      "type": "image/x-icon"
+      "type": "image/png"
     }
   ],
   "start_url": "./index.html",
   "display": "standalone",
   "theme_color": "#FF8A65",
-  "background_color": "#DCEDC8"
+  "background_color": "#FFF"
 }

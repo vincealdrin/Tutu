@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Button } from 'semantic-ui-react';
 import moment from 'moment';
 import {
   fetchArticles,
@@ -94,7 +95,7 @@ class Articles extends Component {
           onPaginate={this.props.fetchArticles}
           rowActions={(id) => (
             <div>
-              {id}
+              <Button content="Update" />
             </div>
           )}
           hideAddBtn

@@ -12,7 +12,7 @@ const {
   PH_TIMEZONE,
   getUpdatedFields,
   getAlexaRank,
-  getDomainOnly,
+  getDomain,
   getDomainCreationDate,
   getWotReputation,
 } = require('../../utils');
@@ -132,7 +132,7 @@ module.exports = (conn, io) => {
         const { countryRank, worldRank, sourceUrl } = await getAlexaRank(source.url);
         const sourceCleanUrl = cleanUrl(sourceUrl);
         const socialScore = await getSocialScore(source.url);
-        const brand = getSourceBrand(cheerioDoc) || getDomainOnly(source.url);
+        const brand = getSourceBrand(cheerioDoc) || getDomain(source.url);
         const wotReputation = await getWotReputation(source.url);
         // const domainCreationDate = getDomainCreationDate(source.url);
 

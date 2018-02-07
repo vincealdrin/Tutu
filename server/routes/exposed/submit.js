@@ -89,22 +89,25 @@ module.exports = (conn, io) => {
       console.log('after');
       console.log(cleanedSrcUrl);
       console.log(id);
-      await r.table('pendingSources').insert({
-        url: cleanedSrcUrl,
-        timestamp: r.now().inTimezone(PH_TIMEZONE),
-        senderIpAddress: ipAddress,
-        wotReputation,
-        id,
-        brand,
-        isReliablePred,
-        aboutUsUrl,
-        contactUsUrl,
-        socialScore,
-        countryRank,
-        worldRank,
-        faviconUrl,
-        title,
-      }, { conflict: 'update' }).run(conn);
+
+      if (!matchedSource) {
+        await r.table('pendingSources').insert({
+          url: cleanedSrcUrl,
+          timestamp: r.now().inTimezone(PH_TIMEZONE),
+          senderIpAddress: ipAddress,
+          wotReputation,
+          id,
+          brand,
+          isReliablePred,
+          aboutUsUrl,
+          contactUsUrl,
+          socialScore,
+          countryRank,
+          worldRank,
+          faviconUrl,
+          title,
+        }, { conflict: 'update' }).run(conn);
+      }
 
       if (submit === 'yes') {
         await r.table('pendingSources').get(id).update({
@@ -119,11 +122,10 @@ module.exports = (conn, io) => {
       res.json({
         sourceUrl: cleanedSrcUrl,
         isCredible: Boolean(isCredible),
-        isVerified: !!matchedSource,
-        verifiedRes: {
-          isCredible: (matchedSource || {}).isReliable,
-          url: (matchedSource || {}).url,
-        },
+        verifiedRes: matchedSource ? {
+          isCredible: matchedSource.isReliable,
+          url: matchedSource.url,
+        } : null,
         pct,
         sourcePct,
         contentPct,

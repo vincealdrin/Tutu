@@ -49,7 +49,7 @@ class Map extends PureComponent {
       articles,
       onChange,
       onChildClick,
-      updateMapState,
+      updateMapLocState,
       isCredible,
       isFocused,
     } = this.props;
@@ -79,7 +79,7 @@ class Map extends PureComponent {
           searchBox.addListener('places_changed', () => {
             const places = searchBox.getPlaces();
 
-            updateMapState({
+            updateMapLocState({
               lat: places[0].geometry.location.lat(),
               lng: places[0].geometry.location.lng(),
             }, 12);
@@ -88,7 +88,7 @@ class Map extends PureComponent {
           searchBoxMobile.addListener('places_changed', () => {
             const places = searchBox.getPlaces();
 
-            updateMapState({
+            updateMapLocState({
               lat: places[0].geometry.location.lat(),
               lng: places[0].geometry.location.lng(),
             }, 12);

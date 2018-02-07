@@ -67,7 +67,7 @@ class RecentArticles extends Component {
           </Dimmer>
           ) : null}
         {!fetchStatus.pending ? (
-          <Label as="a" color="blue" ribbon style={{ marginBottom: '1rem' }}>Recent Articles</Label>
+          <Label color="blue" ribbon style={{ marginBottom: '1rem' }}>Recent Articles</Label>
           ) : null }
         <div className="rec-scrollable-section">
           {articles.map((article) => (

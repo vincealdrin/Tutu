@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button,
+import {
   Segment,
   Label,
   Icon,
@@ -14,7 +14,7 @@ class About extends Component {
     return (
       <div>
         <Segment>
-          <Label as="a" color="red" ribbon style={{ marginBottom: '1rem' }}>About</Label>
+          <Label color="red" ribbon style={{ marginBottom: '1rem' }}>About</Label>
           <div className="scrollable-section about-section-info">
             <Header as="h2" style={{ marginBottom: 32 }}>
               TUTÛ: Interactive Map of Philippines&apos; Credible News

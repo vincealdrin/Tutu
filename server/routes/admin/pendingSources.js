@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const r = require('rethinkdb');
 const cheerio = require('cheerio');
+const moment = require('moment');
 const rp = require('request-promise');
 const validUrl = require('valid-url');
 const {
@@ -21,6 +22,22 @@ const {
 
 module.exports = (conn, io) => {
   const tbl = 'pendingSources';
+
+  router.get('/votes', async (req, res, next) => {
+    try {
+      const { pendingSourceId, isCredible = 'yes' } = req.query;
+      console.log(pendingSourceId);
+      const cursor = await r.table('pendingSourceVotes')
+        .filter(r.row('pendingSourceId').eq(pendingSourceId)
+          .and(r.row('isCredible').eq(isCredible === 'yes')))
+        .run(conn);
+      const votes = await cursor.toArray();
+
+      res.json(votes);
+    } catch (e) {
+      next(e);
+    }
+  });
 
   router.get('/', async (req, res, next) => {
     const {
@@ -43,6 +60,17 @@ module.exports = (conn, io) => {
       const cursor = await query
         .orderBy(r.desc('isReliablePred'), r.desc('timestamp'))
         .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
+        .merge((source) => ({
+          vote: r.table('pendingSourceVotes').get(r.uuid(source('id').add(req.user.id))),
+          credibleVotesCount: r.table('pendingSourceVotes')
+            .filter((vote) => vote('pendingSourceId').eq(source('id'))
+              .and(vote('isCredible').eq(true)))
+            .count(),
+          notCredibleVotesCount: r.table('pendingSourceVotes')
+            .filter((vote) => vote('pendingSourceId').eq(source('id'))
+              .and(vote('isCredible').eq(false)))
+            .count(),
+        }))
         .run(conn);
       const sources = await cursor.toArray();
 
@@ -193,7 +221,7 @@ module.exports = (conn, io) => {
     try {
       const { changes } = await r.table(tbl)
         .get(sourceId)
-        .update(source, { returnChanges: true })
+        .update(source)
         .run(conn);
 
       await r.table('usersFeed').insert({
@@ -228,7 +256,7 @@ module.exports = (conn, io) => {
         table: tbl,
       }).run(conn);
 
-      res.status(204).end();
+      res.sendStatus(204);
     } catch (e) {
       next(e);
     }
@@ -251,7 +279,7 @@ module.exports = (conn, io) => {
         table: tbl,
       }).run(conn);
 
-      res.status(204).end();
+      res.sendStatus(204);
     } catch (e) {
       next(e);
     }
@@ -261,44 +289,93 @@ module.exports = (conn, io) => {
     const {
       id,
       isReliable,
+      comment,
     } = req.body;
 
     try {
-      const { changes } = await r.table(tbl)
-        .get(id)
-        .delete({ returnChanges: true })
+      const votes = await r.table('pendingSourceVotes')
+        .filter(r.row('sourceId').eq(id))
+        .group(r.row('isCredible'))
+        .count()
+        .ungroup()
+        .map((x) => [r.branch(x.getField('group'), 'credible', 'notCredible'), x.getField('reduction')])
+        .coerceTo('object')
         .run(conn);
+      const matchedVote = await r.table('pendingSourceVotes').get(r.uuid(id + req.user.id)).run(conn);
+      const totalJourns = await r.table('users').filter(r.row('role').eq('curator')).count().run(conn);
+      const totalVotes = (votes.credible || 0) + (votes.notCredible || 0);
+      const timestamp = await r.now().inTimezone(PH_TIMEZONE).run(conn);
 
-      const pendingSource = changes[0].old_val;
+      console.log(matchedVote);
+      console.log(votes);
+      console.log(totalVotes + 1);
+      console.log(totalJourns);
+      if (!matchedVote && (totalVotes + 1) >= totalJourns) {
+        const { changes } = await r.table(tbl)
+          .get(id)
+          .delete({ returnChanges: true })
+          .run(conn);
 
-      delete pendingSource.isReliablePred;
+        const pendingSource = changes[0].old_val;
 
-      const newSource = {
-        ...pendingSource,
-        isReliable,
-        verifiedByUserId: req.user.id,
-        timestamp: r.now().inTimezone(PH_TIMEZONE),
-      };
+        delete pendingSource.isReliablePred;
 
-      const { changes: insertedVals } = await r.table('sources')
-        .insert(newSource, { returnChanges: true, conflict: 'replace' })
-        .run(conn);
-      const insertedVal = insertedVals[0].new_val;
+        const newSource = {
+          ...pendingSource,
+          isReliable: votes.credible > votes.notCredible,
+          timestamp,
+        };
 
-      await r.table('usersFeed').insert({
-        userId: req.user.id,
-        type: 'verify',
-        timestamp: r.expr(insertedVal.timestamp).inTimezone(PH_TIMEZONE),
-        sourceId: newSource.id,
-        table: tbl,
-        isReliable,
-      }).run(conn);
+        const { changes: insertedVals } = await r.table('sources')
+          .insert(newSource, { returnChanges: true, conflict: 'update' })
+          .run(conn);
+        const insertedVal = insertedVals[0].new_val;
 
-      res.json(insertedVal);
+        res.json(insertedVal);
+      } else if (matchedVote && matchedVote.isCredible === isReliable) {
+        await r.table('pendingSourceVotes').get(matchedVote.id).delete().run(conn);
+
+        await r.table('usersFeed').insert({
+          userId: req.user.id,
+          type: 'unvote',
+          sourceId: id,
+          table: tbl,
+          timestamp,
+          comment,
+        }).run(conn);
+
+        res.sendStatus(200);
+      } else {
+        const { changes } = await r.table('pendingSourceVotes').insert({
+          id: r.uuid(id + req.user.id),
+          pendingSourceId: id,
+          userId: req.user.id,
+          isCredible: isReliable,
+          timestamp,
+          comment,
+          // votingDeadline: totalVotes + 1 === votesThreshold
+          //   ? r.expr(moment().add(15, 'days')).inTimezone(PH_TIMEZONE)
+          //   : r.row('votingDeadline'),
+        }, { returnChanges: true, conflict: 'update' }).run(conn);
+        const insertedVal = changes[0].new_val;
+
+        await r.table('usersFeed').insert({
+          userId: req.user.id,
+          type: 'vote',
+          sourceId: id,
+          table: tbl,
+          timestamp,
+          isReliable,
+          comment,
+        }).run(conn);
+
+        res.json(insertedVal);
+      }
     } catch (e) {
       next(e);
     }
   });
+
 
   return router;
 };

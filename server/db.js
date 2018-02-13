@@ -30,6 +30,7 @@ module.exports = async (cb) => {
       'usersFeed',
       'visitors',
       'errorArticles',
+      'pendingSourceVotes',
     ];
 
     r.dbCreate(DB_NAME).run(conn, async (err) => {
@@ -119,6 +120,16 @@ module.exports = async (cb) => {
       } catch (e) {
         console.log('status index already exists on crawlerLogs table');
       }
+
+      // try {
+      //   await r.table('pendingSourceVotes').wait();
+      //   await r.table('pendingSourceVotes')
+      //     .indexCreate('vote', [r.row('pendingSourceId'), r.row('userId')])
+      //     .run(conn);
+      //   console.log('vote index created on pendingSourceVotes table');
+      // } catch (e) {
+      //   console.log('vote index already exists on pendingSourceVotes table');
+      // }
 
       cb(conn);
     });

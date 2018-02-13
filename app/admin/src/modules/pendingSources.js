@@ -6,11 +6,14 @@ export const ADD_PENDING_SOURCES = 'pendingSources/ADD_PENDING_SOURCES';
 export const UPDATE_PENDING_SOURCE = 'pendingSources/UPDATE_PENDING_SOURCE';
 export const DELETE_PENDING_SOURCES = 'pendingSources/DELETE_PENDING_SOURCES';
 export const VERIFY_PENDING_SOURCE = 'pendingSources/VERIFY_PENDING_SOURCE';
+export const FETCH_PENDING_SOURCE_VOTES = 'pendingSources/FETCH_PENDING_SOURCE_VOTES';
 
 const initialState = {
   pendingSources: [],
+  pendingSourceVotes: [],
   totalCount: 0,
   fetchStatus: crudStatus,
+  fetchVotesStatus: crudStatus,
   addStatus: crudStatus,
   updateStatus: crudStatus,
   deleteStatus: crudStatus,
@@ -25,6 +28,12 @@ export default (state = initialState, action) => {
         pendingSources: action.pendingSources || state.pendingSources,
         fetchStatus: updateCrudStatus(action),
         totalCount: action.totalCount || state.totalCount,
+      };
+    case FETCH_PENDING_SOURCE_VOTES:
+      return {
+        ...state,
+        pendingSourceVotes: action.pendingSourceVotes || state.pendingSourceVotes,
+        fetchVotesStatus: updateCrudStatus(action),
       };
     case ADD_PENDING_SOURCES:
       return {
@@ -153,18 +162,39 @@ export const deletePendingSources = (ids) => httpThunk(DELETE_PENDING_SOURCES, a
   }
 });
 
-export const verifyPendingSource = (id, isReliable) =>
+export const verifyPendingSource = (id, isReliable, comment) =>
   httpThunk(VERIFY_PENDING_SOURCE, async () => {
     try {
       const { status } = await axios.post('/pendingSources/verify', {
         id,
         isReliable,
+        comment,
       });
 
       return {
         id,
         status,
         isReliable,
+      };
+    } catch (e) {
+      return e;
+    }
+  });
+
+export const fetchPendingSourceVotes = (id, isCredible) =>
+  httpThunk(FETCH_PENDING_SOURCE_VOTES, async () => {
+    try {
+      const { data: votes, status } = await axios.get('/pendingSources/votes', {
+        params: {
+          pendingSourceId: id,
+          isCredible: isCredible ? 'yes' : 'no',
+        },
+      });
+
+      return {
+        pendingSourceVotes: votes,
+        status,
+        isCredible,
       };
     } catch (e) {
       return e;

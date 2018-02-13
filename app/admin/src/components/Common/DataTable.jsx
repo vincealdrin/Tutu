@@ -73,7 +73,7 @@ class DataTable extends Component {
       onDeleteSelected,
       onPaginate,
       rowActions,
-      showActionsColumn = true,
+      hideActions = false,
     } = this.props;
     const {
       isEditing,
@@ -199,7 +199,7 @@ class DataTable extends Component {
                 {text}
               </Table.HeaderCell>
             ))}
-            {showActionsColumn ? (
+            {!hideActions ? (
               <Table.HeaderCell>Actions</Table.HeaderCell>
             ) : null}
           </Table.Row>
@@ -228,9 +228,9 @@ class DataTable extends Component {
                       : datum[accessor || key]}
                   </Table.Cell>
                 ))}
-                {showActionsColumn ? (
+                {!hideActions ? (
                   <Table.Cell>
-                    {rowActions && rowActions(datum.id)}
+                    {rowActions && rowActions(datum)}
                   </Table.Cell>
                 ) : null}
               </Table.Row>

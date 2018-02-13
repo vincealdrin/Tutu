@@ -1,12 +1,22 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button, Menu } from 'semantic-ui-react';
+import {
+  Button,
+  Menu,
+  Modal,
+  Label,
+  Header,
+  Icon,
+  TextArea,
+  Form,
+} from 'semantic-ui-react';
 import moment from 'moment';
 import DataTable from '../Common/DataTable';
 import SourcesForm from './SourcesForm';
 import PendingSourcesForm from './PendingSourcesForm';
 import FakeSourcesForm from './FakeSourcesForm';
+import PendingActionButton from './PendingActionButton';
 import {
   fetchSources,
   addSources,
@@ -17,6 +27,7 @@ import {
   addPendingSources,
   deletePendingSources,
   verifyPendingSource,
+  fetchPendingSourceVotes,
 } from '../../modules/pendingSources';
 import {
   fetchFakeSources,
@@ -25,7 +36,6 @@ import {
 } from '../../modules/fakeSources';
 import './styles.css';
 import { TIME_FORMAT } from '../../constants';
-
 
 const columns = [
   { key: 'brand', text: 'Brand' },
@@ -74,7 +84,11 @@ const mapStateToProps = ({
   },
   pendingSources: {
     pendingSources,
+    pendingSourceVotes,
     totalCount: pendingTotalCount,
+  },
+  user: {
+    info: { role },
   },
   socket,
 }) => ({
@@ -85,6 +99,8 @@ const mapStateToProps = ({
   pendingSources,
   pendingTotalCount,
   socket,
+  role,
+  pendingSourceVotes,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -98,10 +114,14 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   addFakeSources,
   deleteFakeSources,
   verifyPendingSource,
+  fetchPendingSourceVotes,
 }, dispatch);
 
 class Sources extends Component {
-  state = { activeItem: 'pending sources' };
+  state = {
+    activeItem: 'pending sources',
+    isVotesModalOpen: false,
+  };
 
   changeItem = (_, { name }) => this.setState({ activeItem: name });
 
@@ -113,11 +133,26 @@ class Sources extends Component {
       totalCount,
       pendingTotalCount,
       fakeTotalCount,
+      pendingSourceVotes,
+      role,
     } = this.props;
-    const { activeItem } = this.state;
+    const { activeItem, isVotesModalOpen } = this.state;
 
     return (
       <div className="sources-container">
+        <Modal
+          open={isVotesModalOpen}
+          onClose={() => this.setState({ isVotesModalOpen: false })}
+          closeOnDimmerClick
+        >
+          <Modal.Header>Votes</Modal.Header>
+          <Modal.Content image>
+            <Modal.Description>
+              <p>We've found the following gravatar image associated with your e-mail address.</p>
+              <p>Is it okay to use this photo?</p>
+            </Modal.Description>
+          </Modal.Content>
+        </Modal>
         <Menu pointing secondary>
           <Menu.Item
             name="pending sources"
@@ -163,20 +198,70 @@ class Sources extends Component {
                 />
               </div>
             )}
-            rowActions={(id) => (
-              <div>
-                <Button
-                  color="green"
-                  content="Credible"
-                  onClick={() => this.props.verifyPendingSource(id, true)}
-                />
-                <Button
-                  color="red"
-                  content="Not Credible"
-                  onClick={() => this.props.verifyPendingSource(id, false)}
-                />
-              </div>
+            rowActions={({
+              url,
+              id,
+              vote,
+              credibleVotesCount,
+              notCredibleVotesCount,
+            }) => (
+              <Button.Group>
+                <Button as="div" labelPosition="left">
+                  <Label
+                    as="a"
+                    color="green"
+                    pointing="right"
+                    onClick={() => {
+                      this.setState({ isVotesModalOpen: true });
+                      this.props.fetchPendingSourceVotes(id, true);
+                    }}
+                    basic
+                  >
+                    {credibleVotesCount}
+                  </Label>
+                  <PendingActionButton
+                    url={url}
+                    onClick={(comment) => {
+                      this.props.verifyPendingSource(id, true, comment);
+                    }}
+                    vote={vote && vote.isCredible ? vote : null}
+                    isCredible
+                  />
+                </Button>
+
+                <Button.Or />
+                <Button as="div" labelPosition="right">
+                  <PendingActionButton
+                    url={url}
+                    onClick={(comment) => {
+                      this.props.verifyPendingSource(id, false, comment);
+                    }}
+                    vote={vote && !vote.isCredible ? vote : null}
+                    isCredible={false}
+                  />
+                  <Label
+                    as="a"
+                    color="red"
+                    pointing="left"
+                    onClick={() => {
+                      this.setState({ isVotesModalOpen: true });
+                      this.props.fetchPendingSourceVotes(id, false);
+                    }}
+                    basic
+                  >
+                    {notCredibleVotesCount}
+                  </Label>
+                </Button>
+
+                {/* <Button
+                  content={votesCount}
+                  color="blue"
+                  basic
+                /> */}
+              </Button.Group>
             )}
+            hideActions={role !== 'curator'}
+            hideDeleteBtn
             initLoad
           />
         ) : null}
@@ -213,7 +298,8 @@ class Sources extends Component {
                 <Button content="Update" />
               </div>
             )}
-            showActionsColumn={false}
+            hideAddBtn
+            hideDeleteBtn
             initLoad
           />
         ) : null}
@@ -250,7 +336,8 @@ class Sources extends Component {
                 <Button content="Update" />
               </div>
             )}
-            showActionsColumn={false}
+            hideAddBtn
+            hideDeleteBtn
             initLoad
           />
         ) : null}

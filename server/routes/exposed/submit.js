@@ -100,6 +100,8 @@ module.exports = (conn, io) => {
           url: cleanedSrcUrl,
           timestamp: r.now().inTimezone(PH_TIMEZONE),
           senderIpAddress: ipAddress,
+          votes: [],
+          votingDeadline: null,
           wotReputation,
           id,
           brand,

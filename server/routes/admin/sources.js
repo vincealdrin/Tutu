@@ -43,15 +43,16 @@ module.exports = (conn, io) => {
       const cursor = await query
         .orderBy(r.desc('timestamp'))
         .slice(parsedPage * parsedLimit, (parsedPage + 1) * parsedLimit)
-        .eqJoin('verifiedByUserId', r.table('users'))
+        // .eqJoin('verifiedByUserId', r.table('users'))
         .map({
-          brand: r.row('left')('brand'),
-          timestamp: r.row('left')('timestamp'),
-          url: r.row('left')('url'),
-          id: r.row('left')('id'),
-          contactUsUrl: r.row('left')('contactUsUrl'),
-          aboutUsUrl: r.row('left')('aboutUsUrl'),
-          verifiedBy: r.row('right')('name'),
+          brand: r.row('brand'),
+          timestamp: r.row('timestamp'),
+          url: r.row('url'),
+          id: r.row('id'),
+          contactUsUrl: r.row('contactUsUrl'),
+          aboutUsUrl: r.row('aboutUsUrl'),
+          // verifiedBy: r.row('right')('name'),
+          verifiedBy: '',
         })
         .run(conn);
       const sources = await cursor.toArray();

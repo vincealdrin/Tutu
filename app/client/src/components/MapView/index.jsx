@@ -18,7 +18,7 @@ import MapInterface from '../Common/MapInterface';
 import Map from './Map';
 import './styles.css';
 import '../../index.css';
-import { MAX_ZOOM, DEFAULT_CENTER, MIN_ZOOM } from '../../constants';
+import { MAX_ZOOM, DEFAULT_CENTER, MIN_ZOOM, MOBILE_DEFAULT_ZOOM, MOBILE_MIN_ZOOM, IS_MOBILE } from '../../constants';
 
 const mapStateToProps = ({
   mapArticles: {
@@ -56,7 +56,6 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
 }, dispatch);
 
 let timeoutId;
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 class MapView extends Component {
   _onChange = ({
@@ -71,51 +70,89 @@ class MapView extends Component {
       clearTimeout(timeoutId);
     }
     const { initLoad } = this.props;
-    const rightBound = bounds.ne.lng;
-    const topBound = bounds.ne.lat;
-    const botBound = bounds.se.lat;
-    const leftBound = bounds.nw.lng;
+    const {
+      ne: { lng: rightBound, lat: topBound },
+      se: { lat: botBound },
+      nw: { lng: leftBound },
+    } = bounds;
 
+    console.log(bounds);
     switch (zoom) {
       case MIN_ZOOM:
-        if (center.lng > DEFAULT_CENTER.lng || center.lng < DEFAULT_CENTER.lng) {
+        if (IS_MOBILE) {
+          if (rightBound > 128.3889050292969) {
+            timeoutId = setTimeout(() => {
+              this.props.updateMapLocState({
+                lat: center.lat,
+                lng: 123.8314099121094,
+              }, MIN_ZOOM);
+            }, 100);
+          }
+
+          if (leftBound < 114.8061901855469) {
+            timeoutId = setTimeout(() => {
+              this.props.updateMapLocState({
+                lat: center.lat,
+                lng: 119.6213269042969,
+              }, MIN_ZOOM);
+            }, 100);
+          }
+
+          if (topBound > 22.457847641861107) {
+            timeoutId = setTimeout(() => {
+              this.props.updateMapLocState({
+                lat: 16.331994375473,
+                lng: center.lng,
+              }, MIN_ZOOM);
+            }, 100);
+          }
+
+          if (botBound < 3.287710510264418) {
+            timeoutId = setTimeout(() => {
+              this.props.updateMapLocState({
+                lat: 10.096137280287343,
+                lng: center.lng,
+              }, MIN_ZOOM);
+            }, 100);
+          }
+        } else if (center.lng > DEFAULT_CENTER.lng || center.lng < DEFAULT_CENTER.lng) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState(DEFAULT_CENTER, MIN_ZOOM);
           }, 100);
         }
         break;
       case 7:
-        if (rightBound > 138.8314099121094) {
+        if (rightBound > 127.8176159667969) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
               lat: center.lat,
-              lng: 125.8314099121094,
+              lng: 122.1314099121094,
             }, 7);
           }, 100);
         }
 
-        if (leftBound < 108.6213269042969) {
+        if (leftBound < 115.91314819335935) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
               lat: center.lat,
-              lng: 120.6213269042969,
+              lng: 121.6213269042969,
             }, 7);
           }, 100);
         }
 
-        if (topBound > 22.105756998510458) {
+        if (topBound > 21.490580700830535) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
-              lat: 17.831994375473,
+              lat: 17.131994375473,
               lng: center.lng,
             }, 7);
           }, 100);
         }
 
-        if (botBound < 4.496137280287343) {
+        if (botBound < 4.183849540341299) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
-              lat: 8.096137280287343,
+              lat: 8.596137280287343,
               lng: center.lng,
             }, 7);
           }, 100);
@@ -149,10 +186,10 @@ class MapView extends Component {
           }, 100);
         }
 
-        if (botBound < 3.901446551859408) {
+        if (botBound < 4.501446551859408) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
-              lat: 6.796137280287343,
+              lat: 6.596137280287343,
               lng: center.lng,
             }, 8);
           }, 100);
@@ -186,10 +223,10 @@ class MapView extends Component {
           }, 100);
         }
 
-        if (botBound < 4.540199986969856) {
+        if (botBound < 4.240199986969856) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
-              lat: 5.796137280287343,
+              lat: 5.296137280287343,
               lng: center.lng,
             }, 9);
           }, 100);
@@ -223,10 +260,10 @@ class MapView extends Component {
           }, 100);
         }
 
-        if (botBound < 5.07430457682338) {
+        if (botBound < 4.67430457682338) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
-              lat: 5.596137280287343,
+              lat: 5.096137280287343,
               lng: center.lng,
             }, 10);
           }, 100);
@@ -260,10 +297,10 @@ class MapView extends Component {
           }, 100);
         }
 
-        if (botBound < 5.222899228122202) {
+        if (botBound < 4.52899228122202) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
-              lat: 5.396137280287343,
+              lat: 4.796137280287343,
               lng: center.lng,
             }, 11);
           }, 100);
@@ -297,16 +334,56 @@ class MapView extends Component {
           }, 100);
         }
 
-        if (botBound < 5.26922503276468) {
+        if (botBound < 4.466922503276468) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
-              lat: 5.36922503276468,
+              lat: 4.66922503276468,
               lng: center.lng,
             }, MAX_ZOOM);
           }, 100);
         }
         break;
       default:
+        // if (rightBound > 126.86695526123049) {
+        //   timeoutId = setTimeout(() => {
+        //     this.props.updateMapLocState({
+        //       lat: center.lat,
+        //       lng: 125.8314099121094,
+        //     }, MOBILE_DEFAULT_ZOOM);
+        //   }, 100);
+        // }
+
+        // if (leftBound < 116.648571472167997) {
+        //   timeoutId = setTimeout(() => {
+        //     this.props.updateMapLocState({
+        //       lat: center.lat,
+        //       lng: 116.9213269042969,
+        //     }, MOBILE_DEFAULT_ZOOM);
+        //   }, 100);
+        // }
+
+        // if (topBound > 21.280528599739483) {
+        //   timeoutId = setTimeout(() => {
+        //     this.props.updateMapLocState({
+        //       lat: 21.15994375473,
+        //       lng: center.lng,
+        //     }, MOBILE_DEFAULT_ZOOM);
+        //   }, 100);
+        // }
+
+        // if (botBound < 5.26922503276468) {
+        //   timeoutId = setTimeout(() => {
+        //     this.props.updateMapLocState({
+        //       lat: 5.36922503276468,
+        //       lng: center.lng,
+        //     }, MOBILE_DEFAULT_ZOOM);
+        //   }, 100);
+        // }
+        if (center.lng > DEFAULT_CENTER.lng || center.lng < DEFAULT_CENTER.lng) {
+          timeoutId = setTimeout(() => {
+            this.props.updateMapLocState(DEFAULT_CENTER, MOBILE_MIN_ZOOM);
+          }, 100);
+        }
     }
 
     this.props.updateMapState(center, zoom, marginBounds);
@@ -342,7 +419,6 @@ class MapView extends Component {
           isMap={isMap}
           isCredible={isCredible}
           status={fetchStatus}
-          isMobile={isMobile}
           updateMapLocState={this.props.updateMapLocState}
           fetchArticles={this.props.fetchArticles}
           openInsights={this.props.openModal}
@@ -375,7 +451,6 @@ class MapView extends Component {
           onChildClick={this._onChildClick}
           isCredible={isCredible}
           isFocused={focusedOn}
-          isMobile={isMobile}
         />
       </div>
     );

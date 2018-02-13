@@ -11,14 +11,16 @@ import {
   MARGIN_LEFT,
   HOVER_DISTANCE,
   DEFAULT_ZOOM,
+  MOBILE_DEFAULT_ZOOM,
+  MOBILE_MIN_ZOOM,
   MAX_ZOOM,
   MIN_ZOOM,
   MAPS_POSITION_LEFT_BOTTOM,
   MAPS_POSITION_BOTTOM_LEFT,
   MAPS_CONTROL_STYLE,
+  IS_MOBILE,
 } from '../../constants';
 
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 const mapOptions = {
   zoomControlOptions: {
     position: MAPS_POSITION_LEFT_BOTTOM,
@@ -36,7 +38,7 @@ const mapOptions = {
   zoomControl: true,
   mapTypeControl: true,
   minZoomOverride: true,
-  minZoom: isMobile ? 7 : MIN_ZOOM,
+  minZoom: IS_MOBILE ? MOBILE_MIN_ZOOM : MIN_ZOOM,
   maxZoom: MAX_ZOOM,
   gestureHandling: 'greedy',
 };
@@ -56,7 +58,7 @@ class Map extends PureComponent {
 
     return (
       <GoogleMapReact
-        defaultZoom={DEFAULT_ZOOM}
+        defaultZoom={IS_MOBILE ? MOBILE_DEFAULT_ZOOM : DEFAULT_ZOOM}
         bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds', libraries: 'places' }}
         options={{
           ...mapOptions,
@@ -86,7 +88,7 @@ class Map extends PureComponent {
           });
 
           searchBoxMobile.addListener('places_changed', () => {
-            const places = searchBox.getPlaces();
+            const places = searchBoxMobile.getPlaces();
 
             updateMapLocState({
               lat: places[0].geometry.location.lat(),
@@ -114,7 +116,6 @@ class Map extends PureComponent {
                 lat={lat}
                 isCredible={isCredible}
                 isFocused={isFocused}
-                isMobile={isMobile}
               />
             );
           }
@@ -128,7 +129,6 @@ class Map extends PureComponent {
               lat={lat}
               isCredible={isCredible}
               isFocused={isFocused}
-              isMobile={isMobile}
             />
           );
         })}

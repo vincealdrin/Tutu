@@ -14,6 +14,8 @@ const {
   cloudScrape,
   removeUrlPath,
   getWotReputation,
+  analyzeDomain,
+  getDomainCreationDate,
   getDomain,
 } = require('../../utils');
 
@@ -59,7 +61,7 @@ module.exports = (conn, io) => {
       const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, url);
       const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
       const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);
-      console.log('haai');
+      const { isBlogDomain, isDomainSuspicious } = analyzeDomain(domainOnly);
       const {
         isCredible,
         pct,
@@ -75,9 +77,12 @@ module.exports = (conn, io) => {
         body: {
           sourceHasAboutPage: (hasAboutPage && aboutUsUrl) ? 1 : 0,
           sourceHasContactPage: (hasContactPage && contactUsUrl) ? 1 : 0,
+          domainCreationDate: isBlogDomain ? getDomainCreationDate(domainOnly) : null,
           wotReputation,
           url,
           body,
+          isDomainSuspicious,
+          isBlogDomain,
         },
         json: true,
       });

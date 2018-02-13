@@ -404,6 +404,7 @@ while True:
                     'organizations': organizations,
                     'people': people,
                     'popularity': popularity,
+                    # 'articleHtml': article.article_html,
                     'reactions': [],
                     'relatedArticles': []
                 }

@@ -37,6 +37,7 @@ title_tfidf = TfidfVectorizer(
 
 df = pd.DataFrame.from_records(articles)
 
+
 # df = pd.concat([
 #     df[df['category'] == 'Business & Finance'],
 #     df[df['category'] == 'Lifestyle'],
@@ -57,6 +58,32 @@ df = pd.DataFrame.from_records(articles)
 X_train, X_test, y_train, y_test = train_test_split(
     df.body.values, df.category.values, test_size=0.15, random_state=42)
 
+clf = Pipeline([
+    ('tfidf',
+     TfidfVectorizer(
+         stop_words=ENGLISH_STOP_WORDS,
+         ngram_range=(1, 2),
+         max_df=0.85,
+         min_df=0.01)),
+    ('clf', LogisticRegression(penalty='l1', class_weight='balanced')),
+])
+
+clf.fit(X_train, y_train)
+
+pred = clf.predict(X_test)
+
+print('Logistic Regression')
+print('Classification Report')
+print(classification_report(y_test, pred, target_names=clf.classes_))
+
+print('Accuracy: ' + str(accuracy_score(y_test, pred)))
+cv_scores = cross_val_score(clf, X_train, y_train, cv=5)
+print("Cross Validation: %0.2f (+/- %0.2f)" % (cv_scores.mean(),
+                                               cv_scores.std() * 2))
+
+cnf_matrix = confusion_matrix(y_test, pred)
+
+print('\n MultinomialNB')
 clf = Pipeline([
     ('tfidf',
      TfidfVectorizer(

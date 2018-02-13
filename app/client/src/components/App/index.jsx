@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import axios from 'axios';
-import { Modal } from 'semantic-ui-react';
+import { Modal, Button, Icon } from 'semantic-ui-react';
 import 'react-tippy/dist/tippy.css';
 // import 'semantic-ui-css/semantic.min.css';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -39,9 +39,27 @@ class App extends Component {
           basic
         >
           <Modal.Header>If this is your first time visiting this web application,<br /> we recommend you to watch this instructional video first</Modal.Header>
-          <Modal.Content image>
-            <iframe width="670" height="415" src="https://www.youtube.com/embed/sf-R5tBzGMY?rel=0" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen />
+          <Modal.Content style={{ height: '60vh' }}>
+            <iframe
+              src="https://www.youtube.com/embed/sf-R5tBzGMY?rel=0"
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              style={{ width: '100%', height: '100%' }}
+              allowFullScreen
+            />
           </Modal.Content>
+          <Modal.Actions>
+            <Button
+              color="red"
+              onClick={() => {
+                this.setState({ isOpen: false });
+              }}
+              inverted
+              basic
+            >
+              <Icon name="remove" /> Close
+            </Button>
+          </Modal.Actions>
         </Modal>
         <Switch>
           <Route

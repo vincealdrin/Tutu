@@ -6,7 +6,7 @@ import moment from 'moment';
 import './styles.css';
 import TutuLogo from '../../assets/logo/tutu-logo.svg';
 import ImagePlaceholder from '../Common/ImagePlaceholder';
-import { DATE_FORMAT } from '../../constants';
+import { DATE_FORMAT, IS_MOBILE } from '../../constants';
 
 const config = { stiffness: 100, damping: 7, precision: 0.001 };
 const defaultStyle = { scale: 0 };
@@ -22,7 +22,6 @@ const SimpleMarker = ({
   isCredible,
   $hover,
   isFocused,
-  isMobile,
 }) => (
   <Tooltip
     position="bottom-start"
@@ -53,7 +52,7 @@ const SimpleMarker = ({
       </div>
     }
     open={$hover}
-    disabled={isMobile || isFocused}
+    disabled={IS_MOBILE || isFocused}
     animateFill={false}
     sticky
   >

@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import itertools
 import pandas as pd
 import rethinkdb as r
+import datetime as dt
 import re
 
 
@@ -73,6 +74,9 @@ articles = get_articles(lambda join: {
     # 'src_wot_reputation': join['right']['wotReputation'],
     'src_country_rank': join['right']['countryRank'],
     'src_world_rank': join['right']['worldRank'],
+    'src_domain_is_blog': 1 if join['right']['isBlogDomain'] else 0,
+    # 'src_domain_is_suspicious': 1 if join['right']['isDomainSuspicious'] else 0,
+    'src_domain_creation_date': join['right']['domainCreationDate'],
     'src_id': join['right']['id'],
     'credible': join['right']['isReliable']
 })
@@ -91,11 +95,13 @@ df = pd.DataFrame.from_records(train_articles)
 # print(df.head())
 
 df['credible'] = df['credible'].apply(lambda credible: 1 if credible else 0)
+df['src_domain_creation_date'] = df['src_domain_creation_date'].apply(lambda date: date.timestamp() if date else dt.datetime.now().timestamp()).astype(np.int)
 df['src_world_rank'] = df['src_world_rank'].apply(
     lambda rank: 999999999 if rank == 0 else rank)
 df['src_country_rank'] = df['src_country_rank'].apply(
     lambda rank: 999999999 if rank == 0 else rank)
-
+print(df['src_domain_creation_date'].head())
+print(df['src_domain_creation_date'].tail())
 with open('./tl_stopwords.txt', 'r') as f:
     TL_STOPWORDS = f.read().splitlines()
 
@@ -126,6 +132,7 @@ test_df = pd.DataFrame.from_records(test_articles)
 
 test_df['credible'] = test_df['credible'].apply(
     lambda credible: 1 if credible else 0)
+test_df['src_domain_creation_date'] = test_df['src_domain_creation_date'].apply(lambda date: date.timestamp() if date else dt.datetime.now().timestamp()).astype(np.int)
 test_df['src_world_rank'] = test_df['src_world_rank'].apply(
     lambda rank: 999999999 if rank == 0 else rank)
 test_df['src_country_rank'] = test_df['src_country_rank'].apply(
@@ -135,7 +142,6 @@ y_test = test_df.credible.values
 
 test_body = body_tfidf.transform(test_df.body.values)
 test_title = title_tfidf.transform(test_df.title.values)
-
 # print(df.head())
 test_df.drop(['src_id', 'body', 'title', 'credible'], axis=1, inplace=True)
 
@@ -146,8 +152,10 @@ X_test = hstack([test_df, test_body, test_title], format='csr')
 target_names = ['not credible', 'credible']
 
 lr_clf = LogisticRegression(penalty='l1')
+print('hi')
 
 lr_clf.fit(X_train, y_train)
+print('helo')
 lr_pred = lr_clf.predict(X_test)
 print('Logistic Regression')
 print('Classification Report')
@@ -155,7 +163,6 @@ print(classification_report(y_test, lr_pred, target_names=target_names))
 
 print('Accuracy: ' + str(accuracy_score(y_test, lr_pred)))
 
-lr_clf = LogisticRegression(penalty='l1')
 cv_scores = cross_val_score(lr_clf, X_train, y_train, cv=5)
 print("Cross Validation: %0.2f (+/- %0.2f)" % (cv_scores.mean(),
                                                cv_scores.std() * 2))
@@ -185,7 +192,7 @@ plt.figure()
 plot_confusion_matrix(cnf_matrix, classes=target_names, normalize=True,
                       title='Normalized confusion matrix')
 
-plt.show()
+# plt.show()
 
 # nb_clf = MultinomialNB(fit_prior=False)
 # nb_clf.fit(X_train, y_train)

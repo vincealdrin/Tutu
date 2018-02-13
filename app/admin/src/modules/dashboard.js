@@ -3,7 +3,9 @@ import moment from 'moment';
 import { updateCrudStatus, crudStatus, httpThunk } from '../utils';
 import { DATE_FORMAT } from '../constants';
 
-export const FETCH_COUNTS = 'dashboard/FETCH_COUNTS';
+export const FETCH_USERS_COUNTS = 'dashboard/FETCH_USERS_COUNTS';
+export const FETCH_ARTICLES_COUNTS = 'dashboard/FETCH_ARTICLES_COUNTS';
+export const FETCH_SOURCES_COUNTS = 'dashboard/FETCH_SOURCES_COUNTS';
 export const FETCH_SOURCES_SUBMIT = 'dashboard/FETCH_SOURCES_SUBMIT';
 export const FETCH_SENTIMENT_TIME = 'dashboard/FETCH_SENTIMENT_TIME';
 export const FETCH_CATEGORIES_TIME = 'dashboard/FETCH_CATEGORIES_TIME';
@@ -19,7 +21,9 @@ const initialState = {
   },
   counts: {
     visitors: 0,
-    articles: 0,
+    activeUsers: 0,
+    credibleArticles: 0,
+    notCredibleArticles: 0,
     pendingSources: 0,
     credibleSources: 0,
     notCredibleSources: 0,
@@ -82,10 +86,35 @@ export default (state = initialState, action) => {
         } : state.sourcesSubmit,
         fetchSourcesSubmitStatus: updateCrudStatus(action),
       };
-    case FETCH_COUNTS:
+    case FETCH_SOURCES_COUNTS:
       return {
         ...state,
-        counts: { ...action.counts } || state.counts,
+        counts: action.statusText === 'success' ? {
+          ...state.counts,
+          pendingSources: action.pendingSources,
+          credibleSources: action.credibleSources,
+          notCredibleSources: action.notCredibleSources,
+        } : state.counts,
+        fetchCountsStatus: updateCrudStatus(action),
+      };
+    case FETCH_ARTICLES_COUNTS:
+      return {
+        ...state,
+        counts: action.statusText === 'success' ? {
+          ...state.counts,
+          credibleArticles: action.credibleArticles,
+          notCredibleArticles: action.notCredibleArticles,
+        } : state.counts,
+        fetchCountsStatus: updateCrudStatus(action),
+      };
+    case FETCH_USERS_COUNTS:
+      return {
+        ...state,
+        counts: action.statusText === 'success' ? {
+          ...state.counts,
+          visitors: action.visitors,
+          activeUsers: action.activeUsers,
+        } : state.counts,
         fetchCountsStatus: updateCrudStatus(action),
       };
     case FETCH_SENTIMENT_TIME:
@@ -170,7 +199,7 @@ export default (state = initialState, action) => {
 };
 
 
-export const fetchTopInsights = (field, limit) => {
+export const fetchTopInsights = (field, limit, cb) => {
   let actionType = '';
 
   if (field === 'people') {
@@ -192,6 +221,7 @@ export const fetchTopInsights = (field, limit) => {
         },
       });
 
+      if (cb) cb();
       return {
         statusText: 'success',
         insights,
@@ -204,11 +234,12 @@ export const fetchTopInsights = (field, limit) => {
 };
 
 
-export const fetchSentimentInsights = () =>
+export const fetchSentimentInsights = (cb) =>
   httpThunk(FETCH_SENTIMENT_TIME, async () => {
     try {
       const { data: insights, status } = await axios.get('/dashboard/sentiment');
 
+      if (cb) cb();
       return {
         statusText: 'success',
         insights,
@@ -219,11 +250,12 @@ export const fetchSentimentInsights = () =>
     }
   });
 
-export const fetchCategoriesInsights = () =>
+export const fetchCategoriesInsights = (cb) =>
   httpThunk(FETCH_CATEGORIES_TIME, async () => {
     try {
       const { data: insights, status } = await axios.get('/dashboard/categories');
 
+      if (cb) cb();
       return {
         statusText: 'success',
         insights,
@@ -234,14 +266,16 @@ export const fetchCategoriesInsights = () =>
     }
   });
 
-export const fetchCounts = () =>
-  httpThunk(FETCH_COUNTS, async () => {
+export const fetchUsersCounts = (cb) =>
+  httpThunk(FETCH_USERS_COUNTS, async () => {
     try {
-      const { data: counts, status } = await axios.get('/dashboard/counts');
+      const { data: { visitors, activeUsers }, status } = await axios.get('/dashboard/usersCounts');
 
+      if (cb) cb();
       return {
         statusText: 'success',
-        counts,
+        visitors,
+        activeUsers,
         status,
       };
     } catch (e) {
@@ -249,11 +283,47 @@ export const fetchCounts = () =>
     }
   });
 
-export const fetchSourcesSubmit = () =>
+export const fetchSourcesCounts = (cb) =>
+  httpThunk(FETCH_SOURCES_COUNTS, async () => {
+    try {
+      const { data: { pendingSources, credibleSources, notCredibleSources }, status } = await axios.get('/dashboard/sourcesCounts');
+
+      if (cb) cb();
+      return {
+        statusText: 'success',
+        pendingSources,
+        credibleSources,
+        notCredibleSources,
+        status,
+      };
+    } catch (e) {
+      return e;
+    }
+  });
+
+export const fetchArticlesCounts = (cb) =>
+  httpThunk(FETCH_ARTICLES_COUNTS, async () => {
+    try {
+      const { data: { notCredibleArticles, credibleArticles }, status } = await axios.get('/dashboard/articlesCounts');
+
+      if (cb) cb();
+      return {
+        statusText: 'success',
+        notCredibleArticles,
+        credibleArticles,
+        status,
+      };
+    } catch (e) {
+      return e;
+    }
+  });
+
+export const fetchSourcesSubmit = (cb) =>
   httpThunk(FETCH_SOURCES_SUBMIT, async () => {
     try {
       const { data: sourcesSubmit, status } = await axios.get('/dashboard/sourcesSubmit');
 
+      if (cb) cb();
       return {
         statusText: 'success',
         sourcesSubmit,

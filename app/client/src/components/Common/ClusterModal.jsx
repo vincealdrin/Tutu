@@ -19,7 +19,7 @@ import Pagination from './Pagination';
 import Tags from './Tags';
 import Reactions from './Reactions';
 import RelatedArticles from './RelatedArticles';
-import { DATE_FORMAT } from '../../constants';
+import { DATE_FORMAT, IS_MOBILE } from '../../constants';
 import { getSentimentColor, mapOptions } from '../../utils';
 import ImagePlaceholder from '../Common/ImagePlaceholder';
 
@@ -38,14 +38,13 @@ const mapStateToProps = ({
     focusedClusterTotalCount,
     isCredible,
   },
-}, { isMobile }) => ({
+}) => ({
   isOpen: focusedOn === 'cluster'
     && ((!clusterStatus.cancelled && clusterStatus.success) || clusterStatus.pending),
   status: clusterStatus,
   articles: focusedClusterInfo,
   totalCount: focusedClusterTotalCount,
   isCredible,
-  isMobile,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -72,7 +71,6 @@ class ClusterModal extends PureComponent {
       isOpen,
       status,
       isCredible,
-      isMobile,
     } = this.props;
     const {
       currentPage,
@@ -248,9 +246,9 @@ class ClusterModal extends PureComponent {
             <Pagination
               currentPage={currentPage || 1}
               totalPages={Math.ceil((totalCount || limit) / limit) || 1}
-              siblingPagesRange={isMobile ? 0 : 1}
-              hideFirstAndLastPageLinks={isMobile}
-              hidePreviousAndNextPageLinks={isMobile}
+              siblingPagesRange={IS_MOBILE ? 0 : 1}
+              hideFirstAndLastPageLinks={IS_MOBILE}
+              hidePreviousAndNextPageLinks={IS_MOBILE}
               onChange={(page) => {
                 this.setState({ currentPage: page });
                 this.props.fetchFocusedClusterInfo(null, {

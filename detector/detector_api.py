@@ -63,8 +63,8 @@ def predict():
     a.set_html(info['body'])
     a.parse()
 
-    if len(a.text.split()) < 20:
-        return 'Please enter a valid article url from the source', 400
+    # if len(a.text.split()) < 20:
+    #     return 'Please enter a valid article url from the source', 400
 
     xml_str = get('http://data.alexa.com/data?cli=10&url=' + info['url'])
     tree = etree.fromstring(xml_str.text.encode('utf-8'))
@@ -114,12 +114,17 @@ def predict():
     body = body_tfidf.transform(test_df.body.values)
     title = title_tfidf.transform(test_df.title.values)
 
+    # print(zip(body_tfidf.get_feature_names(), body_tfidf.idf_))
+    # print(body)
+    # print(np.sum(body))
+
     test_df.drop(['body', 'title'], axis=1, inplace=True)
     test = hstack([test_df, body, title], format='csr')
 
     pred = clf.predict(test)[0]
     proba = clf.predict_proba(test)[0][1]
     print(clf.classes_)
+    print(clf.predict_proba(test)[0])
     print(pred)
     print(proba)
 

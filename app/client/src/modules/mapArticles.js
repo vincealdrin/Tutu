@@ -12,6 +12,8 @@ import {
   MAX_ZOOM,
   MIN_ZOOM,
   DEFAULT_CENTER,
+  IS_MOBILE,
+  MOBILE_DEFAULT_ZOOM,
 } from '../constants';
 
 export const FETCH_ARTICLES = 'mapArticles/FETCH_ARTICLES';
@@ -38,12 +40,12 @@ const initialState = {
   focusedClusterTotalCount: 0,
   focusedOn: '',
   mapLocState: {
-    zoom: DEFAULT_ZOOM,
+    zoom: IS_MOBILE ? MOBILE_DEFAULT_ZOOM : DEFAULT_ZOOM,
     center: DEFAULT_CENTER,
     bounds: {},
   },
   mapState: {
-    zoom: DEFAULT_ZOOM,
+    zoom: IS_MOBILE ? MOBILE_DEFAULT_ZOOM : DEFAULT_ZOOM,
     center: DEFAULT_CENTER,
     bounds: {},
   },

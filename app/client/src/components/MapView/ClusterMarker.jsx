@@ -4,7 +4,7 @@ import shortid from 'shortid';
 import moment from 'moment';
 import { Motion, spring } from 'react-motion';
 import { Tooltip } from 'react-tippy';
-import { DATE_FORMAT } from '../../constants';
+import { DATE_FORMAT, IS_MOBILE } from '../../constants';
 import ImagePlaceholder from '../Common/ImagePlaceholder';
 import './styles.css';
 
@@ -17,7 +17,6 @@ const ClusterMarker = ({
   $hover,
   isCredible,
   isFocused,
-  isMobile,
 }) => (
   <Tooltip
     position="bottom-start"
@@ -48,7 +47,7 @@ const ClusterMarker = ({
       </Grid>
     }
     open={$hover}
-    disabled={isMobile || isFocused}
+    disabled={IS_MOBILE || isFocused}
     animateFill={false}
     sticky
   >

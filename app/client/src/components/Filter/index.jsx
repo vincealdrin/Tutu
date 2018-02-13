@@ -4,6 +4,7 @@ import { Tooltip } from 'react-tippy';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Slider from 'rc-slider';
+import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import {
   changeCategoriesFilter,
@@ -85,7 +86,7 @@ const FilterAlert = ({ action }) => (
   </div>
 );
 
-const now = new Date();
+const now = moment();
 
 class Filter extends PureComponent {
   render() {

@@ -10,7 +10,7 @@ import UsersFeed from './UsersFeed';
 const columns = [
   { key: 'username', text: 'Username' },
   { key: 'name', text: 'Name' },
-  { key: 'role', text: 'Role' },
+  { key: 'role', text: 'Role', wrapper: (role) => (role === 'curator' ? 'journalist' : role) },
 ];
 
 const mapStateToProps = ({
@@ -83,11 +83,12 @@ class Users extends Component {
                 />
               </div>
             )}
-            rowActions={(id) => (
-              <div>
-                <Button content="Update" />
-              </div>
-            )}
+            showActionsColumn={false}
+            // rowActions={(id) => (
+            //   <div>
+            //     <Button content="Update" />
+            //   </div>
+            // )}
           />
         );
       }

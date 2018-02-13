@@ -122,9 +122,9 @@ class Crawler extends Component {
               <Segment>
                 <Line data={statsData} />
               </Segment>
-              <Segment>
+              {/* <Segment>
                 <Line data={statsData} />
-              </Segment>
+              </Segment> */}
             </Grid.Column>
 
             <Grid.Column width={9}>

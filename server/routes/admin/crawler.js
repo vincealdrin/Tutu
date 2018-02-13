@@ -9,7 +9,7 @@ module.exports = (conn, io) => {
   router.get('/logs', async (req, res, next) => {
     try {
       const date = new Date();
-      date.setDate(date.getDate() - 31);
+      date.setDate(date.getDate() - 3);
 
       const cursor = await r.table(tbl)
         .filter(r.row('timestamp').date().ge(date))
@@ -17,7 +17,7 @@ module.exports = (conn, io) => {
         .orderBy(r.desc(r.row('left')('timestamp')))
         .limit(50)
         .map(mapLog)
-        .run(conn);
+        .run(conn, { arrayLimit: 1000000000 });
       const sources = await cursor.toArray();
 
       return res.json(sources);
@@ -44,7 +44,7 @@ module.exports = (conn, io) => {
           errorCount: r.row('reduction')
             .filter((log) => log('type').eq('articleCrawl').and(log('status').eq('error'))).count(),
         })
-        .run(conn);
+        .run(conn, { arrayLimit: 1000000000 });
       const sources = await cursor.toArray();
 
       return res.json(sources);

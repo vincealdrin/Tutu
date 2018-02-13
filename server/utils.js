@@ -562,3 +562,13 @@ module.exports.getWotReputation = async (url) => {
 
   return 0;
 };
+
+module.exports.analyzeDomain = (url) => {
+  const knownSuspiciousDomainKeywords = ['trending', 'viral', 'definitely', 'duterte', 'du30', 'pinoy', 'trends', 'definitely', 'ph', 'pilipino', 'top', 'info', 'pilipinas', 'philippines', 'updates', 'update', 'public', 'maharlika', 'definitely'];
+  const knowDomainBlogs = ['wordpress', 'altervista', 'blogspot', 'tumblr', 'ghost', 'medium', 'weebly', 'grav', 'wix', 'hugo'];
+
+  return {
+    isDomainSuspicious: new RegExp(`${knownSuspiciousDomainKeywords.join('|')}`, 'i').test(url),
+    isBlogDomain: new RegExp(`${knowDomainBlogs.join('|')}`, 'i').test(url),
+  };
+};

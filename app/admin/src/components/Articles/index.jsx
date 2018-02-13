@@ -93,11 +93,12 @@ class Articles extends Component {
           label="Article"
           onDeleteSelected={this.props.deleteArticles}
           onPaginate={this.props.fetchArticles}
-          rowActions={(id) => (
-            <div>
-              <Button content="Update" />
-            </div>
-          )}
+          showActionsColumn={false}
+          // rowActions={(id) => (
+          //   <div>
+          //     <Button content="Update" />
+          //   </div>
+          // )}
           hideAddBtn
         />
       </div>

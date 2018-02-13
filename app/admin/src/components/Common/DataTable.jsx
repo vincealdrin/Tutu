@@ -73,6 +73,7 @@ class DataTable extends Component {
       onDeleteSelected,
       onPaginate,
       rowActions,
+      showActionsColumn = true,
     } = this.props;
     const {
       isEditing,
@@ -90,7 +91,7 @@ class DataTable extends Component {
       <Table celled>
         <Table.Header fullWidth>
           <Table.Row>
-            <Table.HeaderCell colSpan="5">
+            <Table.HeaderCell colSpan="100">
               {!hideDeleteBtn ? (
                 <Button
                   labelPosition="left"
@@ -131,15 +132,6 @@ class DataTable extends Component {
                     </Modal.Description>
                   </Modal.Content>
                   <Modal.Actions className="sources-modal-note">
-                    {label === 'Sources' || label === 'Fake Sources' ? (
-                      <Header
-                        floated="left"
-                        as="p"
-                        style={{ fontSize: '.9rem', color: '#767676' }}
-                      >
-                        Note: You can add up to 3 sources at the same time.
-                      </Header>
-                    ) : null}
                     {addModalActions && addModalActions(this.cancelAdd)}
                   </Modal.Actions>
                 </Modal>
@@ -207,7 +199,9 @@ class DataTable extends Component {
                 {text}
               </Table.HeaderCell>
             ))}
-            <Table.HeaderCell>Actions</Table.HeaderCell>
+            {showActionsColumn ? (
+              <Table.HeaderCell>Actions</Table.HeaderCell>
+            ) : null}
           </Table.Row>
         </Table.Header>
 
@@ -234,9 +228,11 @@ class DataTable extends Component {
                       : datum[accessor || key]}
                   </Table.Cell>
                 ))}
-                <Table.Cell>
-                  {rowActions && rowActions(datum.id)}
-                </Table.Cell>
+                {showActionsColumn ? (
+                  <Table.Cell>
+                    {rowActions && rowActions(datum.id)}
+                  </Table.Cell>
+                ) : null}
               </Table.Row>
             );
           })}
@@ -244,7 +240,7 @@ class DataTable extends Component {
 
         <Table.Footer>
           <Table.Row>
-            <Table.HeaderCell colSpan="5">
+            <Table.HeaderCell colSpan="100">
               <Button.Group>
                 <Button disabled>Rows</Button>
                 <Dropdown

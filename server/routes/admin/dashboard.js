@@ -21,26 +21,6 @@ module.exports = (conn, { ioClient, io }) => {
     });
   });
 
-  router.get('/visits', async (req, res, next) => {
-    try {
-      return res.json({
-        visitors: await r.table('visitors').count().run(conn),
-        articles: await r.table('articles').count().run(conn),
-        pendingSources: await r.table('pendingSources').count().run(conn),
-        credibleSources: await r.table('sources')
-          .filter(r.row('isReliable').eq(true))
-          .count()
-          .run(conn),
-        notCredibleSources: await r.table('sources')
-          .filter(r.row('isReliable').eq(false))
-          .count()
-          .run(conn),
-      });
-    } catch (e) {
-      next(e);
-    }
-  });
-
   router.get('/sourcesSubmit', async (req, res, next) => {
     try {
       const verifiedSources = await r.table('sources')
@@ -70,10 +50,9 @@ module.exports = (conn, { ioClient, io }) => {
     }
   });
 
-  router.get('/counts', async (req, res, next) => {
+  router.get('/articlesCounts', async (req, res, next) => {
     try {
       return res.json({
-        visitors: await r.table('visitors').count().run(conn),
         notCredibleArticles: await r.table('articles')
           .eqJoin('sourceId', r.table('sources'))
           .filter(r.row('right')('isReliable').eq(false))
@@ -84,6 +63,15 @@ module.exports = (conn, { ioClient, io }) => {
           .filter(r.row('right')('isReliable').eq(true))
           .count()
           .run(conn),
+      });
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/sourcesCounts', async (req, res, next) => {
+    try {
+      return res.json({
         pendingSources: await r.table('pendingSources').count().run(conn),
         credibleSources: await r.table('sources')
           .filter(r.row('isReliable').eq(true))
@@ -93,6 +81,16 @@ module.exports = (conn, { ioClient, io }) => {
           .filter(r.row('isReliable').eq(false))
           .count()
           .run(conn),
+      });
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/usersCounts', async (req, res, next) => {
+    try {
+      return res.json({
+        visitors: await r.table('visitors').count().run(conn),
         activeUsers,
       });
     } catch (e) {
@@ -126,7 +124,7 @@ module.exports = (conn, { ioClient, io }) => {
       }
 
       const date = new Date();
-      date.setDate(date.getDate() - 11);
+      date.setDate(date.getDate() - 5);
 
       const cursor = await r.table('articles')
         .filter(r.row('timestamp').date().ge(date))
@@ -160,7 +158,7 @@ module.exports = (conn, { ioClient, io }) => {
   router.get('/sentiment', async (req, res, next) => {
     try {
       const date = new Date();
-      date.setDate(date.getDate() - 11);
+      date.setDate(date.getDate() - 5);
 
       const cursor = await r.table('articles')
         .filter(r.row('timestamp').date().ge(date))
@@ -194,7 +192,7 @@ module.exports = (conn, { ioClient, io }) => {
   router.get('/categories', async (req, res, next) => {
     try {
       const date = new Date();
-      date.setDate(date.getDate() - 11);
+      date.setDate(date.getDate() - 5);
 
       const cursor = await r.table('articles')
         .filter(r.row('timestamp').date().ge(date))

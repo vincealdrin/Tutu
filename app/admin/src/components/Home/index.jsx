@@ -9,7 +9,9 @@ import {
   fetchSentimentInsights,
   fetchTopInsights,
   fetchCategoriesInsights,
-  fetchCounts,
+  fetchUsersCounts,
+  fetchArticlesCounts,
+  fetchSourcesCounts,
   fetchSourcesSubmit,
 } from '../../modules/dashboard';
 import './styles.css';
@@ -43,7 +45,9 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchSentimentInsights,
   fetchTopInsights,
   fetchCategoriesInsights,
-  fetchCounts,
+  fetchUsersCounts,
+  fetchArticlesCounts,
+  fetchSourcesCounts,
   fetchSourcesSubmit,
 }, dispatch);
 
@@ -53,14 +57,24 @@ class Home extends Component {
 
   componentDidMount() {
     const { socket } = this.props;
-    this.props.fetchCounts();
-    this.props.fetchSentimentInsights();
-    this.props.fetchTopInsights('people');
-    this.props.fetchTopInsights('organizations');
-    this.props.fetchTopInsights('locations');
-    this.props.fetchTopInsights('keywords', 200);
-    this.props.fetchCategoriesInsights();
-    this.props.fetchSourcesSubmit();
+    this.props.fetchUsersCounts(() => {
+      this.props.fetchSourcesCounts(() => {
+        this.props.fetchArticlesCounts(() => {
+          this.props.fetchTopInsights('keywords', 200);
+        });
+      });
+    });
+    this.props.fetchTopInsights('people', 10, () => {
+      this.props.fetchTopInsights('organizations', 10, () => {
+        this.props.fetchTopInsights('locations', 10, () => {
+        });
+      });
+    });
+    this.props.fetchSourcesSubmit(() => {
+      this.props.fetchSentimentInsights(() => {
+        this.props.fetchCategoriesInsights();
+      });
+    });
 
     socket.on('activeUsers', (val) => {
       this.setState({ activeUsers: val });
@@ -86,7 +100,6 @@ class Home extends Component {
       counts,
     } = this.props;
     const { activeUsers } = this.state;
-
     const wordCloud = topKeywords.map(({ keyword, count }) => ({
       text: keyword,
       value: count,

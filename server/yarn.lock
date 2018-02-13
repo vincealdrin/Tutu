@@ -1445,6 +1445,10 @@ interpret@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.1.0.tgz#7ed1b1410c6a0e0f78cf95d3b8440c63f78b8614"
 
+ip@^1.1.4:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/ip/-/ip-1.1.5.tgz#bdded70114290828c0a039e72ef25f5aaec4354a"
+
 ipaddr.js@1.5.2:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.5.2.tgz#d4b505bde9946987ccf0fc58d9010ff9607e3fa0"
@@ -1961,7 +1965,7 @@ node-pre-gyp@^0.6.39:
     tar "^2.2.1"
     tar-pack "^3.4.0"
 
-node-whois@^2.1.0:
+node-whois@^2.1.0, node-whois@^2.1.3:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/node-whois/-/node-whois-2.1.3.tgz#3c73784045f78284efc8e54b469ebefd23f55773"
   dependencies:
@@ -2693,6 +2697,10 @@ slice-ansi@1.0.0:
   dependencies:
     is-fullwidth-code-point "^2.0.0"
 
+smart-buffer@^1.0.13:
+  version "1.1.15"
+  resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-1.1.15.tgz#7f114b5b65fab3e2a35aa775bb12f0d1c649bf16"
+
 snake-case@^1.1.0:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/snake-case/-/snake-case-1.1.2.tgz#0c2f25e305158d9a18d3d977066187fef8a5a66a"
@@ -2751,6 +2759,13 @@ socket.io@^2.0.4:
     socket.io-adapter "~1.1.0"
     socket.io-client "2.0.4"
     socket.io-parser "~3.1.1"
+
+socks@^1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/socks/-/socks-1.1.10.tgz#5b8b7fc7c8f341c53ed056e929b7bf4de8ba7b5a"
+  dependencies:
+    ip "^1.1.4"
+    smart-buffer "^1.0.13"
 
 source-map-support@^0.5:
   version "0.5.0"
@@ -2988,7 +3003,7 @@ ultron@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/ultron/-/ultron-1.1.0.tgz#b07a2e6a541a815fc6a34ccd4533baec307ca864"
 
-underscore@>=1.3.1:
+underscore@>=1.3.1, underscore@^1.5.2:
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.8.3.tgz#4f3fb53b106e6097fcf9cb4109f2a5e9bdfa5022"
 
@@ -3090,6 +3105,14 @@ whois-json@^1.2.2:
   dependencies:
     change-case "https://registry.npmjs.org/change-case/-/change-case-2.3.0.tgz"
     node-whois "^2.1.0"
+
+whois@^2.5.9:
+  version "2.5.9"
+  resolved "https://registry.yarnpkg.com/whois/-/whois-2.5.9.tgz#72fe3291ebaf10acc7a7066501318ecca8a122f3"
+  dependencies:
+    optimist "^0.6.1"
+    socks "^1.1.10"
+    underscore "^1.5.2"
 
 wide-align@^1.1.0:
   version "1.1.2"

@@ -90,7 +90,6 @@ class MapInterface extends PureComponent {
       fetchArticles,
       openInsights,
       updateMapLocState,
-      isMobile,
     } = this.props;
     const {
       currentPosition,
@@ -104,7 +103,7 @@ class MapInterface extends PureComponent {
       <div>
         <NProgress />
         <SimpleModal />
-        <ClusterModal isMobile={isMobile} />
+        <ClusterModal />
         {isMsgShown ? (
           <Message
             header={`${isMap ? 'Map' : 'Grid'} of ${isCredible ? 'Credible' : 'Not Credible'} Sources`}

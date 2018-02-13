@@ -135,42 +135,6 @@ class Sources extends Component {
             onClick={this.changeItem}
           />
         </Menu>
-        {activeItem === 'not credible sources' ? (
-          <DataTable
-            defaultSearchFilter="brand"
-            label="Not Credible Sources"
-            totalCount={fakeTotalCount}
-            data={fakeSources}
-            columns={columns}
-            onDeleteSelected={this.props.deleteFakeSources}
-            onPaginate={this.props.fetchFakeSources}
-            addModalContent={<FakeSourcesForm />}
-            addModalActions={(closeModal) => (
-              <div>
-                <Button
-                  color="black"
-                  content="Cancel"
-                  onClick={closeModal}
-                />
-                <Button
-                  color="green"
-                  onClick={async () => {
-                    await this.props.addFakeSources();
-                    // this.resetInputVals();
-                    closeModal();
-                  }}
-                  content="Add All Fake Sources"
-                />
-              </div>
-            )}
-            rowActions={(id) => (
-              <div>
-                <Button content="Update" />
-              </div>
-            )}
-            initLoad
-          />
-        ) : null}
         {activeItem === 'pending sources' ? (
           <DataTable
             defaultSearchFilter="brand"
@@ -249,6 +213,44 @@ class Sources extends Component {
                 <Button content="Update" />
               </div>
             )}
+            showActionsColumn={false}
+            initLoad
+          />
+        ) : null}
+        {activeItem === 'not credible sources' ? (
+          <DataTable
+            defaultSearchFilter="brand"
+            label="Not Credible Sources"
+            totalCount={fakeTotalCount}
+            data={fakeSources}
+            columns={columns}
+            onDeleteSelected={this.props.deleteFakeSources}
+            onPaginate={this.props.fetchFakeSources}
+            addModalContent={<FakeSourcesForm />}
+            addModalActions={(closeModal) => (
+              <div>
+                <Button
+                  color="black"
+                  content="Cancel"
+                  onClick={closeModal}
+                />
+                <Button
+                  color="green"
+                  onClick={async () => {
+                    await this.props.addFakeSources();
+                    // this.resetInputVals();
+                    closeModal();
+                  }}
+                  content="Add All Fake Sources"
+                />
+              </div>
+            )}
+            rowActions={(id) => (
+              <div>
+                <Button content="Update" />
+              </div>
+            )}
+            showActionsColumn={false}
             initLoad
           />
         ) : null}

@@ -26,10 +26,14 @@ module.exports = (conn, io) => {
   router.get('/votes', async (req, res, next) => {
     try {
       const { pendingSourceId, isCredible = 'yes' } = req.query;
-      console.log(pendingSourceId);
       const cursor = await r.table('pendingSourceVotes')
         .filter(r.row('pendingSourceId').eq(pendingSourceId)
           .and(r.row('isCredible').eq(isCredible === 'yes')))
+        .merge({
+          pendingSource: r.table('pendingSources').get(r.row('pendingSourceId')).default({}).pluck('url', 'brand'),
+          user: r.table('users').get(r.row('userId')).getField('name'),
+        })
+        .without('pendingSourceId', 'userId')
         .run(conn);
       const votes = await cursor.toArray();
 
@@ -288,41 +292,49 @@ module.exports = (conn, io) => {
   router.post('/verify', async (req, res, next) => {
     const {
       id,
-      isReliable,
+      isCredible,
       comment,
     } = req.body;
 
     try {
       const votes = await r.table('pendingSourceVotes')
-        .filter(r.row('sourceId').eq(id))
+        .filter(r.row('pendingSourceId').eq(id))
         .group(r.row('isCredible'))
         .count()
         .ungroup()
         .map((x) => [r.branch(x.getField('group'), 'credible', 'notCredible'), x.getField('reduction')])
         .coerceTo('object')
         .run(conn);
+      console.log(votes);
       const matchedVote = await r.table('pendingSourceVotes').get(r.uuid(id + req.user.id)).run(conn);
       const totalJourns = await r.table('users').filter(r.row('role').eq('curator')).count().run(conn);
-      const totalVotes = (votes.credible || 0) + (votes.notCredible || 0);
+      // const totalVotes = (votes.credible || 0) + (votes.notCredible || 0) + 1;
       const timestamp = await r.now().inTimezone(PH_TIMEZONE).run(conn);
+      // const isDivisible = totalJourns % 2 === 0;
+      // const halfedTotalJourns = Math.ceil(totalJourns / 2);
+      // const majorityCount = isDivisible ? halfedTotalJourns + 1 : halfedTotalJourns;
+      // console.log(majorityCount);
+      // console.log(matchedVote);
+      // console.log(votes);
+      // console.log(totalVotes + 1);
+      // console.log(totalJourns);
+      // if (!matchedVote && (totalVotes + 1) >= majorityCount) {
 
-      console.log(matchedVote);
-      console.log(votes);
-      console.log(totalVotes + 1);
-      console.log(totalJourns);
-      if (!matchedVote && (totalVotes + 1) >= totalJourns) {
+      if (((isCredible && votes.credible + 1 === totalJourns) ||
+          (!isCredible && votes.notCredible + 1 === totalJourns)) &&
+          matchedVote.isCredible !== isCredible) {
         const { changes } = await r.table(tbl)
           .get(id)
           .delete({ returnChanges: true })
           .run(conn);
-
+        console.log(votes);
         const pendingSource = changes[0].old_val;
 
         delete pendingSource.isReliablePred;
 
         const newSource = {
           ...pendingSource,
-          isReliable: votes.credible > votes.notCredible,
+          isReliable: votes.credible + 1 === totalJourns,
           timestamp,
         };
 
@@ -331,8 +343,8 @@ module.exports = (conn, io) => {
           .run(conn);
         const insertedVal = insertedVals[0].new_val;
 
-        res.json(insertedVal);
-      } else if (matchedVote && matchedVote.isCredible === isReliable) {
+        res.json({ votingStatus: 'ended' });
+      } else if (matchedVote && matchedVote.isCredible === isCredible) {
         await r.table('pendingSourceVotes').get(matchedVote.id).delete().run(conn);
 
         await r.table('usersFeed').insert({
@@ -344,13 +356,13 @@ module.exports = (conn, io) => {
           comment,
         }).run(conn);
 
-        res.sendStatus(200);
+        res.json({ votingStatus: 'removed' });
       } else {
         const { changes } = await r.table('pendingSourceVotes').insert({
           id: r.uuid(id + req.user.id),
           pendingSourceId: id,
           userId: req.user.id,
-          isCredible: isReliable,
+          isCredible,
           timestamp,
           comment,
           // votingDeadline: totalVotes + 1 === votesThreshold
@@ -365,17 +377,16 @@ module.exports = (conn, io) => {
           sourceId: id,
           table: tbl,
           timestamp,
-          isReliable,
+          isCredible,
           comment,
         }).run(conn);
 
-        res.json(insertedVal);
+        res.json({ votingStatus: 'changed' });
       }
     } catch (e) {
       next(e);
     }
   });
-
 
   return router;
 };

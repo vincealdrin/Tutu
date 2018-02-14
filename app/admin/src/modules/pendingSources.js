@@ -5,7 +5,7 @@ export const FETCH_PENDING_SOURCES = 'pendingSources/FETCH_PENDING_SOURCES';
 export const ADD_PENDING_SOURCES = 'pendingSources/ADD_PENDING_SOURCES';
 export const UPDATE_PENDING_SOURCE = 'pendingSources/UPDATE_PENDING_SOURCE';
 export const DELETE_PENDING_SOURCES = 'pendingSources/DELETE_PENDING_SOURCES';
-export const VERIFY_PENDING_SOURCE = 'pendingSources/VERIFY_PENDING_SOURCE';
+export const VOTE_PENDING_SOURCE = 'pendingSources/VOTE_PENDING_SOURCE';
 export const FETCH_PENDING_SOURCE_VOTES = 'pendingSources/FETCH_PENDING_SOURCE_VOTES';
 
 const initialState = {
@@ -17,7 +17,7 @@ const initialState = {
   addStatus: crudStatus,
   updateStatus: crudStatus,
   deleteStatus: crudStatus,
-  verifyStatus: crudStatus,
+  voteStatus: crudStatus,
 };
 
 export default (state = initialState, action) => {
@@ -69,13 +69,80 @@ export default (state = initialState, action) => {
           : state.totalCount,
         updateStatus: updateCrudStatus(action),
       };
-    case VERIFY_PENDING_SOURCE:
+    case VOTE_PENDING_SOURCE:
       return {
         ...state,
-        pendingSources: action.statusText === 'success'
-          ? state.pendingSources.filter((source) => action.id !== source.id)
-          : state.pendingSources,
-        verifyStatus: updateCrudStatus(action),
+        pendingSources: action.votingStatus !== 'ended'
+          ? state.pendingSources.map((pendingSource) => {
+            const {
+              vote,
+              credibleVotesCount,
+              notCredibleVotesCount,
+            } = pendingSource;
+            const hasVotedCredible = vote && credibleVotesCount;
+            const hasVotedNotCredible = vote && notCredibleVotesCount;
+
+            if (pendingSource.id === action.pendingSourceId) {
+              if (action.votingStatus === 'changed') {
+                if (action.isCredible) {
+                  return {
+                    ...pendingSource,
+                    vote: { ...vote, isCredible: true },
+                    credibleVotesCount: credibleVotesCount + 1,
+                    notCredibleVotesCount: hasVotedNotCredible
+                      ? notCredibleVotesCount - 1
+                      : notCredibleVotesCount,
+                  };
+                }
+
+                return {
+                  ...pendingSource,
+                  vote: { ...vote, isCredible: false },
+                  credibleVotesCount: hasVotedCredible
+                    ? credibleVotesCount - 1
+                    : credibleVotesCount,
+                  notCredibleVotesCount: notCredibleVotesCount + 1,
+                };
+              }
+
+              if (action.votingStatus === 'removed') {
+                if (action.isCredible) {
+                  return {
+                    ...pendingSource,
+                    vote: null,
+                    credibleVotesCount: hasVotedCredible
+                      ? credibleVotesCount - 1
+                      : credibleVotesCount,
+                  };
+                }
+
+                return {
+                  ...pendingSource,
+                  vote: null,
+                  notCredibleVotesCount: hasVotedNotCredible
+                    ? notCredibleVotesCount - 1
+                    : notCredibleVotesCount,
+                };
+              }
+
+              return {
+                ...pendingSource,
+                credibleVotesCount: action.isCredible
+                  ? pendingSource.credibleVotesCount + 1
+                  : pendingSource.credibleVotesCount,
+                notCredibleVotesCount: !action.isCredible
+                  ? pendingSource.notCredibleVotesCount + 1
+                  : pendingSource.notCredibleVotesCount,
+              };
+            }
+            return pendingSource;
+          })
+          : state.pendingSources
+            .filter((pendingSource) => pendingSource.id !== action.pendingSourceId),
+        // action.statusText === 'success'
+        //   ? state.pendingSources.filter((source) => action.id !== source.id)
+        //   : state.pendingSources,
+        voteStatus: updateCrudStatus(action),
       };
     default:
       return state;
@@ -162,19 +229,23 @@ export const deletePendingSources = (ids) => httpThunk(DELETE_PENDING_SOURCES, a
   }
 });
 
-export const verifyPendingSource = (id, isReliable, comment) =>
-  httpThunk(VERIFY_PENDING_SOURCE, async () => {
+export const votePendingSource = (id, isCredible, comment) =>
+  httpThunk(VOTE_PENDING_SOURCE, async () => {
     try {
-      const { status } = await axios.post('/pendingSources/verify', {
+      const {
+        data: { votingStatus },
+        status,
+      } = await axios.post('/pendingSources/verify', {
         id,
-        isReliable,
+        isCredible,
         comment,
       });
 
       return {
-        id,
+        pendingSourceId: id,
+        votingStatus,
         status,
-        isReliable,
+        isCredible,
       };
     } catch (e) {
       return e;

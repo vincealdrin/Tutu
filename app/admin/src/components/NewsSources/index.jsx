@@ -6,10 +6,10 @@ import {
   Menu,
   Modal,
   Label,
-  Header,
-  Icon,
-  TextArea,
-  Form,
+  Dimmer,
+  Loader,
+  Segment,
+  List,
 } from 'semantic-ui-react';
 import moment from 'moment';
 import DataTable from '../Common/DataTable';
@@ -26,7 +26,7 @@ import {
   fetchPendingSources,
   addPendingSources,
   deletePendingSources,
-  verifyPendingSource,
+  votePendingSource,
   fetchPendingSourceVotes,
 } from '../../modules/pendingSources';
 import {
@@ -85,6 +85,7 @@ const mapStateToProps = ({
   pendingSources: {
     pendingSources,
     pendingSourceVotes,
+    fetchVotesStatus,
     totalCount: pendingTotalCount,
   },
   user: {
@@ -101,6 +102,7 @@ const mapStateToProps = ({
   socket,
   role,
   pendingSourceVotes,
+  fetchVotesStatus,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -113,7 +115,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchFakeSources,
   addFakeSources,
   deleteFakeSources,
-  verifyPendingSource,
+  votePendingSource,
   fetchPendingSourceVotes,
 }, dispatch);
 
@@ -121,6 +123,9 @@ class Sources extends Component {
   state = {
     activeItem: 'pending sources',
     isVotesModalOpen: false,
+    isVotesEmpty: false,
+    focusedUrl: '',
+    focusedLabel: '',
   };
 
   changeItem = (_, { name }) => this.setState({ activeItem: name });
@@ -135,8 +140,15 @@ class Sources extends Component {
       fakeTotalCount,
       pendingSourceVotes,
       role,
+      fetchVotesStatus,
     } = this.props;
-    const { activeItem, isVotesModalOpen } = this.state;
+    const {
+      activeItem,
+      isVotesModalOpen,
+      focusedUrl,
+      focusedLabel,
+      isVotesEmpty,
+    } = this.state;
 
     return (
       <div className="sources-container">
@@ -145,12 +157,28 @@ class Sources extends Component {
           onClose={() => this.setState({ isVotesModalOpen: false })}
           closeOnDimmerClick
         >
-          <Modal.Header>Votes</Modal.Header>
-          <Modal.Content image>
-            <Modal.Description>
-              <p>We've found the following gravatar image associated with your e-mail address.</p>
-              <p>Is it okay to use this photo?</p>
-            </Modal.Description>
+          <Modal.Header>
+            <a href={focusedUrl} target="_blank">{focusedUrl.replace(/https?:\/\//, '')}</a> {focusedLabel} VOTES
+          </Modal.Header>
+          <Modal.Content>
+            <Segment
+              color={focusedLabel === 'CREDIBLE' ? 'green' : 'red'}
+              style={{ height: fetchVotesStatus.pending ? '15vh' : '100%' }}
+            >
+              {fetchVotesStatus.success && isVotesEmpty ? (
+                <span>NO VOTES</span>
+              ) : null}
+              {fetchVotesStatus.success ? (
+                <List divided relaxed>
+                  {pendingSourceVotes.map((vote) => (
+                    <List.Item>
+                      <List.Header> {vote.user} </List.Header>
+                      <List.Description> Comment: {vote.comment} </List.Description>
+                    </List.Item>
+                  ))}
+                </List>
+              ) : <Dimmer active> <Loader>LOADING {focusedLabel} VOTES...</Loader> </Dimmer>}
+            </Segment>
           </Modal.Content>
         </Modal>
         <Menu pointing secondary>
@@ -208,11 +236,15 @@ class Sources extends Component {
               <Button.Group>
                 <Button as="div" labelPosition="left">
                   <Label
-                    as="a"
                     color="green"
                     pointing="right"
                     onClick={() => {
-                      this.setState({ isVotesModalOpen: true });
+                      this.setState({
+                        isVotesModalOpen: true,
+                        focusedUrl: url,
+                        focusedLabel: 'CREDIBLE',
+                        isVotesEmpty: credibleVotesCount === 0,
+                      });
                       this.props.fetchPendingSourceVotes(id, true);
                     }}
                     basic
@@ -222,29 +254,32 @@ class Sources extends Component {
                   <PendingActionButton
                     url={url}
                     onClick={(comment) => {
-                      this.props.verifyPendingSource(id, true, comment);
+                      this.props.votePendingSource(id, true, comment);
                     }}
                     vote={vote && vote.isCredible ? vote : null}
                     isCredible
                   />
                 </Button>
-
                 <Button.Or />
                 <Button as="div" labelPosition="right">
                   <PendingActionButton
                     url={url}
                     onClick={(comment) => {
-                      this.props.verifyPendingSource(id, false, comment);
+                      this.props.votePendingSource(id, false, comment);
                     }}
                     vote={vote && !vote.isCredible ? vote : null}
                     isCredible={false}
                   />
                   <Label
-                    as="a"
                     color="red"
                     pointing="left"
                     onClick={() => {
-                      this.setState({ isVotesModalOpen: true });
+                      this.setState({
+                        isVotesModalOpen: true,
+                        focusedUrl: url,
+                        focusedLabel: 'NOT CREDIBLE',
+                        isVotesEmpty: notCredibleVotesCount === 0,
+                      });
                       this.props.fetchPendingSourceVotes(id, false);
                     }}
                     basic

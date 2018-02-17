@@ -196,19 +196,29 @@ module.exports = (conn, io) => {
       const matchedVote = await r.table('sourceRevotes').get(r.uuid(id + req.user.id)).run(conn);
       const totalJourns = await r.table('users').filter(r.row('role').eq('curator')).count().run(conn);
       const timestamp = await r.now().inTimezone(PH_TIMEZONE).run(conn);
+      let votingStatus = 'started';
 
       if (matchedVote) {
         await r.table('sourceRevotes').get(matchedVote.id).delete().run(conn);
+
+        votingStatus = 'removed';
       } else if (votes + 1 === totalJourns || (!matchedVote && totalJourns === 1)) {
         await r.table('sourceRevotes').filter(r.row('sourceId').eq(id)).delete().run(conn);
-        const { changes } = await r.table('sources').get(id).run(conn, { returnChanges: true });
+        const { changes } = await r.table('sources')
+          .get(id)
+          .delete({ returnChanges: true })
+          .run(conn);
         const source = changes[0].old_val;
-
-        await r.table('pendingSources').insert({
+        const newPendingSource = {
           ...source,
-          isCrediblePred: null,
+          isReliablePred: null,
           isRevote: true,
-        }).run(conn);
+          timestamp,
+        };
+
+        await r.table('pendingSources').insert(newPendingSource).run(conn);
+
+        votingStatus = 'ended';
       } else {
         await r.table('sourceRevotes').insert({
           id: r.uuid(id + req.user.id),
@@ -228,7 +238,7 @@ module.exports = (conn, io) => {
         timestamp,
       }).run(conn);
 
-      res.sendStatus(204);
+      res.json({ votingStatus });
     } catch (e) {
       next(e);
     }

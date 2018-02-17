@@ -291,11 +291,10 @@ module.exports = (conn, io) => {
           .get(id)
           .delete({ returnChanges: true })
           .run(conn);
-        console.log(votes);
-        console.log(changes);
         const pendingSource = changes[0].old_val;
 
         delete pendingSource.isReliablePred;
+        delete pendingSource.isRevote;
 
         const newSource = {
           ...pendingSource,

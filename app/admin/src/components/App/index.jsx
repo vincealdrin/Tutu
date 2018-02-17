@@ -39,13 +39,15 @@ class App extends Component {
     Notification.requestPermission((status) => {
       if (status === 'granted' && navigator.serviceWorker) {
         navigator.serviceWorker.getRegistration().then((reg) => {
-          socket.on('newPendingSource', ({ url, isReliablePred, id }) => {
-            console.log(latestPendingSource);
-            console.log(url);
-            console.log(latestPendingSource !== url);
+          socket.on('newPendingSource', ({
+            url,
+            isReliablePred,
+            isRevote,
+            id,
+          }) => {
             if (reg && latestPendingSource !== url) {
               reg.showNotification('There\'s a new pending source!', {
-                body: `URL: ${url}\nPrediction: ${isReliablePred ? 'Credible' : 'Not Credible'}`,
+                body: `URL: ${url}\n${isRevote ? 'Status: REVOTE' : `Prediction: ${isReliablePred ? 'Credible' : 'Not Credible'}`}`,
                 icon: 'favicon.ico',
                 vibrate: [100, 50, 100],
                 data: {

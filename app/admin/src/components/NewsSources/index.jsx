@@ -59,8 +59,14 @@ const pendingColumns = [
   },
   {
     key: 'isReliablePred',
-    wrapper: (val) => (val ? 'Credible' : 'Not Credible'),
-    text: 'Prediction',
+    wrapper: (val) => {
+      if (val === null) {
+        return 'REVOTE';
+      }
+
+      return (val ? 'Credible' : 'Not Credible');
+    },
+    text: 'Prediction/Status',
   },
   {
     key: 'timestamp',

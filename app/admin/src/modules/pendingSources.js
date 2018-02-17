@@ -20,6 +20,82 @@ const initialState = {
   voteStatus: crudStatus,
 };
 
+const pendingSourcesReducer = (action, state) => (action.votingStatus !== 'ended'
+  ? state.pendingSources.map((pendingSource) => {
+    const {
+      vote,
+      credibleVotesCount,
+      notCredibleVotesCount,
+    } = pendingSource;
+    const hasVotedCredible = vote && credibleVotesCount;
+    const hasVotedNotCredible = vote && notCredibleVotesCount;
+
+    if (pendingSource.id === action.pendingSourceId) {
+      if (action.votingStatus === 'changed') {
+        if (action.isCredible) {
+          return {
+            ...pendingSource,
+            vote: {
+              ...vote,
+              comment: action.comment,
+              isCredible: true,
+            },
+            credibleVotesCount: credibleVotesCount + 1,
+            notCredibleVotesCount: hasVotedNotCredible
+              ? notCredibleVotesCount - 1
+              : notCredibleVotesCount,
+          };
+        }
+
+        return {
+          ...pendingSource,
+          vote: {
+            ...vote,
+            comment: action.comment,
+            isCredible: false,
+          },
+          credibleVotesCount: hasVotedCredible
+            ? credibleVotesCount - 1
+            : credibleVotesCount,
+          notCredibleVotesCount: notCredibleVotesCount + 1,
+        };
+      }
+
+      if (action.votingStatus === 'removed') {
+        if (action.isCredible) {
+          return {
+            ...pendingSource,
+            vote: null,
+            credibleVotesCount: hasVotedCredible
+              ? credibleVotesCount - 1
+              : credibleVotesCount,
+          };
+        }
+
+        return {
+          ...pendingSource,
+          vote: null,
+          notCredibleVotesCount: hasVotedNotCredible
+            ? notCredibleVotesCount - 1
+            : notCredibleVotesCount,
+        };
+      }
+
+      return {
+        ...pendingSource,
+        credibleVotesCount: action.isCredible
+          ? pendingSource.credibleVotesCount + 1
+          : pendingSource.credibleVotesCount,
+        notCredibleVotesCount: !action.isCredible
+          ? pendingSource.notCredibleVotesCount + 1
+          : pendingSource.notCredibleVotesCount,
+      };
+    }
+    return pendingSource;
+  })
+  : state.pendingSources
+    .filter((pendingSource) => pendingSource.id !== action.pendingSourceId));
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case FETCH_PENDING_SOURCES:
@@ -72,81 +148,9 @@ export default (state = initialState, action) => {
     case VOTE_PENDING_SOURCE:
       return {
         ...state,
-        pendingSources: action.votingStatus !== 'ended'
-          ? state.pendingSources.map((pendingSource) => {
-            const {
-              vote,
-              credibleVotesCount,
-              notCredibleVotesCount,
-            } = pendingSource;
-            const hasVotedCredible = vote && credibleVotesCount;
-            const hasVotedNotCredible = vote && notCredibleVotesCount;
-
-            if (pendingSource.id === action.pendingSourceId) {
-              if (action.votingStatus === 'changed') {
-                if (action.isCredible) {
-                  return {
-                    ...pendingSource,
-                    vote: {
-                      ...vote,
-                      comment: action.comment,
-                      isCredible: true,
-                    },
-                    credibleVotesCount: credibleVotesCount + 1,
-                    notCredibleVotesCount: hasVotedNotCredible
-                      ? notCredibleVotesCount - 1
-                      : notCredibleVotesCount,
-                  };
-                }
-
-                return {
-                  ...pendingSource,
-                  vote: {
-                    ...vote,
-                    comment: action.comment,
-                    isCredible: false,
-                  },
-                  credibleVotesCount: hasVotedCredible
-                    ? credibleVotesCount - 1
-                    : credibleVotesCount,
-                  notCredibleVotesCount: notCredibleVotesCount + 1,
-                };
-              }
-
-              if (action.votingStatus === 'removed') {
-                if (action.isCredible) {
-                  return {
-                    ...pendingSource,
-                    vote: null,
-                    credibleVotesCount: hasVotedCredible
-                      ? credibleVotesCount - 1
-                      : credibleVotesCount,
-                  };
-                }
-
-                return {
-                  ...pendingSource,
-                  vote: null,
-                  notCredibleVotesCount: hasVotedNotCredible
-                    ? notCredibleVotesCount - 1
-                    : notCredibleVotesCount,
-                };
-              }
-
-              return {
-                ...pendingSource,
-                credibleVotesCount: action.isCredible
-                  ? pendingSource.credibleVotesCount + 1
-                  : pendingSource.credibleVotesCount,
-                notCredibleVotesCount: !action.isCredible
-                  ? pendingSource.notCredibleVotesCount + 1
-                  : pendingSource.notCredibleVotesCount,
-              };
-            }
-            return pendingSource;
-          })
-          : state.pendingSources
-            .filter((pendingSource) => pendingSource.id !== action.pendingSourceId),
+        pendingSources: action.statusText === 'success'
+          ? pendingSourcesReducer(action, state)
+          : state.pendingSources,
         // action.statusText === 'success'
         //   ? state.pendingSources.filter((source) => action.id !== source.id)
         //   : state.pendingSources,

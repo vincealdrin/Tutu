@@ -17,6 +17,20 @@ const initialState = {
   revoteStatus: crudStatus,
 };
 
+const sourcesReducer = (action, state) => (action.votingStatus !== 'ended'
+  ? state.sources.map((source) => {
+    if (source.id === action.sourceId) {
+      return {
+        ...source,
+        vote: source.vote ? null : { comment: action.comment },
+        votesCount: source.vote ? source.votesCount - 1 : source.votesCount + 1,
+      };
+    }
+
+    return source;
+  })
+  : state.sources.filter((source) => source.id !== action.sourceId));
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case FETCH_SOURCES:
@@ -63,17 +77,7 @@ export default (state = initialState, action) => {
     case REVOTE_SOURCE:
       return {
         ...state,
-        sources: action.statusText === 'success' ? state.sources.map((source) => {
-          if (source.id === action.sourceId) {
-            return {
-              ...source,
-              vote: source.vote ? null : { comment: action.comment },
-              votesCount: source.vote ? source.votesCount - 1 : source.votesCount + 1,
-            };
-          }
-
-          return source;
-        }) : state.sources,
+        sources: action.statusText === 'success' ? sourcesReducer(action, state) : state.sources,
         revoteStatus: updateCrudStatus(action),
       };
     default:
@@ -167,7 +171,7 @@ export const deleteSources = (ids) => httpThunk(DELETE_SOURCES, async () => {
 export const revoteSource = (sourceId, comment) =>
   httpThunk(REVOTE_SOURCE, async () => {
     try {
-      const { status } = await axios.put(`/sources/${sourceId}/revote`, {
+      const { data: { votingStatus }, status } = await axios.put(`/sources/${sourceId}/revote`, {
         sourceId,
         comment,
       });
@@ -176,6 +180,7 @@ export const revoteSource = (sourceId, comment) =>
         sourceId,
         status,
         comment,
+        votingStatus,
       };
     } catch (e) {
       return e;

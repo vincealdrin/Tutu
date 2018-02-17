@@ -4,7 +4,6 @@ import { Motion, spring } from 'react-motion';
 import { Tooltip } from 'react-tippy';
 import moment from 'moment';
 import './styles.css';
-import TutuLogo from '../../assets/logo/tutu-logo.svg';
 import ImagePlaceholder from '../Common/ImagePlaceholder';
 import { DATE_FORMAT, IS_MOBILE } from '../../constants';
 
@@ -70,7 +69,7 @@ const SimpleMarker = ({
             transform: `translate3D(0,0,0) scale(${scale}, ${scale})`,
           }}
         />
-        )}
+      )}
     </Motion>
   </Tooltip>
 );

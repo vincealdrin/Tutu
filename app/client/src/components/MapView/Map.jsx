@@ -19,6 +19,7 @@ import {
   MAPS_POSITION_BOTTOM_LEFT,
   MAPS_CONTROL_STYLE,
   IS_MOBILE,
+  URL_KEYS,
 } from '../../constants';
 
 const mapOptions = {
@@ -42,6 +43,7 @@ const mapOptions = {
   maxZoom: MAX_ZOOM,
   gestureHandling: 'greedy',
 };
+const defaultZoom = IS_MOBILE ? MOBILE_DEFAULT_ZOOM : DEFAULT_ZOOM;
 
 class Map extends PureComponent {
   render() {
@@ -58,8 +60,8 @@ class Map extends PureComponent {
 
     return (
       <GoogleMapReact
-        defaultZoom={IS_MOBILE ? MOBILE_DEFAULT_ZOOM : DEFAULT_ZOOM}
-        bootstrapURLKeys={{ key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds', libraries: 'places' }}
+        defaultZoom={defaultZoom}
+        bootstrapURLKeys={URL_KEYS}
         options={{
           ...mapOptions,
           styles: isCredible ? credibleMapStyle : notCredibleMapStyle,

@@ -87,7 +87,11 @@ export default (state = initialState, action) => {
                 if (action.isCredible) {
                   return {
                     ...pendingSource,
-                    vote: { ...vote, isCredible: true },
+                    vote: {
+                      ...vote,
+                      comment: action.comment,
+                      isCredible: true,
+                    },
                     credibleVotesCount: credibleVotesCount + 1,
                     notCredibleVotesCount: hasVotedNotCredible
                       ? notCredibleVotesCount - 1
@@ -97,7 +101,11 @@ export default (state = initialState, action) => {
 
                 return {
                   ...pendingSource,
-                  vote: { ...vote, isCredible: false },
+                  vote: {
+                    ...vote,
+                    comment: action.comment,
+                    isCredible: false,
+                  },
                   credibleVotesCount: hasVotedCredible
                     ? credibleVotesCount - 1
                     : credibleVotesCount,
@@ -229,36 +237,36 @@ export const deletePendingSources = (ids) => httpThunk(DELETE_PENDING_SOURCES, a
   }
 });
 
-export const votePendingSource = (id, isCredible, comment) =>
+export const votePendingSource = (sourceId, isCredible, comment) =>
   httpThunk(VOTE_PENDING_SOURCE, async () => {
     try {
       const {
         data: { votingStatus },
         status,
-      } = await axios.post('/pendingSources/verify', {
-        id,
+      } = await axios.put(`/pendingSources/${sourceId}/vote`, {
         isCredible,
         comment,
       });
 
       return {
-        pendingSourceId: id,
+        pendingSourceId: sourceId,
         votingStatus,
         status,
         isCredible,
+        comment,
       };
     } catch (e) {
       return e;
     }
   });
 
-export const fetchPendingSourceVotes = (id, isCredible) =>
+export const fetchPendingSourceVotes = (sourceId, isPending, isCredible) =>
   httpThunk(FETCH_PENDING_SOURCE_VOTES, async () => {
     try {
-      const { data: votes, status } = await axios.get('/pendingSources/votes', {
+      const { data: votes, status } = await axios.get(`/pendingSources/${sourceId}/votes`, {
         params: {
-          pendingSourceId: id,
           isCredible: isCredible ? 'yes' : 'no',
+          isPending: isPending ? 'yes' : 'no',
         },
       });
 

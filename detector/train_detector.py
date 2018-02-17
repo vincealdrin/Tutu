@@ -33,8 +33,10 @@ articles = get_articles(lambda join: {
     # ),
     'src_has_about': 1 if join['right']['aboutUsUrl'] else 0,
     'src_has_contact': 1 if join['right']['contactUsUrl'] else 0,
-    'src_country_rank': join['right']['countryRank'],
+    # 'src_country_rank': join['right']['countryRank'],
     'src_world_rank': join['right']['worldRank'],
+    'src_domain_has_number': 1 if join['right']['domainHasNumber'] else 0,
+    'src_domain_is_blog': 1 if join['right']['isBlogDomain'] else 0,
     'credible': join['right']['isReliable']
 })
 
@@ -42,7 +44,7 @@ df = pd.DataFrame.from_records(articles)
 
 df['credible'] = df['credible'].apply(lambda credible: 1 if credible else 0)
 df['src_world_rank'] = df['src_world_rank'].apply(lambda rank: 999999999 if rank == 0 else rank)
-df['src_country_rank'] = df['src_country_rank'].apply(lambda rank: 999999999 if rank == 0 else rank)
+# df['src_country_rank'] = df['src_country_rank'].apply(lambda rank: 999999999 if rank == 0 else rank)
 
 with open('./tl_stopwords.txt', 'r') as f:
     TL_STOPWORDS = f.read().splitlines()

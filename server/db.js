@@ -31,6 +31,7 @@ module.exports = async (cb) => {
       'visitors',
       'errorArticles',
       'pendingSourceVotes',
+      'sourceRevotes',
     ];
 
     r.dbCreate(DB_NAME).run(conn, async (err) => {

@@ -17,10 +17,12 @@ import SourcesForm from './SourcesForm';
 import PendingSourcesForm from './PendingSourcesForm';
 import FakeSourcesForm from './FakeSourcesForm';
 import PendingActionButton from './PendingActionButton';
+import SourcesActionButton from './SourcesActionButton';
 import {
   fetchSources,
   addSources,
   deleteSources,
+  revoteSource,
 } from '../../modules/sources';
 import {
   fetchPendingSources,
@@ -29,11 +31,6 @@ import {
   votePendingSource,
   fetchPendingSourceVotes,
 } from '../../modules/pendingSources';
-import {
-  fetchFakeSources,
-  addFakeSources,
-  deleteFakeSources,
-} from '../../modules/fakeSources';
 import './styles.css';
 import { TIME_FORMAT } from '../../constants';
 
@@ -46,7 +43,7 @@ const columns = [
     ),
     text: 'URL',
   },
-  { key: 'verifiedBy', text: 'Verified by' },
+  // { key: 'verifiedBy', text: 'Verified by' },
 ];
 const pendingColumns = [
   {
@@ -78,10 +75,6 @@ const mapStateToProps = ({
     sources,
     totalCount,
   },
-  fakeSources: {
-    fakeSources,
-    totalCount: fakeTotalCount,
-  },
   pendingSources: {
     pendingSources,
     pendingSourceVotes,
@@ -95,8 +88,6 @@ const mapStateToProps = ({
 }) => ({
   sources,
   totalCount,
-  fakeSources,
-  fakeTotalCount,
   pendingSources,
   pendingTotalCount,
   socket,
@@ -112,11 +103,9 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchPendingSources,
   addPendingSources,
   deletePendingSources,
-  fetchFakeSources,
-  addFakeSources,
-  deleteFakeSources,
   votePendingSource,
   fetchPendingSourceVotes,
+  revoteSource,
 }, dispatch);
 
 class Sources extends Component {
@@ -128,16 +117,28 @@ class Sources extends Component {
     focusedLabel: '',
   };
 
+  getSegmentColor = () => {
+    const { focusedLabel } = this.state;
+
+    if (focusedLabel === 'REVOTE') {
+      return 'blue';
+    }
+
+    if (focusedLabel === 'CREDIBLE') {
+      return 'green';
+    }
+
+    return 'red';
+  }
+
   changeItem = (_, { name }) => this.setState({ activeItem: name });
 
   render() {
     const {
       sources,
       pendingSources,
-      fakeSources,
       totalCount,
       pendingTotalCount,
-      fakeTotalCount,
       pendingSourceVotes,
       role,
       fetchVotesStatus,
@@ -158,11 +159,11 @@ class Sources extends Component {
           closeOnDimmerClick
         >
           <Modal.Header>
-            <a href={focusedUrl} target="_blank">{focusedUrl.replace(/https?:\/\//, '')}</a> {focusedLabel} VOTES
+            <a href={focusedUrl} target="_blank">{focusedUrl.replace(/https?:\/\//, '')}</a>&apos;s {focusedLabel} VOTES
           </Modal.Header>
           <Modal.Content>
             <Segment
-              color={focusedLabel === 'CREDIBLE' ? 'green' : 'red'}
+              color={this.getSegmentColor()}
               style={{ height: fetchVotesStatus.pending ? '15vh' : '100%' }}
             >
               {fetchVotesStatus.success && isVotesEmpty ? (
@@ -181,6 +182,7 @@ class Sources extends Component {
             </Segment>
           </Modal.Content>
         </Modal>
+
         <Menu pointing secondary>
           <Menu.Item
             name="pending sources"
@@ -245,7 +247,7 @@ class Sources extends Component {
                         focusedLabel: 'CREDIBLE',
                         isVotesEmpty: credibleVotesCount === 0,
                       });
-                      this.props.fetchPendingSourceVotes(id, true);
+                      this.props.fetchPendingSourceVotes(id, true, true);
                     }}
                     basic
                   >
@@ -257,6 +259,7 @@ class Sources extends Component {
                       this.props.votePendingSource(id, true, comment);
                     }}
                     vote={vote && vote.isCredible ? vote : null}
+                    comment={vote ? vote.comment : ''}
                     isCredible
                   />
                 </Button>
@@ -268,6 +271,7 @@ class Sources extends Component {
                       this.props.votePendingSource(id, false, comment);
                     }}
                     vote={vote && !vote.isCredible ? vote : null}
+                    comment={vote ? vote.comment : ''}
                     isCredible={false}
                   />
                   <Label
@@ -280,7 +284,7 @@ class Sources extends Component {
                         focusedLabel: 'NOT CREDIBLE',
                         isVotesEmpty: notCredibleVotesCount === 0,
                       });
-                      this.props.fetchPendingSourceVotes(id, false);
+                      this.props.fetchPendingSourceVotes(id, true, false);
                     }}
                     basic
                   >
@@ -308,7 +312,9 @@ class Sources extends Component {
             data={sources}
             columns={columns}
             onDeleteSelected={this.props.deleteSources}
-            onPaginate={this.props.fetchSources}
+            onPaginate={(page, limit, filter, search) => {
+              this.props.fetchSources(true, page, limit, filter, search);
+            }}
             addModalContent={<SourcesForm />}
             addModalActions={(closeModal) => (
               <div>
@@ -328,10 +334,38 @@ class Sources extends Component {
                 />
               </div>
             )}
-            rowActions={(id) => (
-              <div>
-                <Button content="Update" />
-              </div>
+            rowActions={({
+              url,
+              id,
+              votesCount,
+              vote,
+            }) => (
+              <Button as="div" labelPosition="left">
+                <Label
+                  color="blue"
+                  pointing="right"
+                  onClick={() => {
+                    this.setState({
+                      isVotesModalOpen: true,
+                      focusedUrl: url,
+                      focusedLabel: 'REVOTE',
+                      isVotesEmpty: votesCount === 0,
+                    });
+                    this.props.fetchPendingSourceVotes(id, false);
+                  }}
+                  basic
+                >
+                  {votesCount}
+                </Label>
+                <SourcesActionButton
+                  url={url}
+                  hasVoted={vote}
+                  comment={vote ? vote.comment : ''}
+                  onClick={(comment) => {
+                    this.props.revoteSource(id, comment);
+                  }}
+                />
+              </Button>
             )}
             hideAddBtn
             hideDeleteBtn
@@ -342,11 +376,13 @@ class Sources extends Component {
           <DataTable
             defaultSearchFilter="brand"
             label="Not Credible Sources"
-            totalCount={fakeTotalCount}
-            data={fakeSources}
+            totalCount={totalCount}
+            data={sources}
             columns={columns}
             onDeleteSelected={this.props.deleteFakeSources}
-            onPaginate={this.props.fetchFakeSources}
+            onPaginate={(page, limit, filter, search) => {
+              this.props.fetchSources(false, page, limit, filter, search);
+            }}
             addModalContent={<FakeSourcesForm />}
             addModalActions={(closeModal) => (
               <div>
@@ -366,10 +402,38 @@ class Sources extends Component {
                 />
               </div>
             )}
-            rowActions={(id) => (
-              <div>
-                <Button content="Update" />
-              </div>
+            rowActions={({
+              url,
+              id,
+              votesCount,
+              vote,
+            }) => (
+              <Button as="div" labelPosition="left">
+                <Label
+                  color="blue"
+                  pointing="right"
+                  onClick={() => {
+                    this.setState({
+                      isVotesModalOpen: true,
+                      focusedUrl: url,
+                      focusedLabel: 'REVOTE',
+                      isVotesEmpty: votesCount === 0,
+                    });
+                    this.props.fetchPendingSourceVotes(id, false);
+                  }}
+                  basic
+                >
+                  {votesCount}
+                </Label>
+                <SourcesActionButton
+                  url={url}
+                  hasVoted={vote}
+                  comment={vote ? vote.comment : ''}
+                  onClick={(comment) => {
+                    this.props.revoteSource(id, comment);
+                  }}
+                />
+              </Button>
             )}
             hideAddBtn
             hideDeleteBtn

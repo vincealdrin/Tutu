@@ -94,7 +94,9 @@ def predict():
         # 'src_wot_reputation': info['wotReputation'],
         'src_has_about': 1 if info['sourceHasAboutPage'] else 0,
         'src_has_contact': 1 if info['sourceHasContactPage'] else 0,
-        'src_country_rank':  999999999 if country_rank == 0 else country_rank,
+        'src_domain_has_number': 1 if info['domainHasNumber'] else 0,
+        'src_domain_is_blog': 1 if info['isBlogDomain'] else 0,
+        # 'src_country_rank':  999999999 if country_rank == 0 else country_rank,
         'src_world_rank': 999999999 if world_rank == 0 else world_rank,
     })
     test_df = pd.DataFrame(
@@ -105,8 +107,10 @@ def predict():
             # 'src_has_impt_pages': 1 if info['sourceHasAboutPage'] or info['sourceHasContactPage'] else 0,
             'src_has_about': 1 if info['sourceHasAboutPage'] else 0,
             'src_has_contact': 1 if info['sourceHasContactPage'] else 0,
+            'src_domain_has_number': 1 if info['domainHasNumber'] else 0,
+            'src_domain_is_blog': 1 if info['isBlogDomain'] else 0,
             # 'src_wot_reputation': info['wotReputation'],
-            'src_country_rank':  999999999 if country_rank == 0 else country_rank,
+            # 'src_country_rank':  999999999 if country_rank == 0 else country_rank,
             'src_world_rank': 999999999 if world_rank == 0 else world_rank,
         },
         index=[0])

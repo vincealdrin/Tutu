@@ -13,6 +13,11 @@ export const DEFAULT_CENTER = {
   lat: 12.71182110595629,
   lng: 121.3246960449219,
 };
+export const URL_KEYS = {
+  key: 'AIzaSyC0v47qIFf6pweh1FZM3aekCv-dCFEumds',
+  libraries: 'places',
+  v: '3.30',
+};
 export const MAPS_CONTROL_STYLE = 1;
 export const MAPS_POSITION_LEFT_BOTTOM = 6;
 export const MAPS_POSITION_BOTTOM_LEFT = 10;

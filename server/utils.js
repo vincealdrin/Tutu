@@ -7,6 +7,7 @@ const parseDomain = require('parse-domain');
 const rp = require('request-promise');
 const randomUserAgent = require('random-useragent');
 const cloudscraper = require('cloudscraper');
+const Wappalyzer = require('wappalyzer');
 
 const awisClient = awis({
   key: process.env.AMAZON_ACCESS_KEY,
@@ -569,6 +570,7 @@ module.exports.analyzeDomain = (url) => {
 
   return {
     isDomainSuspicious: new RegExp(`${knownSuspiciousDomainKeywords.join('|')}`, 'i').test(url),
+    domainHasNumber: /\d+/.test(url),
     isBlogDomain: new RegExp(`${knowDomainBlogs.join('|')}`, 'i').test(url),
   };
 };

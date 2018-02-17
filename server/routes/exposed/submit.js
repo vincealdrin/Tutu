@@ -61,7 +61,7 @@ module.exports = (conn, io) => {
       const { aboutUsUrl, contactUsUrl } = getAboutContactUrl(cheerioDoc, url);
       const hasAboutPage = !/^https?:\/\/#?$/.test(aboutUsUrl);
       const hasContactPage = !/^https?:\/\/#?$/.test(contactUsUrl);
-      const { isBlogDomain, isDomainSuspicious } = analyzeDomain(domainOnly);
+      const { isBlogDomain, isDomainSuspicious, domainHasNumber } = analyzeDomain(domainOnly);
       const {
         isCredible,
         pct,
@@ -83,6 +83,7 @@ module.exports = (conn, io) => {
           body,
           isDomainSuspicious,
           isBlogDomain,
+          domainHasNumber,
         },
         json: true,
       });
@@ -101,7 +102,8 @@ module.exports = (conn, io) => {
           timestamp: r.now().inTimezone(PH_TIMEZONE),
           senderIpAddress: ipAddress,
           votes: [],
-          votingDeadline: null,
+          // votingDeadline: null,
+          isRevote: false,
           wotReputation,
           id,
           brand,

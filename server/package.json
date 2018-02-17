@@ -31,6 +31,7 @@
     "rethinkdb": "^2.3.3",
     "socket.io": "^2.0.4",
     "valid-url": "^1.0.9",
+    "wappalyzer": "^5.4.8",
     "whois": "^2.5.9",
     "whois-json": "^1.2.2",
     "xml2js": "^0.4.19"

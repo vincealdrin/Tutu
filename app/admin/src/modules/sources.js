@@ -5,6 +5,7 @@ export const FETCH_SOURCES = 'sources/FETCH_SOURCES';
 export const ADD_SOURCES = 'sources/ADD_SOURCES';
 export const UPDATE_SOURCE = 'sources/UPDATE_SOURCE';
 export const DELETE_SOURCES = 'sources/DELETE_SOURCE';
+export const REVOTE_SOURCE = 'pendingSources/REVOTE_SOURCE';
 
 const initialState = {
   sources: [],
@@ -13,6 +14,7 @@ const initialState = {
   addStatus: crudStatus,
   updateStatus: crudStatus,
   deleteStatus: crudStatus,
+  revoteStatus: crudStatus,
 };
 
 export default (state = initialState, action) => {
@@ -58,32 +60,49 @@ export default (state = initialState, action) => {
           : state.totalCount,
         updateStatus: updateCrudStatus(action),
       };
+    case REVOTE_SOURCE:
+      return {
+        ...state,
+        sources: action.statusText === 'success' ? state.sources.map((source) => {
+          if (source.id === action.sourceId) {
+            return {
+              ...source,
+              vote: source.vote ? null : { comment: action.comment },
+              votesCount: source.vote ? source.votesCount - 1 : source.votesCount + 1,
+            };
+          }
+
+          return source;
+        }) : state.sources,
+        revoteStatus: updateCrudStatus(action),
+      };
     default:
       return state;
   }
 };
 
-export const fetchSources = (page, limit, filter, search) => httpThunk(FETCH_SOURCES, async () => {
-  try {
-    const { data: sources, status, headers } = await axios.get('/sources', {
-      params: {
-        isReliable: true,
-        page,
-        limit,
-        filter,
-        search,
-      },
-    });
+export const fetchSources = (isCredible, page, limit, filter, search) =>
+  httpThunk(FETCH_SOURCES, async () => {
+    try {
+      const { data: sources, status, headers } = await axios.get('/sources', {
+        params: {
+          isReliable: isCredible,
+          page,
+          limit,
+          filter,
+          search,
+        },
+      });
 
-    return {
-      totalCount: parseInt(headers['x-total-count'], 10),
-      sources,
-      status,
-    };
-  } catch (e) {
-    return e;
-  }
-});
+      return {
+        totalCount: parseInt(headers['x-total-count'], 10),
+        sources,
+        status,
+      };
+    } catch (e) {
+      return e;
+    }
+  });
 
 
 export const addSources = () => httpThunk(ADD_SOURCES, async (getState) => {
@@ -144,3 +163,21 @@ export const deleteSources = (ids) => httpThunk(DELETE_SOURCES, async () => {
     return e;
   }
 });
+
+export const revoteSource = (sourceId, comment) =>
+  httpThunk(REVOTE_SOURCE, async () => {
+    try {
+      const { status } = await axios.put(`/sources/${sourceId}/revote`, {
+        sourceId,
+        comment,
+      });
+
+      return {
+        sourceId,
+        status,
+        comment,
+      };
+    } catch (e) {
+      return e;
+    }
+  });

@@ -18,7 +18,13 @@ import MapInterface from '../Common/MapInterface';
 import Map from './Map';
 import './styles.css';
 import '../../index.css';
-import { MAX_ZOOM, DEFAULT_CENTER, MIN_ZOOM, MOBILE_DEFAULT_ZOOM, MOBILE_MIN_ZOOM, IS_MOBILE } from '../../constants';
+import {
+  MAX_ZOOM,
+  DEFAULT_CENTER,
+  MIN_ZOOM,
+  MOBILE_MIN_ZOOM,
+  IS_MOBILE,
+} from '../../constants';
 
 const mapStateToProps = ({
   mapArticles: {
@@ -62,7 +68,6 @@ class MapView extends Component {
     center,
     zoom,
     bounds,
-    marginBounds,
   }) => {
     // console.log(bounds);
     // console.log(zoom);
@@ -76,7 +81,7 @@ class MapView extends Component {
       nw: { lng: leftBound },
     } = bounds;
 
-    console.log(bounds);
+    // console.log(bounds);
     switch (zoom) {
       case MIN_ZOOM:
         if (IS_MOBILE) {
@@ -122,7 +127,7 @@ class MapView extends Component {
         }
         break;
       case 7:
-        if (rightBound > 127.8176159667969) {
+        if (rightBound > 129.8176159667969) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
               lat: center.lat,
@@ -131,7 +136,7 @@ class MapView extends Component {
           }, 100);
         }
 
-        if (leftBound < 115.91314819335935) {
+        if (leftBound < 112.91314819335935) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
               lat: center.lat,
@@ -149,7 +154,7 @@ class MapView extends Component {
           }, 100);
         }
 
-        if (botBound < 4.183849540341299) {
+        if (botBound < 3.183849540341299) {
           timeoutId = setTimeout(() => {
             this.props.updateMapLocState({
               lat: 8.596137280287343,
@@ -379,14 +384,14 @@ class MapView extends Component {
         //     }, MOBILE_DEFAULT_ZOOM);
         //   }, 100);
         // }
-        if (center.lng > DEFAULT_CENTER.lng || center.lng < DEFAULT_CENTER.lng) {
-          timeoutId = setTimeout(() => {
-            this.props.updateMapLocState(DEFAULT_CENTER, MOBILE_MIN_ZOOM);
-          }, 100);
-        }
+        // if (center.lng > DEFAULT_CENTER.lng || center.lng < DEFAULT_CENTER.lng) {
+        //   timeoutId = setTimeout(() => {
+        //     this.props.updateMapLocState(DEFAULT_CENTER, MOBILE_MIN_ZOOM);
+        //   }, 100);
+        // }
     }
 
-    this.props.updateMapState(center, zoom, marginBounds);
+    this.props.updateMapState(center, zoom, bounds);
 
     if (initLoad) {
       this.props.fetchArticles();

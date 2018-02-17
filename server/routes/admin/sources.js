@@ -52,8 +52,14 @@ module.exports = (conn, io) => {
           contactUsUrl: r.row('contactUsUrl'),
           aboutUsUrl: r.row('aboutUsUrl'),
           // verifiedBy: r.row('right')('name'),
-          verifiedBy: '',
+          // verifiedBy: '',
         })
+        .merge((source) => ({
+          vote: r.table('sourceRevotes').get(r.uuid(source('id').add(req.user.id))),
+          votesCount: r.table('sourceRevotes')
+            .filter((vote) => vote('sourceId').eq(source('id')))
+            .count(),
+        }))
         .run(conn);
       const sources = await cursor.toArray();
 
@@ -178,6 +184,56 @@ module.exports = (conn, io) => {
     }
   });
 
+  router.put('/:id/revote', async (req, res, next) => {
+    const { comment } = req.body;
+    const { id } = req.params;
+
+    try {
+      const votes = await r.table('sourceRevotes')
+        .filter(r.row('sourceId').eq(id))
+        .count()
+        .run(conn);
+      const matchedVote = await r.table('sourceRevotes').get(r.uuid(id + req.user.id)).run(conn);
+      const totalJourns = await r.table('users').filter(r.row('role').eq('curator')).count().run(conn);
+      const timestamp = await r.now().inTimezone(PH_TIMEZONE).run(conn);
+
+      if (matchedVote) {
+        await r.table('sourceRevotes').get(matchedVote.id).delete().run(conn);
+      } else if (votes + 1 === totalJourns || (!matchedVote && totalJourns === 1)) {
+        await r.table('sourceRevotes').filter(r.row('sourceId').eq(id)).delete().run(conn);
+        const { changes } = await r.table('sources').get(id).run(conn, { returnChanges: true });
+        const source = changes[0].old_val;
+
+        await r.table('pendingSources').insert({
+          ...source,
+          isCrediblePred: null,
+          isRevote: true,
+        }).run(conn);
+      } else {
+        await r.table('sourceRevotes').insert({
+          id: r.uuid(id + req.user.id),
+          sourceId: id,
+          userId: req.user.id,
+          comment,
+          timestamp,
+        }).run(conn);
+      }
+
+      await r.table('usersFeed').insert({
+        userId: req.user.id,
+        type: 'revote',
+        // updated: getUpdatedFields(changes),
+        sourceId: id,
+        table: tbl,
+        timestamp,
+      }).run(conn);
+
+      res.sendStatus(204);
+    } catch (e) {
+      next(e);
+    }
+  });
+
   router.put('/:sourceId', async (req, res, next) => {
     const { sourceId } = req.params;
     const { isIdChanged } = req.query;
@@ -225,7 +281,7 @@ module.exports = (conn, io) => {
         table: tbl,
       }).run(conn);
 
-      res.status(204).end();
+      res.sendStatus(204);
     } catch (e) {
       next(e);
     }
@@ -248,7 +304,7 @@ module.exports = (conn, io) => {
         table: tbl,
       }).run(conn);
 
-      res.status(204).end();
+      res.sendStatus(204);
     } catch (e) {
       next(e);
     }

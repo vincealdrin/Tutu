@@ -8,26 +8,21 @@ import {
   Form,
 } from 'semantic-ui-react';
 
-class PendingActionButton extends Component {
+class SourcesActionButton extends Component {
   state = { text: '' }
 
   render() {
     const {
       url,
-      isCredible,
       onClick,
-      vote,
+      hasVoted,
       comment,
     } = this.props;
     const urlName = url.replace(/https?:\/\//, '');
-    const label = isCredible ? 'CREDIBLE' : 'NOT CREDIBLE';
-    const voteBtnColor = vote && vote.isCredible && isCredible ? 'green' : 'red';
-    const btnColor = isCredible ? 'green' : 'red';
-    const hasVoted = vote !== null;
 
     return (
       <Modal
-        trigger={<Button color={vote ? voteBtnColor : null} content={label} />}
+        trigger={<Button color={hasVoted ? 'blue' : null} content="REVOTE" />}
         size="small"
         basic
       >
@@ -37,15 +32,15 @@ class PendingActionButton extends Component {
             hasVoted
               ? (
                 <span>
-                You tagged <a href={url} target="_blank">{urlName}</a> as <span style={{ color: isCredible ? '#21ba45' : '#ff695e' }}>{label}</span> news source
+                  You asked other journalists for a REVOTE for <a href={url} target="_blank">{urlName}</a>
                 </span>
               )
               : (
                 <span>
-                Are you sure you want to tag <a href={url} target="_blank">{urlName}</a> as <span style={{ color: isCredible ? '#21ba45' : '#ff695e' }}>{label}</span> news source?
+                  Are you sure you want to ask for a REVOTE for <a href={url} target="_blank">{urlName}</a>?
                 </span>
               )
-        }
+          }
         />
         <Modal.Content>
           {hasVoted
@@ -71,16 +66,15 @@ class PendingActionButton extends Component {
           {!hasVoted
             ? (
               <Button
-                color={btnColor}
                 onClick={() => onClick(this.state.text)}
                 inverted
               >
-                <Icon name={isCredible ? 'check circle' : 'warning sign'} /> Yes, I will TAG {urlName} as {label} news source
+                <Icon name="thumbs up" /> Yes, I want to ask for a REVOTE for {urlName}
               </Button>
             )
             : (
               <Button onClick={onClick} inverted>
-                <Icon name="undo" /> I will UNTAG {urlName} as {label} news source
+                <Icon name="undo" /> I DON&apos;T WANT A REVOTE for {urlName}
               </Button>
             )}
         </Modal.Actions>
@@ -89,4 +83,4 @@ class PendingActionButton extends Component {
   }
 }
 
-export default PendingActionButton;
+export default SourcesActionButton;

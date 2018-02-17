@@ -7,7 +7,6 @@ import users from './users';
 import usersFeed from './usersFeed';
 import sources from './sources';
 import pendingSources from './pendingSources';
-import fakeSources from './fakeSources';
 import articles from './articles';
 import crawler from './crawler';
 import dashboard from './dashboard';
@@ -23,7 +22,6 @@ const appReducer = combineReducers({
   usersFeed,
   sources,
   pendingSources,
-  fakeSources,
   articles,
   crawler,
   dashboard,

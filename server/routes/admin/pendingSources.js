@@ -23,18 +23,39 @@ const {
 module.exports = (conn, io) => {
   const tbl = 'pendingSources';
 
-  router.get('/votes', async (req, res, next) => {
+  router.get('/:sourceId/votes', async (req, res, next) => {
     try {
-      const { pendingSourceId, isCredible = 'yes' } = req.query;
-      const cursor = await r.table('pendingSourceVotes')
-        .filter(r.row('pendingSourceId').eq(pendingSourceId)
-          .and(r.row('isCredible').eq(isCredible === 'yes')))
-        .merge({
-          pendingSource: r.table('pendingSources').get(r.row('pendingSourceId')).default({}).pluck('url', 'brand'),
-          user: r.table('users').get(r.row('userId')).getField('name'),
-        })
-        .without('pendingSourceId', 'userId')
-        .run(conn);
+      const { isPending = 'yes', isCredible = 'yes' } = req.query;
+      const { sourceId } = req.params;
+      let cursor;
+
+      if (isPending === 'yes') {
+        cursor = await r.table('pendingSourceVotes')
+          .filter(r.row('sourceId').eq(sourceId)
+            .and(r.row('isCredible').eq(isCredible === 'yes')))
+          .merge({
+            pendingSource: r.table('pendingSources')
+              .get(r.row('sourceId'))
+              .default({})
+              .pluck('url', 'brand'),
+            user: r.table('users').get(r.row('userId')).getField('name'),
+          })
+          .without('sourceId', 'userId')
+          .run(conn);
+      } else {
+        cursor = await r.table('sourceRevotes')
+          .filter(r.row('sourceId').eq(sourceId))
+          .merge({
+            source: r.table('sources')
+              .get(r.row('sourceId'))
+              .default({})
+              .pluck('url', 'brand'),
+            user: r.table('users').get(r.row('userId')).getField('name'),
+          })
+          .without('sourceId', 'userId')
+          .run(conn);
+      }
+
       const votes = await cursor.toArray();
 
       res.json(votes);
@@ -67,11 +88,11 @@ module.exports = (conn, io) => {
         .merge((source) => ({
           vote: r.table('pendingSourceVotes').get(r.uuid(source('id').add(req.user.id))),
           credibleVotesCount: r.table('pendingSourceVotes')
-            .filter((vote) => vote('pendingSourceId').eq(source('id'))
+            .filter((vote) => vote('sourceId').eq(source('id'))
               .and(vote('isCredible').eq(true)))
             .count(),
           notCredibleVotesCount: r.table('pendingSourceVotes')
-            .filter((vote) => vote('pendingSourceId').eq(source('id'))
+            .filter((vote) => vote('sourceId').eq(source('id'))
               .and(vote('isCredible').eq(false)))
             .count(),
         }))
@@ -182,6 +203,7 @@ module.exports = (conn, io) => {
         url: cleanedSrcUrl,
         timestamp: r.now().inTimezone(PH_TIMEZONE),
         senderIpAddress: ipAddress,
+        isRevote: false,
         wotReputation,
         id,
         brand,
@@ -208,6 +230,111 @@ module.exports = (conn, io) => {
       }).run(conn);
 
       return res.json(insertedVal);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.put('/:id/vote', async (req, res, next) => {
+    const {
+      isCredible,
+      comment,
+    } = req.body;
+    const { id } = req.params;
+
+    try {
+      const votes = await r.table('pendingSourceVotes')
+        .filter(r.row('sourceId').eq(id))
+        .group(r.row('isCredible'))
+        .count()
+        .ungroup()
+        .map((x) => [r.branch(x.getField('group'), 'credible', 'notCredible'), x.getField('reduction')])
+        .coerceTo('object')
+        .run(conn);
+      const matchedVote = await r.table('pendingSourceVotes').get(r.uuid(id + req.user.id)).run(conn);
+      const totalJourns = await r.table('users').filter(r.row('role').eq('curator')).count().run(conn);
+      // const totalVotes = (votes.credible || 0) + (votes.notCredible || 0) + 1;
+      const timestamp = await r.now().inTimezone(PH_TIMEZONE).run(conn);
+      // const isDivisible = totalJourns % 2 === 0;
+      // const halfedTotalJourns = Math.ceil(totalJourns / 2);
+      // const majorityCount = isDivisible ? halfedTotalJourns + 1 : halfedTotalJourns;
+      // console.log(majorityCount);
+      // console.log(matchedVote);
+      console.log(votes);
+      // console.log(totalVotes + 1);
+      console.log(totalJourns);
+      console.log((votes.credible || 0) + 1 === totalJourns);
+      console.log(matchedVote);
+      console.log(isCredible);
+      // if (!matchedVote && (totalVotes + 1) >= majorityCount) {
+
+      if (matchedVote && matchedVote.isCredible === isCredible) {
+        await r.table('pendingSourceVotes').get(matchedVote.id).delete().run(conn);
+
+        await r.table('usersFeed').insert({
+          userId: req.user.id,
+          type: 'unvote',
+          sourceId: id,
+          table: tbl,
+          timestamp,
+          comment,
+        }).run(conn);
+
+        return res.json({ votingStatus: 'removed' });
+      }
+
+      if (((isCredible && (votes.credible || 0) + 1 >= totalJourns) ||
+            (!isCredible && (votes.notCredible || 0) + 1 >= totalJourns)) &&
+          ((!matchedVote && totalJourns === 1) ||
+            (matchedVote.isCredible !== isCredible))) {
+        const { changes } = await r.table(tbl)
+          .get(id)
+          .delete({ returnChanges: true })
+          .run(conn);
+        console.log(votes);
+        console.log(changes);
+        const pendingSource = changes[0].old_val;
+
+        delete pendingSource.isReliablePred;
+
+        const newSource = {
+          ...pendingSource,
+          isReliable: votes.credible + 1 === totalJourns,
+          timestamp,
+        };
+
+        const { changes: insertedVals } = await r.table('sources')
+          .insert(newSource, { returnChanges: true, conflict: 'update' })
+          .run(conn);
+        const insertedVal = insertedVals[0].new_val;
+
+        res.json({ votingStatus: 'ended' });
+      } else {
+        const { changes } = await r.table('pendingSourceVotes').insert({
+          id: r.uuid(id + req.user.id),
+          sourceId: id,
+          userId: req.user.id,
+          isCredible,
+          timestamp,
+          comment,
+          // votingDeadline: totalVotes + 1 === votesThreshold
+          //   ? r.expr(moment().add(15, 'days')).inTimezone(PH_TIMEZONE)
+          //   : r.row('votingDeadline'),
+        }, { returnChanges: true, conflict: 'update' }).run(conn);
+        const insertedVal = changes[0].new_val;
+
+        await r.table('usersFeed').insert({
+          userId: req.user.id,
+          type: 'vote',
+          sourceId: id,
+          table: tbl,
+          timestamp,
+          isCredible,
+          comment,
+        }).run(conn);
+
+        res.json({ votingStatus: 'changed' });
+      }
     } catch (e) {
       next(e);
     }
@@ -284,105 +411,6 @@ module.exports = (conn, io) => {
       }).run(conn);
 
       res.sendStatus(204);
-    } catch (e) {
-      next(e);
-    }
-  });
-
-  router.post('/verify', async (req, res, next) => {
-    const {
-      id,
-      isCredible,
-      comment,
-    } = req.body;
-
-    try {
-      const votes = await r.table('pendingSourceVotes')
-        .filter(r.row('pendingSourceId').eq(id))
-        .group(r.row('isCredible'))
-        .count()
-        .ungroup()
-        .map((x) => [r.branch(x.getField('group'), 'credible', 'notCredible'), x.getField('reduction')])
-        .coerceTo('object')
-        .run(conn);
-      console.log(votes);
-      const matchedVote = await r.table('pendingSourceVotes').get(r.uuid(id + req.user.id)).run(conn);
-      const totalJourns = await r.table('users').filter(r.row('role').eq('curator')).count().run(conn);
-      // const totalVotes = (votes.credible || 0) + (votes.notCredible || 0) + 1;
-      const timestamp = await r.now().inTimezone(PH_TIMEZONE).run(conn);
-      // const isDivisible = totalJourns % 2 === 0;
-      // const halfedTotalJourns = Math.ceil(totalJourns / 2);
-      // const majorityCount = isDivisible ? halfedTotalJourns + 1 : halfedTotalJourns;
-      // console.log(majorityCount);
-      // console.log(matchedVote);
-      // console.log(votes);
-      // console.log(totalVotes + 1);
-      // console.log(totalJourns);
-      // if (!matchedVote && (totalVotes + 1) >= majorityCount) {
-
-      if (((isCredible && votes.credible + 1 === totalJourns) ||
-          (!isCredible && votes.notCredible + 1 === totalJourns)) &&
-          matchedVote.isCredible !== isCredible) {
-        const { changes } = await r.table(tbl)
-          .get(id)
-          .delete({ returnChanges: true })
-          .run(conn);
-        console.log(votes);
-        const pendingSource = changes[0].old_val;
-
-        delete pendingSource.isReliablePred;
-
-        const newSource = {
-          ...pendingSource,
-          isReliable: votes.credible + 1 === totalJourns,
-          timestamp,
-        };
-
-        const { changes: insertedVals } = await r.table('sources')
-          .insert(newSource, { returnChanges: true, conflict: 'update' })
-          .run(conn);
-        const insertedVal = insertedVals[0].new_val;
-
-        res.json({ votingStatus: 'ended' });
-      } else if (matchedVote && matchedVote.isCredible === isCredible) {
-        await r.table('pendingSourceVotes').get(matchedVote.id).delete().run(conn);
-
-        await r.table('usersFeed').insert({
-          userId: req.user.id,
-          type: 'unvote',
-          sourceId: id,
-          table: tbl,
-          timestamp,
-          comment,
-        }).run(conn);
-
-        res.json({ votingStatus: 'removed' });
-      } else {
-        const { changes } = await r.table('pendingSourceVotes').insert({
-          id: r.uuid(id + req.user.id),
-          pendingSourceId: id,
-          userId: req.user.id,
-          isCredible,
-          timestamp,
-          comment,
-          // votingDeadline: totalVotes + 1 === votesThreshold
-          //   ? r.expr(moment().add(15, 'days')).inTimezone(PH_TIMEZONE)
-          //   : r.row('votingDeadline'),
-        }, { returnChanges: true, conflict: 'update' }).run(conn);
-        const insertedVal = changes[0].new_val;
-
-        await r.table('usersFeed').insert({
-          userId: req.user.id,
-          type: 'vote',
-          sourceId: id,
-          table: tbl,
-          timestamp,
-          isCredible,
-          comment,
-        }).run(conn);
-
-        res.json({ votingStatus: 'changed' });
-      }
     } catch (e) {
       next(e);
     }

@@ -159,7 +159,7 @@ class Submit extends Component {
                           <br /><Icon name={result.isCredible ? 'check' : 'warning sign'} />
                         <a href={result.sourceUrl} target="_blank">{result.sourceUrl}</a>
                         <br />is <b>{result.isCredible ? 'A CREDIBLE' : 'NOT A CREDIBLE'} SOURCE</b>
-                        <p>Credibility score: ({result.pct.toFixed(2)}%)</p>
+                        <p>Confidence: ({result.isCredible ? result.pct.toFixed(2) : (100 - result.pct).toFixed(2)}%)</p>
                       </div>
                       <h4>NOTE: This result was not verified by a journalist and it might not be accurate</h4>
                     </span>

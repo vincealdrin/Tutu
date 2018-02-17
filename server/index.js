@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const compression = require('compression');
 const passport = require('passport');
 const bodyParser = require('body-parser');
+const Wappalyzer = require('wappalyzer');
 const http = require('http');
 const errorhandler = require('errorhandler');
 const cors = require('cors');
@@ -16,6 +17,26 @@ const routes = require('./routes');
 const { startIoClient, startIoAdmin } = require('./socket-server');
 const r = require('rethinkdb');
 const { getWotReputation, analyzeDomain, getDomainCreationDate } = require('./utils');
+
+const options = {
+  debug: false,
+  delay: 500,
+  maxDepth: 3,
+  maxUrls: 10,
+  maxWait: 5000,
+  recursive: true,
+  userAgent: 'Wappalyzer',
+};
+
+// const wappalyzer = new Wappalyzer('http://globalnation.inquirer.net/164127/breaking-china-named-5-undersea-features-ph-rise-expert?utm_campaign=Echobox&utm_medium=Social&utm_source=Facebook#link_time=1518511190', options);
+
+// wappalyzer.analyze()
+//   .then((json) => {
+//     console.log(json);
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
 
 const app = express();
 const server = http.Server(app);
@@ -52,19 +73,16 @@ initDb(async (conn) => {
   // const s = await r.table('sources').run(conn);
   // const z = await s.toArray();
 
-  // z.forEach(async ({
-  //   id, url, isBlogDomain, domainCreationDate,
-  // }) => {
-  // const res = isBlogDomain ? 0 : await getDomainCreationDate(url);
-  // console.log(res);
-  // if (domainCreationDate.getDay() === 70) {
+  // z.forEach(async ({ id, url }) => {
+  //   const domainMeta = analyzeDomain(url);
+  //   const domainCreationDate = domainMeta.isBlogDomain ? null : await getDomainCreationDate(url);
+  //   const creationDateExpr = domainCreationDate ? new Date(domainCreationDate) : null;
 
-  // await r.table('sources').get(id).update({
-  //   domainCreationDate: await r.now(),
-  //   // wotReputation: res,
-  //   // ...analyzeDomain(url),
-  // }).run(conn);
-  // }
+  //   await r.table('sources').get(id).update({
+  //     domainCreationDate: creationDateExpr,
+  //     // wotReputation: res,
+  //     ...domainMeta,
+  //   }).run(conn);
   // });
 
   io.sockets.on('connection', (socket) => {

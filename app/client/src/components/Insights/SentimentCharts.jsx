@@ -1,31 +1,47 @@
 import React, { Component } from 'react';
 import { Menu } from 'semantic-ui-react';
 import { Line, Pie } from 'react-chartjs-2';
-import { getLineDataset } from '../../utils';
+import { getLineDataset, getLineChartOptions, getPieChartOptions } from '../../utils';
 
-const ActiveMenuItem = ({
-  activeItem,
-  sentimentLineData,
-  sentimentPieData,
-}) => {
-  switch (activeItem) {
-    case 'line': {
-      return <Line data={sentimentLineData} />;
-    }
-    case 'pie': {
-      return <Pie data={sentimentPieData} />;
-    }
-    default:
-      return <p>No Item</p>;
-  }
-};
 class SentimentCharts extends Component {
   state = { activeItem: 'line' };
 
   componentDidMount() {
     this.props.fetchSentimentInsights();
   }
+
   changeItem = (_, { name }) => this.setState({ activeItem: name });
+
+  renderActiveItem = (
+    sentimentLineData,
+    sentimentPieData,
+  ) => {
+    const { isDatalabelShown, status } = this.props;
+    const { activeItem } = this.state;
+
+    switch (activeItem) {
+      case 'line': {
+        return (
+          <Line
+            data={sentimentLineData}
+            options={getLineChartOptions(isDatalabelShown)}
+            redraw={!status.pending}
+          />
+        );
+      }
+      case 'pie': {
+        return (
+          <Pie
+            data={sentimentPieData}
+            options={getPieChartOptions(isDatalabelShown)}
+            redraw={!status.pending}
+          />
+        );
+      }
+      default:
+        return <p>No Item</p>;
+    }
+  };
 
   render() {
     const { activeItem } = this.state;
@@ -79,11 +95,7 @@ class SentimentCharts extends Component {
           <Menu.Item name="line" active={activeItem === 'line'} onClick={this.changeItem} />
           <Menu.Item name="pie" active={activeItem === 'pie'} onClick={this.changeItem} />
         </Menu>
-        <ActiveMenuItem
-          activeItem={activeItem}
-          sentimentPieData={sentimentPieData}
-          sentimentLineData={sentimentLineData}
-        />
+        {this.renderActiveItem(sentimentLineData, sentimentPieData)}
       </div>
     );
   }

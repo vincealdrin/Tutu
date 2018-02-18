@@ -179,3 +179,46 @@ export const getSentimentColor = (sentiment) => {
   }
   return '';
 };
+
+export const getLineChartOptions = (isDatalabelShown) => ({
+  plugins: {
+    datalabels: isDatalabelShown ? {
+      backgroundColor(context) {
+        return context.dataset.backgroundColor;
+      },
+      borderRadius: 4,
+      color: 'black',
+      font: {
+        weight: 'bold',
+      },
+      formatter: Math.round,
+    } : false,
+  },
+});
+
+export const getPieChartOptions = (isDatalabelShown) => ({
+  plugins: {
+    datalabels: isDatalabelShown ? {
+      color: 'black',
+      font: {
+        weight: 'bold',
+      },
+      formatter: Math.round,
+    } : false,
+  },
+});
+
+export const getBarChartOptions = (isDatalabelShown) => ({
+  plugins: {
+    datalabels: isDatalabelShown ? {
+      color: 'black',
+      font: {
+        weight: 'bold',
+      },
+      anchor: 'end',
+      align: 'left',
+      formatter: Math.round,
+    } : false,
+  },
+});
+

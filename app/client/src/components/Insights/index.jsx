@@ -23,7 +23,12 @@ const mapStateToProps = ({
     topOrgs,
     topLocations,
     topKeywords,
-    fetchStatus,
+    fetchSentimentStatus,
+    fetchCategoriesStatus,
+    fetchTopPeopleStatus,
+    fetchTopOrgsStatus,
+    fetchTopLocationsStatus,
+    fetchTopKeywordsStatus,
     isModalOpen,
   },
 }, { isMap }) => ({
@@ -33,7 +38,12 @@ const mapStateToProps = ({
   topOrgs,
   topLocations,
   topKeywords,
-  fetchStatus,
+  fetchSentimentStatus,
+  fetchCategoriesStatus,
+  fetchTopPeopleStatus,
+  fetchTopOrgsStatus,
+  fetchTopLocationsStatus,
+  fetchTopKeywordsStatus,
   isModalOpen,
   isMap,
 });
@@ -50,6 +60,7 @@ class Insights extends Component {
   state = {
     activeCard: 'mainMenu',
     labelDesc: 'Visualized Data',
+    isDatalabelShown: false,
   };
 
   renderSegment = (icon, header, desc) => (
@@ -76,14 +87,23 @@ class Insights extends Component {
       topPeople,
       topOrgs,
       topLocations,
+      fetchSentimentStatus,
+      fetchCategoriesStatus,
+      fetchTopPeopleStatus,
+      fetchTopOrgsStatus,
+      fetchTopLocationsStatus,
+      fetchTopKeywordsStatus,
     } = this.props;
-
-    switch (this.state.activeCard) {
+    const { activeCard, isDatalabelShown } = this.state;
+    console.log(fetchCategoriesStatus);
+    switch (activeCard) {
       case 'Sentiments':
         return (
           <SentimentCharts
             sentiment={sentiment}
             fetchSentimentInsights={this.props.fetchSentimentInsights}
+            isDatalabelShown={isDatalabelShown}
+            status={fetchSentimentStatus}
           />
         );
       case 'Categories':
@@ -91,6 +111,8 @@ class Insights extends Component {
           <CategoriesCharts
             categories={categories}
             fetchCategoriesInsights={this.props.fetchCategoriesInsights}
+            isDatalabelShown={isDatalabelShown}
+            status={fetchCategoriesStatus}
           />
         );
       case 'WordCloud':
@@ -101,6 +123,7 @@ class Insights extends Component {
               value: count,
             }))}
             fetchWordCloud={(count = 200) => this.props.fetchTopInsights('keywords', count)}
+            status={fetchTopKeywordsStatus}
           />
         );
       case 'Top Ten':
@@ -110,6 +133,10 @@ class Insights extends Component {
             topOrgs={topOrgs}
             topLocations={topLocations}
             fetchTopInsights={(field, count = 10) => this.props.fetchTopInsights(field, count)}
+            isDatalabelShown={isDatalabelShown}
+            peopleStatus={fetchTopPeopleStatus}
+            orgsStatus={fetchTopOrgsStatus}
+            locationsStatus={fetchTopLocationsStatus}
           />
         );
       case 'mainMenu':
@@ -118,10 +145,10 @@ class Insights extends Component {
             <Grid columns={2} stackable>
               <Grid.Column>
                 {this.renderSegment(
-                    'smile',
-                    'Sentiments',
-                    'Look at the inclination of people\'s opinions on a certain article either positive, neutral or negative',
-                  )}
+                  'smile',
+                  'Sentiments',
+                  'Look at the inclination of people\'s opinions on a certain article either positive, neutral or negative',
+                )}
               </Grid.Column>
               <Grid.Column>
                 {this.renderSegment(
@@ -155,8 +182,8 @@ class Insights extends Component {
   }
 
   render() {
-    const { activeCard, labelDesc } = this.state;
     const { isModalOpen, isMap } = this.props;
+    const { activeCard, labelDesc, isDatalabelShown } = this.state;
 
     return (
       <Modal
@@ -187,6 +214,15 @@ class Insights extends Component {
         <Modal.Content>
           {this.renderCharts()}
         </Modal.Content>
+        <Modal.Actions>
+          <Button
+            content={`${isDatalabelShown ? 'Hide' : 'Show'} Data Labels`}
+            color={isDatalabelShown ? 'grey' : 'teal'}
+            onClick={() => {
+              this.setState({ isDatalabelShown: !isDatalabelShown });
+            }}
+          />
+        </Modal.Actions>
       </Modal>
     );
   }

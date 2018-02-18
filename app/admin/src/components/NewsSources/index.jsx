@@ -373,6 +373,7 @@ class Sources extends Component {
                 />
               </Button>
             )}
+            hideActions={role !== 'curator'}
             hideAddBtn
             hideDeleteBtn
             initLoad
@@ -441,6 +442,7 @@ class Sources extends Component {
                 />
               </Button>
             )}
+            hideActions={role !== 'curator'}
             hideAddBtn
             hideDeleteBtn
             initLoad

@@ -1,44 +1,61 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Menu } from 'semantic-ui-react';
 import { HorizontalBar, Line, Pie } from 'react-chartjs-2';
-import { getLineDataset } from '../../utils';
+import { getLineDataset, getLineChartOptions, getPieChartOptions, getBarChartOptions } from '../../utils';
 
-const ActiveMenuItem = ({
-  activeItem,
-  categoriesLineData,
-  categoriesPieData,
-  categoriesBarData,
-}) => {
-  switch (activeItem) {
-    case 'line': {
-      return <Line data={categoriesLineData} />;
-    }
-    case 'pie': {
-      return <Pie data={categoriesPieData} />;
-    }
-    case 'horizontal': {
-      return <HorizontalBar data={categoriesBarData} />;
-    }
-    default:
-      return <p>No Item</p>;
-  }
-};
-
-class CategoriesCharts extends Component {
+class CategoriesCharts extends PureComponent {
   state = { activeItem: 'line' };
 
   componentDidMount() {
-    console.log(this.props);
     this.props.fetchCategoriesInsights();
   }
 
   changeItem = (_, { name }) => this.setState({ activeItem: name });
 
-  render() {
+  renderActiveItem = (
+    categoriesLineData,
+    categoriesPieData,
+    categoriesBarData,
+  ) => {
+    const { isDatalabelShown, status } = this.props;
     const { activeItem } = this.state;
-    const {
-      categories = [],
-    } = this.props;
+
+    switch (activeItem) {
+      case 'line': {
+        return (
+          <Line
+            data={categoriesLineData}
+            options={getLineChartOptions(isDatalabelShown)}
+            redraw={!status.pending}
+          />
+        );
+      }
+      case 'pie': {
+        return (
+          <Pie
+            data={categoriesPieData}
+            options={getPieChartOptions(isDatalabelShown)}
+            redraw={!status.pending}
+          />
+        );
+      }
+      case 'horizontal': {
+        return (
+          <HorizontalBar
+            data={categoriesBarData}
+            options={getBarChartOptions(isDatalabelShown)}
+            redraw={!status.pending}
+          />
+        );
+      }
+      default:
+        return <p>No Item</p>;
+    }
+  };
+
+  render() {
+    const { categories = [] } = this.props;
+    const { activeItem } = this.state;
 
     const categoriesLineData = {
       labels: categories.labels,
@@ -48,11 +65,11 @@ class CategoriesCharts extends Component {
           color: '234,95,72',
           data: categories.crimeCount,
         },
-        {
-          label: 'Culture',
-          color: '41,199,202',
-          data: categories.cultureCount,
-        },
+        // {
+        //   label: 'Culture',
+        //   color: '41,199,202',
+        //   data: categories.cultureCount,
+        // },
         {
           label: 'Economy',
           color: '174,18,255',
@@ -118,7 +135,7 @@ class CategoriesCharts extends Component {
     const categoriesPieData = {
       labels: [
         'Crime',
-        'Culture',
+        // 'Culture',
         'Economy',
         'Environment',
         'Health',
@@ -135,7 +152,7 @@ class CategoriesCharts extends Component {
       datasets: [{
         data: [
           categories.crimeCount.reduce((a, b) => (a + b), 0),
-          categories.cultureCount.reduce((a, b) => (a + b), 0),
+          // categories.cultureCount.reduce((a, b) => (a + b), 0),
           categories.econCount.reduce((a, b) => (a + b), 0),
           categories.envCount.reduce((a, b) => (a + b), 0),
           categories.healthCount.reduce((a, b) => (a + b), 0),
@@ -172,7 +189,6 @@ class CategoriesCharts extends Component {
       type: 'horizontalBar',
       labels: [
         'Crime',
-        'Culture',
         'Economy',
         'Environment',
         'Health',
@@ -189,30 +205,22 @@ class CategoriesCharts extends Component {
       datasets: [
         {
           label: 'Count',
-          backgroundColor: [
-            'rgba(255,99,132,0.2)',
-          ],
-          borderColor: [
-            'rgba(255,99,132,1)',
-          ],
-          hoverBackgroundColor: [
-            'rgba(255,99,132,0.4)',
-          ],
-          hoverBorderColor: [
-            'rgba(255,99,132,1)',
-          ],
+          backgroundColor: 'rgba(255,99,132,0.2)',
+          borderColor: 'rgba(255,99,132,1)',
+          hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+          hoverBorderColor: 'rgba(255,99,132,1)',
           borderWidth: 1,
           barThickness: 1,
           data: [
-            categories.econCount.reduce((a, b) => (a + b), 0),
-            categories.lifeCount.reduce((a, b) => (a + b), 0),
-            categories.sportsCount.reduce((a, b) => (a + b), 0),
-            categories.polCount.reduce((a, b) => (a + b), 0),
-            categories.healthCount.reduce((a, b) => (a + b), 0),
             categories.crimeCount.reduce((a, b) => (a + b), 0),
-            categories.weatherCount.reduce((a, b) => (a + b), 0),
-            categories.cultureCount.reduce((a, b) => (a + b), 0),
+            // categories.cultureCount.reduce((a, b) => (a + b), 0),
+            categories.econCount.reduce((a, b) => (a + b), 0),
             categories.envCount.reduce((a, b) => (a + b), 0),
+            categories.healthCount.reduce((a, b) => (a + b), 0),
+            categories.lifeCount.reduce((a, b) => (a + b), 0),
+            categories.polCount.reduce((a, b) => (a + b), 0),
+            categories.sportsCount.reduce((a, b) => (a + b), 0),
+            categories.weatherCount.reduce((a, b) => (a + b), 0),
             categories.busFinCount.reduce((a, b) => (a + b), 0),
             categories.disAccCount.reduce((a, b) => (a + b), 0),
             categories.entArtCount.reduce((a, b) => (a + b), 0),
@@ -230,12 +238,7 @@ class CategoriesCharts extends Component {
           <Menu.Item name="pie" active={activeItem === 'pie'} onClick={this.changeItem} />
           <Menu.Item name="horizontal" active={activeItem === 'horizontal'} onClick={this.changeItem} />
         </Menu>
-        <ActiveMenuItem
-          activeItem={activeItem}
-          categoriesLineData={categoriesLineData}
-          categoriesPieData={categoriesPieData}
-          categoriesBarData={categoriesBarData}
-        />
+        {this.renderActiveItem(categoriesLineData, categoriesPieData, categoriesBarData)}
       </div>
     );
   }

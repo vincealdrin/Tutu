@@ -1,28 +1,7 @@
 import React, { Component } from 'react';
 import { Menu } from 'semantic-ui-react';
 import { HorizontalBar } from 'react-chartjs-2';
-import { getLineDataset } from '../../utils';
-
-const ActiveMenuItem = ({
-  activeItem,
-  peopleBarData,
-  orgsBarData,
-  locationsBarData,
-}) => {
-  switch (activeItem) {
-    case 'people': {
-      return <HorizontalBar data={peopleBarData} />;
-    }
-    case 'organizations': {
-      return <HorizontalBar data={orgsBarData} />;
-    }
-    case 'locations': {
-      return <HorizontalBar data={locationsBarData} />;
-    }
-    default:
-      return <p>No Item</p>;
-  }
-};
+import { getLineDataset, getBarChartOptions } from '../../utils';
 
 class TopTen extends Component {
   state = { activeItem: 'people' };
@@ -34,6 +13,53 @@ class TopTen extends Component {
   }
 
   changeItem = (_, { name }) => this.setState({ activeItem: name });
+
+  renderActiveItem = (
+    peopleBarData,
+    orgsBarData,
+    locationsBarData,
+  ) => {
+    const {
+      isDatalabelShown,
+      peopleStatus,
+      orgsStatus,
+      locationsStatus,
+    } = this.props;
+    const { activeItem } = this.state;
+
+    switch (activeItem) {
+      case 'people': {
+        return (
+          <HorizontalBar
+            data={peopleBarData}
+            options={getBarChartOptions(isDatalabelShown)}
+            redraw={!peopleStatus.pending}
+          />
+        );
+      }
+      case 'organizations': {
+        return (
+          <HorizontalBar
+            data={orgsBarData}
+            options={getBarChartOptions(isDatalabelShown)}
+            redraw={!orgsStatus.pending}
+          />
+        );
+      }
+      case 'locations': {
+        return (
+          <HorizontalBar
+            data={locationsBarData}
+            options={getBarChartOptions(isDatalabelShown)}
+            redraw={!locationsStatus.pending}
+          />
+        );
+      }
+      default:
+        return <p>No Item</p>;
+    }
+  };
+
   render() {
     const { activeItem } = this.state;
     const {
@@ -122,12 +148,7 @@ class TopTen extends Component {
           <Menu.Item name="organizations" active={activeItem === 'organizations'} onClick={this.changeItem} />
           <Menu.Item name="locations" active={activeItem === 'locations'} onClick={this.changeItem} />
         </Menu>
-        <ActiveMenuItem
-          activeItem={activeItem}
-          peopleBarData={peopleBarData}
-          orgsBarData={orgsBarData}
-          locationsBarData={locationsBarData}
-        />
+        {this.renderActiveItem(peopleBarData, orgsBarData, locationsBarData)}
       </div>
     );
   }

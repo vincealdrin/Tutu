@@ -6,6 +6,7 @@ import 'react-tippy/dist/tippy.css';
 // import 'semantic-ui-css/semantic.min.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'rc-slider/assets/index.css';
+import 'chartjs-plugin-datalabels';
 import MapView from '../MapView';
 import GridView from '../GridView';
 import './styles.css';

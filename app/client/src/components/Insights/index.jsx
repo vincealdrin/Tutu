@@ -60,7 +60,7 @@ class Insights extends Component {
   state = {
     activeCard: 'mainMenu',
     labelDesc: 'Visualized Data',
-    isDatalabelShown: false,
+    isDatalabelShown: true,
   };
 
   renderSegment = (icon, header, desc) => (
@@ -95,7 +95,7 @@ class Insights extends Component {
       fetchTopKeywordsStatus,
     } = this.props;
     const { activeCard, isDatalabelShown } = this.state;
-    console.log(fetchCategoriesStatus);
+
     switch (activeCard) {
       case 'Sentiments':
         return (

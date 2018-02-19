@@ -15,7 +15,7 @@ class PendingActionButton extends Component {
     const {
       url,
       isCredible,
-      onClick,
+      onVote,
       vote,
       comment,
     } = this.props;
@@ -61,7 +61,9 @@ class PendingActionButton extends Component {
                 <Form style={{ width: '100%' }}>
                   <TextArea
                     placeholder={`Something you can comment about ${urlName}`}
-                    onChange={(_, { value: text }) => this.setState({ text })}
+                    onChange={(_, { value: text }) => {
+                      this.setState({ text });
+                    }}
                   />
                 </Form>
               </div>
@@ -72,14 +74,14 @@ class PendingActionButton extends Component {
             ? (
               <Button
                 color={btnColor}
-                onClick={() => onClick(this.state.text)}
+                onClick={() => onVote(this.state.text)}
                 inverted
               >
                 <Icon name={isCredible ? 'check circle' : 'warning sign'} /> Yes, I will TAG {urlName} as {label} news source
               </Button>
             )
             : (
-              <Button onClick={onClick} inverted>
+              <Button onClick={() => onVote('')} inverted>
                 <Icon name="undo" /> I will UNTAG {urlName} as {label} news source
               </Button>
             )}

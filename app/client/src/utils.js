@@ -200,9 +200,11 @@ export const getPieChartOptions = (isDatalabelShown) => ({
   plugins: {
     datalabels: isDatalabelShown ? {
       color: 'black',
-      font: {
-        weight: 'bold',
-      },
+      // font: {
+      //   weight: 'bold',
+      // },
+      anchor: 'end',
+      align: 'start',
       formatter: Math.round,
     } : false,
   },
@@ -212,9 +214,9 @@ export const getBarChartOptions = (isDatalabelShown) => ({
   plugins: {
     datalabels: isDatalabelShown ? {
       color: 'black',
-      font: {
-        weight: 'bold',
-      },
+      // font: {
+      //   weight: 'bold',
+      // },
       anchor: 'end',
       align: 'left',
       formatter: Math.round,

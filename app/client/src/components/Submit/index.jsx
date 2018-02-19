@@ -92,7 +92,8 @@ class Submit extends Component {
           </Header>
 
           <p className="tutu-description" >
-              Please insert any Article URL from the source to be analyzed by our trained model to see if they are similar to known not credible news sources.
+              Please insert an Article URL from the source to be analyzed by our machine learning model to see if they are similar to known not credible news sources.
+              (Note: Our model was train with articles coming from the Philippines so it might not work well with news sources from other countries)
           </p>
 
           <Input

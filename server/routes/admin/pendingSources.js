@@ -20,7 +20,7 @@ const {
   getTempBrand,
 } = require('../../utils');
 
-module.exports = (conn, io) => {
+module.exports = (conn, { io }) => {
   const tbl = 'pendingSources';
 
   router.get('/:sourceId/votes', async (req, res, next) => {
@@ -268,6 +268,13 @@ module.exports = (conn, io) => {
       console.log(isCredible);
       // if (!matchedVote && (totalVotes + 1) >= majorityCount) {
 
+      const emitData = {
+        userId: req.user.id,
+        votingStatus: '',
+        id,
+        isCredible,
+      };
+
       if (matchedVote && matchedVote.isCredible === isCredible) {
         await r.table('pendingSourceVotes').get(matchedVote.id).delete().run(conn);
 
@@ -280,13 +287,17 @@ module.exports = (conn, io) => {
           comment,
         }).run(conn);
 
-        return res.json({ votingStatus: 'removed' });
+        emitData.votingStatus = 'removed';
+
+        io.emit('pendingSourceVote', emitData);
+
+        return res.json({ votingStatus: emitData.votingStatus });
       }
 
       if (((isCredible && (votes.credible || 0) + 1 >= totalJourns) ||
             (!isCredible && (votes.notCredible || 0) + 1 >= totalJourns)) &&
           ((!matchedVote && totalJourns === 1) ||
-            (matchedVote.isCredible !== isCredible))) {
+            ((matchedVote && matchedVote.isCredible) !== isCredible))) {
         const { changes } = await r.table(tbl)
           .get(id)
           .delete({ returnChanges: true })
@@ -307,7 +318,9 @@ module.exports = (conn, io) => {
           .run(conn);
         const insertedVal = insertedVals[0].new_val;
 
-        res.json({ votingStatus: 'ended' });
+        emitData.votingStatus = 'ended';
+
+        io.emit('pendingSourceVote', emitData);
       } else {
         const { changes } = await r.table('pendingSourceVotes').insert({
           id: r.uuid(id + req.user.id),
@@ -332,8 +345,12 @@ module.exports = (conn, io) => {
           comment,
         }).run(conn);
 
-        res.json({ votingStatus: 'changed' });
+        emitData.votingStatus = 'changed';
+
+        io.emit('pendingSourceVote', emitData);
       }
+
+      res.json({ votingStatus: emitData.votingStatus });
     } catch (e) {
       next(e);
     }

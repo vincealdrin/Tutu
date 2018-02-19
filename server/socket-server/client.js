@@ -31,7 +31,6 @@ module.exports = (io, conn) => {
     }
   });
 
-
   r.table('articles')
     .changes({ includeTypes: true })
     .eqJoin(r.row('new_val')('sourceId'), r.table('sources'))
@@ -47,4 +46,20 @@ module.exports = (io, conn) => {
         }
       });
     });
+
+  // r.table('pendingSourceVotes')
+  //   .changes({ includeTypes: true })
+  //   // .eqJoin(r.row('new_val')('sourceId'), r.table('sources'))
+  //   // .map(mapFeedArticle)
+  //   .run(conn, (err, cursor) => {
+  //     if (err) throw err;
+
+  //     cursor.each((e, feed) => {
+  //       if (e) throw e;
+  //       console.log(feed);
+  //       if (feed.type === 'add') {
+  //         io.emit('', feed.article);
+  //       }
+  //     });
+  //   });
 };

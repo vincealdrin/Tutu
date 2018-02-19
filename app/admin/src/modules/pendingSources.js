@@ -6,6 +6,7 @@ export const ADD_PENDING_SOURCES = 'pendingSources/ADD_PENDING_SOURCES';
 export const UPDATE_PENDING_SOURCE = 'pendingSources/UPDATE_PENDING_SOURCE';
 export const DELETE_PENDING_SOURCES = 'pendingSources/DELETE_PENDING_SOURCES';
 export const VOTE_PENDING_SOURCE = 'pendingSources/VOTE_PENDING_SOURCE';
+export const UPDATE_PENDING_SOURCE_VOTE = 'pendingSources/UPDATE_PENDING_SOURCE_VOTE';
 export const FETCH_PENDING_SOURCE_VOTES = 'pendingSources/FETCH_PENDING_SOURCE_VOTES';
 
 const initialState = {
@@ -62,23 +63,21 @@ const pendingSourcesReducer = (action, state) => (action.votingStatus !== 'ended
       }
 
       if (action.votingStatus === 'removed') {
-        if (action.isCredible) {
-          return {
+        return action.isCredible
+          ? {
             ...pendingSource,
             vote: null,
             credibleVotesCount: hasVotedCredible
               ? credibleVotesCount - 1
               : credibleVotesCount,
+          }
+          : {
+            ...pendingSource,
+            vote: null,
+            notCredibleVotesCount: hasVotedNotCredible
+              ? notCredibleVotesCount - 1
+              : notCredibleVotesCount,
           };
-        }
-
-        return {
-          ...pendingSource,
-          vote: null,
-          notCredibleVotesCount: hasVotedNotCredible
-            ? notCredibleVotesCount - 1
-            : notCredibleVotesCount,
-        };
       }
 
       return {
@@ -123,17 +122,17 @@ export default (state = initialState, action) => {
           : state.totalCount,
         addStatus: updateCrudStatus(action),
       };
-    case UPDATE_PENDING_SOURCE:
-      return {
-        ...state,
-        pendingSources: state.pendingSources.map((source) => {
-          if (source.id === action.sourceId) {
-            return action.updateSource;
-          }
-          return source;
-        }),
-        updateStatus: updateCrudStatus(action),
-      };
+    // case UPDATE_PENDING_SOURCE:
+    //   return {
+    //     ...state,
+    //     pendingSources: state.pendingSources.map((source) => {
+    //       if (source.id === action.sourceId) {
+    //         return action.updateSource;
+    //       }
+    //       return source;
+    //     }),
+    //     updateStatus: updateCrudStatus(action),
+    //   };
     case DELETE_PENDING_SOURCES:
       return {
         ...state,
@@ -151,10 +150,39 @@ export default (state = initialState, action) => {
         pendingSources: action.statusText === 'success'
           ? pendingSourcesReducer(action, state)
           : state.pendingSources,
-        // action.statusText === 'success'
-        //   ? state.pendingSources.filter((source) => action.id !== source.id)
-        //   : state.pendingSources,
         voteStatus: updateCrudStatus(action),
+      };
+    case UPDATE_PENDING_SOURCE_VOTE:
+      return {
+        ...state,
+        pendingSources: action.votingStatus === 'ended'
+          ? state.pendingSources.filter((source) => source.id !== action.pendingSourceId)
+          : state.pendingSources.map((source) => {
+            if (source.id === action.pendingSourceId) {
+              if (action.votingStatus === 'removed') {
+                return action.isCredible
+                  ? {
+                    ...source,
+                    credibleVotesCount: source.credibleVotesCount - 1,
+                  }
+                  : {
+                    ...source,
+                    notCredibleVotesCount: source.notCredibleVotesCount - 1,
+                  };
+              }
+
+              return {
+                ...source,
+                credibleVotesCount: action.isCredible
+                  ? source.credibleVotesCount + 1
+                  : source.credibleVotesCount,
+                notCredibleVotesCount: !action.isCredible
+                  ? source.notCredibleVotesCount + 1
+                  : source.notCredibleVotesCount,
+              };
+            }
+            return source;
+          }),
       };
     default:
       return state;
@@ -283,3 +311,16 @@ export const fetchPendingSourceVotes = (sourceId, isPending, isCredible) =>
       return e;
     }
   });
+
+export const updatePendingSourceVote = ({
+  id,
+  votingStatus,
+  isCredible,
+  userId,
+}) => ({
+  type: UPDATE_PENDING_SOURCE_VOTE,
+  pendingSourceId: id,
+  votingStatus,
+  isCredible,
+  userId,
+});

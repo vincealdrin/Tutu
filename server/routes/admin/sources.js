@@ -203,7 +203,7 @@ module.exports = (conn, io) => {
 
         votingStatus = 'removed';
       } else if (votes + 1 === totalJourns || (!matchedVote && totalJourns === 1)) {
-        await r.table('sourceRevotes').filter(r.row('sourceId').eq(id)).delete().run(conn);
+        await r.table('pendingSourceVotes').filter(r.row('sourceId').eq(id)).delete().run(conn);
         const { changes } = await r.table('sources')
           .get(id)
           .delete({ returnChanges: true })

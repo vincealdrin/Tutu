@@ -57,6 +57,7 @@ class Home extends Component {
 
   componentDidMount() {
     const { socket } = this.props;
+
     this.props.fetchUsersCounts(() => {
       this.props.fetchSourcesCounts(() => {
         this.props.fetchArticlesCounts(() => {
@@ -64,12 +65,14 @@ class Home extends Component {
         });
       });
     });
+
     this.props.fetchTopInsights('people', 10, () => {
       this.props.fetchTopInsights('organizations', 10, () => {
         this.props.fetchTopInsights('locations', 10, () => {
         });
       });
     });
+
     this.props.fetchSourcesSubmit(() => {
       this.props.fetchSentimentInsights(() => {
         this.props.fetchCategoriesInsights();

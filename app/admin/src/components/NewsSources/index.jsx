@@ -30,6 +30,7 @@ import {
   deletePendingSources,
   votePendingSource,
   fetchPendingSourceVotes,
+  updatePendingSourceVote,
 } from '../../modules/pendingSources';
 import './styles.css';
 import { TIME_FORMAT } from '../../constants';
@@ -88,7 +89,7 @@ const mapStateToProps = ({
     totalCount: pendingTotalCount,
   },
   user: {
-    info: { role },
+    info: { role: userRole, id: userId },
   },
   socket,
 }) => ({
@@ -97,9 +98,10 @@ const mapStateToProps = ({
   pendingSources,
   pendingTotalCount,
   socket,
-  role,
+  userRole,
   pendingSourceVotes,
   fetchVotesStatus,
+  userId,
 });
 
 const mapDispatchToProps = (dispatch) => bindActionCreators({
@@ -112,6 +114,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   votePendingSource,
   fetchPendingSourceVotes,
   revoteSource,
+  updatePendingSourceVote,
 }, dispatch);
 
 class Sources extends Component {
@@ -122,6 +125,21 @@ class Sources extends Component {
     focusedUrl: '',
     focusedLabel: '',
   };
+
+  componentDidMount() {
+    const { socket, userId } = this.props;
+
+    socket.on('pendingSourceVote', (vote) => {
+      console.log(vote);
+      if (userId !== vote.userId) {
+        this.props.updatePendingSourceVote(vote);
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    this.props.socket.removeAllListeners();
+  }
 
   getSegmentColor = () => {
     const { focusedLabel } = this.state;
@@ -146,7 +164,7 @@ class Sources extends Component {
       totalCount,
       pendingTotalCount,
       pendingSourceVotes,
-      role,
+      userRole,
       fetchVotesStatus,
     } = this.props;
     const {
@@ -261,7 +279,7 @@ class Sources extends Component {
                   </Label>
                   <PendingActionButton
                     url={url}
-                    onClick={(comment) => {
+                    onVote={(comment) => {
                       this.props.votePendingSource(id, true, comment);
                     }}
                     vote={vote && vote.isCredible ? vote : null}
@@ -273,7 +291,7 @@ class Sources extends Component {
                 <Button as="div" labelPosition="right">
                   <PendingActionButton
                     url={url}
-                    onClick={(comment) => {
+                    onVote={(comment) => {
                       this.props.votePendingSource(id, false, comment);
                     }}
                     vote={vote && !vote.isCredible ? vote : null}
@@ -305,7 +323,7 @@ class Sources extends Component {
                 /> */}
               </Button.Group>
             )}
-            hideActions={role !== 'curator'}
+            hideActions={userRole !== 'curator'}
             hideDeleteBtn
             initLoad
           />
@@ -373,7 +391,7 @@ class Sources extends Component {
                 />
               </Button>
             )}
-            hideActions={role !== 'curator'}
+            hideActions={userRole !== 'curator'}
             hideAddBtn
             hideDeleteBtn
             initLoad
@@ -442,7 +460,7 @@ class Sources extends Component {
                 />
               </Button>
             )}
-            hideActions={role !== 'curator'}
+            hideActions={userRole !== 'curator'}
             hideAddBtn
             hideDeleteBtn
             initLoad

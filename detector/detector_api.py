@@ -21,6 +21,8 @@ AYLIEN_APP_KEY4 = os.environ.get('AYLIEN_APP_KEY4')
 
 proxies = [PROXY_IP, PROXY_IP2, PROXY_IP3]
 
+categorizer = pickle.load(open('categorizer.pkl', 'rb'))
+
 clf = pickle.load(open('detector_clf.pkl', 'rb'))
 body_tfidf = pickle.load(open('detector_body_tfidf.pkl', 'rb'))
 title_tfidf = pickle.load(open('detector_title_tfidf.pkl', 'rb'))
@@ -141,6 +143,19 @@ def predict():
         'worldRank': world_rank,
     })
 
+@app.route('/categorize', methods=['POST'])
+def categorize():
+    body = request.json
+
+    pred_proba = categorizer.predict_proba([body['text']])[0]
+
+    res = []
+    for i in range(len(categorizer.classes_)):
+        res.append({'label': categorizer.classes_[i], 'score': pred_proba[i]})
+
+    res = sorted(res, key=lambda cat: cat['score'], reverse=True)
+
+    return jsonify(res)
 
 if __name__ == '__main__':
     # clf = joblib.load('model.pkl')

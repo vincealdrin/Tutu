@@ -77,7 +77,7 @@ class GridView extends Component {
               this.setState({ page: 0 });
             }, true);
           }}
-          onSourcesTypeToggle={(isSidebarVisible, sourcesType) => {
+          onSourcesTypeChange={(isSidebarVisible, sourcesType) => {
             if (sourcesType === 'credible') {
               this.props.changeSourcesCredible();
             } else {

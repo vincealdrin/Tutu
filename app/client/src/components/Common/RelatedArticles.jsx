@@ -81,7 +81,8 @@ class RelatedArticles extends PureComponent {
     return (
       <Accordion
         defaultActiveIndex={0}
-        panels={panels.slice(0, (isCredible ? 1 : 2))}
+        // panels={panels.slice(0, (isCredible ? 1 : 2))}
+        panels={panels.slice((isCredible ? 0 : 1), (isCredible ? 1 : 2))}
         style={{ margin: '1rem 0' }}
       />
     );

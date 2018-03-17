@@ -6,6 +6,7 @@ export const ADD_SOURCES = 'sources/ADD_SOURCES';
 export const UPDATE_SOURCE = 'sources/UPDATE_SOURCE';
 export const DELETE_SOURCES = 'sources/DELETE_SOURCE';
 export const REVOTE_SOURCE = 'pendingSources/REVOTE_SOURCE';
+export const UPDATE_REVOTE_SOURCE = 'pendingSources/UPDATE_REVOTE_SOURCE';
 
 const initialState = {
   sources: [],
@@ -80,6 +81,29 @@ export default (state = initialState, action) => {
         sources: action.statusText === 'success' ? sourcesReducer(action, state) : state.sources,
         revoteStatus: updateCrudStatus(action),
       };
+    case UPDATE_REVOTE_SOURCE:
+      return {
+        ...state,
+        sources: action.votingStatus === 'ended'
+          ? state.sources.filter((source) => source.id !== action.sourceId)
+          : state.sources.map((source) => {
+            if (source.id === action.sourceId) {
+              if (action.votingStatus === 'removed') {
+                return {
+                  ...source,
+                  votesCount: source.votesCount - 1,
+                };
+              }
+
+              return {
+                ...source,
+                votesCount: source.votesCount + 1,
+              };
+            }
+            return source;
+          }),
+      };
+
     default:
       return state;
   }
@@ -186,3 +210,15 @@ export const revoteSource = (sourceId, comment) =>
       return e;
     }
   });
+
+export const updateSourceRevote = ({
+  id,
+  userId,
+  votingStatus,
+}) => ({
+  type: UPDATE_REVOTE_SOURCE,
+  sourceId: id,
+  votingStatus,
+  userId,
+});
+

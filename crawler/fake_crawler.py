@@ -20,8 +20,8 @@ from urllib.parse import urldefrag, urlparse
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dotenv import load_dotenv, find_dotenv
 from db import get_locations, get_provinces, get_one, insert_article, insert_log, get_uuid, get_rand_sources, get_sources, insert_item
-from utils import PH_TIMEZONE, search_locations, search_authors, get_publish_date, sleep, get_popularity, get_proxy, clean_url
-from aylien import categorize, get_rate_limits
+from utils import PH_TIMEZONE, search_locations, search_authors, get_publish_date, sleep, get_popularity, get_proxy, clean_url, categorize
+# from aylien import categorize, get_rate_limits
 from nlp import get_entities, summarize2
 from nlp.keywords import parse_topics
 from fake_useragent import UserAgent
@@ -125,8 +125,6 @@ while True:
             continue
 
         for article in source.articles:
-            repeat_categorize = True
-
             start_time = time.clock()
             sleep(slp_time)
 
@@ -163,41 +161,10 @@ while True:
                 if len(title_split) != 1:
                     title = title_split[0].strip()
 
-                while repeat_categorize:
-                    categories, body = categorize(article.url, True)
-
-                    if categories == 'API LIMIT':
-                        print('REACHED AYLIEN LIMIT')
-                        insert_log(
-                            source_id, 'articleCrawl', 'error',
-                            float(time.clock() - start_time), {
-                                'errorMessage':
-                                'REACHED AYLIEN LIMIT (1 HOUR SLEEP)',
-                                'crawlerName':
-                                'not credible crawler'
-                            })
-                        repeat_categorize = True
-                        sleep(3600)
-                    else:
-                        repeat_categorize = False
-
-                if categories is None and body is None:
-                    if PY_ENV == 'development':
-                        print('\n(CAN\'T PARSE BODY) Skipped: ' +
-                              str(article.url) + '\n')
-                    slp_time = insert_log(
-                        source_id, 'articleCrawl', 'error',
-                        float(time.clock() - start_time), {
-                            'articleUrl': article.url,
-                            'articleTitle': title,
-                            'errorMessage': 'CAN\'T PARSE BODY',
-                            'crawlerName': 'not credible crawler'
-                        })
-                    insert_item({'id': article.id}, 'errorArticles')
-                    continue
 
                 pattern = re.compile(source.brand, re.IGNORECASE)
-                body = pattern.sub('', body)
+                body = pattern.sub('', article.text)
+                categories = categorize(body)
 
                 if len(body.split()) < 50:
                     if PY_ENV == 'development':

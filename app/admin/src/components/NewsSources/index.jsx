@@ -23,6 +23,7 @@ import {
   addSources,
   deleteSources,
   revoteSource,
+  updateSourceRevote,
 } from '../../modules/sources';
 import {
   fetchPendingSources,
@@ -115,6 +116,7 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchPendingSourceVotes,
   revoteSource,
   updatePendingSourceVote,
+  updateSourceRevote,
 }, dispatch);
 
 class Sources extends Component {
@@ -133,6 +135,15 @@ class Sources extends Component {
       console.log(vote);
       if (userId !== vote.userId) {
         this.props.updatePendingSourceVote(vote);
+      }
+    });
+
+    socket.on('sourceRevote', (revote) => {
+      console.log(revote);
+      if (userId !== revote.userId) {
+        console.log('ohyy');
+        console.log(this.props.updateSourceRevote);
+        this.props.updateSourceRevote(revote);
       }
     });
   }

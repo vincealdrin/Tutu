@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import time
-from requests import get
+from requests import get, post
 import re
 import rethinkdb as r
 from datetime import datetime
@@ -12,6 +12,7 @@ import asyncio
 from proxybroker import Broker
 import random
 import copy
+import json
 
 SHARED_COUNT_API_KEY = os.environ.get('SHARED_COUNT_API_KEY')
 PROXY_IP = os.environ.get('PROXY_IP')
@@ -37,6 +38,12 @@ def sleep(slp_time):
             print('\n> ' + str(slp_time) + 's sleep...\n')
         time.sleep(slp_time)
 
+def categorize(text):
+    headers = {'Content-type': 'application/json'}
+    data = {'text': text}
+    res = post('http://localhost:5001/categorize', data=json.dumps(data), headers=headers)
+
+    return res.json()
 
 def get_reddit_shared_count(url):
     headers = {'User-Agent': UserAgent().random}

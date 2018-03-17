@@ -162,7 +162,9 @@ class Submit extends Component {
                         <br />is <b>{result.isCredible ? 'A CREDIBLE' : 'NOT A CREDIBLE'} SOURCE</b>
                         <p>Confidence: ({result.isCredible ? result.pct.toFixed(2) : (100 - result.pct).toFixed(2)}%)</p>
                       </div>
-                      <h4>NOTE: This result was not verified by a journalist and it might not be accurate</h4>
+                      {!result.verifiedRes || result.isCredible !== (result.verifiedRes && result.verifiedRes.isCredible) ? (
+                        <h4>NOTE: This result was not verified by a journalist and it might not be accurate</h4>
+                      ) : null}
                     </span>
                   </Message.Header>
                 </Message>

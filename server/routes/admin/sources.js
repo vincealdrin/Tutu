@@ -17,7 +17,7 @@ const {
   getWotReputation,
 } = require('../../utils');
 
-module.exports = (conn, io) => {
+module.exports = (conn, { io }) => {
   const tbl = 'sources';
 
   router.get('/', async (req, res, next) => {
@@ -203,6 +203,7 @@ module.exports = (conn, io) => {
 
         votingStatus = 'removed';
       } else if (votes + 1 === totalJourns || (!matchedVote && totalJourns === 1)) {
+        await r.table('sourceRevotes').filter(r.row('sourceId').eq(id)).delete().run(conn);
         await r.table('pendingSourceVotes').filter(r.row('sourceId').eq(id)).delete().run(conn);
         const { changes } = await r.table('sources')
           .get(id)
@@ -228,6 +229,8 @@ module.exports = (conn, io) => {
           timestamp,
         }).run(conn);
       }
+
+      io.emit('sourceRevote', { userId: req.user.id, id, votingStatus });
 
       await r.table('usersFeed').insert({
         userId: req.user.id,

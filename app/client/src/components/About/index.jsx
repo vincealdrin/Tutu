@@ -35,6 +35,12 @@ class About extends Component {
                 href="https://fb.com/tutunewsph"
               />
               <Icon name="twitter" size="large" /> */}
+              <a href="https://www.facebook.com/tutunewsph" target="_blank">
+                <Icon
+                  name="facebook"
+                  size="large"
+                />
+              </a>
               <a href="mailto:tutunewsph@gmail.com">
                 <Icon
                   name="mail"

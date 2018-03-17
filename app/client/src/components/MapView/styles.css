@@ -92,13 +92,14 @@
 
 .hovered {
   left: -27px !important;
+  z-index: 99999999999;
+  transition: all 0.141592654s ease-in-out;
 }
 
 .simple-marker-icon {
   position: absolute;
   bottom: 1px;
   left: -13.5px;
-  transition: line-height 0.141592654s ease-in-out, font-size 0.141592654s ease-in-out, vertical-align 0.141592654s ease-in-out, left 0.141592654s ease-in-out;
 }
 
 .tippy-tooltip {

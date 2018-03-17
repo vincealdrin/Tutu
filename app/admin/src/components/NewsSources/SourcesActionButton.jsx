@@ -73,7 +73,7 @@ class SourcesActionButton extends Component {
               </Button>
             )
             : (
-              <Button onClick={onClick} inverted>
+              <Button onClick={() => onClick()} inverted>
                 <Icon name="undo" /> I DON&apos;T WANT A REVOTE for {urlName}
               </Button>
             )}

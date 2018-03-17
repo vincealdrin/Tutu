@@ -137,6 +137,7 @@ module.exports = (conn, io) => {
         .eqJoin(r.row('sourceId'), r.table('sources'))
         .filter(r.row('right')('isReliable').eq(isCredible === 'yes')
           .and(r.row('left')('publishDate')
+            // .ge(r.now().inTimezone(PH_TIMEZONE).sub((isCredible === 'yes' ? 11 : 2) * DAY_IN_SECONDS))))
             .ge(r.now().inTimezone(PH_TIMEZONE).sub(2 * DAY_IN_SECONDS))))
         .map((join) => ({
           id: join('left')('id'),

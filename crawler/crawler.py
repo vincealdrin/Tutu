@@ -68,7 +68,7 @@ while True:
         if PY_ENV == 'production':
             # config.browser_user_agent = UserAgent().random
             config.browser_user_agent = 'Tutubot/1.0'
-            config.proxies = proxy
+            # config.proxies = proxy
 
         try:
             source = newspaper.build(url, config=config)

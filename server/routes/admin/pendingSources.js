@@ -294,8 +294,11 @@ module.exports = (conn, { io }) => {
         return res.json({ votingStatus: emitData.votingStatus });
       }
 
-      if (((isCredible && (votes.credible || 0) + 1 >= totalJourns) ||
-            (!isCredible && (votes.notCredible || 0) + 1 >= totalJourns)) &&
+      const matchedCredibleVotes = (votes.credible || 0) + 1;
+      const matchedNotCredibleVotes = (votes.credible || 0) + 1;
+
+      if (((isCredible && matchedCredibleVotes >= totalJourns) ||
+            (!isCredible && matchedNotCredibleVotes >= totalJourns)) &&
           ((!matchedVote && totalJourns === 1) ||
             ((matchedVote && matchedVote.isCredible) !== isCredible))) {
         const { changes } = await r.table(tbl)
@@ -309,7 +312,7 @@ module.exports = (conn, { io }) => {
 
         const newSource = {
           ...pendingSource,
-          isReliable: votes.credible + 1 === totalJourns,
+          isReliable: matchedCredibleVotes === totalJourns,
           timestamp,
         };
 

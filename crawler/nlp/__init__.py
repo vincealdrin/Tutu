@@ -14,6 +14,7 @@ from requests.exceptions import Timeout
 non_org = ['Purok', 'CNN']
 non_person = ['Brgy']
 def get_entities(text):
+    # return set(), set(), False
     sttok = CoreNLPTokenizer(url='http://localhost:9000')
     stner = CoreNLPNERTagger(url='http://localhost:9000')
 

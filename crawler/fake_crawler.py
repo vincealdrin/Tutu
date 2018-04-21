@@ -66,7 +66,7 @@ while True:
 
         if PY_ENV == 'production':
             config.browser_user_agent = UserAgent().random
-            config.proxies = proxy
+            # config.proxies = proxy
 
         try:
             source = newspaper.build(url, config=config)
@@ -368,6 +368,8 @@ while True:
                     'locations': matched_locations,
                     'categories': categories,
                     'sentiment': sentiment,
+                    'organizations': organizations,
+                    'people': people,
                     'organizations': organizations,
                     'people': people,
                     'popularity': popularity,

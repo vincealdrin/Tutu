@@ -295,10 +295,11 @@ module.exports = (conn, { io }) => {
       }
 
       const matchedCredibleVotes = (votes.credible || 0) + 1;
-      const matchedNotCredibleVotes = (votes.credible || 0) + 1;
+      const matchedNotCredibleVotes = (votes.notCredible || 0) + 1;
+      const isCredibleSource = isCredible && matchedCredibleVotes >= totalJourns;
+      const isNotCredibleSource = !isCredible && matchedNotCredibleVotes >= totalJourns;
 
-      if (((isCredible && matchedCredibleVotes >= totalJourns) ||
-            (!isCredible && matchedNotCredibleVotes >= totalJourns)) &&
+      if ((isCredibleSource || isNotCredibleSource) &&
           ((!matchedVote && totalJourns === 1) ||
             ((matchedVote && matchedVote.isCredible) !== isCredible))) {
         const { changes } = await r.table(tbl)
@@ -312,7 +313,7 @@ module.exports = (conn, { io }) => {
 
         const newSource = {
           ...pendingSource,
-          isReliable: matchedCredibleVotes === totalJourns,
+          isReliable: isCredibleSource,
           timestamp,
         };
 

@@ -1,7 +1,11 @@
 # TUTÛ 🗺️
-TUTÛ is an interactive map of articles from news portals in the Philippines. It aggregates articles from our list of news portals and extracts information in each articles through Natural Language Processing. TUTÛ also features a news portal analyzer which scores the credibility of a news portal and its content using a trained machine-learning model.
+This project is a partial fulfillment of the requirements for the Holy Angel University degree B.S in Information Technology with Area of Specialization in Web Development.
+
+## Summary
+TUTÛ is an interactive map of articles from news portals in the Philippines. It aggregates articles in a list of news portals and extracts information in each articles through Natural Language Processing. TUTÛ also features a news portal analyzer which scores the credibility of a news portal and its content using a trained machine-learning model. You can learn more about it [here](https://www.esquiremag.ph/culture/cars-and-tech/tutunews-com-identifies-credible-and-fake-news-sites-a00225-20180131) and you can ask questions [here](https://www.facebook.com/tutunewsph).
 
 ## TUTÛ means “true” or “truth” in Kapampangan language.
+
 
 ## Notable Features
 - - -

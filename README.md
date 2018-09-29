@@ -19,7 +19,7 @@ An Interactive Map of Credible News in the Philippines.
 ![Popular and Recent News gif](./gifs/pop-rec-news.gif)
 
 ### Visualized Data
-![Visualized Data] gif(./gifs/vis.gif)
+![Visualized Data gif](./gifs/vis.gif)
 
 ### Detector
 ![Detector gif](./gifs/detector.gif)

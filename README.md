@@ -1,5 +1,5 @@
 # TUTÛ 🗺️
-An Interactive Map of Credible News in the Philippines.
+TUTÛ is an interactive map of articles from news portals in the Philippines. It aggregates articles from our list of news portals and extracts information in each articles through Natural Language Processing. TUTÛ also features a news portal analyzer which scores the credibility of a news portal and its content using a trained machine-learning model.
 
 ## TUTÛ means “true” or “truth” in Kapampangan language.
 

@@ -17,7 +17,7 @@
     "chartjs-plugin-datalabels": "^0.2.0",
     "google-map-react": "^0.26.0",
     "history": "^4.7.2",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.19",
     "moment": "^2.20.1",
     "nprogress": "^0.2.0",
     "points-cluster": "^0.1.4",

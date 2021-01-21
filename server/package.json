@@ -29,7 +29,7 @@
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "rethinkdb": "^2.3.3",
-    "socket.io": "^2.0.4",
+    "socket.io": "^2.4.0",
     "valid-url": "^1.0.9",
     "wappalyzer": "^5.4.8",
     "whois": "^2.5.9",
